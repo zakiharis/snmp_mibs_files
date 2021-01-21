@@ -1,0 +1,554 @@
+PCI-HOTPLUG-MIB DEFINITIONS ::= BEGIN
+
+--
+-- PCI HOTPLUG MIB
+--
+--
+-- $Copyright$
+-- Copyright (C) Siemens AG 1998
+-- Copyright (C) Fujitsu Siemens Computers GmbH 2001
+-- All rights reserved
+--
+--
+
+--
+-- Update History:
+--   07/24/98        Initial version 
+--   10/12/98        Traps for SCSI devices Hot Plug added
+--                   New board state added : Non Hot Pluggable
+--   26/02/99        Trap numbers changed ( conflict with NT cluster MIB)
+--					 prefix "sie" added  to each MIB node and object name 
+--   27/05/99		 siePciHotPlugSlotCardStartStop suppressed
+
+
+
+IMPORTS
+    OBJECT-TYPE						FROM RFC1212-MIB
+    TRAP-TYPE						FROM RFC1215-MIB
+    DisplayString					FROM RFC1213-MIB
+    enterprises						FROM RFC1155-SMI;
+
+
+-- Trap IDs for all ServerView MIBs:
+-- Trap enterprise is "sniServerMgmt".
+
+-- SNI Trap MIB:            000..199, 300..399  (enterprise "sni"!!)
+-- SNI Mylex MIB:           200..299
+-- SNI ServerControl MIB:   600..699
+-- SNI ServerView MIB:      700..749  
+-- SNI Harddisk MIB:        750..799
+-- SNI NT Cluster MIB		800..999
+-- Siemens PCI HotPlug		1000..1099 (this MIB)
+
+
+-- SNI Server Management MIB nodes
+
+	sni					OBJECT IDENTIFIER       ::= { enterprises    231 }
+
+	sniProductMibs		OBJECT IDENTIFIER       ::= { sni              2 }
+	sniExtensions		OBJECT IDENTIFIER       ::= { sniProductMibs  10 }
+	sniServerMgmt		OBJECT IDENTIFIER		::= { sniExtensions    2 }
+	sniInventory		OBJECT IDENTIFIER       ::= { sniServerMgmt    1 }
+	sniCommon			OBJECT IDENTIFIER		::= { sniServerMgmt    2 }
+	  sniBios			OBJECT IDENTIFIER		::= { sniCommon        1 }
+	  sniEisa			OBJECT IDENTIFIER		::= { sniCommon        2 }
+	  sniHd				OBJECT IDENTIFIER		::= { sniCommon        3 }
+	  sniBus			OBJECT IDENTIFIER		::= { sniCommon        4 }
+	  sniServerControl	OBJECT IDENTIFIER		::= { sniCommon        5 }
+	  sieHotPlug		OBJECT IDENTIFIER       ::= { sniCommon		   6 }
+	sniPcSpecific		OBJECT IDENTIFIER		::= { sniServerMgmt    3 }
+	sniScb				OBJECT IDENTIFIER		::= { sniServerMgmt    4 }
+	sniOsSpecific		OBJECT IDENTIFIER		::= { sniServerMgmt    5 }
+	  sniNetware		OBJECT IDENTIFIER		::= { sniOsSpecific    1 }
+	  sniWinNt			OBJECT IDENTIFIER		::= { sniOsSpecific    2 }
+	  sniOs2			OBJECT IDENTIFIER		::= { sniOsSpecific    3 }
+	  sniUnix			OBJECT IDENTIFIER		::= { sniOsSpecific    4 }
+	sniOemComponents	OBJECT IDENTIFIER		::= { sniServerMgmt    6 }
+	  sniOemDpt			OBJECT IDENTIFIER		::= { sniOemComponents 1 }
+	  sniOemMylex		OBJECT IDENTIFIER		::= { sniOemComponents 2 }
+	    sniMlxDiskArray	OBJECT IDENTIFIER		::= { sniOemMylex      1 }
+	sniSecurity			OBJECT IDENTIFIER		::= { sniServerMgmt    7 }
+	  sniSmSecurity		OBJECT IDENTIFIER		::= { sniSecurity      1 }
+	sniServerView		OBJECT IDENTIFIER       ::= { sniServerMgmt    8 }
+	sniTrapMib			OBJECT IDENTIFIER       ::= { sniExtensions    5 }
+
+
+
+
+
+
+-------------------------------------------------------------------------- 
+--                                                                      --
+-- HOTPLUG MIB Groups                                                   --
+--                                                                      --
+--------------------------------------------------------------------------
+
+    sieHotPlugAgent 			OBJECT IDENTIFIER ::= { sieHotPlug 1 }
+    siePciHotPlugSlot 			OBJECT IDENTIFIER ::= { sieHotPlug 2 }
+	siePciHotPlugTrapInfo		OBJECT IDENTIFIER ::= { sieHotPlug 3 }
+	sieDeviceHotPlugTrapInfo	OBJECT IDENTIFIER ::= { sieHotPlug 4 }
+
+
+
+
+--------------------------------------------------------------------------
+--                           GROUP sieHotPlugAgent                      --
+--                                                                      --
+-- Agent specific version information                                   --
+--                                                                      --
+--------------------------------------------------------------------------   
+ 
+
+sieHotPlugAgentVersionMajor OBJECT-TYPE
+	SYNTAX       INTEGER(0..9)
+	ACCESS       read-only
+	STATUS       mandatory
+	DESCRIPTION  "Major version number of the MIB"
+	::= { sieHotPlugAgent 1 }
+
+
+sieHotPlugAgentVersionMinor OBJECT-TYPE
+	SYNTAX       INTEGER(0..99)
+	ACCESS       read-only
+	STATUS       mandatory
+	DESCRIPTION  "Minor version number of the MIB"
+	::= { sieHotPlugAgent 2 }
+
+ 
+ 
+--------------------------------------------------------------------------
+--                           GROUP siePciHotPlugSlot                       --
+--                                                                      --
+-- PCI Hot Plug slot status and information                             --
+--                                                                      --
+--------------------------------------------------------------------------      
+    
+    
+siePciHotPlugNumberSlots OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION "Number of Hot Plug slots in the system; -1 if unknown."
+	::= { siePciHotPlugSlot 1}
+
+
+siePciHotPlugSlotTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF SiePciHotPlugSlotEntry
+	ACCESS not-accessible
+	STATUS mandatory
+	DESCRIPTION "Table that contains the Hot Plug slot entries."
+	::= { siePciHotPlugSlot 2 }
+ 
+
+siePciHotPlugSlotEntry OBJECT-TYPE
+	SYNTAX SiePciHotPlugSlotEntry
+	ACCESS not-accessible
+	STATUS mandatory
+	DESCRIPTION "Entry of PCI HotPlug Slot ."
+	INDEX { siePciHotPlugSlotLogicalIdentifier }
+	::= { siePciHotPlugSlotTable 1 }
+
+    
+SiePciHotPlugSlotEntry ::=
+        SEQUENCE {
+		siePciHotPlugSlotLogicalIdentifier
+			INTEGER,
+		siePciHotPlugSlotPhysicalSlotNumber
+			INTEGER,
+		siePciHotPlugSlotBusNumber
+			INTEGER,
+		siePciHotPlugSlotDeviceNumber
+			INTEGER,
+		siePciHotPlugSlotIs64Bit
+			INTEGER,
+		siePciHotPlugSlotFrequency
+			INTEGER,
+		siePciHotPlugSlotState
+			INTEGER,
+		siePciHotPlugSlotCardPresent
+			INTEGER,
+		siePciHotPlugSlotCardLockSwitch
+			INTEGER,
+		siePciHotPlugSlotCardName
+			DisplayString,
+		siePciHotPlugSlotCardFrequency
+			INTEGER,
+		siePciHotPlugSlotCardState
+			INTEGER,
+		siePciHotPlugSlotPowerLED
+			INTEGER,
+		siePciHotPlugSlotAttentionLED
+			INTEGER
+	}
+
+
+siePciHotPlugSlotLogicalIdentifier OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION "Logical Identifier to uniquely identify a Hot Plug slot; -1 if unknown."
+	::= { siePciHotPlugSlotEntry 1}
+
+
+siePciHotPlugSlotPhysicalSlotNumber OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION "Physical Slot Number; -1 if unknown."
+	::= { siePciHotPlugSlotEntry 2 }
+
+
+siePciHotPlugSlotBusNumber OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION "PCI Bus Number; -1 if unknown."
+	::= { siePciHotPlugSlotEntry 3}
+
+
+siePciHotPlugSlotDeviceNumber OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION "PCI Device Number; -1 if unknown."
+	::= { siePciHotPlugSlotEntry 4}
+
+    
+siePciHotPlugSlotIs64Bit OBJECT-TYPE
+	SYNTAX INTEGER { unknown(1), pci-slot64-bit(2), pci-slot32-bit(3)       }
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION "Indicates whether the slot is a 64-bits or a 32-bits PCI slot."
+	::= { siePciHotPlugSlotEntry 5}
+
+
+siePciHotPlugSlotFrequency OBJECT-TYPE
+	SYNTAX INTEGER 
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION "Slot frequency in MHz.It indicates at what frequency the bus 
+				 for this slot is currently operating, regardless of 
+				 whether there is an adapter card in the slot or not,
+				 and whether the slot is on or off; -1 if unknown."
+	::= { siePciHotPlugSlotEntry 6}
+
+
+siePciHotPlugSlotState OBJECT-TYPE
+	SYNTAX INTEGER {unknown(1), on(2), off(3)}
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION "State of the Hot Plug slot:
+					1 - The state of the Hot Plug slot can't be determined.
+					2 - The slot is power ON.
+					3 - The slot is power OFF."
+	::= { siePciHotPlugSlotEntry 7}
+
+
+siePciHotPlugSlotCardPresent OBJECT-TYPE
+	SYNTAX INTEGER {unknown(1),notPresent(2),low(3),medium(4),high(5)}
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION "Adapter Card power requirements.
+				 It returns the information encoded by PRSNT[1:2]# pins,
+				 independent of whether the slot is on or off:
+						1 - The adapter Card power requirements can't be determined
+						2 - No adapter card present
+						3 - Adapter card present, 7.5 W maximum
+						4 - Adapter card present, 15 W maximum
+						5 - Adapter card present, 25 W maximum."
+	::= { siePciHotPlugSlotEntry 8}
+
+
+siePciHotPlugSlotCardLockSwitch OBJECT-TYPE
+	SYNTAX INTEGER {unknown(1),cardLockSwitchOn(2),cardLockSwitchOff(3)}
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION "State of the Card Lock switch of the associated Hot Plug slot.
+				 The Card Lock manages the Mechanical Detect Input 0 (DETECT0# pin) :
+						1 - The state of the card lock switch can't be determined
+				 		2 - The adapter card is locked securely 
+								 -> the power can be applied
+						3 - The card lock is removed
+								The power must be powered down :
+								  - if not (case of a surprise removal) 
+									-> an emergency shutdown of the Hot Plug slot is activated
+								-> the power will not be applied."
+	::= { siePciHotPlugSlotEntry 9}
+
+
+siePciHotPlugSlotCardName OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION "The name of the adapter card associated to the Hot Plug slot,
+				 regardless of the adapter card is in the slot or not,
+				 and whether the Hot Plug slot is on or off.
+				 
+				 If there is no associated adapter card, 
+				 the default string 'no associated adapter card' is returned."
+	::= { siePciHotPlugSlotEntry 10}
+
+
+siePciHotPlugSlotCardFrequency OBJECT-TYPE
+	SYNTAX INTEGER 
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION "Adapter Card frequency capability in MHz.
+				 It indicates whether the card is capable of operating at 66 MHz,independently of
+				 whether the bus is currently operating at 33 MHz or 66 MHz and independently of
+				 whether the slot is turned off or on ; -1 if unknown ."
+	::= { siePciHotPlugSlotEntry 11}
+
+
+siePciHotPlugSlotCardState OBJECT-TYPE
+	SYNTAX INTEGER {unknown(1),
+					ok(2),
+					safeToRemove(3),
+					removed(4),
+					quiesced(5),
+					notReady(6),
+					powerFault(7),
+					nonHotPluggable(8),
+					noAssociatedCard(9)}
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION "State of the adapter card associated to the Hot Plug slot :
+					1 - the state of adapter card can't be determined,
+                        or is none of the following:
+					2 - The adapter card is powered and operational 
+					3 - The Hot Plug slot is power down and isolated from the PCI-bus
+					    -> the adapter card can safely be removed
+					4 - The adapter card is removed
+					5 - The adapter card is quiesced, but the Hot Plug slot is still power on
+					6 - The adapter card is powered but not operational
+					7 - A slot power fault has been detected while turning on the Hot Plug slot
+					8 - The adapter card is non Hot Pluggable
+					9 - There is no associated adapter card."
+	::= { siePciHotPlugSlotEntry 12}
+
+
+siePciHotPlugSlotPowerLED OBJECT-TYPE
+	SYNTAX INTEGER {unknown(1),on(2),off(3)}
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION "State of the Power (green) LED :
+					1 - The state of the Power LED can't be determined
+					2 - ON  : the power of the associated slot is switched ON and OK
+					3 - OFF : the power of the associated slot is switched OFF."
+        ::= { siePciHotPlugSlotEntry 13}
+
+ 
+siePciHotPlugSlotAttentionLED OBJECT-TYPE
+	SYNTAX INTEGER {unknown(1),on(2),off(3)}
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION "State of the Attention (yellow) LED :
+					1 - The state of the Attention LED can't be determined
+					2 - ON  : The adapter card inserted into the associated slot needs attention 
+					3 - OFF : The adapter card inserted into the associated slot is operational."
+::= { siePciHotPlugSlotEntry 14}
+ 
+ 
+ 
+     
+
+--------------------------------------------------------------------------
+--                                                                      --
+--                           GROUP siePciHotPlugTrapInfo                --
+--                                                                      --
+-- These variables are all not-accessible                               --
+-- they are sent with the traps only.                                   --
+--                                                                      --
+--------------------------------------------------------------------------
+
+siePciHotPlugTrapServerName OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		not-accessible
+	STATUS		mandatory
+	DESCRIPTION "Name of server the trap occured"
+	::= { siePciHotPlugTrapInfo 1 }
+
+
+siePciHotPlugTrapPhysicalSlotNumber OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS not-accessible
+	STATUS mandatory
+	DESCRIPTION "Physical Slot Number for which a Hot Plug Trap is generated."
+	::= { siePciHotPlugTrapInfo 2 }
+
+
+siePciHotPlugTrapResult OBJECT-TYPE
+	SYNTAX		DisplayString 
+	ACCESS		not-accessible
+	STATUS		mandatory
+	DESCRIPTION "The result of the HotPlug action:
+					- successfull
+					- unsuccessfull."
+	::= { siePciHotPlugTrapInfo 3 }
+
+
+siePciHotPlugTrapCardState OBJECT-TYPE
+	SYNTAX		DisplayString 
+	ACCESS		not-accessible
+	STATUS		mandatory
+	DESCRIPTION "State of the adapter card associated to the Hot Plug action :
+					- OK
+					- Safe to remove
+					- Removed
+					- Quiesced
+					- Not Ready
+					- Power Fault."
+	::= { siePciHotPlugTrapInfo 4 }
+
+
+--------------------------------------------------------------------------
+--                                                                      --
+--                           GROUP sieDeviceHotPlugTrapInfo             --
+--                                                                      --
+-- These variables are all not-accessible                               --
+-- they are sent with the traps only.                                   --
+--                                                                      --
+--------------------------------------------------------------------------
+
+sieDeviceHotPlugTrapServerName OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		not-accessible
+	STATUS		mandatory
+	DESCRIPTION "Name of server the trap occured"
+	::= { sieDeviceHotPlugTrapInfo 1 }
+
+
+sieDeviceHotPlugTrapDeviceName OBJECT-TYPE
+	SYNTAX		DisplayString 
+	ACCESS		not-accessible
+	STATUS		mandatory
+	DESCRIPTION "The name of the SCSI device for which a Hot Plug Trap is generated."
+	::= { sieDeviceHotPlugTrapInfo 2 }
+
+
+sieDeviceHotPlugTrapAdapterName OBJECT-TYPE
+	SYNTAX		DisplayString 
+	ACCESS		not-accessible
+	STATUS		mandatory
+	DESCRIPTION "The name of the SCSI adapter where the SCSI device, generating this trap,
+				is connected."
+	::= { sieDeviceHotPlugTrapInfo 3 }
+
+
+sieDeviceHotPlugTrapPCIBusNumber OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS not-accessible
+	STATUS mandatory
+	DESCRIPTION "PCI Bus Number of the SCSI adapter where the SCSI device, generating this trap,
+				is connected."
+	::= { sieDeviceHotPlugTrapInfo 4 }
+
+
+sieDeviceHotPlugTrapDeviceNumber OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS not-accessible
+	STATUS mandatory
+	DESCRIPTION "Device Number of the SCSI adapter where the SCSI device, generating this trap,
+				is connected."
+	::= { sieDeviceHotPlugTrapInfo 5 }
+
+
+--------------------------------------------------------------------------
+--                                                                      --
+-- pciHotPlug Traps                                                     --
+--                                                                      --
+--------------------------------------------------------------------------   
+
+
+siePciHotPlugTrapHotRemoval TRAP-TYPE
+	ENTERPRISE sniServerMgmt
+	VARIABLES   { siePciHotPlugTrapServerName, siePciHotPlugTrapPhysicalSlotNumber }
+	DESCRIPTION "A Hot Removal action has been started."
+	--#TYPE			"Start of HotPlug action"
+    --#SUMMARY		"A Hot Removal action is started on physical slot %d (server %s)."
+    --#ARGUMENTS	{ 1 ,0 }
+    --#SEVERITY		INFORMATIONAL
+    --#TIMEINDEX	1
+    --#STATE		OPERATIONAL
+	::= 1000
+
+
+siePciHotPlugTrapHotReplace TRAP-TYPE
+	ENTERPRISE sniServerMgmt
+	VARIABLES   { siePciHotPlugTrapServerName, siePciHotPlugTrapPhysicalSlotNumber }
+	DESCRIPTION "A Hot Replace action has been started."
+	--#TYPE			"Start of HotPlug action"
+    --#SUMMARY		"A Hot Replace action is started on physical slot %d (Server %s)."
+    --#ARGUMENTS	{ 1, 0 }
+    --#SEVERITY		INFORMATIONAL
+    --#TIMEINDEX	1
+    --#STATE		OPERATIONAL
+	::= 1001
+
+
+siePciHotPlugTrapEndHotPlugAction TRAP-TYPE
+	ENTERPRISE sniServerMgmt
+	VARIABLES   { siePciHotPlugTrapServerName, siePciHotPlugTrapPhysicalSlotNumber,siePciHotPlugTrapResult,siePciHotPlugTrapCardState}
+	DESCRIPTION "The HotPlug action for the physical slot number held in 
+				 siePciHotPlugTrapPhysicalSlotNumber object is finished."
+	--#TYPE			"End of HotPlug action"
+    --#SUMMARY		"The HotPlug action on physical slot %d is terminated %s (Server %s)."
+	--#SUMMARY		"The card state is : %s"
+    --#ARGUMENTS	{ 1, 2, 0, 3}
+    --#SEVERITY		INFORMATIONAL
+    --#TIMEINDEX	1
+    --#STATE		OPERATIONAL
+	::= 1002
+
+
+--------------------------------------------------------------------------
+--                                                                      --
+-- Device HotPlug  Traps                                                --
+--                                                                      --
+--------------------------------------------------------------------------   
+
+
+sieDeviceHotPlugTrapHotRemoval TRAP-TYPE
+	ENTERPRISE sniServerMgmt
+	VARIABLES   { siePciHotPlugTrapServerName, sieDeviceHotPlugTrapDeviceName,
+				sieDeviceHotPlugTrapAdapterName,sieDeviceHotPlugTrapPCIBusNumber,sieDeviceHotPlugTrapDeviceNumber}
+	DESCRIPTION "A SCSI device has been removed."
+	--#TYPE			"Device HotPlug action"
+    --#SUMMARY		"A SCSI device <%s> on SCSI adapter <%s> (PCI Bus Number %d, Device Number %d) has been removed (server %s)."
+    --#ARGUMENTS	{ 1,2,3,4,0 }
+    --#SEVERITY		INFORMATIONAL
+    --#TIMEINDEX	1
+    --#STATE		OPERATIONAL
+	::= 1020
+
+
+
+sieDeviceHotPlugTrapHotReplace TRAP-TYPE
+	ENTERPRISE sniServerMgmt
+	VARIABLES    { siePciHotPlugTrapServerName, sieDeviceHotPlugTrapDeviceName,
+				sieDeviceHotPlugTrapAdapterName,sieDeviceHotPlugTrapPCIBusNumber,sieDeviceHotPlugTrapDeviceNumber}
+	DESCRIPTION "A SCSI device has been replaced."
+	--#TYPE			"Device HotPlug action"
+    --#SUMMARY		"A SCSI device <%s> on SCSI adapter <%s> (PCI Bus Number %d, Device Number %d) has been replaced (server %s)."
+    --#ARGUMENTS	{ 1,2,3,4,0 }
+    --#SEVERITY		INFORMATIONAL
+    --#TIMEINDEX	1
+    --#STATE		OPERATIONAL
+	::= 1021
+
+
+sieDeviceHotPlugTrapHotAdd TRAP-TYPE
+	ENTERPRISE sniServerMgmt
+	VARIABLES    { siePciHotPlugTrapServerName, sieDeviceHotPlugTrapDeviceName,
+				sieDeviceHotPlugTrapAdapterName,sieDeviceHotPlugTrapPCIBusNumber,sieDeviceHotPlugTrapDeviceNumber}
+	DESCRIPTION "A SCSI device has been added."
+	--#TYPE			"Device HotPlug action"
+    --#SUMMARY		"A SCSI device <%s> on SCSI adapter <%s> (PCI Bus Number %d, Device Number %d) has been added (server %s)."
+    --#ARGUMENTS	{ 1,2,3,4,0 }
+    --#SEVERITY		INFORMATIONAL
+    --#TIMEINDEX	1
+    --#STATE		OPERATIONAL
+
+	::= 1022
+END
+

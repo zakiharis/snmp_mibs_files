@@ -1,0 +1,179 @@
+
+MOBILE-CONTACT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	OBJECT-TYPE, MODULE-IDENTITY, enterprises, 
+	Integer32, Gauge32
+		FROM SNMPv2-SMI	
+	OBJECT-GROUP, MODULE-COMPLIANCE
+		FROM SNMPv2-CONF
+	TEXTUAL-CONVENTION, DisplayString
+		FROM SNMPv2-TC;
+
+mobilePhone MODULE-IDENTITY
+	LAST-UPDATED "201605040350Z"
+	ORGANIZATION 
+		"MIB University"
+	CONTACT-INFO 
+		"E-mail: university.mib@outlook.com"
+	DESCRIPTION 
+		"Definition MIB file for transferring handset information. 
+		"
+
+	REVISION "201605040350Z"
+	DESCRIPTION 
+		"Any contact with multiple phone number."
+
+	REVISION "201604220642Z"
+	DESCRIPTION 
+		"Writing first version of MIB definition, Any contact with one phone number."
+::= { university 2 }
+
+
+MobileOS ::= TEXTUAL-CONVENTION
+	STATUS     current
+	DESCRIPTION 
+		"The OS model of any mobile phone"
+	SYNTAX  INTEGER {
+		iPhoneOS (1),
+		androidOS (2),
+		symbianOS (3),
+		blackBerryOS (4),
+		windowsPhoneOS (5)
+	}
+
+university           OBJECT IDENTIFIER ::= { enterprises 47746 }
+mobileMIBConformance  OBJECT IDENTIFIER ::= { mobilePhone 1 }
+mobileMIBCompliance  OBJECT IDENTIFIER ::= { mobileMIBConformance 1 }
+mobileMIBGroup       OBJECT IDENTIFIER ::= { mobileMIBConformance 2 }
+mobileInfo           OBJECT IDENTIFIER ::= { mobilePhone 2 }
+mobileContact        OBJECT IDENTIFIER ::= { mobilePhone 3 }
+
+handsetOS  OBJECT-TYPE
+	SYNTAX     MobileOS
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The Operating System of Mobile Phone"
+	::= { mobileInfo 1 }
+
+contactListTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF ContactListEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"List of contacts name with phone number"
+	::= { mobileContact 1 }
+
+contactListEntry  OBJECT-TYPE
+	SYNTAX 	ContactListEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Any contact "
+	INDEX { contactListIndex }
+	::= { contactListTable 1 }
+
+ContactListEntry ::= SEQUENCE {
+	contactListIndex
+		Gauge32,
+	contactName
+		DisplayString
+}
+
+contactListIndex  OBJECT-TYPE
+	SYNTAX     Gauge32
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"The ID of any contact "
+	::= { contactListEntry 1 }
+
+contactName  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(1..50))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"The name for any contact"
+	::= { contactListEntry 2 }
+
+contactNumberTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF ContactNumberEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Store phone numbers."
+	::= { mobileContact 2 }
+
+contactNumberEntry  OBJECT-TYPE
+	SYNTAX 	ContactNumberEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Any contact with phone number"
+	INDEX { contactNumberIndex }
+	::= { contactNumberTable 1 }
+
+ContactNumberEntry ::= SEQUENCE {
+	contactNumberIndex
+		Gauge32,
+	contactID
+		Integer32,
+	contactNumber
+		DisplayString
+}
+
+contactNumberIndex  OBJECT-TYPE
+	SYNTAX     Gauge32
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION 
+		"Index of contactNumberTable"
+	::= { contactNumberEntry 1 }
+
+contactID  OBJECT-TYPE
+	SYNTAX     Integer32
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"Equals with contactListID in contactListTable."
+	::= { contactNumberEntry 2 }
+
+contactNumber  OBJECT-TYPE
+	SYNTAX     DisplayString (SIZE(8..17))
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION 
+		"For writing phone numbers "
+	::= { contactNumberEntry 3 }
+
+contactCount  OBJECT-TYPE
+	SYNTAX     Gauge32
+	MAX-ACCESS read-only
+	STATUS     current
+	DESCRIPTION 
+		"The number of contact in Phone Book"
+	::= { mobileContact 3 }
+
+mobileCompliance  MODULE-COMPLIANCE
+	STATUS     current
+	DESCRIPTION 
+		"The definition for conformance to SMIv2"
+	MODULE
+		MANDATORY-GROUPS { customMobile } 
+	::= { mobileMIBCompliance 1 }
+
+customMobile  OBJECT-GROUP
+	OBJECTS { contactCount, 
+		contactID, 
+		contactName, 
+		contactNumber, 
+		handsetOS }
+	STATUS     current
+	DESCRIPTION 
+		"The custom information of handset"
+	REFERENCE 
+		"RFC 2580 - Conformance Statements for SMIv2"
+	::= { mobileMIBGroup 1 }
+END
+

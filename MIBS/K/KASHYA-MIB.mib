@@ -1,0 +1,155 @@
+KASHYA-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+    enterprises
+        FROM RFC1155-SMI
+    OBJECT-TYPE
+        FROM RFC-1212;
+
+
+    kashya OBJECT IDENTIFIER ::= { enterprises 21658 }
+
+    kashyaRegids OBJECT IDENTIFIER ::= { kashya 1 }
+
+    kashyaCommon OBJECT IDENTIFIER ::= { kashya 2 }
+
+    kashyaProducts OBJECT IDENTIFIER ::= { kashya 3 }
+
+    kBX OBJECT IDENTIFIER ::= { kashyaProducts 1 }
+
+    trapInfo OBJECT IDENTIFIER ::= { kBX 1 }
+
+    dateAndTime OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Date and time that trap was sent."
+        ::= { trapInfo 1 }
+
+    eventID OBJECT-TYPE
+        SYNTAX              INTEGER
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Unique event identifier."
+        ::= { trapInfo 2 }
+
+    siteName OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Name of site where event occurred."
+        ::= { trapInfo 3 }
+
+    eventLevel OBJECT-TYPE
+        SYNTAX              INTEGER
+			     {
+			     info(1),
+			     warning(2),
+			     warning-off(3),
+			     error(4),
+			     error-off(5),
+			     critical(6)
+			     }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Value |	Meaning
+				------+--------
+				1     |	info
+				2     |	warning
+				3     |	warning-off
+				4     |	error
+				5     |	error-off
+				6     | critical
+			    "
+        ::= { trapInfo 4 }
+
+    eventTopic OBJECT-TYPE
+        SYNTAX              INTEGER
+			     {	     
+			     site(1),
+			     k-box(2),	     
+			     group(3),
+			     host(4),
+			     management(5),
+			     generic(6)
+			     }
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Value |	Meaning
+				------+--------
+				1     |	site
+				2     |	k-box
+				3     |	group
+				4     |	host
+				5     |	management
+				6     |	generic
+			    "
+        ::= { trapInfo 5 }
+
+    hostName OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Host name."
+        ::= { trapInfo 6 }
+
+    kboxName OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Name of K-Box."
+        ::= { trapInfo 7 }
+
+    volumeName OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Volume name."
+        ::= { trapInfo 8 }
+
+    groupName OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Group name."
+        ::= { trapInfo 9 }
+
+    eventSummary OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "Short description of event."
+        ::= { trapInfo 10 }
+
+    eventDescription OBJECT-TYPE
+        SYNTAX              OCTET STRING
+        ACCESS              read-only
+        STATUS              mandatory
+        DESCRIPTION         "More detailed description of event."
+        ::= { trapInfo 11 }
+
+
+--
+-- Trap definitions
+--
+	
+		info TRAP-TYPE 
+			ENTERPRISE kBX
+			VARIABLES { dateAndTime, eventID, siteName, eventLevel, eventTopic, hostName, groupName, kboxName, volumeName, eventSummary, eventDescription }
+			DESCRIPTION "An informative event, non critical condition"
+			::=  1
+
+		warning TRAP-TYPE 
+			ENTERPRISE kBX
+			VARIABLES { dateAndTime, eventID, siteName, eventLevel, eventTopic, hostName, groupName, kboxName, volumeName, eventSummary, eventDescription }
+            DESCRIPTION "A warning, indicating a non critical problem"
+			::=  2
+
+		error TRAP-TYPE 
+			ENTERPRISE kBX
+			VARIABLES { dateAndTime, eventID, siteName, eventLevel, eventTopic, hostName, groupName, kboxName, volumeName, eventSummary, eventDescription }
+			DESCRIPTION "An error, indicating a critical problem"
+			::=  3
+
+
+END
+

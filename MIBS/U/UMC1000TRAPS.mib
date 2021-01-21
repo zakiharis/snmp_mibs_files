@@ -1,0 +1,564 @@
+-- SCCS ID: %W%	%G% %U%
+
+UMC1000TRAPS DEFINITIONS ::= BEGIN
+IMPORTS
+    TRAP-TYPE
+	    FROM RFC-1215
+    umc1000
+	    FROM AFC-OIDS
+    umc1TerminalStatusChangeSeqNum, umc1TerminalInfoChangeSeqNum,
+    umc1TerminalInfoTerminalId, umc1TerminalInfoName,
+    umc1TerminalInfoSerialDeviceType, umc1TerminalInfoBaudRate,
+    umc1TerminalInfoNewTerminalId,
+    umc1TopologyChangeSeqNum, umc1AlmSeqTableChangeSeqNum,
+    umc1AlmSeqNumber, umc1CurAlmTerminalId, umc1CurAlmOccurrenceIndex,
+    umc1CurAlmTL1Message, umc1CurAlmDetails,
+    umc1SoftwareDiagMessageTimestamp, umc1SoftwareDiagMessageType, 
+    umc1SoftwareDiagMessageString, umc1SystemPitProvChgSeqNbr,
+    umc1SystemPitProvChgData,
+    umc1InventoryShelfTableChangeSeqNum,
+    umc1InventoryShelfTableChangeHistoryData,
+    umc1InventoryPluginTableChangeSeqNum,
+    umc1InventoryPluginTableChangeHistoryData,
+    umc1SystemRelearnTrapSeqNum,
+    umc1SystemSysProvChgSeqNbr,
+    umc1SystemAllSeqNbr,
+    umc1TerminalSpanTableChangeSeqNum, umc1ShelfSpanTableChangeSeqNum,
+    umc1SystemSysProvChgData,
+    umc1TerminalSpanTableChangeHistoryData,
+    umc1ShelfSpanTableChangeHistoryData,
+    umc1GR303TableChangeSeqNum, umc1GR303ChgData,
+    umc1TR8TableChangeSeqNum, umc1TR8ChgData,
+    umc1XCTableChangeSeqNum, umc1XCChgData,
+    umc1AtmProtTableChangeSeqNum, umc1AtmProtGrpChgData,
+    umc1PortProfTableChangeSeqNum, umc1PortProfChgData,
+    umc1V5TableChangeSeqNum, umc1V5ChgData,
+    umc1SecurityDataTableChangeSeqNum, umc1SecurityDataChgData,
+    umc1FacAlmStringTableChangeSeqNum, umc1FacAlmStringChgData,
+    umc1TL1IfProvTableChangeSeqNum, umc1TL1IfProvChgData,
+	umc1SystemGenericDbProvTableSeqNum, 
+	umc1SystemGenericDbProvChgData,
+    umc1SystemTCAHistoryTableSeqNum,
+    umc1SystemTCAHistoryTableChgData,
+    umc1F5LoopbackTransactionResponse,
+    umc1LoopDiagnosticsTrapData
+		FROM UMC1000-MIB;
+
+
+--umc1000Traps MODULE-IDENTITY
+ --LAST-UPDATED "9806191630Z"
+ --ORGANIZATION "afc"
+ --CONTACT-INFO
+ --Advanced Fibre Communications
+ --One Willow Brook Court
+ --Petaluma, CA  94954
+ --Voice: 707-794-7700
+ --Fax: 707-794-7777
+ --DESCRIPTION
+ --"The MIB module to define the UMC 1000 SNMP TRAPS."
+	
+ --::= { umc1Trap 1  }
+
+--------------------------------------------------------------------------------
+
+--
+-- Traps
+--
+--	The UMC 1000 traps.  SNMP traps indicate only that a certain event
+--	within the managed device has occurred.  It is not really analogous to
+--	UMC alarms, as a trap itself does not have a 'state'.  There is no
+--	concept of a trap being 'set' and then 'cleared'.  Likewise, the
+--	information (variables) associated with a trap do *not*, in any way
+--	contribute to the identification of an trap.  Only the enterprise ID
+--	and the trap number can be used.  This means that as far as an EMS
+--	is concerned, a Card Missing trap for a card in LET-1-20 is 
+--	indistinguishable from a Card Missing trap for a card in RST1-3-2.  In
+--	order for this distinction to be made, the EMS itself must delve into
+--	the associated variables and determine the *real* location of the
+--	alarm.  Likewise, it is up to the EMS to determine whether a trap
+--	means that an alarm is being "set" or "cleared".
+--
+
+
+--------------------------------------------------------------------------------
+--
+-- Equipment generated traps
+--
+
+umc1TrapAlarmEvent TRAP-TYPE
+	ENTERPRISE umc1000
+	VARIABLES {
+		umc1AlmSeqTableChangeSeqNum,
+        umc1AlmSeqNumber,
+		umc1CurAlmTerminalId,
+		umc1CurAlmOccurrenceIndex,
+		umc1CurAlmTL1Message,
+		umc1CurAlmDetails
+		}
+	DESCRIPTION
+		"This trap indicates that an Alarm or Status Event has occured
+		in the UMC.  The Alarm Details (or TL1 message) must be
+		examined to determine the severity of the alarm."
+	::= 1
+
+--------------------------------------------------------------------------------
+--
+-- Enumerated Traps
+--	These traps do not map directly to alarm or event occurrences within
+--	the UMC.  Generally they aggregate a number of alarms or events into
+--	a single trap that indicates to the EMS that it needs to figure out
+--	what is going on.
+--
+
+umc1TrapTerminalStatusChange TRAP-TYPE
+	ENTERPRISE umc1000
+	VARIABLES {
+		umc1TerminalStatusChangeSeqNum
+		}
+	DESCRIPTION
+		"This trap indicates that the status for one or more terminals
+		may have changed and therefore the terminal status table needs
+		to be read again."
+	::= 1000000001
+
+umc1TrapTerminalInfoChange TRAP-TYPE
+	ENTERPRISE umc1000
+	VARIABLES {
+		umc1TerminalInfoChangeSeqNum,
+		umc1TerminalInfoTerminalId,
+		umc1TerminalInfoName,
+		umc1TerminalInfoSerialDeviceType,
+		umc1TerminalInfoBaudRate,
+		umc1TerminalInfoNewTerminalId
+		}
+	DESCRIPTION
+		"This trap indicates that the provisioning information for a
+		terminal has changed.  If the sequence number stored in the
+		first varbind is the next sequential number as known by the
+		EMS, *AND* the sequence number matches that in the
+		umc1TerminalInfoChangeSeqNum MIB variable (as fetched from
+		the UMC), then the corresponding data can be used to update the
+		EMSs view of the data.  Otherwise, it must be assumed that
+		the EMS has either lost a trap or the SNMP agent has rebooted,
+		and therefore the EMS must re-read the whole table."
+	::= 1000000002
+
+umc1TrapTopologyChange TRAP-TYPE
+	ENTERPRISE umc1000
+	VARIABLES {
+		umc1TopologyChangeSeqNum
+		}
+	DESCRIPTION
+		"This trap indicates that the information in the topology
+		link table and/or the orphan table may have changed and
+		therefore these tables need to be read again."
+	::= 1000000003
+
+
+
+--------------------------------------------------------------------------------
+--
+-- Inventory Table Change Traps
+
+umc1TrapInventoryShelfTableChange TRAP-TYPE
+	ENTERPRISE umc1000
+	VARIABLES {
+		umc1InventoryShelfTableChangeSeqNum,
+		umc1InventoryShelfTableChangeHistoryData
+		}
+	DESCRIPTION
+		"This trap indicates that umc1InventoryShelfTable has changed.
+		The location and type of all shelves that have been added to
+		the system since the last trap was emitted are stored in the
+		object umc1InventoryShelfTableChangeHistoryData. If the sequence
+		number stored in the first varbind is the next sequential number
+		as known by the EMS, *AND* the sequence number matches that in
+		the umc1InventoryShelfTableChangeSeqNum MIB variable (as fetched
+		from the UMC), then the corresponding data can be used to update
+		the EMSs view of the data. Otherwise, it must be assumed that
+		the EMS has either lost a trap or the SNMP agent has rebooted.
+		In such a case the EMS must attempt to read a row indexed by
+		the value of umc1InventoryShelfTableChangeSeqNum (in the varbind)
+		in the table umc1InventoryShelfTableChangeHistoryTable from
+		the UMC. If successful, it must update the data in its 
+		umc1InventoryShelfTable with the data it read from such a row
+		and all other rows in the table indexed by values higher than
+		the value of umc1InventoryShelfTableChangeSeqNum, if present,  till
+		it reaches the end of the table. Otherwise, the EMS must re-read
+		the whole umc1InventoryShelfTable from the UMC."
+	::= 1000000004
+
+
+
+umc1TrapInventoryPluginTableChange TRAP-TYPE
+	ENTERPRISE umc1000
+	VARIABLES {
+		umc1InventoryPluginTableChangeSeqNum,
+		umc1InventoryPluginTableChangeHistoryData
+	}
+	DESCRIPTION
+		"This trap indicates thatumc1InventoryPluginTable has changed.
+		The location and plug-in type of all cards that have been added
+		to the system since the last trap was emitted are stored in the
+		object umc1InventoryPluginTableChangeHistoryData. If the sequence
+		number stored in the first varbind is the next sequential number
+		as known by the EMS, *AND* the sequence number matches that in
+		the umc1InventoryPluginTableChangeSeqNum MIB variable (as fetched
+		from the UMC), then the corresponding data can be used to update
+		the EMSs view of the data. Otherwise, it must be assumed that
+		the EMS has either lost a trap or the SNMP agent has rebooted.
+		In such a case the EMS must attempt to read a row indexed by
+		the value of umc1InventoryPluginTableChangeSeqNum (in the varbind)
+		in the table umc1InventoryPluginTableChangeHistoryTable from
+		the UMC. If successful, it must update the data in its 
+		umc1InventoryPluginTable with the data it read from such a row
+		and all other rows in the table indexed by values higher than
+		the value of umc1InventoryPluginTableChangeSeqNum, if present,
+		till it reaches the end of the table. Otherwise, the EMS must
+		re-read the whole umc1InventoryPluginTable from the UMC."
+	::= 1000000005
+
+
+umc1TrapPitProvChgTableChange TRAP-TYPE
+    ENTERPRISE umc1000
+    VARIABLES {
+                umc1SystemPitProvChgSeqNbr,
+                umc1SystemPitProvChgData }
+    DESCRIPTION
+    "The trap contains the new row created in the Plug-In Provisioning  
+     Change Table. The management host compares this umc1SystemPitProvChgSeqNbr
+     value with the last one received to determine if any traps have been lost.
+     If this value is one greater than the last one received, no traps were lost,
+     and the management host uses the five octets following the version octet in 
+     umc1SystemPitProvChgData, the second varbind, to retrieve the location and
+     Plug-in type of the Plug-in whose provisioning data has changed. The value
+     of the seventh octet in umc1SystemPitProvChgData for the given plug-in 
+     location and plug-in type is defined by 'DbActionType' in UMC1000.MIB.
+     If the seventh octet indicates the record was deleted it must 
+     delete the plug-in provisioning database record for the given plug-in 
+     location and plug-in type. Otherwise, if the seventh octet indicates the 
+     record added or updated it must retrieve the provisioning database record from 
+     the octets following the seventh octet and update the provisioning data of the 
+	 given plug-in location and plug-in type. 
+	 
+	 If the value of umc1SystemPitProvChgSeqNbr is more than one (1) greater than 
+	 the last one received, the management host determines it has lost one or more of 
+	 these Traps. The management host attempts to retrieve the entry in the Plug-In 
+	 Provisioning Change Table indexed by the last value umc1SystemPitProvChgSeqNbr 
+	 received. If this entry cannot be retrieved, the management host determines that 
+	 more traps have been  lost than the number of entries the Plug-In Provisioning 
+	 Change table  can store. The management host then reads the entire Plug-In  
+	 Provisioning Table to re-sync with that of the agent."
+    ::= 1000000006
+
+umc1TrapSystemRelearnTrap TRAP-TYPE
+    ENTERPRISE umc1000
+    VARIABLES {
+        umc1SystemRelearnTrapSeqNum
+    }
+    DESCRIPTION
+	"This trap indicates that the ACO operation has been performed on the
+     system. If the sequence number stored in the varbind is the next
+     sequential number as known by the EMS, and the sequence number matches
+     that in the umc1SystemRelearnTrapSeqNum MIB variable (as fetched from
+     the UMC), then the EMS has received all such traps. Otherwise, it must
+     be assumed that  the EMS has either lost such a trap or the SNMP agent has 
+     rebooted. Data in umc1ACOSnapTopologyLinkTable contains the snapshot of
+     topology information at the time the trap was emitted by the agent."
+	::= 1000000008
+
+
+umc1TrapSysProvChange TRAP-TYPE
+    ENTERPRISE umc1000
+    VARIABLES { umc1SystemSysProvChgSeqNbr,
+                umc1SystemSysProvChgData }
+    DESCRIPTION
+    "This trap references a row in the System Global Provisioning Change  
+     Table. The management host compares this umc1SystemSysProvChgSeqNbr 
+     value with the last one received to determine if any traps have been
+     lost. If the this value is one greater than the last one received, no  
+     traps were lost, and the management host uses the data in 
+     umc1SystemSysProvChgData varbind to effect the change in its local 
+     copy. If this value is more than one (1) greater than the last one 
+     received, the management host determines it has lost one or more of 
+     these Traps. The management host attempts to retrieve the entry in 
+     the System Global Provisioning Change Table following that indexed 
+     by the last value umc1SystemSysProvChgSeqNbr received. If this entry 
+     cannot be retrieved, the management host determines that more traps 
+     have  been lost than the number of entries the System Global 
+     Provisioning  Change table can cache. The management host then reads 
+     the all objects in the Global System Provisioning Object Group to 
+     re-sync with the Agents. If the next entry is retrieved successfully, 
+     the management host continues reading next entries until it has 
+     retrieved the entry indexed by the varbinds in this trap. 
+    "
+    ::= 1000000009
+
+
+
+--------------------------------------------------------------------------------
+--
+-- Terminal Span Table Change TRAP
+--
+
+umc1TrapTerminalSpanTableChange TRAP-TYPE
+	ENTERPRISE umc1000
+	VARIABLES   {
+		        umc1TerminalSpanTableChangeSeqNum,
+		        umc1TerminalSpanTableChangeHistoryData
+		        }
+	DESCRIPTION
+    "The trap contains the new row created in the umc1TerminalSpanTable. 
+     The management host compares this umc1TerminalSpanChangeSeqNum value with 
+     the last one received to determine if any traps have been lost. If this 
+     value is one greater than the last one received, no traps were lost.
+    "
+	::= 1000000010
+
+
+
+--------------------------------------------------------------------------------
+--
+-- Shelf Span Table Change TRAP
+--
+
+umc1TrapShelfSpanTableChange TRAP-TYPE
+	ENTERPRISE umc1000
+	VARIABLES   {
+                umc1ShelfSpanTableChangeSeqNum,
+                umc1ShelfSpanTableChangeHistoryData
+                }
+	DESCRIPTION
+    "The trap contains the new row created in the umc1ShelfSpanTable The 
+     management host compares this umc1ShelfSpanChangeSeqNum value with 
+     the last one received to determine if any traps have been lost. If 
+     this value is one greater than the last one received, no traps were 
+     lost.
+    "
+	::= 1000000011
+
+
+--------------------------------------------------------------------------------
+
+
+umc1TrapGR303TableChange TRAP-TYPE
+    ENTERPRISE umc1000
+    VARIABLES {
+        umc1GR303TableChangeSeqNum,
+        umc1GR303ChgData 
+        }
+    DESCRIPTION
+    "The trap contains the new row created in the umc1GR303ChgTable. 
+     The management host compares this umc1GR303TableChangeSeqNum value 
+     with the last one received to determine if any traps have been lost.
+     If this value is one greater than the last one received, no traps 
+     were lost.
+    "
+    ::= 1000000012
+
+
+umc1TrapTR8TableChange TRAP-TYPE
+    ENTERPRISE umc1000
+    VARIABLES {
+ 	    umc1TR8TableChangeSeqNum,
+        umc1TR8ChgData }
+    DESCRIPTION
+    "The trap contains the new row created in the umc1TR8ChgTable. 
+     The management host compares this umc1TR8TableChangeSeqNum value
+     with the last one received to determine if any traps have been 
+     lost. If this value is one greater than the last one received, 
+     no traps were lost.
+    "
+    ::= 1000000013
+
+
+
+umc1TrapXCTableChange TRAP-TYPE
+    ENTERPRISE umc1000
+    VARIABLES {
+        umc1XCTableChangeSeqNum,
+        umc1XCChgData }
+    DESCRIPTION
+    "The trap contains the new row created in the umc1XCChgTable. 
+     The management host compares this umc1XCTableChangeSeqNum value with 
+     the last one received to determine if any traps have been lost. If 
+     this value is one greater than the last one received, no traps were 
+     lost.
+    "
+    ::= 1000000014
+
+
+umc1TrapAtmProtGrpTableChange TRAP-TYPE
+    ENTERPRISE umc1000
+    VARIABLES { umc1AtmProtTableChangeSeqNum,
+                umc1AtmProtGrpChgData }
+    DESCRIPTION
+    "The trap contains the new row created in the umc1AtmProtGrpChgTable. 
+     The management host compares this umc1AtmProtTableChangeSeqNum value 
+     with the last one received to determine if any traps have been lost. 
+     If this value is one greater than the last one received, no traps 
+     were lost.
+    "
+    ::= 1000000015
+
+
+umc1TrapPortProfTableChange TRAP-TYPE
+    ENTERPRISE umc1000
+    VARIABLES { umc1PortProfTableChangeSeqNum,
+                umc1PortProfChgData }
+    DESCRIPTION
+    "The trap contains the new row created in the umc1PortProfChgTable. 
+     The management host compares this umc1PortProfTableChangeSeqNum value 
+     with the last one received to determine if any traps have been lost. 
+     If this value is one greater than the last one received, no traps 
+     were lost.
+    "
+    ::= 1000000016
+
+
+umc1TrapV5TableChange TRAP-TYPE
+    ENTERPRISE umc1000
+    VARIABLES {
+ 	    umc1V5TableChangeSeqNum,
+        umc1V5ChgData }
+    DESCRIPTION
+    "The trap contains the new row created in the umc1V5ChgTable. The 
+     management host compares this umc1V5TableChangeSeqNum value with
+     the last one received to determine if any traps have been lost. If
+     this value is one greater than the last one received, no traps were lost.
+    "
+    ::= 1000000017
+
+
+ umc1TrapSecurityDataTableChange TRAP-TYPE
+   ENTERPRISE umc1000
+   VARIABLES { umc1SecurityDataTableChangeSeqNum,
+ 	       umc1SecurityDataChgData }
+   DESCRIPTION
+      "The trap contains the new row created in the umc1SecurityDataChgTable. 
+       The management host compares this umc1SecurityDataTableChangeSeqNum 
+       value with the last one received to determine if any traps have been 
+       lost. If this value is one greater than the last one received, no traps 
+       were lost.
+      "
+    ::= 1000000018
+
+
+umc1TrapFacAlmStringTableChange TRAP-TYPE
+    ENTERPRISE umc1000
+    VARIABLES {umc1FacAlmStringTableChangeSeqNum,
+           umc1FacAlmStringChgData }
+    DESCRIPTION
+     "The trap contains the new row created in the 
+     umc1FacAlmStringChgTable. The management host compares this 
+     umc1FacAlmStringTableChangeSeqNum value with the last one 
+     received to determine if any traps have been lost. If this 
+     value is one greater than the last one received, no traps were 
+     lost.
+     "
+    ::= 1000000019
+
+
+umc1TrapTL1IfProvTableChange TRAP-TYPE
+    ENTERPRISE umc1000
+    VARIABLES {umc1TL1IfProvTableChangeSeqNum,
+               umc1TL1IfProvChgData }
+    DESCRIPTION
+     "The trap contains the new row created in the 
+     umc1TL1IfProvChgTable. The management host compares this 
+     umc1TL1IfProvTableChangeSeqNum value with the last one 
+     received to determine if any traps have been lost. If this 
+     value is one greater than the last one received, no traps were 
+     lost.
+     "
+    ::= 1000000020
+
+umc1TrapGenericDbProvChange TRAP-TYPE
+    ENTERPRISE umc1000
+    VARIABLES {umc1SystemGenericDbProvTableSeqNum,
+               umc1SystemGenericDbProvChgData }
+    DESCRIPTION
+     "The trap contains the new row created in the 
+     umc1SystemGenericDbProvChgTable. The management host compares this 
+     umc1SystemGenericDbProvTableSeqNum value with the last one 
+     received to determine if any traps have been lost. If this 
+     value is one greater than the last one received, no traps were 
+     lost.
+     "
+    ::= 1000000021
+
+--------------------------------------------------------------------------------
+--
+-- Maintenance TRAPs
+--	These traps do not map directly to alarm or event occurrences within
+--	the UMC.  Generally they are used to pass on board level software 
+--  debugging information.
+--
+--------------------------------------------------------------------------------
+
+umc1TrapSoftwareDiagnostics TRAP-TYPE
+	ENTERPRISE umc1000
+	VARIABLES {
+		umc1SoftwareDiagMessageTimestamp,
+		umc1SoftwareDiagMessageType,
+		umc1SoftwareDiagMessageString
+		}
+	DESCRIPTION
+		"This trap passes software diagnostic messages from the IPMI
+        card to an external SNMP monitoring device."
+	::= 1100000001
+
+--------------------------------------------------------------------------------
+--
+-- All Sequence Number Dump TRAP
+--
+--------------------------------------------------------------------------------
+
+umc1TrapAllSeqNbrDump TRAP-TYPE
+	ENTERPRISE umc1000
+	VARIABLES  {
+			umc1SystemAllSeqNbr
+		     }
+	DESCRIPTION
+		" This trap passes all sequence numbers from the agent to Management 
+		station. This trap is instantiated when a Management station sends 
+		SNMP GET Request to read all sequence numbers."
+      ::= 1100000002
+
+
+    umc1TrapTCAHistoryTableChange TRAP-TYPE
+        ENTERPRISE umc1000
+        VARIABLES { umc1SystemTCAHistoryTableSeqNum,
+                    umc1SystemTCAHistoryTableChgData }
+        DESCRIPTION
+            "The trap contains the new row created in the 
+            umc1SystemTCAHistoryTable. The management host compares this 
+            umc1SystemTCAHistoryTableSeqNum value with the last one 
+            received to determine if any traps have been lost. If this 
+            value is one greater than the last one received, no traps were 
+            lost.
+            "
+    ::= 1000000022
+
+
+umc1F5LoopbackResult TRAP-TYPE
+    ENTERPRISE umc1000
+    VARIABLES { umc1F5LoopbackTransactionResponse}
+    DESCRIPTION
+        "The trap contains the new result of an F5 Loopback request.  Because
+        of the delay in this request, the results come to the EMS as a
+        trap so we don't have to wait on a SET."
+    ::= 1000000023
+
+umc1LoopbackDiagnosticsTrap TRAP-TYPE
+    ENTERPRISE umc1000
+    VARIABLES { umc1LoopDiagnosticsTrapData}
+    DESCRIPTION
+        "The trap contains the new result of the LoopCharacteristics
+        part of a LoopDiagnostic ADSL2+ response.  Because
+        of the delay in this request, the results come to the EMS as a
+        trap so we don't have to wait on a SET.  Remaining results (the
+        noise parameters) can be retrieved using the umc1LoopDiagnosticsDataRequestTable"
+    ::= 1000000024
+
+END

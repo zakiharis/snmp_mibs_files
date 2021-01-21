@@ -1,0 +1,318 @@
+NIMBLE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE,
+    Unsigned32, Counter64
+        FROM SNMPv2-SMI
+    DisplayString, TruthValue
+        FROM SNMPv2-TC
+    enterprises
+        FROM SNMPv2-SMI;
+
+nimble MODULE-IDENTITY
+    LAST-UPDATED    "201208310000Z"
+    ORGANIZATION    "Nimble Storage, Inc."
+    CONTACT-INFO
+            "Nimble Storage
+
+            support@nimblestorage.com"
+    DESCRIPTION
+        "SMI Information for Nimble"
+
+    REVISION    "201208310000Z"
+    DESCRIPTION "Nimble Storage 2.0.3.0 MIB"
+
+    REVISION    "201206120000Z"
+    DESCRIPTION "Nimble Storage 1.3.0.0 MIB"
+
+    REVISION    "201102280000Z"
+    DESCRIPTION "Initial revision"
+    ::= { enterprises 37447 }
+
+--
+-- Nimble Objects (variables and tables)
+--
+
+variables OBJECT IDENTIFIER ::= { nimble 1 }
+
+--
+-- Volume Information
+--
+
+volNumberOfVolumes OBJECT-TYPE
+    SYNTAX         Unsigned32
+    MAX-ACCESS     read-only
+    STATUS         obsolete
+    DESCRIPTION
+    "This variable has been obsoleted"
+    ::= { variables 1 }
+
+volTable OBJECT-TYPE  -- MUST BE SUFFIXED WITH Table
+    SYNTAX         SEQUENCE OF VolEntry
+    MAX-ACCESS     not-accessible
+    STATUS         current
+    DESCRIPTION
+    "Volume information table."
+    ::= { variables 2 }
+
+volEntry OBJECT-TYPE
+    SYNTAX          VolEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+    "A row of volume information."
+    INDEX { volIndex }
+    ::= { volTable 1 }
+
+VolEntry ::= SEQUENCE {
+    volIndex                 Unsigned32,
+    volID                    Unsigned32,
+    volName                  DisplayString,
+    volSizeLow               Unsigned32,
+    volSizeHigh              Unsigned32,
+    volUsageLow              Unsigned32,
+    volUsageHigh             Unsigned32,
+    volReserveLow            Unsigned32,
+    volReserveHigh           Unsigned32,
+    volOnline                TruthValue,
+    volNumConnections        Unsigned32
+}
+
+volIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "Volume Index."
+    ::= { volEntry 1 }
+
+volID OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Volume ID."
+    ::= { volEntry 2 }
+
+volName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Volume Name."
+    ::= { volEntry 3 }
+
+volSizeLow OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Maximum defined size of a volume in bytes - low order bytes."
+    ::= { volEntry 4 }
+
+volSizeHigh OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Maximum defined size of a volume in bytes - high order bytes."
+    ::= { volEntry 5 }
+
+volUsageLow OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Current number of bytes a volume is using - low order bytes."
+    ::= { volEntry 6 }
+
+volUsageHigh OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Current number of bytes a volume is using - high order bytes."
+    ::= { volEntry 7 }
+
+volReserveLow OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Number of bytes reserved for a volume - low order bytes."
+    ::= { volEntry 8 }
+
+volReserveHigh OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Number of bytes reserved for a volume - high order bytes."
+    ::= { volEntry 9 }
+
+volOnline OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Volume Online (true or false)."
+    ::= { volEntry 10 }
+
+volNumConnections OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Number of iSCSI connections to the volume."
+    ::= { volEntry 11 }
+
+---
+--- Global Stats
+---
+
+globalStats OBJECT IDENTIFIER ::= { variables 3 }
+
+statTimeEpochSeconds OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Time at which the sample was taken, measured in seconds since UNIX epoch."
+    ::= { globalStats 1 }
+
+ioReads OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Total cumulative number of Read I/Os (sequential and random)."
+    ::= { globalStats 2 }
+
+ioSeqReads OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Total cumulative number of Sequential Read I/Os."
+    ::= { globalStats 3 }
+
+ioWrites OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Total cumulative number of Write I/Os."
+    ::= { globalStats 4 }
+
+ioSeqWrites OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Total cumulative number of Sequential Write I/Os."
+    ::= { globalStats 5 }
+
+ioReadTimeMicrosec OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Total cumulative microseconds the system has spent processing Read I/Os.  This includes system and disk latency, but not any network latency back to the initiator."
+    ::= { globalStats 6 }
+
+ioWriteTimeMicrosec OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Total cumulative microseconds the system has spent processing Write I/Os.  This includes system and disk latency, but not any network latency back to the initiator."
+    ::= { globalStats 7 }
+
+ioReadBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Total cumulative number of Read I/O bytes (sequential and random)."
+    ::= { globalStats 8 }
+
+ioSeqReadBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Total cumulative number of Sequential Read I/O bytes."
+    ::= { globalStats 9 }
+
+ioWriteBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Total cumulative number of Write I/O bytes (sequential and random)."
+    ::= { globalStats 10 }
+
+ioSeqWriteBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Total cumulative number of Sequential Write I/O bytes."
+    ::= { globalStats 11 }
+
+diskVolBytesUsedLow OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Total number of bytes used on disk for volumes - low order bytes."
+    ::= { globalStats 12 }
+
+diskVolBytesUsedHigh OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Total number of bytes used on disk for volumes - high order bytes."
+    ::= { globalStats 13 }
+
+diskSnapBytesUsedLow OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Total number of bytes used on disk for snapshots - low order bytes."
+    ::= { globalStats 14 }
+
+diskSnapBytesUsedHigh OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Total number of bytes used on disk for snapshots - high order bytes."
+    ::= { globalStats 15 }
+
+ioNonseqReadHits OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Total cumulative number of cache hits for Non-Sequential Read I/Os."
+    ::= { globalStats 16 }
+
+--
+-- Nimble arrays
+--
+
+arrays OBJECT IDENTIFIER ::= { nimble 3 }
+
+arrayEntry OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "Nimble Array."
+    ::= { arrays 1 }
+
+
+END

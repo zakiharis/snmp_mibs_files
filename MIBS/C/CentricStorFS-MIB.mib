@@ -1,0 +1,835 @@
+CentricStorFS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	OBJECT-TYPE, TimeTicks, Counter, enterprises
+			FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION, DisplayString
+			FROM SNMPv2-TC
+	sysName 	
+			FROM SNMPv2-MIB
+	TRAP-TYPE
+			FROM RFC-1215;
+	
+centricStorFS	OBJECT IDENTIFIER ::= { enterprises 8010 }
+
+centricStorFSProduct	OBJECT IDENTIFIER ::= { centricStorFS 1 }
+centricStorFSCluster	OBJECT IDENTIFIER ::= { centricStorFS 2 }
+centricStorFSSysstat	OBJECT IDENTIFIER ::= { centricStorFS 3 }
+centricStorFSNFS		OBJECT IDENTIFIER ::= { centricStorFS 7 }
+
+
+     centricStorFSFileName OBJECT-TYPE
+                SYNTAX  DisplayString
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "The file name"
+                ::= { centricStorFS 11 }
+
+
+-- 
+-- The centricStorFSProduct group
+-- This group contains product information.
+--
+
+	centricStorFSProdType OBJECT-TYPE
+		SYNTAX	DisplayString
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"The product type."
+		::= { centricStorFSProduct 1 }
+
+	centricStorFSProdVer OBJECT-TYPE
+		SYNTAX	DisplayString
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"The Product Version."
+		::= { centricStorFSProduct 2 }
+
+	centricStorFSProdInstallDate OBJECT-TYPE
+		SYNTAX	DisplayString	
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"The time the product was installed."
+		::= { centricStorFSProduct 3 }
+
+	centricStorFSSystemURL OBJECT-TYPE
+	        SYNTAX DisplayString
+        	ACCESS read-only
+	        STATUS mandatory
+        	DESCRIPTION
+	            "The top-level URL of the system."
+        	::= { centricStorFSProduct 4 }
+
+
+-- 
+-- The centricStorFSCluster Group
+-- This group contains information about the cluster.
+-- 
+	centricStorFSCluName OBJECT-TYPE
+		SYNTAX	DisplayString
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"The name of the cluster."
+		::= { centricStorFSCluster 1 }
+
+	centricStorFSCluCond OBJECT-TYPE
+		SYNTAX	INTEGER {
+			other(1),
+			ok(2),
+			degraded(3),
+			failed(4)
+		}
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"The cluster condition as reported by this node.
+			other(1)	The cluster condition can not be determined. 
+			ok(2)		The cluster condition is functioning normally.
+					Every one of the nodes are up.
+			degraded(3)	The cluster condition is degraded if only one node from a pair of nodes is failed 
+					or degraded.
+			failed(4)	The cluster condition is failed if at least two nodes in a pair are failed"
+		::= { centricStorFSCluster 2 }
+
+
+	centricStorFSCluTotResourceCond OBJECT-TYPE
+		SYNTAX	INTEGER {
+			other(1),
+			ok(2),
+			degraded(3),
+			failed(4)
+		}
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"The cluster resource aggregate condition as reported by this node.
+			This condition is derived directly from each and every Cluster
+			resource condition as defined later in the Cluster Resource group.
+			other(1)	The condition can not be determined, which equates to
+					each and every resource condition as undetermined.
+			ok(2)		The condition is functioning normally, which equates
+					to each and every resource condition as ok.
+			degraded(3)	The condition is degraded if at least one resource
+					condition is degraded.
+			failed(4)	The condition is failed if at least one resource
+					condition is failed."
+		::= { centricStorFSCluster 3 }
+
+
+	--
+	-- Cluster Node Table
+	-- This table contains information about the nodes in a cluster.
+	--
+
+		centricStorFSCluNodeTable OBJECT-TYPE
+			SYNTAX  SEQUENCE OF CentricStorFSCluNodeEntry
+			ACCESS  not-accessible
+			STATUS  mandatory
+			DESCRIPTION
+				"A list of the cluster nodes entries."
+			::= { centricStorFSCluster 4 }
+
+		centricStorFSCluNodeEntry OBJECT-TYPE
+			SYNTAX  CentricStorFSCluNodeEntry
+			ACCESS  not-accessible
+			STATUS  mandatory
+			DESCRIPTION
+				"A centricStorFSCluNode entry contains general and conditional
+				information about one node in the cluster."
+			INDEX   { centricStorFSCluNodeIdx }
+			::= { centricStorFSCluNodeTable 1 }
+
+		CentricStorFSCluNodeEntry ::= SEQUENCE {
+			centricStorFSCluNodeIdx
+				INTEGER,
+			centricStorFSCluNodeName
+				DisplayString,
+			centricStorFSCluNodeStatus
+				INTEGER,
+			centricStorFSCluTotResourcesPerNode
+				INTEGER
+		}
+	
+		centricStorFSCluNodeIdx OBJECT-TYPE
+			SYNTAX  INTEGER (0..65535)
+			ACCESS  read-only
+			STATUS  mandatory
+			DESCRIPTION
+				"A unique index for this node entry."
+			::= { centricStorFSCluNodeEntry 1 }
+
+		centricStorFSCluNodeName OBJECT-TYPE
+			SYNTAX  DisplayString
+			ACCESS  read-only
+			STATUS  mandatory
+			DESCRIPTION
+				"The name of the node."
+			::= { centricStorFSCluNodeEntry 2 }
+
+		centricStorFSCluNodeStatus OBJECT-TYPE
+			SYNTAX  INTEGER {
+				other(1),
+				nodeUp(2),
+				nodeDown(3),
+				nodeAdminMode(4)
+			}
+			ACCESS  read-only
+			STATUS  mandatory
+			DESCRIPTION
+				"The current status of the node.
+				The following values are defined:
+				other(1)	- Indicates that an error has occurred and
+						the exact state of the node could not be
+						determined, or the node status is unavailable.
+				nodeUp(2)	- The node is operating as an active member of a
+						cluster. A node that is up responds to updates
+						to the cluster database, can host and manage
+						groups, and can maintain communication with
+						other nodes in the cluster.
+				nodeDown(3)	- The node is trying to form or rejoin a cluster
+						or is down. A node that is down is not an active
+						cluster member and it may or may not be running.
+						The Cluster Service may have started and then
+						failed, or may have failed to start completely.
+				nodeAdminMode(4)	- The node is down for maintenance:
+						the administrator initiated a node failure."	
+			::= { centricStorFSCluNodeEntry 3 }
+
+		centricStorFSCluTotResourcesPerNode OBJECT-TYPE
+			SYNTAX  INTEGER {
+				other(1),
+				ok(2),
+				degraded(3),
+				failed(4)
+			}
+			ACCESS  read-only
+			STATUS  mandatory
+			DESCRIPTION
+				"This node resource aggregate condition.
+				This condition is derived directly from each and every resource
+				condition reported on this node.
+				other(1)	The condition can not be determined, which equates to
+						each and every resource condition as undetermined.
+				ok(2)		The condition is functioning normally, which equates
+						to each and every resource condition as ok.
+				degraded(3)	The condition is degraded if a both-mode resource on one 
+						node is failed.
+				failed(4)	The condition is failed if a resource doesn't work on
+						BOTH nodes in one redundancy group or."
+			::= { centricStorFSCluNodeEntry 4 }
+
+
+	-- 
+	-- Cluster Resource Table
+	-- This table contains information about the resources of the cluster.
+	-- 
+
+		centricStorFSCluResourceTable OBJECT-TYPE
+			SYNTAX  SEQUENCE OF CentricStorFSCluResourceEntry
+			ACCESS  not-accessible
+			STATUS  mandatory
+			DESCRIPTION
+				"A table of resources managed by the cluster reported by this MIB."
+			::= { centricStorFSCluster 5 }
+
+		centricStorFSCluResourceEntry OBJECT-TYPE
+			SYNTAX  CentricStorFSCluResourceEntry
+			ACCESS  not-accessible
+			STATUS  mandatory
+			DESCRIPTION
+				"The properties describing a resource managed by the cluster."
+			INDEX   { centricStorFSCluResourceIdx }
+			::= { centricStorFSCluResourceTable 1 }
+
+		CentricStorFSCluResourceEntry ::= SEQUENCE {
+			centricStorFSCluResourceIdx
+				INTEGER,
+			centricStorFSCluResourceName
+				DisplayString,
+			centricStorFSCluResourceOwnerNode
+				DisplayString,
+			centricStorFSCluResourceSubCluster
+				DisplayString,
+			centricStorFSCluResourceStatus
+				DisplayString
+		}
+
+		centricStorFSCluResourceIdx OBJECT-TYPE
+			SYNTAX  INTEGER (0..65535)
+			ACCESS  read-only
+			STATUS  mandatory
+			DESCRIPTION
+				"A unique index for this resource entry."
+			::= { centricStorFSCluResourceEntry 1 }
+
+		centricStorFSCluResourceName OBJECT-TYPE
+			SYNTAX  DisplayString
+			ACCESS  read-only
+			STATUS  mandatory
+			DESCRIPTION
+				"The name of the resource. It must be unique within the cluster."
+			::= { centricStorFSCluResourceEntry 2 }
+
+		centricStorFSCluResourceOwnerNode OBJECT-TYPE
+			SYNTAX  DisplayString
+			ACCESS  read-only
+			STATUS  mandatory
+			DESCRIPTION
+				"The node in the cluster where the group of the resource is
+				currently online."
+			::= { centricStorFSCluResourceEntry 4 }
+
+		centricStorFSCluResourceSubCluster OBJECT-TYPE
+			SYNTAX  DisplayString
+			ACCESS  read-only
+			STATUS  mandatory
+			DESCRIPTION
+				"The sub-cluster where the group of the resource is currently online."
+			::= { centricStorFSCluResourceEntry 5 }
+
+		centricStorFSCluResourceStatus OBJECT-TYPE
+			SYNTAX  DisplayString
+			ACCESS  read-only
+			STATUS  mandatory
+			DESCRIPTION
+				"The resource's current state. 
+				The following values are defined:
+				other(1)	- Indicates that an error has occurred and the
+							exact state of the resource could not be
+							determined or the resource state is unavailable.
+				resourceStart(2)	- The resource is up and functioning normally.
+				resourceStop(3)		- The resource is down - it has failed 
+									and does not functioning.
+				resourceTakeover(4)	- The resource has performed take over.
+				resourceStandby(5)	- The resource is in standby state - 
+									ready to start running."
+			::= { centricStorFSCluResourceEntry 6 }
+
+			
+-- 
+-- The centricStorFSSysstat group
+-- This group contains system statistics about the cluster 
+-- (CPU statistics, IO, etc...)
+-- 
+
+	centricStorFSCpuTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF CentricStorFSCpuEntry
+		ACCESS  not-accessible
+		STATUS  mandatory
+		DESCRIPTION
+			"A table of information about the cpu."
+		::= { centricStorFSSysstat 1 }
+
+	centricStorFSCpuEntry OBJECT-TYPE
+		SYNTAX  CentricStorFSCpuEntry
+		ACCESS  not-accessible
+		STATUS  mandatory 
+		DESCRIPTION
+			"Statistics about the cpu utilization on each node ."
+		INDEX   { centricStorFSCpuNodeIdx }
+		::= { centricStorFSCpuTable 1 }
+
+	CentricStorFSCpuEntry ::= SEQUENCE {
+		centricStorFSCpuNodeIdx
+			INTEGER,
+		centricStorFSCpuNodeName
+			DisplayString,
+		centricStorFSCpuIdle
+			INTEGER,
+	        centricStorFSCpuUserTimePct
+                        INTEGER,
+		centricStorFSCpuKernelTimePct
+                        INTEGER
+	}
+
+	centricStorFSCpuNodeIdx OBJECT-TYPE
+		SYNTAX  INTEGER (0..65535)
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"A unique index for this node."
+		::= { centricStorFSCpuEntry 1 } 
+
+	centricStorFSCpuNodeName OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"A unique name for this node."
+		::= { centricStorFSCpuEntry 2 } 
+
+	centricStorFSCpuIdle OBJECT-TYPE
+		SYNTAX  INTEGER (0..100)
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The CPU idle."
+		::= { centricStorFSCpuEntry 3 } 	
+
+	centricStorFSCpuUserTimePct OBJECT-TYPE
+                SYNTAX  INTEGER (0..100)
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "The percentage of CPU (or CPUs) utilization that
+                        occurred while executing at the user mode (application)"
+                ::= { centricStorFSCpuEntry 4 }
+
+	centricStorFSCpuKernelTimePct OBJECT-TYPE
+                SYNTAX  INTEGER (0..100)
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "The percentage of CPU (or CPUs) utilization that
+                        occurred while executing at the system mode (kernel)"
+                ::= { centricStorFSCpuEntry 5 }
+	
+
+	centricStorFSIOStat	OBJECT IDENTIFIER ::= { centricStorFSSysstat 2 }
+
+	centricStorFSIOReadOps OBJECT-TYPE
+		SYNTAX  Counter
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The total number of read type IO ops done."
+		::= { centricStorFSIOStat 1 } 	
+	
+	centricStorFSIOWriteOps OBJECT-TYPE
+		SYNTAX  Counter
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"The total number of write type IO ops done."
+		::= { centricStorFSIOStat 2 } 	
+
+
+-- 
+-- The centricStorFSNFS group
+-- This group contains NFS statistics of the cluster.
+-- This group contains NFS statistics of the cluster, since the last boot.
+--
+
+	centricStorFSNFSOps	OBJECT IDENTIFIER ::= { centricStorFSNFS 1 }
+
+	centricStorFSNFSPct	OBJECT IDENTIFIER ::= { centricStorFSNFS 2 }
+
+	centricStorFSNFSKB	OBJECT IDENTIFIER ::= { centricStorFSNFS 3 }
+	
+	-- 
+	-- The centricStorFSNFSOps group
+	-- This group contains the number of Ops received by 
+	-- the cluster for each NFS procedure,
+	-- since the last boot.
+	-- 
+	
+	centricStorFSNFSV2Ops	OBJECT IDENTIFIER ::= { centricStorFSNFSOps 1 }
+
+	centricStorFSNFSV3Ops	OBJECT IDENTIFIER ::= { centricStorFSNFSOps 2 }
+
+	-- 
+	-- The centricStorFSNFSV2Ops group
+	-- This group contains the number of Ops received by 
+	-- the cluster for each NFS version 2 procedure, 
+	-- since the last boot 
+	-- 
+
+		centricStorFSNFSV2O OBJECT-TYPE
+			SYNTAX	Counter
+			ACCESS	read-only
+			STATUS	mandatory
+			DESCRIPTION
+				"The number of NFS Version 2 calls received,
+				since the last boot."
+			::= { centricStorFSNFSV2Ops 1 }
+
+		centricStorFSNFSV2ORead OBJECT-TYPE
+			SYNTAX  Counter
+			ACCESS  read-only
+			STATUS  mandatory
+			DESCRIPTION
+				"The number of NFS Version 2 calls received
+				for the NFSPROC_READ (Read From File)
+				procedure, since the last boot."
+			::= { centricStorFSNFSV2Ops 8 }
+
+		centricStorFSNFSV2OWrite OBJECT-TYPE
+			SYNTAX	Counter
+			ACCESS	read-only
+			STATUS	mandatory
+			DESCRIPTION
+				"The number of NFS Version 2 calls received
+				for the NFSPROC_WRITE (Write to File)
+				procedure, since the last boot."
+			::= { centricStorFSNFSV2Ops 10 }
+
+	-- 
+	-- The centricStorFSNFSV3Ops group
+	-- This group contains the number of Ops received by 
+	-- the cluster for each NFS version 3 procedure, 
+	-- since the last boot 
+	--
+
+		centricStorFSNFSV3O OBJECT-TYPE
+			SYNTAX	Counter
+			ACCESS	read-only
+			STATUS	mandatory
+			DESCRIPTION
+				"The number of NFS Version 3 calls received,
+				since the last boot."
+			::= { centricStorFSNFSV3Ops 1 }
+
+		centricStorFSNFSV3ORead OBJECT-TYPE
+			SYNTAX	Counter
+			ACCESS	read-only
+			STATUS	mandatory
+			DESCRIPTION
+				"The number of NFS Version 3 calls received
+				for the NFSPROC3_READ (Read From File)
+				procedure, since the last boot."
+			::= { centricStorFSNFSV3Ops 8 }
+
+		centricStorFSNFSV3OWrite	OBJECT-TYPE
+			SYNTAX	Counter
+			ACCESS	read-only
+			STATUS	mandatory
+			DESCRIPTION
+				"The number of NFS Version 3 calls received
+				for the NFSPROC3_WRITE (Write to File)
+				procedure, since the last boot."
+			::= { centricStorFSNFSV3Ops 9 }
+
+	-- 
+	-- The centricStorFSNFSPct group
+	-- This group contains the number of Ops received by the
+	-- cluster for each NFS procedure since the last boot, as a
+	-- percentage of the number of total RPC calls received.
+	--
+
+	centricStorFSNFSV2Pct	OBJECT IDENTIFIER ::= { centricStorFSNFSPct 1 }
+
+	centricStorFSNFSV3Pct	OBJECT IDENTIFIER ::= { centricStorFSNFSPct 2 }
+
+	-- 
+	-- The centricStorFSNFSV2Pct group
+	-- This group contains the number of Ops received by the
+	-- cluster for each NFS version 2 procedure since the last
+	-- boot, as a percentage of the number of total RPC calls
+	-- received.
+	--
+
+		centricStorFSNFSV2PRead OBJECT-TYPE
+			SYNTAX	INTEGER (0..100)
+			ACCESS	read-only
+			STATUS	mandatory
+			DESCRIPTION
+				"The number of NFS Version 2 calls received
+				for the NFSPROC_READ (Read From File)
+				procedure since the last boot, 
+				as a percentage of total RPC calls."
+			::= { centricStorFSNFSV2Pct 7 }
+
+		centricStorFSNFSV2PWrite OBJECT-TYPE
+			SYNTAX	INTEGER (0..100)
+			ACCESS	read-only
+			STATUS	mandatory
+			DESCRIPTION
+				"The number of NFS Version 2 calls received
+				for the NFSPROC_WRITE (Write to File)
+				procedure since the last boot, 
+				as a percentage of total RPC calls."
+			::= { centricStorFSNFSV2Pct 9 }
+
+	
+	-- 
+	-- The centricStorFSNFSV3Pct group
+	-- This group contains the number of Ops received by 
+	-- the cluster for each NFS version 3 procedure
+	-- since the last boot, as a percentage of the number 
+	-- total RPC calls received.
+	--
+
+		centricStorFSNFSV3PRead OBJECT-TYPE
+			SYNTAX  INTEGER (0..100)
+			ACCESS  read-only
+			STATUS  mandatory
+			DESCRIPTION
+				"The number of NFS Version 3 calls received
+				for the NFSPROC3_READ (Read From File)
+				procedure since the last boot, 
+				as a percentage of total RPC calls."
+			::= { centricStorFSNFSV3Pct 7 }
+
+		centricStorFSNFSV3PWrite OBJECT-TYPE
+			SYNTAX	INTEGER (0..100)
+			ACCESS	read-only
+			STATUS	mandatory
+			DESCRIPTION
+				"The number of NFS Version 3 calls received
+				for the NFSPROC3_WRITE (Write to File)
+				procedure since the last boot, 
+				as a percentage of total RPC calls."
+			::= { centricStorFSNFSV3Pct 8 }
+
+	-- 
+	-- The centricStorFSNFSKB group
+	-- This group contains the number of KB received & sent by 
+	-- the cluster."
+		 centricStorFSNFSKBIn      OBJECT-TYPE
+                        SYNTAX  Counter
+                        ACCESS  read-only
+                        STATUS  mandatory
+                        DESCRIPTION
+                                "The amount of read operations in KB recived by the cluster."
+                        ::= { centricStorFSNFSKB 1 }
+                                                                                                                          
+                centricStorFSNFSKBOut     OBJECT-TYPE
+                        SYNTAX  Counter
+                        ACCESS  read-only
+                        STATUS  mandatory
+                        DESCRIPTION
+                                "The amount of write operations in KB recived by the cluster."
+                        ::= { centricStorFSNFSKB 2 }
+
+--
+-- General Event Description
+--
+
+	centricStorFSGenEventDesc OBJECT-TYPE
+		SYNTAX  DisplayString
+		ACCESS  read-only
+		STATUS  mandatory
+		DESCRIPTION
+			"A string describing the general event."
+		::= { centricStorFS 10 } 
+
+--
+--  Cluster Trap Definition
+--
+--  The centricStorFS enterprise			   (1.3.6.1.4.1.8010)
+--
+
+	centricStorFSCluOK TRAP-TYPE
+		ENTERPRISE centricStorFS
+		VARIABLES  { sysName, centricStorFSCluName }
+		DESCRIPTION
+			"This trap will be sent any time the condition of the cluster
+			 becomes ok."
+
+		--#TYPE		"Cluster OK"
+		--#SUMMARY	"Cluster %s is ok."
+		--#ARGUMENTS	{1}
+		--#SEVERITY	NORMAL
+		--#TIMEINDEX	99
+		--#STATE	OK
+	::= 1
+
+	centricStorFSCluDegraded TRAP-TYPE
+		ENTERPRISE centricStorFS
+		VARIABLES  { sysName, centricStorFSCluName }
+		DESCRIPTION
+			"This trap will be sent any time the condition of the cluster
+			 becomes degraded."
+
+		--#TYPE		"Cluster Degraded"
+		--#SUMMARY	"Cluster %s has become degraded."
+		--#ARGUMENTS	{1}
+		--#SEVERITY	MAJOR
+		--#TIMEINDEX	99
+		--#STATE	DEGRADED
+	::= 2
+
+	centricStorFSCluFailed TRAP-TYPE
+		ENTERPRISE centricStorFS
+		VARIABLES  { sysName, centricStorFSCluName }
+		DESCRIPTION
+			"This trap will be sent any time the condition of the cluster
+			 becomes failed."
+
+		--#TYPE		"Cluster Failed"
+		--#SUMMARY	"Cluster %s has failed."
+		--#ARGUMENTS	{1}
+		--#SEVERITY	MAJOR
+		--#TIMEINDEX	99
+		--#STATE	FAILED
+	::= 3
+
+	centricStorFSCluNodeOK TRAP-TYPE
+		ENTERPRISE centricStorFS
+		VARIABLES  { sysName, centricStorFSCluNodeName }
+		DESCRIPTION
+			"This trap will be sent any time the condition of a node in
+			 the cluster becomes ok."
+
+		--#TYPE		"Cluster Node OK"
+		--#SUMMARY	"Cluster %s node %s is ok."
+		--#ARGUMENTS	{0,1}
+		--#SEVERITY	NORMAL
+		--#TIMEINDEX	99
+		--#STATE	OK
+	::= 4
+		
+	centricStorFSCluNodeDegraded TRAP-TYPE
+		ENTERPRISE centricStorFS
+		VARIABLES  { sysName, centricStorFSCluNodeName }
+		DESCRIPTION
+			"This trap will be sent any time the condition of a node in
+			 the cluster becomes degraded.
+
+			 User Action: Make a note of the cluster node name then
+			 check the node for the cause of the degraded condition."
+
+		--#TYPE	  "Cluster Node Degraded"
+		--#SUMMARY   "Cluster %s node %s has become degraded."
+		--#ARGUMENTS {0,1}
+		--#SEVERITY  MAJOR
+		--#TIMEINDEX 99
+		--#STATE	 DEGRADED
+	::= 5
+
+	centricStorFSCluNodeFailed TRAP-TYPE
+		ENTERPRISE centricStorFS
+		VARIABLES  { sysName, centricStorFSCluNodeName }
+		DESCRIPTION
+			"This trap will be sent any time the condition of a node in
+			 the cluster becomes failed.
+
+			 User Action: Make a note of the cluster node name
+			 then check the node for the cause of the failure."
+
+		--#TYPE		"Cluster Node Failed"
+		--#SUMMARY	"Cluster %s node %s has failed."
+		--#ARGUMENTS	{0,1}
+		--#SEVERITY	MAJOR
+		--#TIMEINDEX	99
+		--#STATE	FAILED
+	::= 6
+
+	centricStorFSCluResourceOK TRAP-TYPE
+		ENTERPRISE centricStorFS
+		VARIABLES  { sysName, centricStorFSCluResourceName, centricStorFSCluResourceOwnerNode }
+		DESCRIPTION
+			"This trap will be sent any time the condition of a cluster
+			 resource becomes ok."
+
+		--#TYPE		"Cluster Resource OK"
+		--#SUMMARY	"Cluster %s resource %s on node %s is ok."
+		--#ARGUMENTS	{0,1,2}
+		--#SEVERITY	NORMAL
+		--#TIMEINDEX	99
+		--#STATE	OK
+	::= 7
+	
+	centricStorFSCluResourceDegraded TRAP-TYPE
+		ENTERPRISE centricStorFS
+		VARIABLES  { sysName, centricStorFSCluResourceName, centricStorFSCluResourceOwnerNode }
+		DESCRIPTION
+			"This trap will be sent any time the condition of a cluster
+			 resource becomes degraded.
+
+			 User Action: Make a note of the cluster resource name then
+			 check the resource for the cause of the degraded condition."
+
+		--#TYPE		"Cluster Resource Degraded"
+		--#SUMMARY	"Cluster %s resource %s on node %s has become degraded."
+		--#ARGUMENTS	{0,1,2}
+		--#SEVERITY	MAJOR
+		--#TIMEINDEX	99
+		--#STATE	DEGRADED
+	::= 8
+
+	centricStorFSCluResourceFailed TRAP-TYPE
+		ENTERPRISE centricStorFS
+		VARIABLES  { sysName, centricStorFSCluResourceName, centricStorFSCluResourceOwnerNode }
+		DESCRIPTION
+			"This trap will be sent any time the condition of a cluster
+			 resource becomes failed.
+
+			 User Action: Make a note of the cluster resource name
+			 then check the resource for the cause of the failure."
+
+		--#TYPE		"Cluster Resource Failed"
+		--#SUMMARY	"Cluster %s resource %s on node %s has failed."
+		--#ARGUMENTS	{0,1,2}
+		--#SEVERITY	MAJOR
+		--#TIMEINDEX	99
+		--#STATE	FAILED
+	::= 9
+
+	centricStorFSGenNormalEvent TRAP-TYPE
+		ENTERPRISE centricStorFS
+		VARIABLES  { sysName, centricStorFSGenEventDesc, centricStorFSCluNodeName }
+		DESCRIPTION
+			"This trap will be sent for normal events."
+
+		--#TYPE		"Normal Event"
+		--#SUMMARY	"%s has occured on %s"
+		--#ARGUMENTS	{1,2}
+		--#SEVERITY	NORMAL
+		--#TIMEINDEX	99
+		--#STATE	OK
+	::= 14
+
+	centricStorFSGenMinorEvent TRAP-TYPE
+		ENTERPRISE centricStorFS
+		VARIABLES  { sysName, centricStorFSGenEventDesc, centricStorFSCluNodeName }
+		DESCRIPTION
+			"This trap will be sent for minor events."
+
+		--#TYPE		"Minor Event"
+		--#SUMMARY	"%s has occured on %s"
+		--#ARGUMENTS	{1,2}
+		--#SEVERITY	CRITICAL
+		--#TIMEINDEX	99
+		--#STATE	DEGRADED
+	::= 15
+
+	centricStorFSGenMajorEvent TRAP-TYPE
+		ENTERPRISE centricStorFS
+		VARIABLES  { sysName, centricStorFSGenEventDesc, centricStorFSCluNodeName }
+		DESCRIPTION
+			"This trap will be sent for major events."
+
+		--#TYPE		"Major Event"
+		--#SUMMARY	"%s has occured on %s"
+		--#ARGUMENTS	{1,2}
+		--#SEVERITY	MAJOR
+		--#TIMEINDEX	99
+		--#STATE	DEGRADED
+	::= 16
+
+	centricStorFSGenCriticalEvent TRAP-TYPE
+		ENTERPRISE centricStorFS
+		VARIABLES  { sysName, centricStorFSGenEventDesc, centricStorFSCluNodeName }
+		DESCRIPTION
+			"This trap will be sent for critical events."
+
+		--#TYPE		"Critical Event"
+		--#SUMMARY	"%s has occured on %s"
+		--#ARGUMENTS	{1,2}
+		--#SEVERITY	CRITICAL
+		--#TIMEINDEX	99
+		--#STATE	FAILED
+	::= 17
+
+        centricStorFSAntiVirusEvent TRAP-TYPE
+                ENTERPRISE centricStorFS
+                VARIABLES  { sysName, centricStorFSFileName }
+                DESCRIPTION
+                        "The antivirus software on or connected to system
+                         detected a virus."
+                                                                                                                          
+                --#TYPE         "Virus detected"
+                --#SUMMARY      "Antivirus Software on %s found a virus in file %s"
+                --#ARGUMENTS    {0,1}
+                --#SEVERITY     MAJOR
+                --#TIMEINDEX    99
+                --#STATE        DEGRADED
+        ::= 18
+
+END

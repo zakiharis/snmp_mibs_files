@@ -1,0 +1,120 @@
+Vnxe-MIB DEFINITIONS ::= BEGIN 
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, OBJECT-IDENTITY, 
+    enterprises
+        FROM SNMPv2-SMI
+
+    DisplayString, TimeStamp
+        FROM SNMPv2-TC;
+
+vnxe MODULE-IDENTITY
+    LAST-UPDATED "201205250000Z"           -- 25 May 2012, midnight
+    ORGANIZATION "EMC Corporation"
+    CONTACT-INFO 
+       "EMC Corporation
+        176 South St.
+        Hopkinton, MA 01748
+        USA
+        Tel:   +1.508.435.1000"
+    DESCRIPTION
+        "MIB Definition used in the VNXe Product Line:
+         iso(1).org(3).dod(6).internet(1).private(4).enterprises(1).
+         emc(1139).vnxe(18)"
+    REVISION "201205250000Z"
+    DESCRIPTION "Original release"
+    ::= { emc 18 }
+
+emc OBJECT IDENTIFIER ::= { enterprises 1139  }
+vnxeObjects                OBJECT IDENTIFIER ::= { vnxe 1 }
+vnxeTrap                    OBJECT IDENTIFIER ::= { vnxeObjects 18 }
+vnxeTrapVariable OBJECT IDENTIFIER ::= { vnxeTrap 1 }
+    
+vnxeTrapNode OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "This is node/IP address of the system that causes the trap."
+    ::= { vnxeTrapVariable 1 }
+
+vnxeTrapComponent OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "This is the component that causes the trap."
+    ::= { vnxeTrapVariable 2 }
+
+vnxeTrapSymptomID OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "This is the symptom ID that causes the trap."
+    ::= { vnxeTrapVariable 3 }
+
+vnxeTrapSymptomText OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "This is the symptom description for SymptomID."
+    ::= { vnxeTrapVariable 4 }
+
+vnxeTrapTimeStamp OBJECT-TYPE
+    SYNTAX TimeStamp
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION "This is the timestamp of the trap."
+    ::= { vnxeTrapVariable 5 }
+
+vnxeGenericTrap OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION "This is the subtree for generic trap from VNXe storage system"
+    ::= { vnxeTrap 2 }
+
+vnxeGenericTrapEmergency NOTIFICATION-TYPE
+    OBJECTS { vnxeTrapNode, vnxeTrapComponent, vnxeTrapSymptomID, vnxeTrapSymptomText, vnxeTrapTimeStamp }
+    STATUS current
+    DESCRIPTION "This trap is generated when the system is unusable."
+    ::= { vnxeGenericTrap 0 }
+
+vnxeGenericTrapAlert NOTIFICATION-TYPE
+    OBJECTS { vnxeTrapNode, vnxeTrapComponent, vnxeTrapSymptomID, vnxeTrapSymptomText, vnxeTrapTimeStamp }
+    STATUS current
+    DESCRIPTION "This trap is generated when action needs to be taken immediately."
+    ::= { vnxeGenericTrap 1 }
+
+vnxeGenericTrapCritical NOTIFICATION-TYPE
+    OBJECTS { vnxeTrapNode, vnxeTrapComponent, vnxeTrapSymptomID, vnxeTrapSymptomText, vnxeTrapTimeStamp }
+    STATUS current
+    DESCRIPTION "This trap is generated when the system is in critical condition."
+    ::= { vnxeGenericTrap 2 }
+
+vnxeGenericTrapError NOTIFICATION-TYPE
+    OBJECTS { vnxeTrapNode, vnxeTrapComponent, vnxeTrapSymptomID, vnxeTrapSymptomText, vnxeTrapTimeStamp }
+    STATUS current
+    DESCRIPTION "This trap is generated when there is an error in the system."
+    ::= { vnxeGenericTrap 3 }
+
+vnxeGenericTrapWarning NOTIFICATION-TYPE
+    OBJECTS { vnxeTrapNode, vnxeTrapComponent, vnxeTrapSymptomID, vnxeTrapSymptomText, vnxeTrapTimeStamp }
+    STATUS current
+    DESCRIPTION "This trap is generated when there is a warning condition in the system."
+    ::= { vnxeGenericTrap 4 }
+    
+vnxeGenericTrapNotice NOTIFICATION-TYPE
+    OBJECTS { vnxeTrapNode, vnxeTrapComponent, vnxeTrapSymptomID, vnxeTrapSymptomText }
+    STATUS current
+    DESCRIPTION "This trap is generated when there is a normal but significant condition in the system."
+    ::= { vnxeGenericTrap 5 }
+
+vnxeGenericTrapInformational NOTIFICATION-TYPE
+    OBJECTS { vnxeTrapNode, vnxeTrapComponent, vnxeTrapSymptomID, vnxeTrapSymptomText, vnxeTrapTimeStamp }
+    STATUS current
+    DESCRIPTION "This trap is generated when there is an informational message."
+    ::= { vnxeGenericTrap 6 }
+
+vnxeGenericTrapDebug NOTIFICATION-TYPE
+    OBJECTS { vnxeTrapNode, vnxeTrapComponent, vnxeTrapSymptomID, vnxeTrapSymptomText, vnxeTrapTimeStamp }
+    STATUS current
+    DESCRIPTION "This trap is generated when there is a debug-level message."
+    ::= { vnxeGenericTrap 7 }
+END

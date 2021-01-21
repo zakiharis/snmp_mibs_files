@@ -1,0 +1,367 @@
+EVENTS-MIB DEFINITIONS ::= BEGIN
+
+--	
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, Integer32,
+	NOTIFICATION-TYPE, Unsigned32, Counter64, Counter32
+		FROM SNMPv2-SMI
+	DateAndTime, DisplayString,TimeStamp
+		FROM SNMPv2-TC
+	SnmpAdminString
+		FROM SNMP-FRAMEWORK-MIB
+	kav4LinuxFS
+		FROM KAV-FOR-LINUX-FS-MIB
+;
+
+events MODULE-IDENTITY
+	LAST-UPDATED "201602241200Z"
+	ORGANIZATION "www.kaspersky.com"
+	CONTACT-INFO "Kaspersky Lab"
+	DESCRIPTION "."
+	-- revisions
+	REVISION "201602241200Z"
+	DESCRIPTION  "Automatically generated."
+ ::= { kav4LinuxFS 1 }
+
+
+avBasesAttachedEvent NOTIFICATION-TYPE
+	OBJECTS { avBasesDate }
+	STATUS current
+	DESCRIPTION
+		"AV Bases Reloaded Sucessfully"
+	::= { events 10 }
+
+avBasesDate OBJECT-TYPE
+	SYNTAX DateAndTime
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		""
+	::= { events 100 }
+
+avBasesAreOutOfDateEvent NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION
+		"AV Bases Are Out-of-Date"
+	::= { events 11 }
+
+avBasesAreTotallyOutOfDateEvent NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION
+		"AV Bases Are Totally Out-of-Date"
+	::= { events 12 }
+
+avNothingToUpdateEvent NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION
+		"Nothing to Update"
+	::= { events 15 }
+
+avModuleNotDownloadedEvent NOTIFICATION-TYPE
+	OBJECTS { avNotDownloadedModuleName, avModuleDownloadFailureReason }
+	STATUS current
+	DESCRIPTION
+		"Module Download Failed"
+	::= { events 17 }
+
+avNotDownloadedModuleName OBJECT-TYPE
+	SYNTAX SnmpAdminString
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		""
+	::= { events 106 }
+
+avModuleDownloadFailureReason OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		""
+	::= { events 107 }
+
+avBasesIntegrityCheckFailedEvent NOTIFICATION-TYPE
+	OBJECTS { avBasesIntegrityFailReason }
+	STATUS current
+	DESCRIPTION
+		"AV Base Integrity Check Failed"
+	::= { events 19 }
+
+avBasesIntegrityFailReason OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		""
+	::= { events 101 }
+
+avUpdateErrorEvent NOTIFICATION-TYPE
+	OBJECTS { avUpdateFailureModuleName, avModuleUpdateFailureReason }
+	STATUS current
+	DESCRIPTION
+		"Update Failed"
+	::= { events 22 }
+
+avUpdateFailureModuleName OBJECT-TYPE
+	SYNTAX SnmpAdminString
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		""
+	::= { events 111 }
+
+avModuleUpdateFailureReason OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		""
+	::= { events 149 }
+
+avRetranslationErrorEvent NOTIFICATION-TYPE
+	OBJECTS { avRetranslateFailureModuleName, avRetranslationFailureReason }
+	STATUS current
+	DESCRIPTION
+		"Retranslation Failed"
+	::= { events 49 }
+
+avRetranslateFailureModuleName OBJECT-TYPE
+	SYNTAX SnmpAdminString
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		""
+	::= { events 112 }
+
+avRetranslationFailureReason OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		""
+	::= { events 113 }
+
+avBasesRollbackCompletedEvent NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION
+		"Rollback completed"
+	::= { events 23 }
+
+avBasesRollbackErrorEvent NOTIFICATION-TYPE
+	OBJECTS { avBasesRollbackErrorReason }
+	STATUS current
+	DESCRIPTION
+		"Rollback error"
+	::= { events 24 }
+
+avBasesRollbackErrorReason OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		""
+	::= { events 102 }
+
+avBasesAppliedEvent NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION
+		"AvBases applied"
+	::= { events 25 }
+
+avLicenseInstalledEvent NOTIFICATION-TYPE
+	OBJECTS { avInstalledLicenseKeySerial }
+	STATUS current
+	DESCRIPTION
+		"License Installed"
+	::= { events 50 }
+
+avInstalledLicenseKeySerial OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		""
+	::= { events 150 }
+
+avLicenseNotInstalledEvent NOTIFICATION-TYPE
+	OBJECTS { avLicenseInstalationFailedKeySerial, avLicenseKeyInstalationFailureReason }
+	STATUS current
+	DESCRIPTION
+		"License Installation Failure"
+	::= { events 51 }
+
+avLicenseInstalationFailedKeySerial OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		""
+	::= { events 151 }
+
+avLicenseKeyInstalationFailureReason OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		""
+	::= { events 152 }
+
+avLicenseRevokedEvent NOTIFICATION-TYPE
+	OBJECTS { avRevokedLicenseKeySerial }
+	STATUS current
+	DESCRIPTION
+		"License Revoked"
+	::= { events 52 }
+
+avRevokedLicenseKeySerial OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		""
+	::= { events 153 }
+
+avLicenseNotRevokedEvent NOTIFICATION-TYPE
+	OBJECTS { avLicenseRevokationFailureKeySerial, avLicenseRevokationFailureReason }
+	STATUS current
+	DESCRIPTION
+		"License Revokation Failure"
+	::= { events 53 }
+
+avLicenseRevokationFailureKeySerial OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		""
+	::= { events 154 }
+
+avLicenseRevokationFailureReason OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		""
+	::= { events 155 }
+
+avLicenseExpiredEvent NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION
+		"License Expired"
+	::= { events 54 }
+
+avLicenseExpiresSoonEvent NOTIFICATION-TYPE
+	OBJECTS { avLicenseKeyDaysTillExpiratiom }
+	STATUS current
+	DESCRIPTION
+		"License Expires Soon"
+	::= { events 55 }
+
+avLicenseKeyDaysTillExpiratiom OBJECT-TYPE
+	SYNTAX Unsigned32
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		""
+	::= { events 156 }
+
+avLicenseErrorEvent NOTIFICATION-TYPE
+	OBJECTS { avLicenseErrorReason, avLicenseErrorReason }
+	STATUS current
+	DESCRIPTION
+		"License Error"
+	::= { events 56 }
+
+avLicenseErrorReason OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		""
+	::= { events 199 }
+
+avThreatDetectedEvent NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION
+		"Thread Detected"
+	::= { events 301 }
+
+avObjectDisinfectedEvent NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION
+		"Object Disinfected"
+	::= { events 303 }
+
+avObjectDeletedEvent NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION
+		"Object Deleted"
+	::= { events 302 }
+
+avTaskStateChangedEvent NOTIFICATION-TYPE
+	OBJECTS { avTaskState, persistentTaskId, runtimeTaskId }
+	STATUS current
+	DESCRIPTION
+		"Task State is changed"
+	::= { events 200 }
+
+avTaskState OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		""
+	::= { events 253 }
+
+avApplicationStartedEvent NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION
+		"Application is Started"
+	::= { events 1 }
+
+avApplicationSettingsChangedEvent NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION
+		"Application settings are changed"
+	::= { events 3 }
+
+avObjectAddedToQuarantine NOTIFICATION-TYPE
+	OBJECTS { avFileName, avFileName }
+	STATUS current
+	DESCRIPTION
+		"ObjectSavedToQuarantine"
+	::= { events 352 }
+
+avFileName OBJECT-TYPE
+	SYNTAX SnmpAdminString
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		""
+	::= { events 401 }
+
+avObjectAddedToBackup NOTIFICATION-TYPE
+	OBJECTS { avFileName, avFileName }
+	STATUS current
+	DESCRIPTION
+		"ObjectSavedToBackup"
+	::= { events 353 }
+
+persistentTaskId OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		"Pesrsistent Task ID"
+	::= { events 251 }
+
+runtimeTaskId OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS accessible-for-notify
+	STATUS current
+	DESCRIPTION
+		"Runtime Task ID"
+	::= { events 252 }
+
+END

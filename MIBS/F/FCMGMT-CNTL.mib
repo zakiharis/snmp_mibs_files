@@ -1,0 +1,110 @@
+FCMGMT-CNTL DEFINITIONS ::= BEGIN
+
+   IMPORTS
+   experimental
+        FROM RFC1155-SMI
+   OBJECT-TYPE
+        FROM RFC-1212;
+
+   fcmgmt   OBJECT IDENTIFIER
+--      DEFAULT     get-function-async   get_Unsupported
+--      DEFAULT     set-function-async   set_Unsupported
+--      DEFAULT     test-function-async  it_exists_async
+--      DEFAULT     next-function-async  std_next_async
+--      DEFAULT     cookie      (char *) 0
+--      DEFAULT  view-mask            ((bits32_t) 0xFFFFFFFFL)
+      ::= { experimental 94 }
+
+   connSet   OBJECT IDENTIFIER
+--      DEFAULT  get-function-async   get_connSet
+--      DEFAULT  next-function-async  std_next_async
+--      DEFAULT  view-mask            ((bits32_t) 0xFFFFFFFFL)
+      ::= { fcmgmt 1 }
+
+	revisionNumber OBJECT IDENTIFIER
+--      DEFAULT  get-function-async   get_revisionNumber
+--      DEFAULT  next-function-async  std_next_async
+--      DEFAULT  view-mask            ((bits32_t) 0xFFFFFFFFL)
+		::= { fcmgmt 3 }
+
+   connUnitTable   OBJECT IDENTIFIER
+--      DEFAULT  get-function-async   get_connUnit
+--      DEFAULT  next-function-async  get_connUnit
+--      DEFAULT  view-mask            ((bits32_t) 0xFFFFFFFFL)
+      ::= { connSet 6 }
+
+	connUnitRevsTable OBJECT IDENTIFIER
+--      DEFAULT  get-function-async   get_connUnitRevsTable
+--      DEFAULT  next-function-async  get_connUnitRevsTable
+--      DEFAULT  view-mask            ((bits32_t) 0xFFFFFFFFL)
+		::= { connSet 7 }
+
+	connUnitSensorTable OBJECT IDENTIFIER
+--      DEFAULT  get-function-async   get_connUnitSensorTable
+--      DEFAULT  next-function-async  get_connUnitSensorTable
+--      DEFAULT  view-mask            ((bits32_t) 0xFFFFFFFFL)
+		::= { connSet 8 }
+
+	connUnitZoneTable OBJECT IDENTIFIER
+--      DEFAULT  get-function-async   get_connUnitSubTable
+--      DEFAULT  next-function-async  get_connUnitSubTable
+--      DEFAULT  view-mask            ((bits32_t) 0xFFFFFFFFL)
+		::= { connSet 9 }
+
+	connUnitPortTable OBJECT IDENTIFIER 
+--      DEFAULT  get-function-async   get_connUnitPortTable
+--      DEFAULT  next-function-async  get_connUnitPortTable
+--      DEFAULT  view-mask            ((bits32_t) 0xFFFFFFFFL)
+		::= { connSet 10 } 
+
+	connUnitEventTable OBJECT IDENTIFIER 
+--      DEFAULT  get-function-async   get_connUnitEventTable
+--      DEFAULT  next-function-async  get_connUnitEventTable
+--      DEFAULT  view-mask            ((bits32_t) 0xFFFFFFFFL)
+		::= { connSet 11 } 
+
+	connUnitLinkTable OBJECT IDENTIFIER
+--      DEFAULT  get-function-async   get_connUnitLinkTable
+--      DEFAULT  next-function-async  get_connUnitLinkTable
+--      DEFAULT  view-mask            ((bits32_t) 0xFFFFFFFFL)
+		::= { connSet 12 }
+
+   trapReg   OBJECT IDENTIFIER ::= { fcmgmt 2 } 
+   trapMaxClients OBJECT IDENTIFIER
+   --      DEFAULT     get-function-async  get_int_async
+   --      DEFAULT     next-function-async std_next_async
+   --      DEFAULT     cookie      (char *)&TRAPMAXCLIENTS
+      ::= { trapReg 1 }
+
+   trapClientCount OBJECT IDENTIFIER
+   --      DEFAULT     get-function-async  get_int_async
+   --      DEFAULT     next-function-async std_next_async
+   --      DEFAULT     cookie      (char *)&trapClientCount
+      ::= { trapReg 2 }
+
+   trapRegTable OBJECT IDENTIFIER 
+--      DEFAULT  get-function-async   get_trapRegTable
+--      DEFAULT  next-function-async  get_trapRegTable
+--      DEFAULT  view-mask            ((bits32_t) 0xFFFFFFFFL)
+		::= { trapReg 3 } 
+
+   trapRegEntry   OBJECT IDENTIFIER ::= { trapRegTable 1 } 
+
+    trapRegFilter OBJECT IDENTIFIER 
+--      DEFAULT  set-function-async   set_trapRegFilter
+--      DEFAULT  test-function-async  test_trapReg
+        ::= { trapRegEntry 3} 
+
+    trapRegRowState OBJECT IDENTIFIER
+--      DEFAULT  set-function-async   set_trapRegRowState
+--      DEFAULT  test-function-async  test_trapReg
+        ::= { trapRegEntry 4} 
+
+   statSet   OBJECT IDENTIFIER ::= { fcmgmt 4 } 
+
+   connUnitPortStatTable   OBJECT IDENTIFIER
+--      DEFAULT  get-function-async   get_connUnitPortStats
+--      DEFAULT  next-function-async  get_connUnitPortStats
+--      DEFAULT  view-mask            ((bits32_t) 0xFFFFFFFFL)
+		::= { statSet 5 } 
+END

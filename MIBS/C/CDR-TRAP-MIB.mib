@@ -1,0 +1,153 @@
+CDR-TRAP-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    enterprises, Counter
+        FROM RFC1155-SMI
+    OBJECT-TYPE
+        FROM RFC-1212
+    DisplayString
+        FROM RFC1213-MIB
+    ObjectName, Integer32, Counter32, snmpModules
+        FROM SNMPv2-SMI
+    cdrClient, cdrCallState, fCAppID, fCAppInstance, originationNumber, destinationNumber, callAnswerTime, switchId, callId, subType, severity, fullPercent, fileSystem, fileName, errorNo 
+        FROM CDR-DS1-MIB
+    TruthValue, DisplayString, TestAndIncr, TimeStamp, RowStatus
+        FROM SNMPv2-TC;
+
+	lucent		    OBJECT IDENTIFIER  ::=  {  enterprises  1751  }
+	products	    OBJECT IDENTIFIER  ::=  {  lucent  1  }
+	softSwitch	    OBJECT IDENTIFIER  ::=  {  products 1198  }
+	cdrDeviceServer OBJECT IDENTIFIER  ::=  {  softSwitch 7 }
+
+    cdrTraps   MODULE-IDENTITY    
+        LAST-UPDATED "240701"
+        ORGANIZATION "Lucent Technologies"    
+        CONTACT-INFO 
+                ""    
+        DESCRIPTION
+                "The MIB module for entities implementing the xxxx
+                protocol."  
+
+    ::=  {  cdrDeviceServer 0  }
+
+	-- The traps group. Listed below are the traps currently
+	-- supported by this device server  
+
+
+
+
+cDRBufferOverflow NOTIFICATION-TYPE
+	OBJECTS { cdrClient }
+    STATUS current
+    DESCRIPTION
+        "BufferOverflow."
+-- RMZ i want to start from 1 ok?
+::= { cdrTraps 1 }
+
+cDRInconsistentState NOTIFICATION-TYPE
+    OBJECTS { cdrCallState}
+    STATUS current
+    DESCRIPTION
+        "A Call has transitioned into an inconsistent state.
+        OBJECTS DEFINITION:
+		1) cdrCallState: Call state."
+	       
+::= { cdrTraps 2 }
+
+cDRNewClient NOTIFICATION-TYPE 
+    OBJECTS { cdrClient }
+    STATUS current
+    DESCRIPTION 
+        "A new client registered.
+	    VARIABLES DEFINITION:
+	    1) cdrClient: the newClient."
+
+::= { cdrTraps 3 }
+
+cDRClientDisconnected NOTIFICATION-TYPE
+    OBJECTS { cdrClient }
+    STATUS current
+    DESCRIPTION
+        "Client disconnected.
+        VARIABLES DEFINITION:
+        1) cdrClient: the Client."
+
+::= { cdrTraps 4 }
+
+cDRClientBufferOverflow NOTIFICATION-TYPE
+    OBJECTS { cdrClient }
+    STATUS current
+    DESCRIPTION
+        "Client Buffer Overflows.
+        VARIABLES DEFINITION:
+        1) cdrClient: the Client."
+
+::= { cdrTraps 5 }
+
+cDRFCAppInfoTimeOut NOTIFICATION-TYPE
+    OBJECTS { fCAppID, fCAppInstance }
+    STATUS current
+    DESCRIPTION
+        "FullCircle Application did not provide its information before time out.
+        VARIABLES DEFINITION:
+        1) FCAppID - FullCircle Application ID.
+        2) FCAppInstanceID - FullCircleApplcationInstanceID."
+
+::= { cdrTraps 6 }
+
+cDRLDCDetected NOTIFICATION-TYPE
+    OBJECTS { severity, originationNumber, destinationNumber, callAnswerTime, switchId, callId }
+    STATUS current
+    DESCRIPTION
+        "A Long Duration Call is detected.
+        VARIABLES DEFINITION:
+	    1) Severity: 1: Info, 2: Minor, 3: Major.
+		2) OriginationNumber.
+		3) DestinationNumber.
+		4) CallAnswerTime: YYYYMMDD:hhmmssms
+			 (example '20010506:172335100'  means may/06/2000 05:23PM, 35 seconds, 1000milliseconds).
+		5) SwitchId.
+		6) CallId."
+
+::= { cdrTraps 7 }
+
+
+cDRLDCContinued NOTIFICATION-TYPE
+    OBJECTS { severity, originationNumber, destinationNumber, callAnswerTime, switchId, callId }
+    STATUS current
+    DESCRIPTION
+        "A Long Duration Call is continued.
+         VARIABLES DEFINITION:
+         1) Severity: 1: Info, 2: Minor, 3: Major.
+         2) OriginationNumber.
+         3) DestinationNumber. 
+         4) CallAnswerTime: YYYYMMDD:hhmmssms
+         (example '20010506:172335100'  means may/06/2000 05:23PM, 35 seconds, 1000milliseconds).
+         5) SwitchId.
+         6) CallId."
+
+::= { cdrTraps 8 }
+
+cDRDiskFull NOTIFICATION-TYPE
+    OBJECTS { fullPercent, fileSystem }
+    STATUS current
+    DESCRIPTION
+        "Disk is flled to the FullPercent value, on the FileSystem.
+			 Severity: CRITICAL.
+             VARIABLES DEFINITION:
+            1) FullPercent.
+			2) FileSystem."
+::= { cdrTraps 9 }
+
+cDRClientAlarm NOTIFICATION-TYPE
+    OBJECTS { subType, severity, fullPercent, fileSystem, fileName, errorNo }
+    STATUS current
+    DESCRIPTION
+        "CDR Client Alarm."
+
+::= { cdrTraps 10 }
+
+
+
+END
+
+

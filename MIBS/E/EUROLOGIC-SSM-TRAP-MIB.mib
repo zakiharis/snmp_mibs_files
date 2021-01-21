@@ -1,0 +1,127 @@
+--
+-- SNMPv1 MIB for Eurologic Enterprise & Spheras Storage Manager Traps
+--
+-- Copyright (c) 1996-2002, Eurologic Systems Ltd.
+--
+
+EUROLOGIC-SSM-TRAP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	enterprises
+		FROM RFC1155-SMI
+	OBJECT-TYPE
+		FROM RFC-1212
+   	TRAP-TYPE
+		FROM RFC-1215
+	DisplayString
+		FROM RFC1213-MIB
+                ;
+--
+-- Eurologic enterprise
+--
+eurologic	OBJECT IDENTIFIER ::= { enterprises 1633 }
+
+--
+-- Eurologic SNMP-compatible products
+--
+elProducts	OBJECT IDENTIFIER ::= { eurologic 1 }
+elRAID		OBJECT IDENTIFIER ::= { elProducts 1 }
+elAgents	OBJECT IDENTIFIER ::= { elProducts 2 }
+eliSCSIConv	OBJECT IDENTIFIER ::= { elProducts 3 }
+elSSM		OBJECT IDENTIFIER ::= { elProducts 4 }
+
+--
+-- Note that Eurologic products sending enterprise specific traps
+-- using the SNMP v1 protocol should allocate an OID to be used for
+-- the enterprise field of the trap under their own portion of the MIB
+-- tree. Do not use 'eurologic' (enterprises 1633) on its own.
+--
+
+--
+-- Eurologic Spheras Storage Manager Traps
+--
+elSSMTrapMIB OBJECT IDENTIFIER
+	::= { elSSM 1 }
+
+elSSMTrapObjects OBJECT IDENTIFIER
+   	::= { elSSMTrapMIB 1 }
+
+elSSMEventTrap TRAP-TYPE
+	ENTERPRISE	elSSMTrapObjects
+	VARIABLES	{ eventHost, eventDate, eventTime, eventSeverity, 
+				  eventSubsystem, eventItem, eventDescription }
+	DESCRIPTION 
+		"An elSSMEventTrap signifies that an event has occurred in Spheras
+		Storage Manager. The variables encode the details of the event.
+		When sending this trap using SNMP v2 or later, use the OID of the 
+		elSSMEventTrap object as the trap. When sending the trap using SNMP v1
+		use the OID of elSSMTrapObjects as the enterprise field of the trap and
+		1 as the specific trap."
+	--#TYPE         "Spheras Storage Manager Event"
+	--#SUMMARY      "Host: %s, Date: %s, Time: %s, Severity: %s, Subsystem: %s, Item: %s, Description: %s."
+	--#ARGUMENTS    { 0, 1, 2, 3, 4, 5, 6}
+	--#SEVERITY     INFORMATIONAL
+	--#TIMEINDEX    1
+	--#STATE        OPERATIONAL	
+       ::= 1
+
+eventVar OBJECT IDENTIFIER
+    ::= { elSSMTrapObjects 1 }
+
+eventHost OBJECT-TYPE
+   	SYNTAX	DisplayString
+   	ACCESS	read-only
+   	STATUS	mandatory
+   	DESCRIPTION 
+   		"The host on which the event ocurred."
+	::= { eventVar 1 }
+
+eventDate OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION 
+   		"The date on which the event ocurred (YYYY-MM-DD format)."
+   	::= { eventVar 2 }
+
+eventTime OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION 
+		"The time at which the event ocurred (24 hour clock format)."
+	::= { eventVar 3 }
+
+eventSeverity OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION 
+		"The severity of the event - Information, Warning or Critical."
+    ::= { eventVar 4 }
+
+eventSubsystem OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION 
+		"The subsystem in which the event occurred."
+    ::= { eventVar 5 }
+
+eventItem OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION 
+		"The item within the subsystem for which the event occurred."
+	::= { eventVar 6 }
+
+eventDescription OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION 
+		"The description of the event."
+	::= { eventVar 7 }
+
+END -- end of module EUROLOGIC-SSM-TRAP-MIB.

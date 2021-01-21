@@ -1,0 +1,35 @@
+    ASKEY-RSTP-ENABLE-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        Integer32                               FROM SNMPv2-SMI
+        
+        TruthValue                              FROM SNMPv2-TC
+        
+        MODULE-COMPLIANCE, OBJECT-GROUP         FROM SNMPv2-CONF
+
+        ipDslam                                 FROM ASKEY-DSLAM-MIB
+        askeySystemMib				FROM ASKEY-SYSTEM-MIB
+        ;
+        
+    askeyRstpAdminEnableMib MODULE-IDENTITY
+        LAST-UPDATED    "200311260000Z"  -- november 26, 2003
+        ORGANIZATION    "ASKEY Inc."
+        CONTACT-INFO    "ASKEY Inc.
+                         E-mail: sgetz@askey.com.tw"
+        DESCRIPTION     ""
+     ::= { askeySystemMib 17 }
+    
+    askeyRstpAdminStatus  OBJECT-TYPE
+        SYNTAX INTEGER {
+               enable(1),
+               disable(2)
+          }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Setting this object to enable (1) enables RSTP Protocol.  Setting
+             it to disable (2) disables RSTP Protocol."
+        ::= { askeyRstpAdminEnableMib 1 }
+        
+        END

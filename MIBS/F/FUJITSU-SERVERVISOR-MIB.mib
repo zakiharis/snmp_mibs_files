@@ -1,0 +1,47 @@
+FUJITSU-SERVERVISOR-MIB DEFINITIONS ::= BEGIN 
+
+-- Servervisor(FUJITSU EventLog Agent) MIB for ServerView.
+-- All Rights Reserved, Copyright FUJITSU LIMITED 1999-2000
+
+IMPORTS
+	enterprises		FROM RFC1155-SMI
+	DisplayString	FROM RFC1213-MIB
+	TRAP-TYPE			FROM RFC-1215
+	OBJECT-TYPE		FROM RFC-1212;
+
+fujitsu						OBJECT IDENTIFIER ::= { enterprises 211 }
+application				OBJECT IDENTIFIER ::= { fujitsu 4 }
+
+-- Servervisor's Enterprise OID.
+aplNetwork				OBJECT IDENTIFIER ::= { application 1 }
+aplNetFunction		OBJECT IDENTIFIER ::= { aplNetwork 3 }
+aplLSC						OBJECT IDENTIFIER ::= { aplNetFunction 16 }
+
+-- Servervisor's Trap Information.
+lsc								OBJECT IDENTIFIER ::= { application 36 }
+svisor						OBJECT IDENTIFIER ::= { lsc 1 }
+evtlogAgnt				OBJECT IDENTIFIER ::= { svisor 1 }
+evtlogAgntTrap		OBJECT IDENTIFIER ::= { evtlogAgnt 1 }
+
+svisorTrap				OBJECT-TYPE
+									SYNTAX	DisplayString(SIZE(0..512))
+									ACCESS	not-accessible
+									STATUS	mandatory
+									DESCRIPTION		"Servervisor's SNMP Trap Information."
+									::= { evtlogAgntTrap 1 }
+
+-- Servervisor's Trap Type Definitions
+svisorTrapType		TRAP-TYPE
+									ENTERPRISE evtlogAgntTrap
+									VARIABLES { svisorTrap }
+									DESCRIPTION		"Servervisor has reported a status event."
+									--#TYPE				"Servervisor Event"
+									--#SUMMARY		"Servervisor has reported: %s"
+									--#ARGUMENTS	{ 0 }
+									--#SEVERITY		INFORMATIONAL
+									--#TIMEINDEX	1
+									--#STATE			OPERATIONAL
+									--#CATEGORY		"Status Events"
+									::= 1
+END
+

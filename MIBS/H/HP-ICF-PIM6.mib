@@ -1,0 +1,579 @@
+HP-ICF-PIM6 DEFINITIONS ::= BEGIN
+
+IMPORTS
+        OBJECT-TYPE, MODULE-IDENTITY, Integer32, 
+	    Unsigned32, Counter32, TimeTicks FROM SNMPv2-SMI
+	MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+        TruthValue, RowStatus
+	    FROM SNMPv2-TC
+        hpSwitch
+            FROM HP-ICF-OID 
+	InterfaceIndex
+	    FROM IF-MIB
+        InetAddressType, InetAddress
+            FROM INET-ADDRESS-MIB;
+
+    hpicfPim6MIB MODULE-IDENTITY
+        LAST-UPDATED "201204120000Z"  -- May 22, 2015
+        ORGANIZATION "HP Networking"
+        CONTACT-INFO "Hewlett-Packard Company
+                      8000 Foothills Blvd.
+                      Roseville, CA 95747"
+        DESCRIPTION  "This MIB module contains HP proprietary
+                     extensions to the standard PIM MIB (RFC 5060)."
+
+        REVISION     "201204120000Z"  -- May 22, 2015
+        DESCRIPTION  "Extended hpicfPim6IfTable to provide more detail on PIM 
+                     enabled interfaces."
+                     
+        ::= { hpSwitch 122 }
+
+-- **********************************************************************
+-- The PIM MIB Groups
+-- **********************************************************************
+
+    hpicfPim6Objects     OBJECT IDENTIFIER ::= { hpicfPim6MIB 1 }
+    hpicfPim6Traps       OBJECT IDENTIFIER ::= { hpicfPim6Objects 0 }
+    hpicfPim6            OBJECT IDENTIFIER ::= { hpicfPim6Objects 1 }
+
+    hpicfPim6Conformance OBJECT IDENTIFIER ::= { hpicfPim6MIB 2 }
+    hpicfPim6Groups      OBJECT IDENTIFIER ::= { hpicfPim6Conformance 1 }
+    hpicfPim6Compliances OBJECT IDENTIFIER ::= { hpicfPim6Conformance 2 }
+
+-- **********************************************************************
+-- Start of MIB objects
+-- **********************************************************************
+
+    hpicfPim6AdminStatus OBJECT-TYPE
+        SYNTAX      INTEGER{
+                        enable(1),
+                        disable(2)
+                    }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The operational status of the PIMv6 routing protocol
+                    on this router. Default is disabled."
+        DEFVAL      { disable }
+        ::= { hpicfPim6 1 }
+
+    hpicfPim6StateRefreshInterval OBJECT-TYPE
+        SYNTAX      Integer32 (10..300)
+        UNITS       "seconds"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The interval between successive State Refresh
+                    messages originated by this router. 
+                    Default is 60 seconds."
+        DEFVAL { 60 } 
+        ::= { hpicfPim6 2 } 
+
+    hpicfPim6TrapControl OBJECT-TYPE
+        SYNTAX       BITS {
+                         neighborLoss(0),
+                         hardMrtFull(1)
+                     }
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION  "Indicates whether the PIMv6-enabled router will generate
+                     SNMP traps for PIMv6 events. The set bit means 'enabled'.
+
+                     - neighborLoss(0)
+                       This bit controls whether the notification trap is
+                       allowed to be sent when the neighbor timer expires
+                       and the router has no other neighbors on the same
+                       interface with a lower IP address than itself.
+
+                     - hardMrtFull(1)
+                       This bit controls whether the notification trap is
+                       allowed to be sent when the MRT table is full and
+                       the error has been originated by hardware."
+
+        ::= { hpicfPim6 3 }
+
+-- **********************************************************************
+-- The Extensions to the PIM Interface Table (RFC 5060 and RFC 2934)
+-- **********************************************************************
+
+    hpicfPim6IfTable OBJECT-TYPE
+        SYNTAX      SEQUENCE OF HpicfPim6IfEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "HP extensions to the pimInterfaceTable."
+        ::= { hpicfPim6 4 }
+
+    hpicfPim6IfEntry OBJECT-TYPE
+        SYNTAX      HpicfPim6IfEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "HP extensions for an entry in the pimInterfaceTable."
+    	INDEX      { hpicfPim6IfIndex }
+        ::= { hpicfPim6IfTable 1 }
+
+    HpicfPim6IfEntry ::=
+        SEQUENCE {
+            hpicfPim6IfIndex                        InterfaceIndex,
+	    hpicfPim6IfAddressType                  InetAddressType,
+	    hpicfPim6IfAddress 	                    InetAddress,
+            hpicfPim6IfMode                         INTEGER,
+            hpicfPim6IfTrigHelloInterval            Unsigned32,
+            hpicfPim6IfHelloHoldtime                Unsigned32,
+            hpicfPim6IfLanPruneDelay                TruthValue,
+            hpicfPim6IfPropagationDelay             Unsigned32,
+            hpicfPim6IfOverrideInterval             Unsigned32,
+            hpicfPim6IfGenerationID                 TruthValue,
+            hpicfPim6IfJoinPruneHoldtime            Unsigned32,
+            hpicfPim6IfGraftRetryInterval           Unsigned32,
+            hpicfPim6IfMaxGraftRetries              Integer32,
+            hpicfPim6IfSRTTLThreshold               Unsigned32,
+            hpicfPim6IfLanDelayEnabled              TruthValue,
+            hpicfPim6IfSRCapable                    TruthValue,
+            hpicfPim6IfNBRTimeout                   Integer32,
+            hpicfPim6IfNBRCount                     Counter32,
+            hpicfPim6IfNegotiatedPropagationDelay   TimeTicks,
+            hpicfPim6IfNegotiatedOverrideInterval   TimeTicks,
+            hpicfPim6IfAssertHoldInterval           Counter32,
+            hpicfPim6IfNumRoutersNotUsingLanDelay   Counter32,
+            hpicfPim6IfHelloInterval                Unsigned32,
+            hpicfPim6IfStatus                       RowStatus
+        }
+
+    hpicfPim6IfIndex OBJECT-TYPE
+        SYNTAX      InterfaceIndex
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION "The ifindex value of this PIMv6 interface."
+        ::= { hpicfPim6IfEntry 1 }
+
+    hpicfPim6IfAddressType OBJECT-TYPE
+        SYNTAX     InetAddressType
+        MAX-ACCESS read-create
+        STATUS     current
+        DESCRIPTION
+            "The address type of this PIMv6 interface."
+        ::= { hpicfPim6IfEntry 2 }
+
+    hpicfPim6IfAddress OBJECT-TYPE
+        SYNTAX     InetAddress (SIZE (0|4|8|16|20))
+        MAX-ACCESS read-create
+        STATUS     current
+        DESCRIPTION
+            "The primary IP address of this router on this PIMv6
+            interface.  The InetAddressType is given by the
+            pimInterfaceAddressType object."
+        REFERENCE "RFC 4601 sections 4.1.6, 4.3.1-4.3.4, and 4.5.1"
+        ::= { hpicfPim6IfEntry 3 }
+
+    hpicfPim6IfMode OBJECT-TYPE
+        SYNTAX     INTEGER { dense(1), sparse(2)}
+        MAX-ACCESS read-create
+    	STATUS     current
+    	DESCRIPTION
+            "The configured mode of this PIMv6 interface."
+   	DEFVAL     { dense }
+   	 ::= { hpicfPim6IfEntry 4 }
+    
+    hpicfPim6IfTrigHelloInterval OBJECT-TYPE 
+        SYNTAX      Unsigned32 (0..60)
+        UNITS       "seconds"
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "The maximum time before this router sends a triggered 
+		     PIMv6 Hello message on this interface.  This object 
+		     corresponds to the 'Trigered_Hello_Delay' timer value 
+	             defined in the PIM-SM specification. A value of zero 
+	    	     has no special meaning and indicates that triggered PIMv6 
+	             Hello messages should always be sent immediately."
+	REFERENCE "RFC 4601 section 4.11"
+        DEFVAL { 5 } 
+        ::= { hpicfPim6IfEntry 5 } 
+
+    hpicfPim6IfHelloHoldtime OBJECT-TYPE 
+        SYNTAX      Unsigned32 (0..65535) 
+        UNITS       "seconds"
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "The value set in the Holdtime field of PIMv6 Hello 
+		     messages transmitted on this interface.  A value of 
+		     65535 represents an 'infinite' holdtime.  Implementations 
+		     are recommended to use a holdtime that is 3.5 times 
+		     the value of hpicfPim6InterfaceHelloInterval,or 65535 if 
+	      	     hpicfPim6InterfaceHelloInterval is set to zero."
+        REFERENCE "RFC 4601 sections 4.3.2 and 4.9.2"
+        DEFVAL { 105 } 
+        ::= { hpicfPim6IfEntry 6 } 
+
+    hpicfPim6IfLanPruneDelay OBJECT-TYPE 
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "Turns the LAN Prune Delay options ON and OFF, on this
+                     interface. Default is true."
+        DEFVAL { true }
+        ::= { hpicfPim6IfEntry 7 }
+
+    hpicfPim6IfPropagationDelay OBJECT-TYPE 
+        SYNTAX      Unsigned32 (0..32767)
+        UNITS       "milliseconds"
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "The expected propagation delay between PIMv6 routers on 
+		     this network or link.This router inserts this value into 
+		     the Propagation_Delay  messages sent on this interface.  
+		     Implementations SHOULD enforce a lower bound on the permitted 
+		     values for this object to allow for scheduling and processing 
+		     delays within local router."
+        DEFVAL { 500 }
+        ::= { hpicfPim6IfEntry 8 }
+
+    hpicfPim6IfOverrideInterval OBJECT-TYPE 
+        SYNTAX      Unsigned32 (0..65535)
+        UNITS       "milliseconds"
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "  The value this router inserts into the Override_Interval
+                     field of the LAN Prune Delay option in the PIMv6 Hello 
+		     messages it sends on this interface. 
+		       When overriding a prune, PIMv6 routers pick a random timer  
+		     up to the value of this object. The more PIMv6 routers that 
+		     are active on a network,the more likely it is that the prune 
+		     will be overridden after a small proportion of this time has elapsed. 
+			The more PIMv6 routers are active on this network, the larger 
+		     this object should be to obtain an optimal spread of prune 
+		     override latencies."
+        REFERENCE "RFC 4601 section 4.3.3"
+	DEFVAL { 2500 } 
+        ::= { hpicfPim6IfEntry 9 } 
+
+    hpicfPim6IfGenerationID OBJECT-TYPE 
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "Turns the Generation ID option ON and OFF, on this
+                      interface. Default is false."
+        DEFVAL { false } 
+        ::= { hpicfPim6IfEntry 10 }
+
+    hpicfPim6IfJoinPruneHoldtime OBJECT-TYPE
+        SYNTAX      Unsigned32 (0..65535)
+        UNITS       "seconds"
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "The value inserted into the Holdtime field of a PIMv6 
+		     Join/Prune message sent on this interface.  A value of 
+		     65535 represents an 'infinite' holdtime.  Implementations 
+		     are recommended to use a holdtime that is 3.5 times the 
+		     value of hpicfPim6JoinPruneInterval, or 65535 if 
+		     hpicfpiPim6JoinPruneInterval is set to zero.  PIMv6-DM 
+		     implementations are recommended to use the value of hpicfPim6IfPruneLimitInterval."
+        REFERENCE "RFC 4601 sections 4.5.3 and 4.9.5"
+        DEFVAL { 210 }
+        ::= { hpicfPim6IfEntry 11 }
+
+    hpicfPim6IfGraftRetryInterval OBJECT-TYPE 
+        SYNTAX      Unsigned32 (0..65535)
+        UNITS       "seconds"
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "The minimum interval that must transpire between two 
+		     successive Grafts sent by a router.  This object corresponds 
+		     to the 'Graft_Retry_Period' timer value defined in the PIMv6-DM 
+		     specification.  This object is used only by PIMv6-DM."
+        REFERENCE "RFC 3973 section 4.8"
+        DEFVAL { 3 }
+        ::= { hpicfPim6IfEntry 12 } 
+
+    hpicfPim6IfMaxGraftRetries OBJECT-TYPE 
+        SYNTAX      Integer32 (1..10)
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "The maximum number of times this router will re-send a 
+                     Graft on this interface. Default is 2."
+        DEFVAL { 2 }
+        ::= { hpicfPim6IfEntry 13 }
+
+    hpicfPim6IfSRTTLThreshold OBJECT-TYPE 
+        SYNTAX      Unsigned32 
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "The Time To Live in a PIMv6-DM State Refresh message at
+                    which it is not forwarded on this interface. Default is 0."
+        DEFVAL { 0 }
+        ::= { hpicfPim6IfEntry 14 }
+
+    hpicfPim6IfLanDelayEnabled OBJECT-TYPE 
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Evaluates to TRUE if all routers on this interface are
+                    using the LAN Prune Delay Option."
+        ::= { hpicfPim6IfEntry 15 }
+
+    hpicfPim6IfSRCapable OBJECT-TYPE 
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Evaluates to TRUE if all routers on this interface are
+                    using the State Refresh Capable Option."
+        ::= { hpicfPim6IfEntry 16 }
+
+    hpicfPim6IfNBRTimeout OBJECT-TYPE
+        SYNTAX      Integer32 (60..8000)
+        UNITS       "seconds"
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION "Time interval after which the router will consider a 
+                    neighbor to not be present, if no PIM Hello messages
+                    arrived on the interface. Default is 180 seconds."
+        DEFVAL { 180 }
+        ::= { hpicfPim6IfEntry 17 }
+
+    hpicfPim6IfNBRCount OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "PIMv6 Neighbor Count."
+        ::= { hpicfPim6IfEntry 18 }
+
+    hpicfPim6IfNegotiatedPropagationDelay OBJECT-TYPE
+        SYNTAX      TimeTicks
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Negotiated PIMv6 LAN/Propagation Delay (ms)."
+        ::= { hpicfPim6IfEntry 19 }
+
+    hpicfPim6IfNegotiatedOverrideInterval OBJECT-TYPE
+        SYNTAX      TimeTicks
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Negotiated PIMv6 Override Interval (ms)."
+        ::= { hpicfPim6IfEntry 20 }
+
+    hpicfPim6IfAssertHoldInterval OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "PIMv6 Assert Hold Interval (s)."
+        ::= { hpicfPim6IfEntry 21 }
+
+    hpicfPim6IfNumRoutersNotUsingLanDelay OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Number of routers on network not using LAN Delay."
+        ::= { hpicfPim6IfEntry 22 }
+
+    hpicfPim6IfHelloInterval OBJECT-TYPE
+        SYNTAX     Unsigned32 (0..18000)
+   	UNITS      "seconds"
+    	MAX-ACCESS read-create
+        STATUS     current
+        DESCRIPTION
+            "The frequency at which PIMv6 Hello messages are transmitted
+            on this interface.  This object corresponds to the
+            'Hello_Period' timer value defined in the PIM-SM
+            specification.  A value of zero represents an 'infinite'
+            interval, and indicates that periodic PIM Hello messages
+            should not be sent on this interface."
+   	DEFVAL { 30 }
+    	::= { hpicfPim6IfEntry 23 }
+
+
+    hpicfPim6IfStatus OBJECT-TYPE
+        SYNTAX     RowStatus
+        MAX-ACCESS read-create
+        STATUS     current
+        DESCRIPTION
+            "The status of this entry.  Creating the entry enables PIMv6
+            on the interface; destroying the entry disables PIMv6 on the
+            interface.
+
+            This status object can be set to active(1) without setting
+            any other columnar objects in this entry.
+
+            All writeable objects in this entry can be modified when the
+            status of this entry is active(1)."
+        ::= { hpicfPim6IfEntry 24 }
+
+
+
+    hpicfPim6RemoveConfig OBJECT-TYPE
+        SYNTAX      TruthValue
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "PIMv6 is halted.  This objects clears all existing PIMv6
+                    configuration, intializes the pim config to the default
+                    state.  SnmpGet on this will always return false.
+                    An SnmpSet of false has no effect."
+        DEFVAL      { false }
+        ::= { hpicfPim6 5 }
+
+
+-- **********************************************************************
+-- Sum total of entries in hpicfPim6StaticRpfTable
+-- **********************************************************************
+
+    hpicfPim6NumStaticRpfEntries OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Total number of Static RPF entries."
+        ::= { hpicfPim6 6 }
+
+    hpicfPim6Version OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Currently running PIM Version."
+        ::= { hpicfPim6 7}
+
+    hpicfPim6StarGEntries OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Total number of entries in the (*,G) table"
+        ::= { hpicfPim6 8 }
+
+    hpicfPim6SGEntries OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "Total number of entries in the (S,G) table."
+        ::= { hpicfPim6 9 }
+
+-- **********************************************************************
+-- Sum total of the entries in hpicfPim6NeighborTable
+-- **********************************************************************
+
+    hpicfPim6TotalNeighborCount OBJECT-TYPE
+        SYNTAX      Counter32
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION "PIMv6 Neighbor Count."
+        ::= { hpicfPim6 10 }
+
+    hpicfPim6JoinPruneInterval OBJECT-TYPE
+    	SYNTAX     Integer32
+    	UNITS      "seconds"
+    	MAX-ACCESS read-write
+    	STATUS     current
+    	DESCRIPTION
+            "The default interval at which periodic PIMv6-SM Join/Prune
+            messages are to be sent."
+   	::= { hpicfPim6 11 }
+
+-- **********************************************************************
+-- Conformance Information
+-- **********************************************************************
+
+    hpicfPim6DenseMIBCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "The compliance statement for HP routers running
+                    PIMv6 Dense Mode and implementing the HP-ICF-PIM6 MIB."
+        MODULE  -- this module
+            MANDATORY-GROUPS { hpicfPim6BaseGroup,
+                               hpicfPim6DenseIfGroup }
+        ::= { hpicfPim6Compliances 1 }
+
+    hpicfPim6UcastRoutingCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "The compliance statement for HP routers running
+                    PIMv6 and related Unicast routing info."
+        MODULE  -- this module
+            MANDATORY-GROUPS { hpicfPim6StaticRpfExtensionsGroup
+			     }
+        ::= { hpicfPim6Compliances 2 }
+
+    hpicfPim6GlobalCountersCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "The compliance statement for HP routers running
+                    PIMv6 and related global statistics data."
+        MODULE  -- this module
+            MANDATORY-GROUPS { hpicfPim6GlobalCounterGroup }
+        ::= { hpicfPim6Compliances 3 }
+
+
+    hpicfPim6BaseGroup OBJECT-GROUP
+        OBJECTS     { hpicfPim6AdminStatus,
+                      hpicfPim6StateRefreshInterval,
+                      hpicfPim6TrapControl,
+	              hpicfPim6JoinPruneInterval,
+                      hpicfPim6RemoveConfig
+		    }
+        STATUS      current
+        DESCRIPTION "A collection of objects to support basic PIM v6
+                    configuration information on HP routers."
+        ::= { hpicfPim6Groups 1 }
+
+   
+
+    hpicfPim6DenseIfGroup OBJECT-GROUP
+        OBJECTS     { 
+		      hpicfPim6IfAddressType,
+		      hpicfPim6IfAddress,
+		      hpicfPim6IfMode,
+		      hpicfPim6IfStatus,
+                      hpicfPim6IfTrigHelloInterval,
+		      hpicfPim6IfHelloInterval,
+                      hpicfPim6IfHelloHoldtime,
+                      hpicfPim6IfLanPruneDelay,
+                      hpicfPim6IfPropagationDelay,
+                      hpicfPim6IfOverrideInterval,
+                      hpicfPim6IfGenerationID,
+                      hpicfPim6IfJoinPruneHoldtime,
+                      hpicfPim6IfGraftRetryInterval,
+                      hpicfPim6IfMaxGraftRetries,
+                      hpicfPim6IfSRTTLThreshold,
+                      hpicfPim6IfLanDelayEnabled,
+                      hpicfPim6IfSRCapable,
+		      hpicfPim6IfNBRTimeout
+		    }
+        STATUS      current
+        DESCRIPTION "A collection of objects that extends objects defined
+                    in pimInterfaceTable and used to support management of 
+                    interfaces operating in PIMv6 Dense Mode."
+        ::= { hpicfPim6Groups 2 }
+
+
+    hpicfPim6InterfaceInfoCompliance MODULE-COMPLIANCE
+        STATUS      current
+        DESCRIPTION "The compliance statement for HP routers running
+                    PIMv6 and related interface and neighbor info."
+        MODULE  -- this module
+            MANDATORY-GROUPS { hpicfPim6InterfaceExtensionsGroup }
+        ::= { hpicfPim6Compliances 4 }
+
+    hpicfPim6InterfaceExtensionsGroup OBJECT-GROUP
+        OBJECTS     { 
+		      hpicfPim6Version,
+                      hpicfPim6IfNBRCount,
+                      hpicfPim6IfNegotiatedPropagationDelay,
+                      hpicfPim6IfNegotiatedOverrideInterval,
+                      hpicfPim6IfAssertHoldInterval,
+                      hpicfPim6IfNumRoutersNotUsingLanDelay
+		    }
+        STATUS      current
+        DESCRIPTION "A collection of objects that extends objects defined
+                    in pimInterfaceTable."
+        ::= { hpicfPim6Groups 3 }
+
+    hpicfPim6StaticRpfExtensionsGroup OBJECT-GROUP
+        OBJECTS     {
+                      hpicfPim6NumStaticRpfEntries
+                    }
+        STATUS      current
+        DESCRIPTION "A collection of objects that
+                    extend hpicfPim6StaticRpfTable."
+        ::= { hpicfPim6Groups 4 }
+
+    hpicfPim6GlobalCounterGroup OBJECT-GROUP
+        OBJECTS     { hpicfPim6StarGEntries,
+		      hpicfPim6SGEntries,
+                      hpicfPim6TotalNeighborCount 
+	            }
+        STATUS      current
+        DESCRIPTION "A collection of global 
+                     PIMv6 counter objects."
+        ::= { hpicfPim6Groups 5 }
+
+END

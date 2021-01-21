@@ -1,0 +1,122 @@
+-- The Barix Barionet MIB leaf
+-- The Barix MIB Registration Authority is barix.mib
+-- Version:	2.2 
+-- Date:	07 December, 2010
+-- Copyright (c) 2005 Barix AG
+--
+-- Changes:
+-- 20050322 KPS  Updated according to Barix MIB registration authority
+-- 20050525 KPS  Cosmetic. Made sure comments start at beginning of line
+-- 20100118 KPS  Cosmetic. Pointless changes to suit some new validation tools 
+-- 20101207 PK   Added digitalInputNotification trap definition
+
+--          BARIX-MIB DEFINITIONS ::= BEGIN      --
+         BARIONET-MIB DEFINITIONS ::= BEGIN
+
+          IMPORTS
+                  enterprises
+                          FROM RFC1155-SMI
+                  OBJECT-TYPE
+                          FROM RFC-1212
+                  TRAP-TYPE
+                          FROM RFC-1215;
+                          
+          DisplayString ::=
+              OCTET STRING
+          -- This data type is used to model textual information taken
+          -- from the NVT ASCII character set.  By convention, objects
+          -- with this syntax are declared as having
+          --
+          --      SIZE (0..255)
+
+          PhysAddress ::=
+              OCTET STRING
+          -- This data type is used to model media addresses.  For many
+          -- types of media, this will be in a binary representation.
+          -- For example, an ethernet address would be represented as
+          -- a string of 6 octets.
+
+                          
+ 
+ 
+                barix          OBJECT IDENTIFIER ::= { enterprises 17491 }
+--                software       OBJECT IDENTIFIER ::= { barix 1 }          --
+--                barionet       OBJECT IDENTIFIER ::= { software 1 }       --
+               products       OBJECT IDENTIFIER ::= { barix 1 }
+               barionet       OBJECT IDENTIFIER ::= { products 1 }
+
+ 
+-- Barionet MIB, subject to change   --  
+-- Parameters (Prefix  Par)          --
+ 
+		bariState OBJECT-TYPE
+			SYNTAX INTEGER (0..1)
+			ACCESS read-only
+			STATUS mandatory
+			DESCRIPTION
+				"a value which indicates the operational status
+				 of the Barionet.
+				 	0: down (The Barionet is in startup phase)
+					1: up   (The Barionet has actual port data)"
+			::= { barionet 1 }
+
+-- The Barionet input table   --
+
+		bariInputTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF BariInputEntry
+			ACCESS not-accessible
+			STATUS mandatory
+			DESCRIPTION 
+                  "A list of Barionet I/O variables, indexed 1..1000
+                   The function of the various addresses can be looked up in the manual"
+                        ::= { barionet 2 }
+
+		bariInputEntry OBJECT-TYPE
+			SYNTAX BariInputEntry
+			ACCESS not-accessible
+			STATUS mandatory
+			DESCRIPTION
+				"A specific digital input entry."
+			INDEX   { bariInputIndex }
+			::= { bariInputTable 1 }
+
+		BariInputEntry ::= 
+			SEQUENCE {
+                bariInputIndex     INTEGER (1..1000),
+				bariInputValue	   INTEGER (0..4294967295)
+			}
+
+		bariInputIndex OBJECT-TYPE
+            SYNTAX  INTEGER (1..1000)
+			ACCESS	read-only
+			STATUS	mandatory
+			DESCRIPTION
+				"The variable number. one to 1000"
+                        ::= { bariInputEntry 1 }
+		
+
+		bariInputValue OBJECT-TYPE
+			SYNTAX	INTEGER
+			ACCESS	read-write
+			STATUS	mandatory
+			DESCRIPTION
+				"The current value of the variable "
+                        ::= { bariInputEntry 2 }
+				
+-- Barionet trap definitions --
+
+		digitalInputNotification TRAP-TYPE
+			ENTERPRISE barionet
+			VARIABLES { bariInputIndex,
+				    bariInputValue
+			}
+			DESCRIPTION 
+				"A digitalInputNotification trap is sent on change
+				of a digital input state or as a notification of
+				the current state of the input.
+
+				The two variables are the input number (index into 
+				the input table) and the input state at the time of 
+				the notification."
+			::=1
+          END

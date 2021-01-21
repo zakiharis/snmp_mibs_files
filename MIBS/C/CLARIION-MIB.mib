@@ -1,0 +1,117 @@
+CLARIION-MIB DEFINITIONS ::= BEGIN 
+IMPORTS
+   OBJECT-TYPE, DisplayString
+   FROM RFC1213-MIB;
+
+   internet                                  OBJECT IDENTIFIER ::= { iso(1) org(3) dod(6) 1 }
+   enterprises                               OBJECT IDENTIFIER ::= { internet private(4) 1 }
+   clariion                                  OBJECT IDENTIFIER ::= { enterprises 1981 }
+   clarInfo                                  OBJECT IDENTIFIER ::= { clariion 1}
+   eventMonitor                              OBJECT IDENTIFIER ::= { clarInfo 4}
+
+   deviceType OBJECT-TYPE
+            SYNTAX  DisplayString
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+            "A textual description of this device.
+            Description for all current devices is 'CLARiiON Storage System'."
+            ::= { clarInfo 1 }
+
+
+    hostName OBJECT-TYPE
+            SYNTAX  DisplayString
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                        "Clariion Host Name."
+            ::= { eventMonitor 3 }
+
+    deviceID OBJECT-TYPE
+            SYNTAX  DisplayString
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                        "Clariion Device ID."
+            ::= { eventMonitor 4 }
+
+    eventID OBJECT-TYPE
+            SYNTAX  DisplayString
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                        "Event ID."
+            ::= { eventMonitor 5 }
+
+    eventText OBJECT-TYPE
+            SYNTAX  DisplayString
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                        "Event description."
+            ::= { eventMonitor 6 }
+
+    storageSystem OBJECT-TYPE
+            SYNTAX  DisplayString
+            ACCESS  read-only
+            STATUS  mandatory
+            DESCRIPTION
+                        "Storage System Name."
+            ::= { eventMonitor 7 }
+
+   eventMonitorTrap TRAP-TYPE
+              ENTERPRISE  clariion 
+              VARIABLES   { hostName, deviceID, 
+                            eventID, eventText,
+                            storageSystem }
+              DESCRIPTION
+                          "An EventMonitorTrap is generated in
+                          response to a user-specified event.
+                          Details can be found in Variables data."
+              ::= 2
+
+   eventMonitorTrapInfo TRAP-TYPE
+              ENTERPRISE   clariion
+              VARIABLES   { hostName, deviceID, 
+                            eventID, eventText,
+                            storageSystem }
+              DESCRIPTION
+                          "An Informational EventMonitorTrap is generated in
+                          response to a user-specified event.
+                          Details can be found in Variables data."
+              ::= 3
+
+   eventMonitorTrapWarn TRAP-TYPE
+              ENTERPRISE   clariion
+              VARIABLES   { hostName, deviceID, 
+                            eventID, eventText,
+                            storageSystem }
+              DESCRIPTION
+                          "A Warning EventMonitorTrap is generated in
+                          response to a user-specified event.
+                          Details can be found in Variables data."
+              ::= 4
+
+   eventMonitorTrapError TRAP-TYPE
+              ENTERPRISE   clariion
+              VARIABLES   { hostName, deviceID, 
+                            eventID, eventText,
+                            storageSystem }
+              DESCRIPTION
+                          "An Error EventMonitorTrap is generated in
+                          response to a user-specified event.
+                          Details can be found in Variables data."
+              ::= 5
+
+   eventMonitorTrapFault TRAP-TYPE
+              ENTERPRISE   clariion
+              VARIABLES   { hostName, deviceID, 
+                            eventID, eventText,
+                            storageSystem }
+              DESCRIPTION
+                          "A Fault EventMonitorTrap is generated in
+                          response to a user-specified event.
+                          Details can be found in Variables data."
+              ::= 6
+
+END

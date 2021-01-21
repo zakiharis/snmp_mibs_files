@@ -1,0 +1,513 @@
+XYTRONIX-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        enterprises, MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE
+                FROM SNMPv2-SMI
+        DisplayString
+                FROM SNMPv2-TC;
+
+x410 MODULE-IDENTITY
+        LAST-UPDATED "201708281200Z"
+        ORGANIZATION "Xytronix Research & Design"
+        CONTACT-INFO "www.ControlByWeb.com"
+        DESCRIPTION "X-410 MIB"
+        REVISION "201708281200Z"
+        DESCRIPTION ""
+        ::= {enterprises 30586 41}
+
+xytronix          OBJECT IDENTIFIER ::= {enterprises 30586}
+
+io                OBJECT IDENTIFIER ::= {x410 0}
+pulseTimer        OBJECT IDENTIFIER ::= {x410 1}
+counter          OBJECT IDENTIFIER ::= {x410 2}
+onTimer          OBJECT IDENTIFIER ::= {x410 3}
+totalOnTimer      OBJECT IDENTIFIER ::= {x410 4}
+frequency        OBJECT IDENTIFIER ::= {x410 5}
+
+notifications                OBJECT IDENTIFIER ::= {x410 100}
+ioNotifications              OBJECT IDENTIFIER ::= {notifications 0}
+counterNotifications          OBJECT IDENTIFIER ::= {notifications 2}
+onTimerNotifications          OBJECT IDENTIFIER ::= {notifications 3}
+totalOnTimerNotifications    OBJECT IDENTIFIER ::= {notifications 4}
+frequencyNotifications        OBJECT IDENTIFIER ::= {notifications 5}
+
+
+digitalInput1 OBJECT-TYPE
+  SYNTAX  DisplayString
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+        "Digital Input 1"
+  ::= {io 1}
+
+
+digitalInput2 OBJECT-TYPE
+  SYNTAX  DisplayString
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+      "Digital Input 2"
+
+  ::= {io 2}
+
+digitalInput3 OBJECT-TYPE
+  SYNTAX  DisplayString
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+        "Digital Input 3"
+  ::= {io 3}
+
+
+digitalInput4 OBJECT-TYPE
+  SYNTAX  DisplayString
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+        "Digital Input 4"
+  ::= {io 4}
+
+
+relay1 OBJECT-TYPE
+  SYNTAX  DisplayString
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+        "Relay 1"
+  ::= {io 5}
+
+
+relay2 OBJECT-TYPE
+  SYNTAX  DisplayString
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+        "Relay 2"
+  ::= {io 6}
+
+
+relay3 OBJECT-TYPE
+  SYNTAX  DisplayString
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+        "Relay 3"
+  ::= {io 7}
+
+
+relay4 OBJECT-TYPE
+  SYNTAX  DisplayString
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+        "Relay 4"
+  ::= {io 8}
+
+
+vin OBJECT-TYPE
+  SYNTAX  DisplayString
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+        "Vin"
+  ::= {io 9}
+
+
+register1 OBJECT-TYPE
+  SYNTAX  DisplayString
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+        "Register 1"
+  ::= {io 10}
+
+
+relay1PulseTimer OBJECT-TYPE
+  SYNTAX  DisplayString
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+        "Relay 1 Pulse Timer"
+  ::= {pulseTimer 5}
+
+
+relay2PulseTimer OBJECT-TYPE
+  SYNTAX  DisplayString
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+        "Relay 2 Pulse Timer"
+  ::= {pulseTimer 6}
+
+
+relay3PulseTimer OBJECT-TYPE
+  SYNTAX  DisplayString
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+        "Relay 3 Pulse Timer"
+  ::= {pulseTimer 7}
+
+
+relay4PulseTimer OBJECT-TYPE
+  SYNTAX  DisplayString
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+        "Relay 4 Pulse Timer"
+  ::= {pulseTimer 8}
+
+
+digitalInput1Counter OBJECT-TYPE
+  SYNTAX  DisplayString
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+        "Digital Input 1 Counter"
+  ::= {counter 1}
+
+
+digitalInput2Counter OBJECT-TYPE
+  SYNTAX  DisplayString
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+        "Digital Input 2 Counter"
+  ::= {counter 2}
+
+
+digitalInput3Counter OBJECT-TYPE
+  SYNTAX  DisplayString
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+        "Digital Input 3 Counter"
+  ::= {counter 3}
+
+
+digitalInput4Counter OBJECT-TYPE
+  SYNTAX  DisplayString
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+        "Digital Input 4 Counter"
+  ::= {counter 4}
+
+
+digitalInput1OnTimer OBJECT-TYPE
+  SYNTAX  DisplayString
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+        "Digital Input 1 On Timer"
+  ::= {onTimer 1}
+
+
+digitalInput2OnTimer OBJECT-TYPE
+  SYNTAX  DisplayString
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+        "Digital Input 2 On Timer"
+  ::= {onTimer 2}
+
+
+digitalInput3OnTimer OBJECT-TYPE
+  SYNTAX  DisplayString
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+        "Digital Input 3 On Timer"
+  ::= {onTimer 3}
+
+
+digitalInput4OnTimer OBJECT-TYPE
+  SYNTAX  DisplayString
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+        "Digital Input 4 On Timer"
+  ::= {onTimer 4}
+
+
+digitalInput1TotalOnTimer OBJECT-TYPE
+  SYNTAX  DisplayString
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+        "Digital Input 1 Total On Timer"
+  ::= {totalOnTimer 1}
+
+
+digitalInput2TotalOnTimer OBJECT-TYPE
+  SYNTAX  DisplayString
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+        "Digital Input 2 Total On Timer"
+  ::= {totalOnTimer 2}
+
+
+digitalInput3TotalOnTimer OBJECT-TYPE
+  SYNTAX  DisplayString
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+        "Digital Input 3 Total On Timer"
+  ::= {totalOnTimer 3}
+
+
+digitalInput4TotalOnTimer OBJECT-TYPE
+  SYNTAX  DisplayString
+  MAX-ACCESS  read-write
+  STATUS  current
+  DESCRIPTION
+        "Digital Input 4 Total On Timer"
+  ::= {totalOnTimer 4}
+
+
+digitalInput1Frequency OBJECT-TYPE
+  SYNTAX  DisplayString
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+        "Digital Input 1 Frequency"
+  ::= {frequency 1}
+
+
+digitalInput2Frequency OBJECT-TYPE
+  SYNTAX  DisplayString
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+        "Digital Input 2 Frequency"
+  ::= {frequency 2}
+
+
+digitalInput3Frequency OBJECT-TYPE
+  SYNTAX  DisplayString
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+        "Digital Input 3 Frequency"
+  ::= {frequency 3}
+
+
+digitalInput4Frequency OBJECT-TYPE
+  SYNTAX  DisplayString
+  MAX-ACCESS  read-only
+  STATUS  current
+  DESCRIPTION
+        "Digital Input 4 Frequency"
+  ::= {frequency 4}
+
+
+digitalInput1Notification NOTIFICATION-TYPE
+  OBJECTS {digitalInput1}
+  STATUS current
+  DESCRIPTION
+        "Digital Input 1"
+  ::= {ioNotifications 1}
+
+
+digitalInput2Notification NOTIFICATION-TYPE
+  OBJECTS {digitalInput2}
+  STATUS current
+  DESCRIPTION
+        "Digital Input 2"
+  ::= {ioNotifications 2}
+
+
+digitalInput3Notification NOTIFICATION-TYPE
+  OBJECTS {digitalInput3}
+  STATUS current
+  DESCRIPTION
+        "Digital Input 3"
+  ::= {ioNotifications 3}
+
+
+digitalInput4Notification NOTIFICATION-TYPE
+  OBJECTS {digitalInput4}
+  STATUS current
+  DESCRIPTION
+        "Digital Input 4"
+  ::= {ioNotifications 4}
+
+
+relay1Notification NOTIFICATION-TYPE
+  OBJECTS {relay1}
+  STATUS current
+  DESCRIPTION
+        "Relay 1"
+  ::= {ioNotifications 5}
+
+
+relay2Notification NOTIFICATION-TYPE
+  OBJECTS {relay2}
+  STATUS current
+  DESCRIPTION
+        "Relay 2"
+  ::= {ioNotifications 6}
+
+
+relay3Notification NOTIFICATION-TYPE
+  OBJECTS {relay3}
+  STATUS current
+  DESCRIPTION
+        "Relay 3"
+  ::= {ioNotifications 7}
+
+
+relay4Notification NOTIFICATION-TYPE
+  OBJECTS {relay4}
+  STATUS current
+  DESCRIPTION
+        "Relay 4"
+  ::= {ioNotifications 8}
+
+
+vinNotification NOTIFICATION-TYPE
+  OBJECTS {vin}
+  STATUS current
+  DESCRIPTION
+        "Vin"
+  ::= {ioNotifications 9}
+
+
+register1Notification NOTIFICATION-TYPE
+  OBJECTS {register1}
+  STATUS current
+  DESCRIPTION
+        "Register 1"
+  ::= {ioNotifications 10}
+
+
+digitalInput1CounterNotification NOTIFICATION-TYPE
+  OBJECTS {digitalInput1Counter}
+  STATUS current
+  DESCRIPTION
+        "Digital Input 1 Counter"
+  ::= {counterNotifications 1}
+
+
+digitalInput2CounterNotification NOTIFICATION-TYPE
+  OBJECTS {digitalInput2Counter}
+  STATUS current
+  DESCRIPTION
+        "Digital Input 2 Counter"
+  ::= {counterNotifications 2}
+
+
+digitalInput3CounterNotification NOTIFICATION-TYPE
+  OBJECTS {digitalInput3Counter}
+  STATUS current
+  DESCRIPTION
+        "Digital Input 3 Counter"
+  ::= {counterNotifications 3}
+
+
+digitalInput4CounterNotification NOTIFICATION-TYPE
+  OBJECTS {digitalInput4Counter}
+  STATUS current
+  DESCRIPTION
+        "Digital Input 4 Counter"
+  ::= {counterNotifications 4}
+
+
+digitalInput1OnTimerNotification NOTIFICATION-TYPE
+  OBJECTS {digitalInput1OnTimer}
+  STATUS current
+  DESCRIPTION
+        "Digital Input 1 On Timer"
+  ::= {onTimerNotifications 1}
+
+
+digitalInput2OnTimerNotification NOTIFICATION-TYPE
+  OBJECTS {digitalInput2OnTimer}
+  STATUS current
+  DESCRIPTION
+        "Digital Input 2 On Timer"
+  ::= {onTimerNotifications 2}
+
+
+digitalInput3OnTimerNotification NOTIFICATION-TYPE
+  OBJECTS {digitalInput3OnTimer}
+  STATUS current
+  DESCRIPTION
+        "Digital Input 3 On Timer"
+  ::= {onTimerNotifications 3}
+
+
+digitalInput4OnTimerNotification NOTIFICATION-TYPE
+  OBJECTS {digitalInput4OnTimer}
+  STATUS current
+  DESCRIPTION
+        "Digital Input 4 On Timer"
+  ::= {onTimerNotifications 4}
+
+
+digitalInput1TotalOnTimerNotification NOTIFICATION-TYPE
+  OBJECTS {digitalInput1TotalOnTimer}
+  STATUS current
+  DESCRIPTION
+        "Digital Input 1 Total On Timer"
+  ::= {totalOnTimerNotifications 1}
+
+
+digitalInput2TotalOnTimerNotification NOTIFICATION-TYPE
+  OBJECTS {digitalInput2TotalOnTimer}
+  STATUS current
+  DESCRIPTION
+        "Digital Input 2 Total On Timer"
+  ::= {totalOnTimerNotifications 2}
+
+
+digitalInput3TotalOnTimerNotification NOTIFICATION-TYPE
+  OBJECTS {digitalInput3TotalOnTimer}
+  STATUS current
+  DESCRIPTION
+        "Digital Input 3 Total On Timer"
+  ::= {totalOnTimerNotifications 3}
+
+
+digitalInput4TotalOnTimerNotification NOTIFICATION-TYPE
+  OBJECTS {digitalInput4TotalOnTimer}
+  STATUS current
+  DESCRIPTION
+        "Digital Input 4 Total On Timer"
+  ::= {totalOnTimerNotifications 4}
+
+
+digitalInput1FrequencyNotification NOTIFICATION-TYPE
+  OBJECTS {digitalInput1Frequency}
+  STATUS current
+  DESCRIPTION
+        "Digital Input 1 Frequency"
+  ::= {frequencyNotifications 1}
+
+
+digitalInput2FrequencyNotification NOTIFICATION-TYPE
+  OBJECTS {digitalInput2Frequency}
+  STATUS current
+  DESCRIPTION
+        "Digital Input 2 Frequency"
+  ::= {frequencyNotifications 2}
+
+
+digitalInput3FrequencyNotification NOTIFICATION-TYPE
+  OBJECTS {digitalInput3Frequency}
+  STATUS current
+  DESCRIPTION
+        "Digital Input 3 Frequency"
+  ::= {frequencyNotifications 3}
+
+
+digitalInput4FrequencyNotification NOTIFICATION-TYPE
+  OBJECTS {digitalInput4Frequency}
+  STATUS current
+  DESCRIPTION
+        "Digital Input 4 Frequency"
+  ::= {frequencyNotifications 4}
+
+
+END

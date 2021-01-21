@@ -1,0 +1,956 @@
+PSA-LinIntelixgbeTrap-MIB DEFINITIONS ::= BEGIN
+
+--PRIMEQUEST system management MIB for Partition
+--
+--
+--$Copyright$
+--Copyright Fujitsu Limited 2010
+--All rights reserved
+--
+--
+--MIB Revision: 02000008
+--
+
+IMPORTS
+	OBJECT-TYPE								FROM RFC-1212
+	TRAP-TYPE								FROM RFC-1215
+	mib-2, DisplayString					FROM RFC1213-MIB
+	TimeTicks, Counter, Gauge, IpAddress	FROM RFC1155-SMI
+	mgmt, enterprises						FROM RFC1155-SMI;
+
+--enterprises	OBJECT IDENTIFIER ::={ iso org(3) dod(6) internet(1) private(4) 1 }
+--
+--PRIMEQUEST system management MIB nodes
+--fujitsu:                    1.3.6.1.4.1.211
+-- products:                  1.3.6.1.4.1.211.1
+--  iaServer:                 1.3.6.1.4.1.211.1.31
+--   primequest:              1.3.6.1.4.1.211.1.31.1
+--    partition:	           1.3.6.1.4.1.211.1.31.1.2
+--
+--Trap enterprise is "psaLinIntelixgbeTrap"
+
+--FUJITSU PRIMEQUEST system management MIB nodes for Partition
+  fujitsu        OBJECT IDENTIFIER  ::={ enterprises 211 }
+  products       OBJECT IDENTIFIER  ::={ fujitsu 1 }
+  iaServer       OBJECT IDENTIFIER  ::={ products 31 }
+  primequest     OBJECT IDENTIFIER  ::={ iaServer 1 }
+   partition     OBJECT IDENTIFIER  ::={ primequest 2 }
+    parititonVariables	OBJECT IDENTIFIER	::={ partition	200 }
+    partitionEnterprise        OBJECT IDENTIFIER  ::={ partition 201 }
+     psaComTrap                OBJECT IDENTIFIER  ::={ partitionEnterprise 1 }
+     psaLinLanComTrap          OBJECT IDENTIFIER  ::={ partitionEnterprise 2 }
+     psaLinIntelE100Trap       OBJECT IDENTIFIER  ::={ partitionEnterprise 3 }
+     psaLinIntelE1000Trap      OBJECT IDENTIFIER  ::={ partitionEnterprise 4 }
+     psaLinBcm5700Trap         OBJECT IDENTIFIER  ::={ partitionEnterprise 5 }
+     psaLinEmulexTrap          OBJECT IDENTIFIER  ::={ partitionEnterprise 6 }
+     psaLinLsiLogicTrap        OBJECT IDENTIFIER  ::={ partitionEnterprise 7 }
+     psaLinScsiComTrap         OBJECT IDENTIFIER  ::={ partitionEnterprise 8 }
+     psaLinGrmpdTrap           OBJECT IDENTIFIER  ::={ partitionEnterprise 9 }
+     psaLinGdsTrap             OBJECT IDENTIFIER  ::={ partitionEnterprise 10 }
+     psaLinGlsTrap             OBJECT IDENTIFIER  ::={ partitionEnterprise 11 }
+     psaLinTg3Trap             OBJECT IDENTIFIER  ::={ partitionEnterprise 12 }
+     psaLinIbTrap              OBJECT IDENTIFIER  ::={ partitionEnterprise 13 }
+     psaLinXframe2Trap         OBJECT IDENTIFIER  ::={ partitionEnterprise 14 }
+     psaGschTrap               OBJECT IDENTIFIER  ::={ partitionEnterprise 15 }
+     psaLinIntelE1000ETrap     OBJECT IDENTIFIER  ::={ partitionEnterprise 16 }
+     psaLinIntelIgbTrap        OBJECT IDENTIFIER  ::={ partitionEnterprise 17 }
+     psaLinSvsRaidTrap         OBJECT IDENTIFIER  ::={ partitionEnterprise 18 }
+     psaLinIntelixgbeTrap      OBJECT IDENTIFIER  ::={ partitionEnterprise 19 }
+     psaExternalFileUnitTrap   OBJECT IDENTIFIER  ::={ partitionEnterprise 101 }
+
+--***************************************************************************************
+--
+--FUJITSU PRIMEQUEST system management trap parameter variables for Partition
+--	They aren't directly accessibles(can't use snmp get/set command), but sent with trap
+--
+--***************************************************************************************
+
+     trapVarComInfo	OBJECT IDENTIFIER	::={ parititonVariables 1 }
+
+trapPartitionName OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Partition name which trap is generated."
+   ::= { trapVarComInfo 1 }
+
+trapPartitionId OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Paritition identifier which trap is generated."
+   ::= { trapVarComInfo 2 }
+
+trapEventLevel OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Event level"
+   ::= { trapVarComInfo 3 }
+
+trapEventId OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Event Identifier"
+   ::= { trapVarComInfo 4 }
+
+trapUnitName OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Unit name which trap is generated."
+   ::= { trapVarComInfo 5 }
+
+trapMmbVip OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Management board vertual IP address."
+   ::= { trapVarComInfo 6 }
+
+     trapVarDivInfo	OBJECT IDENTIFIER	::={ parititonVariables 2 }
+
+trapPartNo OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Parts number of trap source."
+   ::= { trapVarDivInfo 1 }
+
+trapStepping OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 2 }
+
+trapSerialNo OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Serial number of trap source. "
+   ::= { trapVarDivInfo 3 }
+
+trapModelNo OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Model number of trap source."
+   ::= { trapVarDivInfo 4 }
+
+trapSuspect OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Logical name or pci bus number of trap source."
+   ::= { trapVarDivInfo 5 }
+
+trapVendorId OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Vendor identifier of trap source."
+   ::= { trapVarDivInfo 6 }
+
+trapDeviceId OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Device identifier of trap source."
+   ::= { trapVarDivInfo 7 }
+
+trapRevision OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Revision of trap source."
+   ::= { trapVarDivInfo 8 }
+
+trapCardName OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Device name of trap source."
+   ::= { trapVarDivInfo 9 }
+
+trapErrDetail OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 10 }
+
+trapErrCode OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 11 }
+
+trapIrpCode OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 12 }
+
+trapHbaNo OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 13 }
+
+trapErrCause OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 14 }
+
+trapPathNo OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 15 }
+
+trapDiskId OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 16 }
+
+trapFmrDiskId OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 17 }
+
+trapCurDiskId OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 18 }
+
+trapPathId OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 19 }
+
+trapPhysIf OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 20 }
+
+trapVirtualIf OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 21 }
+
+trapLogicalIp OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 22 }
+
+trapWatchIp OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 23 }
+
+trapInterface OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 24 }
+
+trapSourceIp OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 25 }
+
+trapDestIp OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 26 }
+
+trapModelName OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Model name of trap source."
+   ::= { trapVarDivInfo 27 }
+
+trapFlagcode OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 28 }
+
+--***************************************************************************************
+--
+--FUJITSU PRIMEQUEST system management TRAP definition for Partition
+--	Trap enterprise:	psaLinIntelixgbeTrap (.1.3.6.1.4.1.211.1.31.1.2.201.19)
+--
+--***************************************************************************************
+
+ixgbeEvent0 TRAP-TYPE
+   ENTERPRISE   psaLinIntelixgbeTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "ixgbe: Adapter or Software error (Cannot enable PCI device from suspend)"
+   --#TYPE			"Ixgbe Event 0"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ixgbe:Adapter or Software error (Cannot enable PCI device from suspend)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 11800
+
+ixgbeEvent1 TRAP-TYPE
+   ENTERPRISE   psaLinIntelixgbeTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "ixgbe: Adapter or Software error (Cannot initialize interrupts for device)"
+   --#TYPE			"Ixgbe Event 1"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ixgbe:Adapter or Software error (Cannot initialize interrupts for device)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 11801
+
+ixgbeEvent2 TRAP-TYPE
+   ENTERPRISE   psaLinIntelixgbeTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ixgbe: Adapter error (Fan has stopped)"
+   --#TYPE			"Ixgbe Event 2"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ixgbe:%s Adapter error (Fan has stopped) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 11802
+
+ixgbeEvent3 TRAP-TYPE
+   ENTERPRISE   psaLinIntelixgbeTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "ixgbe: Adapter or Software error (request_irq failed for MSIX interrupt Error)"
+   --#TYPE			"Ixgbe Event 3"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ixgbe:%s Adapter or Software error (request_irq failed for MSIX interrupt Error)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 11803
+
+ixgbeEvent4 TRAP-TYPE
+   ENTERPRISE   psaLinIntelixgbeTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "ixgbe: Adapter or Software error (request_irq for msix_lsc failed)"
+   --#TYPE			"Ixgbe Event 4"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ixgbe:%s Adapter or Software error (request_irq for msix_lsc failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 11804
+
+ixgbeEvent5 TRAP-TYPE
+   ENTERPRISE   psaLinIntelixgbeTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "ixgbe: Adapter or Software error (request_irq failed)"
+   --#TYPE			"Ixgbe Event 5"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ixgbe:%s Adapter or Software error (request_irq failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 11805
+
+ixgbeEvent6 TRAP-TYPE
+   ENTERPRISE   psaLinIntelixgbeTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ixgbe: Adapter or Software error (RXDCTL.ENABLE on Rx queue not set within the polling period)"
+   --#TYPE			"Ixgbe Event 6"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ixgbe:%s Adapter or Software error (RXDCTL.ENABLE on Rx queue not set within the polling period) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 11806
+
+ixgbeEvent7 TRAP-TYPE
+   ENTERPRISE   psaLinIntelixgbeTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ixgbe: Adapter error (link_config FAILED)"
+   --#TYPE			"Ixgbe Event 7"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ixgbe:%s Adapter error (link_config FAILED) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 11807
+
+ixgbeEvent8 TRAP-TYPE
+   ENTERPRISE   psaLinIntelixgbeTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ixgbe: Adapter error (Unable to allocate MSI-X interrupts)"
+   --#TYPE			"Ixgbe Event 8"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ixgbe:%s Adapter error (Unable to allocate MSI-X interrupts) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 11808
+
+ixgbeEvent9 TRAP-TYPE
+   ENTERPRISE   psaLinIntelixgbeTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "ixgbe: Software error (Unable to allocate MSI interrupt; falling back to legacy)"
+   --#TYPE			"Ixgbe Event 9"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ixgbe:%s Software error (Unable to allocate MSI interrupt; falling back to legacy)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 11809
+
+ixgbeEvent10 TRAP-TYPE
+   ENTERPRISE   psaLinIntelixgbeTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "ixgbe: Software error (Unable to allocate memory for queues)"
+   --#TYPE			"Ixgbe Event 10"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ixgbe:%s Software error (Unable to allocate memory for queues)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 11810
+
+ixgbeEvent11 TRAP-TYPE
+   ENTERPRISE   psaLinIntelixgbeTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "ixgbe: Adapter or Software error (Unable to setup interrupt capabilities)"
+   --#TYPE			"Ixgbe Event 11"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ixgbe:%s Adapter or Software error (Unable to setup interrupt capabilities)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 11811
+
+ixgbeEvent12 TRAP-TYPE
+   ENTERPRISE   psaLinIntelixgbeTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "ixgbe: Software error (Unable to allocate memory for the transmit descriptor ring)"
+   --#TYPE			"Ixgbe Event 12"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ixgbe:%s Software error (Unable to allocate memory for the transmit descriptor ring)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 11812
+
+ixgbeEvent13 TRAP-TYPE
+   ENTERPRISE   psaLinIntelixgbeTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "ixgbe: Software error (vmalloc allocation failed for the rx desc ring)"
+   --#TYPE			"Ixgbe Event 13"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ixgbe:%s Software error (vmalloc allocation failed for the rx desc ring)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 11813
+
+ixgbeEvent14 TRAP-TYPE
+   ENTERPRISE   psaLinIntelixgbeTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ixgbe: Adapter or Software error (Cannot re-enable PCI device after reset)"
+   --#TYPE			"Ixgbe Event 14"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ixgbe:%s Adapter or Software error (Cannot re-enable PCI device after reset) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 11814
+
+ixgbeEvent15 TRAP-TYPE
+   ENTERPRISE   psaLinIntelixgbeTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ixgbe: Adapter error (ixgbe_up failed after reset)"
+   --#TYPE			"Ixgbe Event 15"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ixgbe:%s Adapter error (ixgbe_up failed after reset) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 11815
+
+ixgbeEvent16 TRAP-TYPE
+   ENTERPRISE   psaLinIntelixgbeTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ixgbe: Adapter or Software error (HW Init failed)"
+   --#TYPE			"Ixgbe Event 16"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ixgbe:%s Adapter or Software error (HW Init failed) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 11816
+
+ixgbeEvent17 TRAP-TYPE
+   ENTERPRISE   psaLinIntelixgbeTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ixgbe: Adapter error (Hardware Error)"
+   --#TYPE			"Ixgbe Event 17"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ixgbe:%s Adapter error (Hardware Error) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 11817
+
+ixgbeEvent18 TRAP-TYPE
+   ENTERPRISE   psaLinIntelixgbeTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ixgbe: Adapter or Software error (EEPROM initialization failed)"
+   --#TYPE			"Ixgbe Event 18"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ixgbe:%s Adapter or Software error (EEPROM initialization failed) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 11818
+
+ixgbeEvent19 TRAP-TYPE
+   ENTERPRISE   psaLinIntelixgbeTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "ixgbe: Software error (TX DMA map failed)"
+   --#TYPE			"Ixgbe Event 19"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ixgbe:%s Software error (TX DMA map failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 11819
+
+ixgbeEvent20 TRAP-TYPE
+   ENTERPRISE   psaLinIntelixgbeTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "ixgbe: Software error (No usable DMA configuration)"
+   --#TYPE			"Ixgbe Event 20"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ixgbe:%s Software error (No usable DMA configuration)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 11820
+
+ixgbeEvent21 TRAP-TYPE
+   ENTERPRISE   psaLinIntelixgbeTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ixgbe: Adapter error (The EEPROM Checksum Is Not Valid)"
+   --#TYPE			"Ixgbe Event 21"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ixgbe:%s Adapter error (The EEPROM Checksum Is Not Valid) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 11821
+
+ixgbeEvent22 TRAP-TYPE
+   ENTERPRISE   psaLinIntelixgbeTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ixgbe: Adapter or Software error (invalid MAC address)"
+   --#TYPE			"Ixgbe Event 22"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ixgbe:%s Adapter or Software error (invalid MAC address) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 11822
+
+ixgbeEvent23 TRAP-TYPE
+   ENTERPRISE   psaLinIntelixgbeTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ixgbe: Adapter error (setup link failed)"
+   --#TYPE			"Ixgbe Event 23"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ixgbe:%s Adapter error (setup link failed) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 11823
+
+ixgbeEvent24 TRAP-TYPE
+   ENTERPRISE   psaLinIntelixgbeTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ixgbe: Adapter error (pattern test failed)"
+   --#TYPE			"Ixgbe Event 24"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ixgbe:%s Adapter error (pattern test failed) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 11824
+
+ixgbeEvent25 TRAP-TYPE
+   ENTERPRISE   psaLinIntelixgbeTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ixgbe: Adapter error (set/check reg test failed)"
+   --#TYPE			"Ixgbe Event 25"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ixgbe:%s Adapter error (set/check reg test failed) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 11825
+
+ixgbeEvent26 TRAP-TYPE
+   ENTERPRISE   psaLinIntelixgbeTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ixgbe: Adapter error (failed STATUS register test)"
+   --#TYPE			"Ixgbe Event 26"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ixgbe:%s Adapter error (failed STATUS register test) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 11826
+
+ixgbeEvent27 TRAP-TYPE
+   ENTERPRISE   psaLinIntelixgbeTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ixgbe: Adapter error (Could not enable Tx Queue)"
+   --#TYPE			"Ixgbe Event 27"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ixgbe:%s Adapter error (Could not enable Tx Queue) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 11827
+
+ixgbeEvent28 TRAP-TYPE
+   ENTERPRISE   psaLinIntelixgbeTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "ixgbe: Software error (Failed to enable PCI sriov)"
+   --#TYPE			"Ixgbe Event 28"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ixgbe:%s Software error (Failed to enable PCI sriov)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 11828
+
+ixgbeEvent29 TRAP-TYPE
+   ENTERPRISE   psaLinIntelixgbeTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "ixgbe: Software error (Unable to allocate memory for VF Data Storage - SRIOV disabled)"
+   --#TYPE			"Ixgbe Event 29"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ixgbe:%s Software error (Unable to allocate memory for VF Data Storage - SRIOV disabled)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 11829
+
+ixgbeEvent30 TRAP-TYPE
+   ENTERPRISE   psaLinIntelixgbeTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "ixgbe: Adapter error (Error receiving msg from VF)"
+   --#TYPE			"Ixgbe Event 30"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ixgbe:Adapter error (Error receiving msg from VF)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 11830
+
+ixgbeEvent31 TRAP-TYPE
+   ENTERPRISE   psaLinIntelixgbeTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "ixgbe: Software error (Could not set MAC Filter for VF)"
+   --#TYPE			"Ixgbe Event 31"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ixgbe:%s Software error (Could not set MAC Filter for VF)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 11831
+
+ixgbeEvent32 TRAP-TYPE
+   ENTERPRISE   psaLinIntelixgbeTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "ixgbe: Software error (Unhandled Msg)"
+   --#TYPE			"Ixgbe Event 32"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ixgbe:%s Software error (Unhandled Msg)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 11832
+
+END

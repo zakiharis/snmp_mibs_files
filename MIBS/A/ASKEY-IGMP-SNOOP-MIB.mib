@@ -1,0 +1,265 @@
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+--
+--  File         : askeyIgmpSnoop.mib
+--  Description  : ASEKY IGMP Snooping Enterprise MIB - Hardward Independent 
+--  Version      : 1.0   
+--  Date         : October 10, 2003
+--
+--  Copyright (c) 2003-2004 ASKEY Computer Inc.  All Rights Reserved.
+--
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+--  ASKEY IGMP Snooping Enterprise MIB
+--
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+
+    ASKEY-IGMP-SNOOP-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        Integer32                               FROM SNMPv2-SMI
+        
+        TruthValue                              FROM SNMPv2-TC
+        
+        MODULE-COMPLIANCE, OBJECT-GROUP         FROM SNMPv2-CONF
+        
+        PortList, dot1qStaticMulticastEntry,
+        dot1qVlanIndex                          FROM Q-BRIDGE-MIB      
+
+        ipDslam                                 FROM ASKEY-DSLAM-MIB
+        ;
+         
+
+    askeyIgmpSnoopMib MODULE-IDENTITY
+        LAST-UPDATED    "200311260000Z"  -- november 26, 2003
+        ORGANIZATION    "ASKEY Inc."
+        CONTACT-INFO    "ASKEY Inc.
+                         E-mail: cwfu@askey.com.tw"
+
+        DESCRIPTION     "ASKEY IGMP SNOOPING MIB OID defines and documentation."
+
+    ::= { ipDslam 3 }
+
+
+      MacAddress ::= OCTET STRING (SIZE (6))    -- a 6 octet address in
+                                                -- the "canonical" order
+      -- defined by IEEE 802.1a, i.e., as if it were transmitted least
+      -- significant bit first, even though 802.5 (in contrast to other
+      -- 802.x protocols) requires MAC addresses to be transmitted most
+      -- significant bit first.
+      --
+      -- 16-bit addresses, if needed, are represented by setting their
+      -- upper 4 octets to all 0's, i.e., AAFF would be represented
+      -- as 00000000AAFF.
+      
+      
+      -- Similarly, all representations of Bridge-Id in this MIB Module
+      -- use, as a textual convention (i.e. this convention does not affect
+      -- their encoding), the data type:
+
+
+------------------------------------------------------------------------------
+--  define group(s) in ASKEY-IGMP-SNOOP-MIB
+------------------------------------------------------------------------------
+    askeyIgmpSnoop              OBJECT IDENTIFIER ::= { askeyIgmpSnoopMib 1 }
+    askeyIgmpSnoopConformance   OBJECT IDENTIFIER ::= { askeyIgmpSnoopMib 2 }
+    askeyIgmpSnoopGroups        OBJECT IDENTIFIER ::= { askeyIgmpSnoopConformance 1 }
+    askeyIgmpSnoopCompliances   OBJECT IDENTIFIER ::= { askeyIgmpSnoopConformance 2 }
+
+------------------------------------------------------------------------------
+--
+--  askeyIgmpSnoop - IGMP Snooping Parameters
+--
+--  This group is used to instrument the Layer 2 IGMP Snooping support.
+--
+------------------------------------------------------------------------------
+--
+    askeyIgmpSnoopOperStatus  OBJECT-TYPE
+        SYNTAX INTEGER {
+               enable(1),
+               disable(2)
+          }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Setting this object to enable (1) enables IGMP Snooping.  Setting
+             it to disable (2) disables IGMP Snooping.
+             
+             Note that IGMP Snooping can function with or without GVRP and/or
+             GMRP enabled."
+        ::= { askeyIgmpSnoop 1 }
+
+--    askeyMcastMacAgingAdminStatus  OBJECT-TYPE
+--          SYNTAX  INTEGER {
+--               enable(1),
+--               disable(2)
+--          }
+--          MAX-ACCESS  read-write
+--          STATUS  current
+--          DESCRIPTION
+--             "Setting this object to enable (1) enables aging out.  
+--              Setting it to disable (2) disables aging out."
+--        ::= { askeyIgmpSnoop 2 }
+
+    askeyMcastAgingTime  OBJECT-TYPE
+        SYNTAX INTEGER (10..1000000)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "DURABLE: { 300 }
+             The timeout period in seconds for aging out Multicast Groups
+             dynamically learned with IGMP Snooping. Note that aging operates
+             on a per interface per VLAN per multicast group basis.
+             
+             This interval is also used to age out ports that have received
+             IGMP Router Query PDUs on a per VLAN basis."
+        ::= { askeyIgmpSnoop 3 }
+
+    askeyIgmpSnoopTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF AskeyIgmpSnoopEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table, which provides IGMP Snooping information, augments
+             the 'dot1qStaticMulticastTable' in the Q-MIB (RFC2674)."
+        ::= { askeyIgmpSnoop 4 }
+
+    askeyIgmpSnoopEntry OBJECT-TYPE
+        SYNTAX AskeyIgmpSnoopEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Displays by VLAN, Multicast Group, and Multicast receive port
+             (which is always 0 for TMS) the set of ports enabled to forward
+             Multicast Group traffic as determined by the IGMP Snooping task."
+--        AUGMENTS { dot1qStaticMulticastEntry }      CWFu Marked
+        INDEX  {askeyIgmpSnoopVlanId, askeyIgmpSnoopMacAddress }
+        ::= { askeyIgmpSnoopTable 1 }
+
+    AskeyIgmpSnoopEntry ::= SEQUENCE {
+        askeyIgmpSnoopVlanId        INTEGER, 
+        askeyIgmpSnoopMacAddress    MacAddress,
+        askeyIgmpSnoopEgressPorts   PortList,
+        askeyIgmpSnoopQueryPorts   PortList
+    }
+
+   askeyIgmpSnoopVlanId    OBJECT-TYPE
+        SYNTAX      INTEGER  (1..4093)
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "IEEE 802.1q VLAN tag number."
+        ::= { askeyIgmpSnoopEntry 1 }
+   
+   askeyIgmpSnoopMacAddress    OBJECT-TYPE
+         SYNTAX  MacAddress
+         MAX-ACCESS  read-only
+         STATUS  current
+         DESCRIPTION
+             "A multicast MAC address for which the bridge has
+             snoopped information."
+        ::= { askeyIgmpSnoopEntry 2 }
+
+    askeyIgmpSnoopEgressPorts  OBJECT-TYPE
+        SYNTAX PortList
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This read-only object displays the set of ports enabled to
+             forward specific Multicast Group traffic as determined by the
+             IGMP Snooping task.
+            
+             It should be noted that the IGMP Snooping task generates a pseudo-
+             static (i.e., not saved in NVM) port list similar to the RFC2674
+             Q-MIB 'dot1qStaticMulticastStaticEgressPorts' object. Consequently,
+             a port will not be a member of 'tmsIgmpSnoopEgressPorts' if
+             it is a member of 'dot1qStaticMulticastForbiddenEgressPorts'."
+        ::= { askeyIgmpSnoopEntry 3 }
+
+    askeyIgmpSnoopQueryPorts  OBJECT-TYPE
+        SYNTAX PortList
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "This read-only object displays the set of ports that have received
+             IGMP Router Query PDUs for this VLAN as determined by the IGMP
+             Snooping task."
+        ::= { askeyIgmpSnoopEntry 4 }
+
+
+--    askeyIgmpSnoopQueryTable OBJECT-TYPE
+--        SYNTAX SEQUENCE OF AskeyIgmpSnoopQueryEntry
+--        MAX-ACCESS not-accessible
+--        STATUS current
+--        DESCRIPTION
+--            "A table displaying the IGMP Router Query PDU ports."
+--        ::= { askeyIgmpSnoop 5 }
+--
+--    askeyIgmpSnoopQueryEntry OBJECT-TYPE
+--        SYNTAX AskeyIgmpSnoopQueryEntry
+--        MAX-ACCESS not-accessible
+--        STATUS current
+--        DESCRIPTION
+--            "A table displaying the IGMP Router Query PDU ports.  These are
+--             maintained on a per VLAN basis."
+--        INDEX { dot1qVlanIndex }
+--        ::= { askeyIgmpSnoopQueryTable 1 }
+--
+--    AskeyIgmpSnoopQueryEntry ::= SEQUENCE {
+--        askeyIgmpSnoopQueryPorts   PortList
+--    }
+--
+--    askeyIgmpSnoopQueryPorts  OBJECT-TYPE
+--        SYNTAX PortList
+--        MAX-ACCESS read-only
+--        STATUS current
+--        DESCRIPTION
+--            "This read-only object displays the set of ports that have received
+--             IGMP Router Query PDUs for this VLAN as determined by the IGMP
+--             Snooping task."
+--        ::= { askeyIgmpSnoopQueryEntry 1 }
+--
+
+------------------------------------------------------------------------------
+--  conformance information
+------------------------------------------------------------------------------
+
+--  --------------------------------------------------------------------------
+--  units of conformance
+--  --------------------------------------------------------------------------
+    askeyIgmpSnoopGroup     OBJECT-GROUP
+        OBJECTS {
+        askeyIgmpSnoopOperStatus,
+--        askeyMcastMacAgingAdminStatus,
+        askeyMcastAgingTime,
+        askeyIgmpSnoopEgressPorts,
+        askeyIgmpSnoopQueryPorts
+        }
+        STATUS  current
+        DESCRIPTION
+           "This group configures and retrieves IGMP Snooping information."
+        ::= { askeyIgmpSnoopGroups 1 }
+
+
+--  --------------------------------------------------------------------------
+--  compliance statements
+--  --------------------------------------------------------------------------
+
+    askeyIgmpSnoopCompliance MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+           "The compliance statement."
+        MODULE  -- this module
+        MANDATORY-GROUPS {
+            askeyIgmpSnoopGroup
+        }
+        ::= { askeyIgmpSnoopCompliances 1 }
+
+
+--
+-- END of ASKEY-IGMP-SNOOP-MIB                
+--
+
+END

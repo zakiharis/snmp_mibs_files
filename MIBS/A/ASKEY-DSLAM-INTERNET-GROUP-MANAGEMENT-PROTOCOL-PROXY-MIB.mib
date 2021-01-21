@@ -1,0 +1,214 @@
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+--
+--  File         : askeyIGMPProxy.mib
+--  Description  : Askey defined to record all managed objects for IGMP proxy
+--  Version      : 1.0
+--  Date         : Aug. 25, 2004 by Dennis Tseng   
+--
+--  Copyright (c) 1999-2004 Askey International, Corp.  All Rights Reserved.
+--
+--  -   ipDslam                 FROM ASKEY-DSLAM-MIB
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+
+ASKEY-DSLAM-INTERNET-GROUP-MANAGEMENT-PROTOCOL-PROXY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE,
+    Integer32,
+    IpAddress,
+    MODULE-IDENTITY			FROM SNMPv2-SMI
+    MacAddress				FROM SNMPv2-TC
+    ipDslam                 FROM ASKEY-DSLAM-MIB
+    EnabledStatus           FROM P-BRIDGE-MIB    
+    PortList				FROM Q-BRIDGE-MIB
+    ifIndex   		    	FROM IF-MIB
+    ;
+
+askeyIgmpProxyMib MODULE-IDENTITY
+        LAST-UPDATED    "200503250000Z"  -- march 25, 2005
+        ORGANIZATION    "ASKEY Inc."
+        CONTACT-INFO    "ASKEY Inc.
+                         E-mail: cwfu@askey.com.tw"
+
+        DESCRIPTION     
+        	"This mib describes the configuration of the igmp proxy 
+        	and the group informatoin."
+
+    ::= { ipDslam 14 }
+
+
+askeyIgmpProxyOperEnable OBJECT-TYPE
+    SYNTAX       EnabledStatus
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+        "This object manages the igmp proxy status."
+    ::= { askeyIgmpProxyMib 1 }
+
+askeyIgmpProxyRobust OBJECT-TYPE
+    SYNTAX       INTEGER(1..5)
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "This object describes the counter of igmp proxy retry."
+	DEFVAL {3}        
+    ::= { askeyIgmpProxyMib 2 }
+
+askeyIgmpProxyQueryInterval OBJECT-TYPE
+    SYNTAX       INTEGER(1..30)
+    UNITS       "second"		
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        ""
+	DEFVAL {3}
+    ::= { askeyIgmpProxyMib 3 }
+
+askeyIgmpProxyImmediatedLeaveEnable OBJECT-TYPE
+    SYNTAX       EnabledStatus
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        ""
+    ::= { askeyIgmpProxyMib 4 }
+
+--
+-- group table
+--
+
+askeyIgmpGroupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AskeyIgmpGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+    	""
+    ::= { askeyIgmpProxyMib 5 }
+
+askeyIgmpGroupEntry OBJECT-TYPE
+    SYNTAX      AskeyIgmpGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    	""
+    INDEX { askeyIgmpGroupIp }
+    ::= { askeyIgmpGroupTable 1 }
+
+AskeyIgmpGroupEntry ::=
+    SEQUENCE {
+        askeyIgmpGroupIp	      				IpAddress,
+        askeyIgmpGroupVlanId					Integer32,
+		askeyIgmpGroupLastReporter				IpAddress,		
+		askeyIgmpGroupLastIfindex				Integer32,
+		askeyIgmpGroupUptime					Integer32,
+		askeyIgmpGroupMemberList				PortList,
+		askeyIgmpGroupMemberCounter				Integer32	
+    }    
+    
+askeyIgmpGroupIp OBJECT-TYPE
+    SYNTAX       IpAddress
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+		""
+    ::= { askeyIgmpGroupEntry 1 }
+
+askeyIgmpGroupVlanId OBJECT-TYPE
+    SYNTAX       Integer32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+		""
+    ::= { askeyIgmpGroupEntry 2 }
+
+    
+askeyIgmpGroupLastReporter OBJECT-TYPE
+    SYNTAX       IpAddress
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+		""
+    ::= { askeyIgmpGroupEntry 3 }
+
+askeyIgmpGroupLastIfindex OBJECT-TYPE
+    SYNTAX       Integer32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+		""
+    ::= { askeyIgmpGroupEntry 4 }
+
+
+askeyIgmpGroupUptime OBJECT-TYPE
+    SYNTAX       Integer32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+		""
+    ::= { askeyIgmpGroupEntry 5 }
+
+askeyIgmpGroupMemberList OBJECT-TYPE
+    SYNTAX       PortList
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+		""
+    ::= { askeyIgmpGroupEntry 6 }  
+
+askeyIgmpGroupMemberCounter OBJECT-TYPE
+    SYNTAX       Integer32
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+		""
+    ::= { askeyIgmpGroupEntry 7}        
+    
+--
+-- member table
+--
+
+ askeyIgmpMemberTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AskeyIgmpMemberEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION 
+    	""
+    ::= { askeyIgmpProxyMib 6 }
+
+askeyIgmpMemberEntry OBJECT-TYPE
+    SYNTAX      AskeyIgmpMemberEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    	""
+    INDEX { ifIndex, askeyIgmpMemberGroupIp }
+    ::= { askeyIgmpMemberTable 1 }
+
+AskeyIgmpMemberEntry ::=
+    SEQUENCE {
+    	askeyIgmpMemberGroupIp					IpAddress,
+		askeyIgmpMemberState					INTEGER
+    }    
+
+askeyIgmpMemberGroupIp OBJECT-TYPE
+    SYNTAX       IpAddress
+    MAX-ACCESS   not-accessible
+    STATUS       current
+    DESCRIPTION
+        ""
+    ::= { askeyIgmpMemberEntry 1 }
+    
+askeyIgmpMemberState OBJECT-TYPE
+    SYNTAX      INTEGER {
+    	idleState (0),
+        pollState (1),
+        activeState(2)
+        }
+    MAX-ACCESS   read-only
+    STATUS       current
+    DESCRIPTION
+		""
+    ::= { askeyIgmpMemberEntry 2 }           
+END
+

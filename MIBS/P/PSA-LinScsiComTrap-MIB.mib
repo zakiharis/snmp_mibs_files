@@ -1,0 +1,3261 @@
+PSA-LinScsiComTrap-MIB DEFINITIONS ::= BEGIN
+
+--PRIMEQUEST system management MIB for Partition
+--
+--
+--$Copyright$
+--Copyright Fujitsu Limited 2004-2010
+--All rights reserved
+--
+--
+--MIB Revision: 02000006
+--
+
+IMPORTS
+	OBJECT-TYPE								FROM RFC-1212
+	TRAP-TYPE								FROM RFC-1215
+	mib-2, DisplayString					FROM RFC1213-MIB
+	TimeTicks, Counter, Gauge, IpAddress	FROM RFC1155-SMI
+	mgmt, enterprises						FROM RFC1155-SMI;
+
+--enterprises	OBJECT IDENTIFIER ::={ iso org(3) dod(6) internet(1) private(4) 1 }
+--
+--PRIMEQUEST system management MIB nodes
+--fujitsu:                    1.3.6.1.4.1.211
+-- products:                  1.3.6.1.4.1.211.1
+--  iaServer:                 1.3.6.1.4.1.211.1.31
+--   primequest:              1.3.6.1.4.1.211.1.31.1
+--    partition:	           1.3.6.1.4.1.211.1.31.1.2
+--
+--Trap enterprise is "psaLinScsiComTrap"
+
+--FUJITSU PRIMEQUEST system management MIB nodes for Partition
+  fujitsu        OBJECT IDENTIFIER  ::={ enterprises 211 }
+  products       OBJECT IDENTIFIER  ::={ fujitsu 1 }
+  iaServer       OBJECT IDENTIFIER  ::={ products 31 }
+  primequest     OBJECT IDENTIFIER  ::={ iaServer 1 }
+   partition     OBJECT IDENTIFIER  ::={ primequest 2 }
+    parititonVariables	OBJECT IDENTIFIER	::={ partition	200 }
+    partitionEnterprise        OBJECT IDENTIFIER  ::={ partition 201 }
+     psaComTrap                OBJECT IDENTIFIER  ::={ partitionEnterprise 1 }
+     psaLinLanComTrap          OBJECT IDENTIFIER  ::={ partitionEnterprise 2 }
+     psaLinIntelE100Trap       OBJECT IDENTIFIER  ::={ partitionEnterprise 3 }
+     psaLinIntelE1000Trap      OBJECT IDENTIFIER  ::={ partitionEnterprise 4 }
+     psaLinBcm5700Trap         OBJECT IDENTIFIER  ::={ partitionEnterprise 5 }
+     psaLinEmulexTrap          OBJECT IDENTIFIER  ::={ partitionEnterprise 6 }
+     psaLinLsiLogicTrap        OBJECT IDENTIFIER  ::={ partitionEnterprise 7 }
+     psaLinScsiComTrap         OBJECT IDENTIFIER  ::={ partitionEnterprise 8 }
+     psaLinGrmpdTrap           OBJECT IDENTIFIER  ::={ partitionEnterprise 9 }
+     psaLinGdsTrap             OBJECT IDENTIFIER  ::={ partitionEnterprise 10 }
+     psaLinGlsTrap             OBJECT IDENTIFIER  ::={ partitionEnterprise 11 }
+     psaLinTg3Trap             OBJECT IDENTIFIER  ::={ partitionEnterprise 12 }
+     psaLinIbTrap              OBJECT IDENTIFIER  ::={ partitionEnterprise 13 }
+     psaLinXframe2Trap         OBJECT IDENTIFIER  ::={ partitionEnterprise 14 }
+     psaGschTrap               OBJECT IDENTIFIER  ::={ partitionEnterprise 15 }
+     psaLinIntelE1000ETrap     OBJECT IDENTIFIER  ::={ partitionEnterprise 16 }
+     psaLinIntelIgbTrap        OBJECT IDENTIFIER  ::={ partitionEnterprise 17 }
+     psaLinSvsRaidTrap         OBJECT IDENTIFIER  ::={ partitionEnterprise 18 }
+     psaExternalFileUnitTrap   OBJECT IDENTIFIER  ::={ partitionEnterprise 101 }
+
+--***************************************************************************************
+--
+--FUJITSU PRIMEQUEST system management trap parameter variables for Partition
+--	They aren't directly accessibles(can't use snmp get/set command), but sent with trap
+--
+--***************************************************************************************
+
+     trapVarComInfo	OBJECT IDENTIFIER	::={ parititonVariables 1 }
+
+trapPartitionName OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Partition name which trap is generated."
+   ::= { trapVarComInfo 1 }
+
+trapPartitionId OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Paritition identifier which trap is generated."
+   ::= { trapVarComInfo 2 }
+
+trapEventLevel OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Event level"
+   ::= { trapVarComInfo 3 }
+
+trapEventId OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Event Identifier"
+   ::= { trapVarComInfo 4 }
+
+trapUnitName OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Unit name which trap is generated."
+   ::= { trapVarComInfo 5 }
+
+trapMmbVip OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Management board vertual IP address."
+   ::= { trapVarComInfo 6 }
+
+     trapVarDivInfo	OBJECT IDENTIFIER	::={ parititonVariables 2 }
+
+trapPartNo OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Parts number of trap source."
+   ::= { trapVarDivInfo 1 }
+
+trapStepping OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 2 }
+
+trapSerialNo OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Serial number of trap source. "
+   ::= { trapVarDivInfo 3 }
+
+trapModelNo OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Model number of trap source."
+   ::= { trapVarDivInfo 4 }
+
+trapSuspect OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Logical name or pci bus number of trap source."
+   ::= { trapVarDivInfo 5 }
+
+trapVendorId OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Vendor identifier of trap source."
+   ::= { trapVarDivInfo 6 }
+
+trapDeviceId OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Device identifier of trap source."
+   ::= { trapVarDivInfo 7 }
+
+trapRevision OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Revision of trap source."
+   ::= { trapVarDivInfo 8 }
+
+trapCardName OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Device name of trap source."
+   ::= { trapVarDivInfo 9 }
+
+trapErrDetail OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 10 }
+
+trapErrCode OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 11 }
+
+trapIrpCode OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 12 }
+
+trapHbaNo OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 13 }
+
+trapErrCause OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 14 }
+
+trapPathNo OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 15 }
+
+trapDiskId OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 16 }
+
+trapFmrDiskId OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 17 }
+
+trapCurDiskId OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 18 }
+
+trapPathId OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 19 }
+
+trapPhysIf OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 20 }
+
+trapVirtualIf OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 21 }
+
+trapLogicalIp OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 22 }
+
+trapWatchIp OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 23 }
+
+trapInterface OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 24 }
+
+trapSourceIp OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 25 }
+
+trapDestIp OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 26 }
+
+trapModelName OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Model name of trap source."
+   ::= { trapVarDivInfo 27 }
+
+trapFlagcode OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 28 }
+
+--***************************************************************************************
+--
+--FUJITSU PRIMEQUEST system management TRAP definition for Partition
+--	Trap enterprise:	psaLinScsiComTrap (.1.3.6.1.4.1.211.1.31.1.2.201.8)
+--
+--***************************************************************************************
+
+scsiComEvent0 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "sd: Software error (Unknown command)"
+   --#TYPE			"Scsi Com Event 0"
+   --#SUMMARY		"%s(PID=%d) %s %d %s sd: Software error (Unknown command)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14000
+
+scsiComEvent1 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapCardName,
+      trapSerialNo,
+      trapMmbVip
+   }
+   DESCRIPTION "sd: Device error (Not ready)"
+   --#TYPE			"Scsi Com Event 1"
+   --#SUMMARY		"%s(PID=%d) %s %d %s sd:%s Device error (Not ready) vendor=%s model=%s serial-no=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 14001
+
+scsiComEvent2 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapCardName,
+      trapSerialNo,
+      trapMmbVip
+   }
+   DESCRIPTION "sd: Device error (Not ready)"
+   --#TYPE			"Scsi Com Event 2"
+   --#SUMMARY		"%s(PID=%d) %s %d %s sd:%s Device error (Not ready) vendor=%s model=%s serial-no=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 14002
+
+scsiComEvent3 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapCardName,
+      trapSerialNo,
+      trapMmbVip
+   }
+   DESCRIPTION "sd: Device error (READ CAPACITY failed)"
+   --#TYPE			"Scsi Com Event 3"
+   --#SUMMARY		"%s(PID=%d) %s %d %s sd:%s Device error (READ CAPACITY failed) vendor=%s model=%s serial-no=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 14003
+
+scsiComEvent4 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapCardName,
+      trapSerialNo,
+      trapMmbVip
+   }
+   DESCRIPTION "sd: Device error (READ CAPACITY failed)"
+   --#TYPE			"Scsi Com Event 4"
+   --#SUMMARY		"%s(PID=%d) %s %d %s sd:%s Device error (READ CAPACITY failed) vendor=%s model=%s serial-no=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 14004
+
+scsiComEvent5 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapCardName,
+      trapSerialNo,
+      trapMmbVip
+   }
+   DESCRIPTION "sd: Device  error (DISK size too big)"
+   --#TYPE			"Scsi Com Event 5"
+   --#SUMMARY		"%s(PID=%d) %s %d %s sd:%s Device error (DISK size too big) vendor=%s model=%s serial-no=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 14005
+
+scsiComEvent6 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapVendorId,
+      trapCardName,
+      trapSerialNo,
+      trapMmbVip
+   }
+   DESCRIPTION "sd: Device error (sector size 0 reported)"
+   --#TYPE			"Scsi Com Event 6"
+   --#SUMMARY		"%s(PID=%d) %s %d %s sd: Device error (sector size 0 reported) vendor=%s model=%s serial-no=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7 }
+   --#SEVERITY		MINOR
+   ::= 14006
+
+scsiComEvent7 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapCardName,
+      trapSerialNo,
+      trapMmbVip
+   }
+   DESCRIPTION "sd: Device error (unsupported sector size)"
+   --#TYPE			"Scsi Com Event 7"
+   --#SUMMARY		"%s(PID=%d) %s %d %s sd:%s Device error (unsupported sector size) vendor=%s model=%s serial-no=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 14007
+
+scsiComEvent8 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "sd: Software error (Request allocation failure)"
+   --#TYPE			"Scsi Com Event 8"
+   --#SUMMARY		"%s(PID=%d) %s %d %s sd: Software error (Request allocation failure)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14008
+
+scsiComEvent9 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "sd: Software error (Memory allocation failure)"
+   --#TYPE			"Scsi Com Event 9"
+   --#SUMMARY		"%s(PID=%d) %s %d %s sd: Software error (Memory allocation failure)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14009
+
+scsiComEvent10 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapCardName,
+      trapMmbVip
+   }
+   DESCRIPTION "sr: Device error (Recovered error)"
+   --#TYPE			"Scsi Com Event 10"
+   --#SUMMARY		"%s(PID=%d) %s %d %s sr:%s Device error (Recovered error) vendor=%s model=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7 }
+   --#SEVERITY		MINOR
+   ::= 14010
+
+scsiComEvent12 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "sr: Software error (bad sector size)"
+   --#TYPE			"Scsi Com Event 12"
+   --#SUMMARY		"%s(PID=%d) %s %d %s sr: Software error (bad sector size)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14012
+
+scsiComEvent13 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapCardName,
+      trapMmbVip
+   }
+   DESCRIPTION "sr: Device error (unsupported sector size)"
+   --#TYPE			"Scsi Com Event 13"
+   --#SUMMARY		"%s(PID=%d) %s %d %s sr:%s Device error (unsupported sector size) vendor=%s model=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7 }
+   --#SEVERITY		MINOR
+   ::= 14013
+
+scsiComEvent14 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "sr: Software error (Request allocation failure)"
+   --#TYPE			"Scsi Com Event 14"
+   --#SUMMARY		"%s(PID=%d) %s %d %s sr: Software error (Request allocation failure)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14014
+
+scsiComEvent15 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "sr: Software error (out of memory)"
+   --#TYPE			"Scsi Com Event 15"
+   --#SUMMARY		"%s(PID=%d) %s %d %s sr: Software error (out of memory)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14015
+
+scsiComEvent16 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapCardName,
+      trapMmbVip
+   }
+   DESCRIPTION "st: Device error (Error with sense data)"
+   --#TYPE			"Scsi Com Event 16"
+   --#SUMMARY		"%s(PID=%d) %s %d %s st:%s Device error (Error with sense data) vendor=%s model=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7 }
+   --#SEVERITY		MINOR
+   ::= 14016
+
+scsiComEvent17 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapCardName,
+      trapMmbVip
+   }
+   DESCRIPTION "st: Device error"
+   --#TYPE			"Scsi Com Event 17"
+   --#SUMMARY		"%s(PID=%d) %s %d %s st:%s Device error vendor=%s model=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7 }
+   --#SEVERITY		MINOR
+   ::= 14017
+
+scsiComEvent18 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapCardName,
+      trapMmbVip
+   }
+   DESCRIPTION "st: Device error (Stepping over filemark forward failed)"
+   --#TYPE			"Scsi Com Event 18"
+   --#SUMMARY		"%s(PID=%d) %s %d %s st:%s Device error (Stepping over filemark forward failed) vendor=%s model=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7 }
+   --#SEVERITY		MINOR
+   ::= 14018
+
+scsiComEvent19 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapCardName,
+      trapMmbVip
+   }
+   DESCRIPTION "st: Device error (Error on flush)"
+   --#TYPE			"Scsi Com Event 19"
+   --#SUMMARY		"%s(PID=%d) %s %d %s st:%s Device error (Error on flush) vendor=%s model=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7 }
+   --#SEVERITY		MINOR
+   ::= 14019
+
+scsiComEvent20 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapCardName,
+      trapMmbVip
+   }
+   DESCRIPTION "st: Device error (Can't set default drive buffering mode)"
+   --#TYPE			"Scsi Com Event 20"
+   --#SUMMARY		"%s(PID=%d) %s %d %s st:%s Device error (Can't set default drive buffering mode) vendor=%s model=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7 }
+   --#SEVERITY		MINOR
+   ::= 14020
+
+scsiComEvent21 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "st: Software error (Can't allocate one page tape buffer)"
+   --#TYPE			"Scsi Com Event 21"
+   --#SUMMARY		"%s(PID=%d) %s %d %s st:%s Software error (Can't allocate one page tape buffer)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 14021
+
+scsiComEvent22 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapCardName,
+      trapMmbVip
+   }
+   DESCRIPTION "st: Device error (Error on write filemark)"
+   --#TYPE			"Scsi Com Event 22"
+   --#SUMMARY		"%s(PID=%d) %s %d %s st:%s Device error (Error on write filemark) vendor=%s model=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7 }
+   --#SEVERITY		MINOR
+   ::= 14022
+
+scsiComEvent23 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapCardName,
+      trapMmbVip
+   }
+   DESCRIPTION "st: Device error (Can't set default compression)"
+   --#TYPE			"Scsi Com Event 23"
+   --#SUMMARY		"%s(PID=%d) %s %d %s st:%s Device error (Can't set default compression) vendor=%s model=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7 }
+   --#SEVERITY		MINOR
+   ::= 14023
+
+scsiComEvent24 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapCardName,
+      trapMmbVip
+   }
+   DESCRIPTION "st: Device or Software error (Overrun)"
+   --#TYPE			"Scsi Com Event 24"
+   --#SUMMARY		"%s(PID=%d) %s %d %s st:%s Device or Software error (Overrun) vendor=%s model=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7 }
+   --#SEVERITY		MINOR
+   ::= 14024
+
+scsiComEvent25 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapCardName,
+      trapMmbVip
+   }
+   DESCRIPTION "st: Device or Software error (Incorrect block size)"
+   --#TYPE			"Scsi Com Event 25"
+   --#SUMMARY		"%s(PID=%d) %s %d %s st:%s Device or Software error (Incorrect block size) vendor=%s model=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7 }
+   --#SEVERITY		MINOR
+   ::= 14025
+
+scsiComEvent26 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "st: Software error (Illegal block size)"
+   --#TYPE			"Scsi Com Event 26"
+   --#SUMMARY		"%s(PID=%d) %s %d %s st:%s Software error (Illegal block size)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 14026
+
+scsiComEvent27 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapCardName,
+      trapMmbVip
+   }
+   DESCRIPTION "st: Device or Software error (Partitioning of tape failed)"
+   --#TYPE			"Scsi Com Event 27"
+   --#SUMMARY		"%s(PID=%d) %s %d %s st:%s Device or Software error (Partitioning of tape failed) vendor=%s model=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7 }
+   --#SEVERITY		MINOR
+   ::= 14027
+
+scsiComEvent28 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "st: Software error (not root)"
+   --#TYPE			"Scsi Com Event 28"
+   --#SUMMARY		"%s(PID=%d) %s %d %s st:%s Software error (not root)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 14028
+
+scsiComEvent29 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "st: Software error (Can't allocate new tape buffer)"
+   --#TYPE			"Scsi Com Event 29"
+   --#SUMMARY		"%s(PID=%d) %s %d %s st: Software error (Can't allocate new tape buffer)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14029
+
+scsiComEvent30 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "st: Software error (failed to enlarge buffer)"
+   --#TYPE			"Scsi Com Event 30"
+   --#SUMMARY		"%s(PID=%d) %s %d %s st: Software error (failed to enlarge buffer)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14030
+
+scsiComEvent31 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "st: Software error (overflow)"
+   --#TYPE			"Scsi Com Event 31"
+   --#SUMMARY		"%s(PID=%d) %s %d %s st: Software error (overflow)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14031
+
+scsiComEvent32 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "st: Software error (overflow)"
+   --#TYPE			"Scsi Com Event 32"
+   --#SUMMARY		"%s(PID=%d) %s %d %s st: Software error (overflow)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14032
+
+scsiComEvent33 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "st: Software error (overflow)"
+   --#TYPE			"Scsi Com Event 33"
+   --#SUMMARY		"%s(PID=%d) %s %d %s st: Software error (overflow)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14033
+
+scsiComEvent34 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "st: Software error (overflow)"
+   --#TYPE			"Scsi Com Event 34"
+   --#SUMMARY		"%s(PID=%d) %s %d %s st: Software error (overflow)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14034
+
+scsiComEvent35 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "st: Software error (overflow)"
+   --#TYPE			"Scsi Com Event 35"
+   --#SUMMARY		"%s(PID=%d) %s %d %s st: Software error (overflow)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14035
+
+scsiComEvent36 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "st: Software error (Device not attached)"
+   --#TYPE			"Scsi Com Event 36"
+   --#SUMMARY		"%s(PID=%d) %s %d %s st: Software error (Device not attached)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14036
+
+scsiComEvent37 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "st: Software error (Device not attached)"
+   --#TYPE			"Scsi Com Event 37"
+   --#SUMMARY		"%s(PID=%d) %s %d %s st: Software error (Device not attached)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14037
+
+scsiComEvent38 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "st: Software error (Can't extend device array)"
+   --#TYPE			"Scsi Com Event 38"
+   --#SUMMARY		"%s(PID=%d) %s %d %s st: Software error (Can't extend device array)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14038
+
+scsiComEvent39 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "st: Software error (Can't allocate device descriptor)"
+   --#TYPE			"Scsi Com Event 39"
+   --#SUMMARY		"%s(PID=%d) %s %d %s st: Software error (Can't allocate device descriptor)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14039
+
+scsiComEvent40 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "st: Software error (Device not attached)"
+   --#TYPE			"Scsi Com Event 40"
+   --#SUMMARY		"%s(PID=%d) %s %d %s st:%s Software error (Device not attached)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 14040
+
+scsiComEvent41 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "st: Software error (Can't add rewind mode)"
+   --#TYPE			"Scsi Com Event 41"
+   --#SUMMARY		"%s(PID=%d) %s %d %s st:%s Software error (Can't add rewind mode)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 14041
+
+scsiComEvent44 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "st: Software error (Unable to get major number for SCSI tapes)"
+   --#TYPE			"Scsi Com Event 44"
+   --#SUMMARY		"%s(PID=%d) %s %d %s st: Software error (Unable to get major number for SCSI tapes)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14044
+
+scsiComEvent45 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "sg: Software error (NULL request)"
+   --#TYPE			"Scsi Com Event 45"
+   --#SUMMARY		"%s(PID=%d) %s %d %s sg: Software error (NULL request)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14045
+
+scsiComEvent46 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "sg: Software error (device array cannot be resized)"
+   --#TYPE			"Scsi Com Event 46"
+   --#SUMMARY		"%s(PID=%d) %s %d %s sg: Software error (device array cannot be resized)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14046
+
+scsiComEvent47 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (Bad queue type)"
+   --#TYPE			"Scsi Com Event 47"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi: Software error (Bad queue type)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14047
+
+scsiComEvent48 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (SCSI subsystem Initialization failed)"
+   --#TYPE			"Scsi Com Event 48"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi: Software error (SCSI subsystem Initialization failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14048
+
+scsiComEvent49 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (Old type LLD Driver)"
+   --#TYPE			"Scsi Com Event 49"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi: Software error (Old type LLD Driver)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14049
+
+scsiComEvent50 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (Old type LLD Driver)"
+   --#TYPE			"Scsi Com Event 50"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi: Software error (Old type LLD Driver)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14050
+
+scsiComEvent51 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (Strange LLD Driver)"
+   --#TYPE			"Scsi Com Event 51"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi: Software error (Strange LLD Driver)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14051
+
+scsiComEvent52 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (SCSI internal ioctl failed)"
+   --#TYPE			"Scsi Com Event 52"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi: Software error (SCSI internal ioctl failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14052
+
+scsiComEvent53 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (SCSI device (ioctl) reports ILLEGAL REQUEST)"
+   --#TYPE			"Scsi Com Event 53"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi: Software error (SCSI device (ioctl) reports ILLEGAL REQUEST)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14053
+
+scsiComEvent54 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapCardName,
+      trapSerialNo,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Device error (ioctl error)"
+   --#TYPE			"Scsi Com Event 54"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi:%s Device error (ioctl error) vendor=%s model=%s serial-no=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 14054
+
+scsiComEvent55 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (cannot allocate scsi_result)"
+   --#TYPE			"Scsi Com Event 55"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi: Software error (cannot allocate scsi_result)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14055
+
+scsiComEvent56 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapCardName,
+      trapSerialNo,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Device error (offlined)"
+   --#TYPE			"Scsi Com Event 56"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi:%s Device error (offlined) vendor=%s model=%s serial-no=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 14056
+
+scsiComEvent57 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (reservation conflict)"
+   --#TYPE			"Scsi Com Event 57"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi:%s Software error (reservation conflict)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 14057
+
+scsiComEvent58 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (request allocate failed; prevent media removal cmd not sent)"
+   --#TYPE			"Scsi Com Event 58"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi: Software error (request allocate failed; prevent media removal cmd not sent)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14058
+
+scsiComEvent59 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapCardName,
+      trapSerialNo,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Device error (Not ready)"
+   --#TYPE			"Scsi Com Event 59"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi:%s Device error (Not ready) vendor=%s model=%s serial-no=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 14059
+
+scsiComEvent60 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapCardName,
+      trapSerialNo,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Device error (Medium error or Volume overflow)"
+   --#TYPE			"Scsi Com Event 60"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi:%s Device error (Medium error or Volume overflow) vendor=%s model=%s serial-no=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 14060
+
+scsiComEvent61 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapCardName,
+      trapSerialNo,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Device error (SCSI command retry out)"
+   --#TYPE			"Scsi Com Event 61"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi:%s Device error (SCSI command retry out) vendor=%s model=%s serial-no=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 14061
+
+scsiComEvent62 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (Incorrect number of segments)"
+   --#TYPE			"Scsi Com Event 62"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi: Software error (Incorrect number of segments)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14062
+
+scsiComEvent63 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (impossible request)"
+   --#TYPE			"Scsi Com Event 63"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi: Software error (impossible request)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14063
+
+scsiComEvent64 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (can't init sg slab)"
+   --#TYPE			"Scsi Com Event 64"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi: Software error (can't init sg slab)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14064
+
+scsiComEvent65 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (can't init sg mempool)"
+   --#TYPE			"Scsi Com Event 65"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi: Software error (can't init sg mempool)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14065
+
+scsiComEvent66 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (Allocation failure)"
+   --#TYPE			"Scsi Com Event 66"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi: Software error (Allocation failure)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14066
+
+scsiComEvent67 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (Device configuration error)"
+   --#TYPE			"Scsi Com Event 67"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi: Software error (Device configuration error)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14067
+
+scsiComEvent68 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Device error (inquiry failed)"
+   --#TYPE			"Scsi Com Event 68"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi: Device error (inquiry failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14068
+
+scsiComEvent69 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (Allocation failure)"
+   --#TYPE			"Scsi Com Event 69"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi: Software error (Allocation failure)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14069
+
+scsiComEvent70 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapCardName,
+      trapSerialNo,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Device error (Device configuration error)"
+   --#TYPE			"Scsi Com Event 70"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi:%s Device error (Device configuration error) vendor=%s model=%s serial-no=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 14070
+
+scsiComEvent71 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapCardName,
+      trapSerialNo,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Device error (Device configuration error)"
+   --#TYPE			"Scsi Com Event 71"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi:%s Device error (Device configuration error) vendor=%s model=%s serial-no=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 14071
+
+scsiComEvent72 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapCardName,
+      trapSerialNo,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Device error (Device configuration error)"
+   --#TYPE			"Scsi Com Event 72"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi:%s Device error (Device configuration error) vendor=%s model=%s serial-no=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 14072
+
+scsiComEvent73 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapCardName,
+      trapSerialNo,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Device error (Unexpected response)"
+   --#TYPE			"Scsi Com Event 73"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi:%s Device error (Unexpected response) vendor=%s model=%s serial-no=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 14073
+
+scsiComEvent74 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (Allocation failure)"
+   --#TYPE			"Scsi Com Event 74"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi: Software error (Allocation failure)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14074
+
+scsiComEvent75 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (no memory)"
+   --#TYPE			"Scsi Com Event 75"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi: Software error (no memory)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14075
+
+scsiComEvent76 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (proc_mkdir failed)"
+   --#TYPE			"Scsi Com Event 76"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi: Software error (proc_mkdir failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14076
+
+scsiComEvent77 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (Failed to register)"
+   --#TYPE			"Scsi Com Event 77"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi: Software error (Failed to register)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14077
+
+scsiComEvent78 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (rejecting I/O to dead device)"
+   --#TYPE			"Scsi Com Event 78"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi: Software error (rejecting I/O to dead device)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14078
+
+scsiComEvent79 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (rejecting I/O to device being removed)"
+   --#TYPE			"Scsi Com Event 79"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi: Software error (rejecting I/O to device being removed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14079
+
+scsiComEvent80 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (rejecting I/O to offline device)"
+   --#TYPE			"Scsi Com Event 80"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi: Software error (rejecting I/O to offline device)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14080
+
+scsiComEvent83 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "st: Software error (Can't set default block size)"
+   --#TYPE			"Scsi Com Event 83"
+   --#SUMMARY		"%s(PID=%d) %s %d %s st:%s Software error (Can't set default block size)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 14083
+
+scsiComEvent84 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "sd: Software error (Bad block number requested)"
+   --#TYPE			"Scsi Com Event 84"
+   --#SUMMARY		"%s(PID=%d) %s %d %s sd: Software error (Bad block number requested)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14084
+
+scsiComEvent85 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapCardName,
+      trapSerialNo,
+      trapMmbVip
+   }
+   DESCRIPTION "sd: Device error (test WP failed)"
+   --#TYPE			"Scsi Com Event 85"
+   --#SUMMARY		"%s(PID=%d) %s %d %s sd:%s Device error (test WP failed) vendor=%s model=%s serial-no=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 14085
+
+scsiComEvent86 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapCardName,
+      trapSerialNo,
+      trapMmbVip
+   }
+   DESCRIPTION "sd: Device error (cache data unavailable)"
+   --#TYPE			"Scsi Com Event 86"
+   --#SUMMARY		"%s(PID=%d) %s %d %s sd:%s Device error (cache data unavailable) vendor=%s model=%s serial-no=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 14086
+
+scsiComEvent87 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapCardName,
+      trapSerialNo,
+      trapMmbVip
+   }
+   DESCRIPTION "sd: Device error (asking for cache data failed)"
+   --#TYPE			"Scsi Com Event 87"
+   --#SUMMARY		"%s(PID=%d) %s %d %s sd:%s Device error (asking for cache data failed) vendor=%s model=%s serial-no=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 14087
+
+scsiComEvent88 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "st: Software error (Write not multiple of tape block size)"
+   --#TYPE			"Scsi Com Event 88"
+   --#SUMMARY		"%s(PID=%d) %s %d %s st:%s Software error (Write not multiple of tape block size)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 14088
+
+scsiComEvent89 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "st: Software error (Too many tape devices)"
+   --#TYPE			"Scsi Com Event 89"
+   --#SUMMARY		"%s(PID=%d) %s %d %s st: Software error (Too many tape devices)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14089
+
+scsiComEvent90 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "sg: Software error (Unable to attach sg device)"
+   --#TYPE			"Scsi Com Event 90"
+   --#SUMMARY		"%s(PID=%d) %s %d %s sg: Software error (Unable to attach sg device)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14090
+
+scsiComEvent91 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "sg: Software error (cannot be allocated)"
+   --#TYPE			"Scsi Com Event 91"
+   --#SUMMARY		"%s(PID=%d) %s %d %s sg: Software error (cannot be allocated)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14091
+
+scsiComEvent93 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "sg: Software error (unable to make symlink)"
+   --#TYPE			"Scsi Com Event 93"
+   --#SUMMARY		"%s(PID=%d) %s %d %s sg:%s Software error (unable to make symlink)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 14093
+
+scsiComEvent94 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "sr: Software error (Unable to allocate SCSI request)"
+   --#TYPE			"Scsi Com Event 94"
+   --#SUMMARY		"%s(PID=%d) %s %d %s sr: Software error (Unable to allocate SCSI request)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14094
+
+scsiComEvent95 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "sr: Software error (unknown vendor code)"
+   --#TYPE			"Scsi Com Event 95"
+   --#SUMMARY		"%s(PID=%d) %s %d %s sr:%s Software error (unknown vendor code)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 14095
+
+scsiComEvent96 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "st: Software error (Unable create sysfs class)"
+   --#TYPE			"Scsi Com Event 96"
+   --#SUMMARY		"%s(PID=%d) %s %d %s st: Software error (Unable create sysfs class)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14096
+
+scsiComEvent97 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "sg: Software error (kmalloc Sg_device failure)"
+   --#TYPE			"Scsi Com Event 97"
+   --#SUMMARY		"%s(PID=%d) %s %d %s sg: Software error (kmalloc Sg_device failure)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14097
+
+scsiComEvent99 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "sg: Software error (alloc_disk failed)"
+   --#TYPE			"Scsi Com Event 99"
+   --#SUMMARY		"%s(PID=%d) %s %d %s sg: Software error (alloc_disk failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14099
+
+scsiComEvent100 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "sg: Software error (cdev_alloc failed)"
+   --#TYPE			"Scsi Com Event 100"
+   --#SUMMARY		"%s(PID=%d) %s %d %s sg: Software error (cdev_alloc failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14100
+
+scsiComEvent101 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "sg: Software error (sg_alloc failed)"
+   --#TYPE			"Scsi Com Event 101"
+   --#SUMMARY		"%s(PID=%d) %s %d %s sg: Software error (sg_alloc failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14101
+
+scsiComEvent102 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "sg: Software error (class_simple_device_add failed)"
+   --#TYPE			"Scsi Com Event 102"
+   --#SUMMARY		"%s(PID=%d) %s %d %s sg: Software error (class_simple_device_add failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14102
+
+scsiComEvent103 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (Illegal state transition)"
+   --#TYPE			"Scsi Com Event 103"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi: Software error (Illegal state transition)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14103
+
+scsiComEvent104 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (Target device_add failed)"
+   --#TYPE			"Scsi Com Event 104"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi: Software error (Target device_add failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14104
+
+scsiComEvent105 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (Target transport add failed)"
+   --#TYPE			"Scsi Com Event 105"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi: Software error (Target transport add failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14105
+
+scsiComEvent106 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (Target transport attr add failed)"
+   --#TYPE			"Scsi Com Event 106"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi: Software error (Target transport attr add failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14106
+
+scsiComEvent107 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (allocation failure)"
+   --#TYPE			"Scsi Com Event 107"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi: Software error (allocation failure)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14107
+
+scsiComEvent108 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (ordered flushes don't support queueing)"
+   --#TYPE			"Scsi Com Event 108"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi: Software error (ordered flushes don't support queueing)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14108
+
+scsiComEvent110 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapCardName,
+      trapSerialNo,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Device error (probe failed)"
+   --#TYPE			"Scsi Com Event 110"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi:%s Device error (probe failed) vendor=%s model=%s serial-no=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 14110
+
+scsiComEvent111 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (barrier error; disabling flush support)"
+   --#TYPE			"Scsi Com Event 111"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi: Software error (barrier error; disabling flush support)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14111
+
+scsiComEvent112 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "st: Software error (Can't allocate tape buffer)"
+   --#TYPE			"Scsi Com Event 112"
+   --#SUMMARY		"%s(PID=%d) %s %d %s st: Software error (Can't allocate tape buffer)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14112
+
+scsiComEvent113 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "st: Software error (class_simple_device_add failed)"
+   --#TYPE			"Scsi Com Event 113"
+   --#SUMMARY		"%s(PID=%d) %s %d %s st: Software error (class_simple_device_add failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14113
+
+scsiComEvent114 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "st: Software error (Can't create sysfs link from SCSI device)"
+   --#TYPE			"Scsi Com Event 114"
+   --#SUMMARY		"%s(PID=%d) %s %d %s st: Software error (Can't create sysfs link from SCSI device)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14114
+
+scsiComEvent115 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "sd: Software error (FUA write on READ/WRITE drive)"
+   --#TYPE			"Scsi Com Event 115"
+   --#SUMMARY		"%s(PID=%d) %s %d %s sd: Software error (FUA write on READ/WRITE drive)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14115
+
+scsiComEvent116 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapCardName,
+      trapSerialNo,
+      trapMmbVip
+   }
+   DESCRIPTION "sd: Device error (too big for this kernel)"
+   --#TYPE			"Scsi Com Event 116"
+   --#SUMMARY		"%s(PID=%d) %s %d %s sd:%s Device error (too big for this kernel) vendor=%s model=%s serial-no=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 14116
+
+scsiComEvent117 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "sd: Software error (malformed MODE SENSE response)"
+   --#TYPE			"Scsi Com Event 117"
+   --#SUMMARY		"%s(PID=%d) %s %d %s sd:%s Software error (malformed MODE SENSE response)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 14117
+
+scsiComEvent118 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapCardName,
+      trapSerialNo,
+      trapMmbVip
+   }
+   DESCRIPTION "sd: Device error (got wrong page)"
+   --#TYPE			"Scsi Com Event 118"
+   --#SUMMARY		"%s(PID=%d) %s %d %s sd:%s Device error (got wrong page) vendor=%s model=%s serial-no=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 14118
+
+scsiComEvent119 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "st: Software error (class_device_create failed)"
+   --#TYPE			"Scsi Com Event 119"
+   --#SUMMARY		"%s(PID=%d) %s %d %s st:%s Software error (class_device_create failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 14119
+
+scsiComEvent120 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (Device not ready)"
+   --#TYPE			"Scsi Com Event 120"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi:%s Software error (Device not ready)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 14120
+
+scsiComEvent121 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (Volume overflow. CDB)"
+   --#TYPE			"Scsi Com Event 121"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi:%s Software error (Volume overflow. CDB)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 14121
+
+scsiComEvent122 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (SCSI error)"
+   --#TYPE			"Scsi Com Event 122"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi:%s Software error (SCSI error)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 14122
+
+scsiComEvent123 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (rejecting I/O to offline device)"
+   --#TYPE			"Scsi Com Event 123"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi:%s Software error (rejecting I/O to offline device)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 14123
+
+scsiComEvent124 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (rejecting I/O to dead device)"
+   --#TYPE			"Scsi Com Event 124"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi:%s Software error (rejecting I/O to dead device)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 14124
+
+scsiComEvent125 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (rejecting I/O to device being removed)"
+   --#TYPE			"Scsi Com Event 125"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi:%s Software error (rejecting I/O to device being removed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 14125
+
+scsiComEvent126 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (impossible request)"
+   --#TYPE			"Scsi Com Event 126"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi: Software error (impossible request)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14126
+
+scsiComEvent127 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (timing out command. waited)"
+   --#TYPE			"Scsi Com Event 127"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi: Software error (timing out command. waited)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14127
+
+scsiComEvent128 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (can't init scsi io context cache)"
+   --#TYPE			"Scsi Com Event 128"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi: Software error (can't init scsi io context cache)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14128
+
+scsiComEvent129 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (allocation failure)"
+   --#TYPE			"Scsi Com Event 129"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi: Software error (allocation failure)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14129
+
+scsiComEvent130 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (target allocation failed)"
+   --#TYPE			"Scsi Com Event 130"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi: Software error (target allocation failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14130
+
+scsiComEvent131 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapCardName,
+      trapSerialNo,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Device error (Can't create sysfs link from SCSI device)"
+   --#TYPE			"Scsi Com Event 131"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi:%s Device error (Can't create sysfs link from SCSI device) vendor=%s model=%s serial-no=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 14131
+
+scsiComEvent132 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "sr: Software error (bad sector size)"
+   --#TYPE			"Scsi Com Event 132"
+   --#SUMMARY		"%s(PID=%d) %s %d %s sr:%s Software error (bad sector size)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 14132
+
+scsiComEvent133 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "sg: Software error (Unable to attach sg device)"
+   --#TYPE			"Scsi Com Event 133"
+   --#SUMMARY		"%s(PID=%d) %s %d %s sg:%s Software error (Unable to attach sg device)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 14133
+
+scsiComEvent134 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapCardName,
+      trapSerialNo,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Device error (offlined)"
+   --#TYPE			"Scsi Com Event 134"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi:%s Device error (offlined) vendor=%s model=%s serial-no=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 14134
+
+scsiComEvent135 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (reservation conflict)"
+   --#TYPE			"Scsi Com Event 135"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi:%s Software error (reservation conflict)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 14135
+
+scsiComEvent136 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (request failed)"
+   --#TYPE			"Scsi Com Event 136"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi:%s Software error (request failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 14136
+
+scsiComEvent137 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapCardName,
+      trapSerialNo,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Device error (ioctl_internal_command)"
+   --#TYPE			"Scsi Com Event 137"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi:%s Device error (ioctl_internal_command) vendor=%s model=%s serial-no=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 14137
+
+scsiComEvent138 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapCardName,
+      trapSerialNo,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Device error (Volume overflow. CDB)"
+   --#TYPE			"Scsi Com Event 138"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi:%s Device error (Volume overflow. CDB) vendor=%s model=%s serial-no=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 14138
+
+scsiComEvent139 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapCardName,
+      trapSerialNo,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Device error (I/O error)"
+   --#TYPE			"Scsi Com Event 139"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi:%s Device error (I/O error) vendor=%s model=%s serial-no=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 14139
+
+scsiComEvent141 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "st: Software error (Async command already active)"
+   --#TYPE			"Scsi Com Event 141"
+   --#SUMMARY		"%s(PID=%d) %s %d %s st:%s Software error (Async command already active)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 14141
+
+scsiComEvent142 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (timing out command. waited)"
+   --#TYPE			"Scsi Com Event 142"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi:%s Software error (timing out command. waited)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 14142
+
+scsiComEvent143 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (mapping failed)"
+   --#TYPE			"Scsi Com Event 143"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi: Software error (mapping failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14143
+
+scsiComEvent144 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (target device_add failed)"
+   --#TYPE			"Scsi Com Event 144"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi:%s Software error (target device_add failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 14144
+
+scsiComEvent145 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (target allocation failed)"
+   --#TYPE			"Scsi Com Event 145"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi:%s Software error (target allocation failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 14145
+
+scsiComEvent146 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (Unexpected response from lun while scanning. scan aborted)"
+   --#TYPE			"Scsi Com Event 146"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi:%s Software error (Unexpected response from lun while scanning. scan aborted)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 14146
+
+scsiComEvent147 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (fc_host_post_event: Dropped Event)"
+   --#TYPE			"Scsi Com Event 147"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi: Software error (fc_host_post_event: Dropped Event)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14147
+
+scsiComEvent148 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (fc_host_post_vendor_event: Dropped Event)"
+   --#TYPE			"Scsi Com Event 148"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi: Software error (fc_host_post_vendor_event: Dropped Event)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14148
+
+scsiComEvent149 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (attempted to queue work; when no workqueue created)"
+   --#TYPE			"Scsi Com Event 149"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi: Software error (attempted to queue work; when no workqueue created)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14149
+
+scsiComEvent150 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (attempted to flush work; when no workqueue created)"
+   --#TYPE			"Scsi Com Event 150"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi: Software error (attempted to flush work; when no workqueue created)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14150
+
+scsiComEvent151 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (fc_rport_create: allocation failure)"
+   --#TYPE			"Scsi Com Event 151"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi: Software error (fc_rport_create: allocation failure)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14151
+
+scsiComEvent152 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (FC Remote Port device_add failed)"
+   --#TYPE			"Scsi Com Event 152"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi: Software error (FC Remote Port device_add failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14152
+
+scsiComEvent153 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (FC remote port time out: no longer a FCP target; removing starget)"
+   --#TYPE			"Scsi Com Event 153"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi:%s Software error (FC remote port time out: no longer a FCP target; removing starget)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 14153
+
+scsiComEvent154 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (FC remote port time out: leaving target alone)"
+   --#TYPE			"Scsi Com Event 154"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi:%s Software error (FC remote port time out: leaving target alone)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 14154
+
+scsiComEvent155 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (FC remote port time out: removing target)"
+   --#TYPE			"Scsi Com Event 155"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi:%s Software error (FC remote port time out: removing target)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 14155
+
+scsiComEvent156 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (FC remote port time out: removing target and saving binding)"
+   --#TYPE			"Scsi Com Event 156"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi:%s Software error (FC remote port time out: removing target and saving binding)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 14156
+
+scsiComEvent157 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (it's already part of another port)"
+   --#TYPE			"Scsi Com Event 157"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi:%s Software error (it's already part of another port)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 14157
+
+scsiComEvent158 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (saving binding)"
+   --#TYPE			"Scsi Com Event 158"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi:%s Software error (saving binding)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 14158
+
+scsiComEvent159 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (target resuming)"
+   --#TYPE			"Scsi Com Event 159"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi:%s Software error (target resuming)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 14159
+
+scsiComEvent160 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (host resuming)"
+   --#TYPE			"Scsi Com Event 160"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi:%s Software error (host resuming)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 14160
+
+scsiComEvent161 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "sd: Software error (No memory for request)"
+   --#TYPE			"Scsi Com Event 161"
+   --#SUMMARY		"%s(PID=%d) %s %d %s sd: Software error (No memory for request)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14161
+
+scsiComEvent162 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapCardName,
+      trapMmbVip
+   }
+   DESCRIPTION "st: Device error"
+   --#TYPE			"Scsi Com Event 162"
+   --#SUMMARY		"%s(PID=%d) %s %d %s st:%s Device error vendor=%s model=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7 }
+   --#SEVERITY		MINOR
+   ::= 14162
+
+scsiComEvent163 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "sd: Software error (START_STOP FAILED)"
+   --#TYPE			"Scsi Com Event 163"
+   --#SUMMARY		"%s(PID=%d) %s %d %s sd:%s Software error (START_STOP FAILED)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 14163
+
+scsiComEvent164 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "sd: Software error (Cannot create port links or backlink)"
+   --#TYPE			"Scsi Com Event 164"
+   --#SUMMARY		"%s(PID=%d) %s %d %s sd: Software error (Cannot create port links or backlink)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14164
+
+scsiComEvent165 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapCardName,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Device error"
+   --#TYPE			"Scsi Com Event 165"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi:%s Device error vendor=%s model=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7 }
+   --#SEVERITY		MINOR
+   ::= 14165
+
+scsiComEvent166 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (event eaten due to OOM)"
+   --#TYPE			"Scsi Com Event 166"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi:%s Software error (event eaten due to OOM)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 14166
+
+scsiComEvent167 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapCardName,
+      trapSerialNo,
+      trapMmbVip
+   }
+   DESCRIPTION "sd: Device error (malformed MODE SENSE response)"
+   --#TYPE			"Scsi Com Event 167"
+   --#SUMMARY		"%s(PID=%d) %s %d %s sd:%s Device error (malformed MODE SENSE response) vendor=%s model=%s serial-no=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 14167
+
+scsiComEvent168 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (FC Virtual Port device add failed)"
+   --#TYPE			"Scsi Com Event 168"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi: Software error (FC Virtual Port device add failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14168
+
+scsiComEvent169 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (FC Virtual Port LLDD Create failed)"
+   --#TYPE			"Scsi Com Event 169"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi: Software error (FC Virtual Port LLDD Create failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 14169
+
+scsiComEvent170 TRAP-TYPE
+   ENTERPRISE   psaLinScsiComTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "scsi: Software error (Cannot create vport symlinks)"
+   --#TYPE			"Scsi Com Event 170"
+   --#SUMMARY		"%s(PID=%d) %s %d %s scsi:%s Software error (Cannot create vport symlinks)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 14170
+
+END

@@ -1,0 +1,1861 @@
+PSA-LinIbTrap-MIB DEFINITIONS ::= BEGIN
+
+--PRIMEQUEST system management MIB for Partition
+--
+--
+--$Copyright$
+--Copyright Fujitsu Limited 2007
+--All rights reserved
+--
+--
+--MIB Revision: 01130001
+--
+
+IMPORTS
+	OBJECT-TYPE								FROM RFC-1212
+	TRAP-TYPE								FROM RFC-1215
+	mib-2, DisplayString					FROM RFC1213-MIB
+	TimeTicks, Counter, Gauge, IpAddress	FROM RFC1155-SMI
+	mgmt, enterprises						FROM RFC1155-SMI;
+
+--enterprises	OBJECT IDENTIFIER ::={ iso org(3) dod(6) internet(1) private(4) 1 }
+--
+--PRIMEQUEST system management MIB nodes
+--fujitsu:                    1.3.6.1.4.1.211
+-- products:                  1.3.6.1.4.1.211.1
+--  iaServer:                 1.3.6.1.4.1.211.1.31
+--   primequest:              1.3.6.1.4.1.211.1.31.1
+--    partition:	           1.3.6.1.4.1.211.1.31.1.2
+--
+--Trap enterprise is "psaLinIbTrap"
+
+--FUJITSU PRIMEQUEST system management MIB nodes for Partition
+  fujitsu        OBJECT IDENTIFIER  ::={ enterprises 211 }
+  products       OBJECT IDENTIFIER  ::={ fujitsu 1 }
+  iaServer       OBJECT IDENTIFIER  ::={ products 31 }
+  primequest     OBJECT IDENTIFIER  ::={ iaServer 1 }
+   partition     OBJECT IDENTIFIER  ::={ primequest 2 }
+    parititonVariables	OBJECT IDENTIFIER	::={ partition	200 }
+    partitionEnterprise		OBJECT IDENTIFIER  ::={ partition 201 }
+     psaComTrap				OBJECT IDENTIFIER  ::={ partitionEnterprise 1 }
+     psaLinLanComTrap			OBJECT IDENTIFIER  ::={ partitionEnterprise 2 }
+     psaLinIntelE100Trap		OBJECT IDENTIFIER  ::={ partitionEnterprise 3 }
+     psaLinIntelE1000Trap		OBJECT IDENTIFIER  ::={ partitionEnterprise 4 }
+     psaLinBcm5700Trap			OBJECT IDENTIFIER  ::={ partitionEnterprise 5 }
+     psaLinEmulexTrap			OBJECT IDENTIFIER  ::={ partitionEnterprise 6 }
+     psaLinLsiLogicTrap		OBJECT IDENTIFIER  ::={ partitionEnterprise 7 }
+     psaLinScsiComTrap			OBJECT IDENTIFIER  ::={ partitionEnterprise 8 }
+     psaLinGrmpdTrap			OBJECT IDENTIFIER  ::={ partitionEnterprise 9 }
+     psaLinGdsTrap				OBJECT IDENTIFIER  ::={ partitionEnterprise 10 }
+     psaLinGlsTrap				OBJECT IDENTIFIER  ::={ partitionEnterprise 11 }
+     psaLinTg3Trap				OBJECT IDENTIFIER  ::={ partitionEnterprise 12 }
+     psaLinIbTrap				OBJECT IDENTIFIER  ::={ partitionEnterprise 13 }
+     psaLinXframe2Trap			OBJECT IDENTIFIER  ::={ partitionEnterprise 14 }
+     psaGschTrap				OBJECT IDENTIFIER  ::={ partitionEnterprise 15 }
+     psaExternalFileUnitTrap	OBJECT IDENTIFIER  ::={ partitionEnterprise 101 }
+
+--***************************************************************************************
+--
+--FUJITSU PRIMEQUEST system management trap parameter variables for Partition
+--	They aren't directly accessibles(can't use snmp get/set command), but sent with trap
+--
+--***************************************************************************************
+
+     trapVarComInfo	OBJECT IDENTIFIER	::={ parititonVariables 1 }
+
+trapPartitionName OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Partition name which trap is generated."
+   ::= { trapVarComInfo 1 }
+
+trapPartitionId OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Paritition identifier which trap is generated."
+   ::= { trapVarComInfo 2 }
+
+trapEventLevel OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Event level"
+   ::= { trapVarComInfo 3 }
+
+trapEventId OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Event Identifier"
+   ::= { trapVarComInfo 4 }
+
+trapUnitName OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Unit name which trap is generated."
+   ::= { trapVarComInfo 5 }
+
+trapMmbVip OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Management board vertual IP address."
+   ::= { trapVarComInfo 6 }
+
+     trapVarDivInfo	OBJECT IDENTIFIER	::={ parititonVariables 2 }
+
+trapPartNo OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Parts number of trap source."
+   ::= { trapVarDivInfo 1 }
+
+trapStepping OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 2 }
+
+trapSerialNo OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Serial number of trap source. "
+   ::= { trapVarDivInfo 3 }
+
+trapModelNo OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Model number of trap source."
+   ::= { trapVarDivInfo 4 }
+
+trapSuspect OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Logical name or pci bus number of trap source."
+   ::= { trapVarDivInfo 5 }
+
+trapVendorId OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Vendor identifier of trap source."
+   ::= { trapVarDivInfo 6 }
+
+trapDeviceId OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Device identifier of trap source."
+   ::= { trapVarDivInfo 7 }
+
+trapRevision OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Revision of trap source."
+   ::= { trapVarDivInfo 8 }
+
+trapCardName OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Device name of trap source."
+   ::= { trapVarDivInfo 9 }
+
+trapErrDetail OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 10 }
+
+trapErrCode OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 11 }
+
+trapIrpCode OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 12 }
+
+trapHbaNo OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 13 }
+
+trapErrCause OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 14 }
+
+trapPathNo OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 15 }
+
+trapDiskId OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 16 }
+
+trapFmrDiskId OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 17 }
+
+trapCurDiskId OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 18 }
+
+trapPathId OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 19 }
+
+trapPhysIf OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 20 }
+
+trapVirtualIf OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 21 }
+
+trapLogicalIp OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 22 }
+
+trapWatchIp OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 23 }
+
+trapInterface OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 24 }
+
+trapSourceIp OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 25 }
+
+trapDestIp OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 26 }
+
+trapModelName OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Model name of trap source."
+   ::= { trapVarDivInfo 27 }
+
+trapFlagcode OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 28 }
+
+--***************************************************************************************
+--
+--FUJITSU PRIMEQUEST system management TRAP definition for Partition
+--	Trap enterprise:	psaLinIbTrap (.1.3.6.1.4.1.211.1.31.1.2.201.13)
+--
+--***************************************************************************************
+
+ibEvent0 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter error (internal error)"
+   --#TYPE			"Ib Event 0"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter error (internal error) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 18000
+
+ibEvent1 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter error (uplink bus error)"
+   --#TYPE			"Ib Event 1"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter error (uplink bus error) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 18001
+
+ibEvent2 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter error (DDR data error)"
+   --#TYPE			"Ib Event 2"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter error (DDR data error) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 18002
+
+ibEvent3 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter error (internal parity error)"
+   --#TYPE			"Ib Event 3"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter error (internal parity error) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 18003
+
+ibEvent4 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter error (unknown)"
+   --#TYPE			"Ib Event 4"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter error (unknown) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 18004
+
+ibEvent5 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Software error (CQ on CQN)"
+   --#TYPE			"Ib Event 5"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Software error (CQ on CQN)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 18005
+
+ibEvent6 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Software error (EQ overrun on EQN)"
+   --#TYPE			"Ib Event 6"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Software error (EQ overrun on EQN)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 18006
+
+ibEvent7 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter or Software error (Unhandled event on EQ)"
+   --#TYPE			"Ib Event 7"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter or Software error (Unhandled event on EQ) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18007
+
+ibEvent8 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Software error (Couldn't map command register)"
+   --#TYPE			"Ib Event 8"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Software error (Couldn't map command register)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 18008
+
+ibEvent9 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Software error (Couldn't map interrupt clear register; aborting)"
+   --#TYPE			"Ib Event 9"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Software error (Couldn't map interrupt clear register; aborting)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 18009
+
+ibEvent10 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Software error (Couldn't map EQ arm register; aborting)"
+   --#TYPE			"Ib Event 10"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Software error (Couldn't map EQ arm register; aborting)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 18010
+
+ibEvent11 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Software error (Couldn't map EQ CI register; aborting)"
+   --#TYPE			"Ib Event 11"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Software error (Couldn't map EQ CI register; aborting)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 18011
+
+ibEvent12 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Software error (Couldn't map ecr register; aborting)"
+   --#TYPE			"Ib Event 12"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Software error (Couldn't map ecr register; aborting)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 18012
+
+ibEvent13 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter or Software error (Failed to init command interface; aborting)"
+   --#TYPE			"Ib Event 13"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter or Software error (Failed to init command interface; aborting) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18013
+
+ibEvent14 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter or Software error (Couldn't read PCI-X command register; aborting)"
+   --#TYPE			"Ib Event 14"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter or Software error (Couldn't read PCI-X command register; aborting) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18014
+
+ibEvent15 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter or Software error (Couldn't write PCI-X command register; aborting)"
+   --#TYPE			"Ib Event 15"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter or Software error (Couldn't write PCI-X command register; aborting) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18015
+
+ibEvent16 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter or Software error (Couldn't read PCI Express device control register; aborting)"
+   --#TYPE			"Ib Event 16"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter or Software error (Couldn't read PCI Express device control register; aborting) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18016
+
+ibEvent17 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter or Software error (Couldn't write PCI Express device control register; aborting)"
+   --#TYPE			"Ib Event 17"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter or Software error (Couldn't write PCI Express device control register; aborting) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18017
+
+ibEvent18 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter or Software error (Failed to allocate driver access region; aborting)"
+   --#TYPE			"Ib Event 18"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter or Software error (Failed to allocate driver access region; aborting) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18018
+
+ibEvent19 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Software error (Couldn't map kernel access region; aborting)"
+   --#TYPE			"Ib Event 19"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Software error (Couldn't map kernel access region; aborting)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 18019
+
+ibEvent20 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Software error (Couldn't map HCA reset register; aborting)"
+   --#TYPE			"Ib Event 20"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Software error (Couldn't map HCA reset register; aborting)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 18020
+
+ibEvent21 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter or Software error (Couldn't save HCA PCI header; aborting)"
+   --#TYPE			"Ib Event 21"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter or Software error (Couldn't save HCA PCI header; aborting) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18021
+
+ibEvent22 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter or Software error (Couldn't save HCA bridge PCI header; aborting)"
+   --#TYPE			"Ib Event 22"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter or Software error (Couldn't save HCA bridge PCI header; aborting) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18022
+
+ibEvent23 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter or Software error (Couldn't access HCA after reset; aborting)"
+   --#TYPE			"Ib Event 23"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter or Software error (Couldn't access HCA after reset; aborting) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 18023
+
+ibEvent24 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter or Software error (Couldn't restore HCA bridge reg; aborting)"
+   --#TYPE			"Ib Event 24"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter or Software error (Couldn't restore HCA bridge reg; aborting) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18024
+
+ibEvent25 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter or Software error (Couldn't restore HCA bridge COMMAND; aborting)"
+   --#TYPE			"Ib Event 25"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter or Software error (Couldn't restore HCA bridge COMMAND; aborting) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18025
+
+ibEvent26 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter or Software error (Couldn't restore HCA reg; aborting)"
+   --#TYPE			"Ib Event 26"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter or Software error (Couldn't restore HCA reg; aborting) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18026
+
+ibEvent27 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter or Software error (Couldn't restore HCA COMMAND; aborting)"
+   --#TYPE			"Ib Event 27"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter or Software error (Couldn't restore HCA COMMAND; aborting) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18027
+
+ibEvent28 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter or Software error (PCI device did not come back after reset; aborting)"
+   --#TYPE			"Ib Event 28"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter or Software error (PCI device did not come back after reset; aborting) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 18028
+
+ibEvent29 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter or Software error (Failed to reset HCA; aborting)"
+   --#TYPE			"Ib Event 29"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter or Software error (Failed to reset HCA; aborting) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 18029
+
+ibEvent30 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter or Software error (Failed to initialize table; aborting)"
+   --#TYPE			"Ib Event 30"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter or Software error (Failed to initialize table; aborting) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 18030
+
+ibEvent31 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter or Software error (Failed to create driver PD; aborting)"
+   --#TYPE			"Ib Event 31"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter or Software error (Failed to create driver PD; aborting) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18031
+
+ibEvent32 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter or Software error (Failed to switch to event-driven firmware commands; aborting)"
+   --#TYPE			"Ib Event 32"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter or Software error (Failed to switch to event-driven firmware commands; aborting) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18032
+
+ibEvent33 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Software error (No AMGM entries left)"
+   --#TYPE			"Ib Event 33"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Software error (No AMGM entries left)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 18033
+
+ibEvent34 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Software error (Couldn't allocate memory to save HCA PCI header; aborting)"
+   --#TYPE			"Ib Event 34"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Software error (Couldn't allocate memory to save HCA PCI header; aborting)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 18034
+
+ibEvent35 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Software error (Couldn't allocate memory to save HCA bridge PCI header; aborting)"
+   --#TYPE			"Ib Event 35"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Software error (Couldn't allocate memory to save HCA bridge PCI header; aborting)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 18035
+
+ibEvent36 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Software error (MGID not found)"
+   --#TYPE			"Ib Event 36"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Software error (MGID not found)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 18036
+
+ibEvent37 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Software error (QP not found in MGM)"
+   --#TYPE			"Ib Event 37"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Software error (QP not found in MGM)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 18037
+
+ibEvent38 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Software error (SQ full)"
+   --#TYPE			"Ib Event 38"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Software error (SQ full)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 18038
+
+ibEvent39 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Software error (too many gathers)"
+   --#TYPE			"Ib Event 39"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Software error (too many gathers)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 18039
+
+ibEvent40 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Software error (opcode invalid)"
+   --#TYPE			"Ib Event 40"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Software error (opcode invalid)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 18040
+
+ibEvent41 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Software error (RQ full)"
+   --#TYPE			"Ib Event 41"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Software error (RQ full)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 18041
+
+ibEvent42 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Software error (SRQ full)"
+   --#TYPE			"Ib Event 42"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Software error (SRQ full)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 18042
+
+ibEvent43 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter or Software error (HCA minimum page size bigger than kernel PAGE_SIZE; aborting)"
+   --#TYPE			"Ib Event 43"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter or Software error (HCA minimum page size bigger than kernel PAGE_SIZE; aborting) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18043
+
+ibEvent44 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter or Software error (HCA has number of ports that cannot support; aborting)"
+   --#TYPE			"Ib Event 44"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter or Software error (HCA has number of ports that cannot support; aborting) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18044
+
+ibEvent45 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter or Software error (Profile requires some bytes; won't in some bytes of context memory)"
+   --#TYPE			"Ib Event 45"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter or Software error (Profile requires some bytes; won't in some bytes of context memory) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18045
+
+ibEvent46 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter or Software error (MAD_IFC failed)"
+   --#TYPE			"Ib Event 46"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter or Software error (MAD_IFC failed) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18046
+
+ibEvent47 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter or Software error (MAD_IFC returned status)"
+   --#TYPE			"Ib Event 47"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter or Software error (MAD_IFC returned status) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18047
+
+ibEvent48 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter or Software error (NOP command failed to generate interrupt (IRQ); aborting)"
+   --#TYPE			"Ib Event 48"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter or Software error (NOP command failed to generate interrupt (IRQ); aborting) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18048
+
+ibEvent49 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Software error (Try again with MSI/MSI-X disabled)"
+   --#TYPE			"Ib Event 49"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Software error (Try again with MSI/MSI-X disabled)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 18049
+
+ibEvent50 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Software error (BIOS or ACPI interrupt routing problem)"
+   --#TYPE			"Ib Event 50"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Software error (BIOS or ACPI interrupt routing problem)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 18050
+
+ibEvent51 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter or Software error (command failed; aborting)"
+   --#TYPE			"Ib Event 51"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter or Software error (command failed; aborting) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 18051
+
+ibEvent52 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter or Software error (returned status; aborting)"
+   --#TYPE			"Ib Event 52"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter or Software error (returned status; aborting) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 18052
+
+ibEvent53 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter or Software error (READ_MGM returned status)"
+   --#TYPE			"Ib Event 53"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter or Software error (READ_MGM returned status) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18053
+
+ibEvent54 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter or Software error (MGM at index is full)"
+   --#TYPE			"Ib Event 54"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter or Software error (MGM at index is full) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18054
+
+ibEvent55 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter or Software error (WRITE_MGM returned status)"
+   --#TYPE			"Ib Event 55"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter or Software error (WRITE_MGM returned status) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18055
+
+ibEvent56 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter or Software error (MGID_HASH returned status)"
+   --#TYPE			"Ib Event 56"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter or Software error (MGID_HASH returned status) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18056
+
+ibEvent57 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter or Software error (Found zero MGID in AMGM)"
+   --#TYPE			"Ib Event 57"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter or Software error (Found zero MGID in AMGM) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18057
+
+ibEvent58 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter or Software error (couldn't request catastrophic error)"
+   --#TYPE			"Ib Event 58"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter or Software error (couldn't request catastrophic error) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18058
+
+ibEvent59 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter or Software error (couldn't map catastrophic error)"
+   --#TYPE			"Ib Event 59"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter or Software error (couldn't map catastrophic error) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18059
+
+ibEvent60 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Software error (MPT ioremap for FMR failed)"
+   --#TYPE			"Ib Event 60"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Software error (MPT ioremap for FMR failed) "
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 18060
+
+ibEvent61 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Software error (MTT ioremap for FMR failed)"
+   --#TYPE			"Ib Event 61"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Software error (MTT ioremap for FMR failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 18061
+
+ibEvent62 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter or Software error (No bridge found)"
+   --#TYPE			"Ib Event 62"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter or Software error (No bridge found) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18062
+
+ibEvent63 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter or Software error (Got FW area not aligned to 4K)"
+   --#TYPE			"Ib Event 63"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter or Software error (Got FW area not aligned to 4K) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18063
+
+ibEvent64 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter or Software error (Kernel UARC page not empty)"
+   --#TYPE			"Ib Event 64"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter or Software error (Kernel UARC page not empty) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18064
+
+ibEvent65 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter or Software error (Completion event for bogus CQ)"
+   --#TYPE			"Ib Event 65"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter or Software error (Completion event for bogus CQ) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18065
+
+ibEvent66 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter or Software error (CQ entry for unknown QP)"
+   --#TYPE			"Ib Event 66"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter or Software error (CQ entry for unknown QP) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18066
+
+ibEvent67 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter or Software error (No memory for mailbox to free CQ)"
+   --#TYPE			"Ib Event 67"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter or Software error (No memory for mailbox to free CQ) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18067
+
+ibEvent68 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter or Software error (MTT table of order is too small)"
+   --#TYPE			"Ib Event 68"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter or Software error (MTT table of order is too small) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18068
+
+ibEvent69 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter or Software error (No memory for mailbox to free SRQ)"
+   --#TYPE			"Ib Event 69"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter or Software error (No memory for mailbox to free SRQ) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18069
+
+ibEvent70 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter or Software error (HCA FW version is old)"
+   --#TYPE			"Ib Event 70"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter or Software error (HCA FW version is old) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18070
+
+ibEvent71 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter or Software error (If you have problems; try updating your HCA FW)"
+   --#TYPE			"Ib Event 71"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter or Software error (If you have problems; try updating your HCA FW) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18071
+
+ibEvent72 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter or Software error (Unable to reserve 2^31 FMR MTTs)"
+   --#TYPE			"Ib Event 72"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter or Software error (Unable to reserve 2^31 FMR MTTs) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18072
+
+ibEvent73 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter or Software error (SYS_EN DDR error)"
+   --#TYPE			"Ib Event 73"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter or Software error (SYS_EN DDR error) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 18073
+
+ibEvent74 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter or Software error (Async event for bogus)"
+   --#TYPE			"Ib Event 74"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter or Software error (Async event for bogus) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18074
+
+ibEvent75 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter or Software error (command failed)"
+   --#TYPE			"Ib Event 75"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter or Software error (command failed) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 18075
+
+ibEvent76 TRAP-TYPE
+   ENTERPRISE   psaLinIbTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "ib: Adapter or Software error (returned status)"
+   --#TYPE			"Ib Event 76"
+   --#SUMMARY		"%s(PID=%d) %s %d %s ib:%s Adapter or Software error (returned status) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 18076
+
+END

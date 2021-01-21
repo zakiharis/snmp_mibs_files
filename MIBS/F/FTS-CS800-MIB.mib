@@ -1,0 +1,497 @@
+FTS-CS800-MIB DEFINITIONS ::= BEGIN
+--
+--
+-- Last changed:  9-6-2005
+--      MMH Added serial number to the system info group
+-- Last changed:  9-20-2003
+--       Author:  Pauline Boyd
+-- Last changed:  3-23-2010
+--       Author:  Dieter Kasper
+-- Last changed:  6-08-2011
+--       Author: Brian Raccuglia
+-- Last changed:  6-17-2011
+--       Author: Ursula Menke
+-- Last changed:  2-08-2012
+--       Author: Ursula Menke
+-- Last changed:  2-27-2012
+--       Author:  Toshio Ichimura
+-- Last changed:  3-16-2012
+--       Author: Ursula Menke
+-- Last changed:  3-26-2012
+--       Author: Lars Holowko (fix IMPORTS typo)
+-- Last changed:  10-1-2012
+--       Author: Christoph Knacke (added trap information to SUMMARY message)
+--
+--  Import required symbols from standard definitions
+--
+
+IMPORTS
+    OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE,
+    Integer32, enterprises, IpAddress
+        FROM SNMPv2-SMI
+
+    TEXTUAL-CONVENTION, DisplayString
+        FROM SNMPv2-TC
+
+    snmpTrapAddress
+        FROM SNMP-COMMUNITY-MIB;
+--
+--  FUJITSU SNMP MIB
+--
+eternuscs MODULE-IDENTITY
+    LAST-UPDATED "201210010000Z"
+    ORGANIZATION "FUJITSU LIMITED"
+    CONTACT-INFO    
+        "         FUJITSU LIMITED
+		  storage-pm@ts.fujitsu.com
+        "
+    DESCRIPTION
+	"This file defines the private FTS SNMP MIB.
+         This mib contains general FUJITSU device info. All
+         FUJITSU devices should support this mib."
+    REVISION "201210010000Z"
+    DESCRIPTION "changes for SNMPv2 conformance"
+	::= { enterprises sni(231) sniProductMibs(2) 70 }
+
+cs800 OBJECT IDENTIFIER ::= { eternuscs 2 }
+cs800snmp OBJECT IDENTIFIER ::= { cs800 1 }
+
+-- Groups
+
+qSystemInfo           OBJECT IDENTIFIER ::= { cs800snmp 1 }
+qTrapDestination      OBJECT IDENTIFIER ::= { cs800snmp 2 }
+qTrapEnable           OBJECT IDENTIFIER ::= { cs800snmp 3 }
+qTraps                OBJECT IDENTIFIER ::= { cs800snmp 4 }
+
+--
+-- Textual-Convention of some common data types for storage libraries 
+--
+
+-- Define the overall device state
+--
+
+DeviceState ::= INTEGER { unavailable(1), available(2), online(3), offline(4), goingonline(5), statenotavailable(6) }
+
+-- Define the trap enabling variables
+--
+
+TrapToggle ::= INTEGER { disabled(1), enabled(2), trapnotavailable(3) }
+
+--
+-- System Info Group
+--
+-- The System Info group contains general system information
+-- of all FUJITSU devices.
+--
+
+qDeviceName    OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The host name of the FUJITSU device."
+    ::= { qSystemInfo 1 }
+
+qAssignedName  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64)) 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The assigned name of the FUJITSU device.
+            If none is given, the default value
+            is the name of the device (qDeviceName)."
+    ::= { qSystemInfo 2 }
+
+qLocation      OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The location of the FUJITSU device.  If none
+             is provided, the value is an empty string." 
+    ::= { qSystemInfo 3 }
+
+qVendorId      OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64)) 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The manufacturing vendor id."
+    ::= { qSystemInfo 4 }
+
+qProductId     OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64)) 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The product model."
+    ::= { qSystemInfo 5 }
+ 
+qProductRev    OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..64))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The product revision."
+    ::= { qSystemInfo 6 }
+
+qState         OBJECT-TYPE
+    SYNTAX      DeviceState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The current state of the FUJITSU device."
+    ::= { qSystemInfo 7 }
+
+qTrapDescription     OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "A textual description of the trap sent."
+    ::= { qSystemInfo 8 }
+
+qSenseKey      OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "If available, a hexadecimal sense key value for the trap sent.
+             If not available, the value is 0x00."
+    ::= { qSystemInfo 9 }
+
+qAsc           OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "If available, a hexadecimal ASC value for the trap sent.
+             If not available, the value is 0x00."
+    ::= { qSystemInfo 10 }
+
+qAscq          OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "If available, a hexadecimal ASCQ value for the trap sent.
+             If not available, the value is 0x00."
+    ::= { qSystemInfo 11 }
+
+qSerialNumber   OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The serial number of the FUJITSU device."
+    ::= { qSystemInfo 12 }
+--
+-- Trap Destination Group
+--
+-- The Trap Destination Group contains the IP Addresses
+-- of the Management Consoles that are allowed to receive
+-- traps from the SNMP Agent. The maximum number of
+-- trap destination IP addresses that can be set in the
+-- agent is 5.
+ 
+qTrapAddress1  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The IP Address of the Management Console that
+                 can receive the traps."
+    ::= { qTrapDestination 1 }
+
+qTrapAddress2  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The IP Address of the Management Console that
+                 can receive the traps."
+    ::= { qTrapDestination 2 }
+
+qTrapAddress3  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The IP Address of the Management Console that
+                 can receive the traps."
+    ::= { qTrapDestination 3 }
+
+qTrapAddress4  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The IP Address of the Management Console that
+                 can receive the traps."
+    ::= { qTrapDestination 4 }
+
+qTrapAddress5  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "The IP Address of the Management Console that
+                 can receive the traps."
+    ::= { qTrapDestination 5 }
+
+qTrapIpAddress  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION "The IP Address of the System that sent the traps."
+    ::= { qTrapDestination 13 }
+
+
+--
+-- Trap Enable Group
+--
+-- The Trap Enable group contains objects that the agent uses
+-- to determine which traps are to be sent to the defined network
+-- manager(s).  Each variable can be individually enabled or disabled.
+--
+
+qInfoEnable    OBJECT-TYPE
+    SYNTAX      TrapToggle
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The variable defines whether detected information
+            traps are sent.  This type of trap will be sent to
+            the defined management station(s) if the value of
+            qInfoEnable is enabled(2)."
+    ::= { qTrapEnable 1 }
+
+qWarningEnable OBJECT-TYPE
+    SYNTAX      TrapToggle
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The variable defines whether detected warning
+            traps are sent.  This type of trap will be sent to
+            the defined management station(s) if the value of
+            qWarningEnable is enabled(2)."
+    ::= { qTrapEnable 2 }
+
+qCriticalEnable OBJECT-TYPE
+    SYNTAX      TrapToggle
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The variable defines whether detected critical
+            traps are sent.  This type of trap will be sent to
+            the defined management station(s) if the value of
+            qCriticalEnable is enabled(2)."
+    ::= { qTrapEnable 3 }
+
+qAvailableEnable OBJECT-TYPE
+    SYNTAX      TrapToggle
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The variable defines whether detected device available
+            state change traps are sent.  This type of trap will be
+            sent to the defined management station(s) if the value of
+            qAvailableEnable is enabled(2)."
+    ::= { qTrapEnable 4 }
+
+qUnavailableEnable OBJECT-TYPE
+    SYNTAX      TrapToggle
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The variable defines whether detected device unavailable
+            state change traps are sent.  This type of trap will be
+            sent to the defined management station(s) if the value of
+            qUnavailableEnable is enabled(2)."
+    ::= { qTrapEnable 5 }
+
+qNoInterventionNeededEnable    OBJECT-TYPE
+    SYNTAX      TrapToggle
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The variable defines whether detected device no
+            intervention needed traps are sent.  This type of trap will
+            be sent to the defined management station(s) if the value of
+            qNoInterventionNeededEnable is enabled(2)."
+    ::= { qTrapEnable 6 }
+
+qRequestedInterventionEnable    OBJECT-TYPE
+    SYNTAX      TrapToggle
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The variable defines whether detected user requested
+            intervention traps are sent.  This type of trap will
+            be sent to the defined management station(s) if the
+            value of qRequestedInterventionEnable is enabled(2)."
+    ::= { qTrapEnable 7 }
+
+qRequiredInterventionEnable    OBJECT-TYPE
+    SYNTAX      TrapToggle
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "The variable defines whether detected user required
+            intervention traps are sent.  This type of trap will
+            be sent to the defined management station(s) if the
+            value of qRequiredInterventionEnable is enabled(2)."
+    ::= { qTrapEnable 8 }
+
+--
+-- Traps
+--
+-- These traps are generated when an error is detected and the
+-- appropriate trap flag is enabled.
+--
+
+qInfoTrap NOTIFICATION-TYPE
+    OBJECTS {
+		snmpTrapAddress,
+                qTrapDescription
+    }
+    STATUS  current
+    DESCRIPTION
+            "A condition has been detected that provides
+             information about the Device. The qTrapDescription 
+             variable provides more information about the trap. 
+             This trap will only be sent if the value of qInfoEnable 
+             is enabled(2)."
+--#TYPE "Information event"
+--#SUMMARY "Information: %s"
+--#ARGUMENTS {1,0}
+--#SEVERITY INFORMATIONAL
+    ::= { qTraps 1 }
+
+
+qWarningTrap NOTIFICATION-TYPE
+    OBJECTS {
+		snmpTrapAddress,
+                qTrapDescription
+    }
+    STATUS  current
+    DESCRIPTION
+            "A condition has been detected that provides
+             information about the Device. The qTrapDescription 
+             variable provides more information about the trap. 
+             This trap will only be sent if the value of qWarningEnable
+             is enabled(2)."
+--#TYPE "Warning event"
+--#SUMMARY "Warning: %s"
+--#ARGUMENTS {1,0}
+--#SEVERITY MINOR
+    ::= { qTraps 2 }
+
+qCriticalTrap NOTIFICATION-TYPE
+    OBJECTS {
+		snmpTrapAddress,
+                qTrapDescription
+    }
+    STATUS  current
+    DESCRIPTION
+            "A condition has been detected that provides
+             information about the Device. The qTrapDescription 
+             variable provides more information about the trap. 
+             This trap will only be sent if the value of qCriticalEnable
+             is enabled(2)."
+--#TYPE "Critical event"
+--#SUMMARY "Critical event: %s"
+--#ARGUMENTS {1,0}
+--#SEVERITY CRITICAL
+    ::= { qTraps 3 }
+
+qAvailableTrap NOTIFICATION-TYPE
+    OBJECTS {
+		snmpTrapAddress,
+                qTrapDescription
+    }
+    STATUS  current
+    DESCRIPTION
+            "The Device has changed from an unavailable to an
+             available state. The qTrapDescription variable 
+             provides more information about the trap.  This 
+             trap will only be sent if the value of qAvailableEnable
+             is enabled(2)."
+--#TYPE "Device is available"
+--#SUMMARY "Device has changed state from unavailable to available %s"
+--#ARGUMENTS {1,0}
+--#SEVERITY INFORMATIONAL
+    ::= { qTraps 4 }
+
+qUnavailableTrap NOTIFICATION-TYPE
+    OBJECTS {
+		snmpTrapAddress,
+                qTrapDescription
+    }
+    STATUS  current
+    DESCRIPTION
+            "The Device has changed from an available to an
+             unavailable state. The qTrapDescription variable
+             provides more information about the trap.  This 
+             trap will only be sent if the value of qUnavailableEnable
+             is enabled(2)."
+--#TYPE "Device is unavailable"
+--#SUMMARY "Device has changed state to unavailable %s"
+--#ARGUMENTS {1,0}
+--#SEVERITY MAJOR
+    ::= { qTraps 5 }
+
+qNoInterventionNeededTrap NOTIFICATION-TYPE
+    OBJECTS {
+		snmpTrapAddress,
+                qTrapDescription
+    }
+    STATUS  current
+    DESCRIPTION
+            "It has been detected that the device has returned
+             to a condition where no user intervention is needed.
+             The qTrapDescription variable provides
+             more information about the trap.  This trap will 
+             only be sent if the value of qNoInterventionNeededEnable
+             is enabled(2)."
+--#TYPE "No intervention needed"
+--#SUMMARY "Device has returned to a state where no user intervention is needed %s"
+--#ARGUMENTS {1,0}
+--#SEVERITY INFORMATIONAL
+    ::= { qTraps 6 }
+
+qRequestedInterventionTrap NOTIFICATION-TYPE
+    OBJECTS {
+		snmpTrapAddress,
+                qTrapDescription
+    }
+    STATUS  current
+    DESCRIPTION
+            "It has been detected that the device has at least one
+             component that is requesting user intervention.  The
+             qTrapDescription variable provides 
+             more information about the trap. This trap will
+             only be sent if the value of qRequestedInterventionEnable
+             is enabled(2)."
+--#TYPE "Intervention requested"
+--#SUMMARY "Device has reached a state where user intervention is requested %s"
+--#ARGUMENTS {1,0}
+--#SEVERITY MAJOR
+    ::= { qTraps 7 }
+
+qRequiredInterventionTrap NOTIFICATION-TYPE
+    OBJECTS {
+		snmpTrapAddress,
+                qTrapDescription
+    }
+    STATUS  current
+    DESCRIPTION
+            "It has been detected that the device has at least one
+             component that requires user intervention.  The
+             qTrapDescription variable provides more
+             information about the trap. This trap will
+             only be sent if the value of qRequiredInterventionEnable
+             is enabled(2)."
+--#TYPE "Intervention required"
+--#SUMMARY "Device has reached a state where user intervention is needed %s"
+--#ARGUMENTS {1,0}
+--#SEVERITY CRITICAL
+    ::= { qTraps 8 }
+
+END
+

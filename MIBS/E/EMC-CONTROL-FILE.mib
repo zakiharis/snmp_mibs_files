@@ -1,0 +1,25 @@
+EMC-CONTROL-FILE DEFINITIONS ::= BEGIN
+
+IMPORTS
+   enterprises, experimental
+        FROM RFC1155-SMI
+   OBJECT-TYPE
+        FROM RFC-1212;
+
+--   emc                  OBJECT IDENTIFIER ::= { enterprises 1139 }
+   emc   OBJECT IDENTIFIER ::= { enterprises 1139 }
+
+   eccGateway   OBJECT-TYPE
+  SYNTAX INTEGER
+  ACCESS read-only 
+  STATUS mandatory 
+  DESCRIPTION 
+    ""
+--      DEFAULT  get-function-async   get_emcGateway
+--      DEFAULT  set-function-async   null_set_async
+--      DEFAULT  test-function-async  it_exists_async
+--      DEFAULT  next-function-async  std_next_async
+--      DEFAULT  cookie               0
+--      DEFAULT  view-mask            ((bits32_t) 0xFFFFFFFFL)
+      ::= { emc 3 }
+END

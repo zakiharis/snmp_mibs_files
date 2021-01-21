@@ -1,0 +1,395 @@
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+--
+--  File         : askeyHardwareInfo.mib
+--  Description  : Askey defined to record all managed objects for hardware information
+--  Version      : 1.0
+--  Date         : April. 06, 2005
+--
+--  Copyright (c) 1999-2004 Askey International, Corp.  All Rights Reserved.
+--
+--  -   ipDslam                 FROM ASKEY-DSLAM-MIB
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+
+ASKEY-HARDWARE-INFORMATION-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE,
+    Integer32,
+	Unsigned32,
+    MODULE-IDENTITY			FROM SNMPv2-SMI
+    ipDslam                 FROM ASKEY-DSLAM-MIB
+    DisplayString           FROM SNMPv2-TC
+    aeAlarmPhysicalIndex	FROM ASKEY-ENTITY-ALARM-MIB
+    ifIndex                 FROM IF-MIB
+    ;
+
+askeyHwInfo MODULE-IDENTITY
+        LAST-UPDATED    "200509200000Z"
+        ORGANIZATION    "ASKEY Inc."
+        CONTACT-INFO    "ASKEY Inc.
+                         E-mail: cwfu@askey.com.tw"
+        DESCRIPTION     "This Mib describs with the information of
+        				network card, line card and fan module."
+    ::= { ipDslam 15 }
+
+askeyHwInfoTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AskeyHwInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "This table describes the information and the limit of voltage and
+    temperature about network card, line card and fan tray. "
+    ::= { askeyHwInfo 1 }
+
+askeyHwInfoEntry OBJECT-TYPE
+    SYNTAX      AskeyHwInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    ""
+    INDEX {aeAlarmPhysicalIndex, askeyHwInfoType, askeyHwSensorId}
+    ::= { askeyHwInfoTable 1 }
+
+AskeyHwInfoEntry ::=
+    SEQUENCE {
+		askeyHwInfoType							INTEGER,
+		askeyHwSensorId							INTEGER,
+		askeyHwSensorDescription				DisplayString,
+		askeyHwValue							INTEGER,
+		askeyHwRefValue							INTEGER,
+		askeyHwValueThreshholdLow				INTEGER,
+		askeyHwValueThreshholdHigh				INTEGER
+		}
+
+askeyHwInfoType OBJECT-TYPE
+    SYNTAX      INTEGER{
+    		fanspeed(1),
+    		voltage(2),
+    		temperature(3)
+    }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "This object describes the measure value about rotation speed of fan,
+    voltage or temperature of the equipment include network card, line
+    card, and fan tray."
+    ::= { askeyHwInfoEntry 1 }
+
+askeyHwSensorId OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "This object describes the index that mapping to the sensor
+    of the hardware device:
+    on the network card, there is 1 max6652; on the line card, there
+    are 2 max6652s with 8 sensor, and each chip has 4 sensors
+    to measure the voltage."
+    ::= { askeyHwInfoEntry 2 }
+
+askeyHwSensorDescription OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "This object describes the sensor on the nc or lc"
+    ::= { askeyHwInfoEntry 3 }
+
+askeyHwValue OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "This object describes the value of hardware on the nc or lc"
+    ::= { askeyHwInfoEntry 4 }
+
+askeyHwRefValue OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "This object describes the reference value of hardware on the nc or lc"
+    ::= { askeyHwInfoEntry 5 }
+
+askeyHwValueThreshholdLow OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "This object describes the low-bound value of the
+    voltage on the nc or lc. If the measured value is lower
+    than the value, the system will report the alarm."
+    ::= { askeyHwInfoEntry 6 }
+
+askeyHwValueThreshholdHigh OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "This object describes the high-bound value of the
+    voltage on the nc or lc. If the measured value is
+    higher than the value, the system will report the
+    alarm."
+    ::= { askeyHwInfoEntry 7 }
+
+
+sensorThresholds OBJECT IDENTIFIER ::= { askeyHwInfo 2 }
+
+sensorTempHigh OBJECT-TYPE
+    SYNTAX  INTEGER (-20..100)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The threshold for temperature up bound. Its range is from
+            -20 C to 100 C"
+    ::= { sensorThresholds 1 }
+
+sensorTempLow OBJECT-TYPE
+    SYNTAX  INTEGER (-20..100)
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "The threshold for temperature low bound. Its range is from
+            -20 C to 100 C"
+    ::= { sensorThresholds 2 }
+
+gbicModuleTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF GbicModuleTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "GBIC module information"
+    ::= { askeyHwInfo 3 }
+
+gbicModuleTableEntry OBJECT-TYPE
+    SYNTAX      GbicModuleTableEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    ""
+    INDEX {ifIndex}
+    ::= { gbicModuleTable 1 }
+
+GbicModuleTableEntry ::=
+    SEQUENCE {
+        gbicIdentifier					INTEGER,
+		gbicConnector					INTEGER,
+		gbicTransceiver					Unsigned32,
+		gbicEncoding					INTEGER,
+		gbicBrNominal               	INTEGER,
+		gbicLength9um					INTEGER,
+		gbicLength50um					INTEGER,
+		gbicLength62-5um				INTEGER, -- 62.5um
+		gbicCopperLength				INTEGER,
+		gbicVendorName					DisplayString,
+		gbicVendorOUI					Unsigned32,
+		gbicVendorPN					DisplayString,
+		gbicVendorSN					Unsigned32,
+		gbicLaserWaveLength				INTEGER
+	}
+
+gbicIdentifier OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "	This object describes the identifier value specifies the physical 
+	device described by the serial information.
+	A value 3 means SFP."
+    ::= { gbicModuleTableEntry 1 }
+
+gbicConnector OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "	The connector value indicates the external connector provided on the interface.
+	A value 1 means SC.
+	A value 7 means LC."
+    ::= { gbicModuleTableEntry 2 }
+
+gbicTransceiver OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "	This object describes the gigabit ethernet compliance codes.The following bit 
+	significant indicators define the electronic or optical interfaces that are 
+	supported by the GBIC.
+	6 - 
+	IEEE ethernet standard:
+ 		bit	0 - 1000BASE-SX
+		   	1 - 1000BASE-LX
+		   	2 - 1000BASE-CX
+		   	3 - 1000BASE-Tn
+	7 - 	
+		bit	0 - electrical inter-enclosure(EL)
+		   	1 - longwave laser(LC)
+	distance capability:
+ 		bit	4 - long distance(L)
+		   	5 - intermediate distance(I)
+		   	6 - short distance(S)
+		   	7 - very long distance(V)
+	8 - 
+	SONET compliance codes:
+ 		bit	4 - longwave laser(LL)
+		   	5 - shortwave laser w/OFC(SL)
+		   	6 - shortwave laser w/o OFC(SN)
+		   	7 - intra-enclosure (EL)
+	9 -
+	transmission media type:
+    	bit	0 - single mode(SM)
+		   	2 - multi-mode-50m(M5)
+		   	3 - multi-mode-62.5m(M6)
+		   	4 - video coax(TV)
+		   	5 - miniature coax(MI)
+		   	6 - shielded twisted pair(TP)
+		   	7 - twin axial pair(TW)
+	10 - 
+	fibre channel link length:
+		bit	0 - 100MBytes/Sec
+		   	2 - 200MBytes/Sec
+		   	4 - 400MBytes/Sec"
+	::= { gbicModuleTableEntry 3 }
+
+gbicEncoding OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "	The encoding value indicates the serial encoding mechanism that is 
+	the nominal design target of the particular GBIC.
+	value	0 - Unspecified
+	     	1 - 8B10B
+	     	2 - 4B5B
+	     	3 - NRZ
+	     	4 - Manchester
+	     	5 - SONET Scrambled"
+	::= { gbicModuleTableEntry 4 }
+
+gbicBrNominal OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "	The nominal bit rate (BR, nominal) is specified in units of 100 Megabits 
+	per second, rounded off to the nearest 100 Megabits per second. The bit 
+	rate includes those bits necessary to encode and delimit the signal as 
+	well as those bits carrying data information. A value of 0 indicates that 
+	the bit rate is not specified and must be determined from the transceiver 
+	technology. The actual information transfer rate will depend on the encoding 
+	of the data, as defined by the encoding value."
+    ::= { gbicModuleTableEntry 5 }
+
+gbicLength9um OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "	This value specifies the link length that is supported by the GBIC while 
+	operating in compliance with the applicable standards using single mode 
+	fiber.The value is in units of 100 meters. A value of 255 means that the 
+	GBIC supports a link length greater than 25.4 km. A value of zero means 
+	that the GBIC does not support single mode fiber or that the length 
+	information must be determined from the transceiver technology."
+    ::= { gbicModuleTableEntry 6 }
+
+gbicLength50um OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "	This value specifies the link length that is supported by the GBIC while 
+	operating in compliance with the applicable standards using 50 micron 
+	multi-mode fiber. The value is in units of 10 meters. A value of 255 
+	means that the GBIC supports a link length greater than 2.54 km. A value 
+	of zero means that the GBIC does not support 50 micron multi-mode fiber or 
+	that the length information must be determined from the transceiver technology."
+    ::= { gbicModuleTableEntry 7 }
+
+gbicLength62-5um OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "	This value specifies the link length that is supported by the GBIC while 
+	operating in compliance with the applicable standards using 62.5 micron 
+	multi-mode fiber. The value is in units of 10 meters. A value of 255 means 
+	that the GBIC supports a link length greater than 2.54 km. A value of zero 
+	means that the GBIC does not 62.5 micron multi-mode fiber or that the 
+	length information must determined from the transceiver technology. It is 
+	common for GBICs to support both 50 micron and 62.5 micron fiber."
+    ::= { gbicModuleTableEntry 8 }
+
+gbicCopperLength OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "	This value specifies the minimum link length that is supported by the GBIC 
+	while operating in compliance with the applicable standards using copper 
+	cable. The value is in units of 1 meter. A value of 255 means that the GBIC 
+	supports a link length greater than 254 meters. A value of zero means that 
+	the GBIC does not support copper cables or that the length information must 
+	be determined from the transceiver technology. Further information about the 
+	cable design, equalization, and connectors is usually required to guarantee 
+	meeting a particular length requirement."
+    ::= { gbicModuleTableEntry 9 }
+
+gbicVendorName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "	The vendor name is a 16 character field that contains ASCII characters, 
+	left-aligned and padded on the right with ASCII spaces (20h). The vendor 
+	name shall be the full name of the corporation, a commonly accepted 
+	abbreviation of the name of the corporation, the SCSI company code for the 
+	corporation, or the stock exchange code for the corporation. At least one 
+	of the vendor name or the vendor OUI fields shall contain valid serial data."
+    ::= { gbicModuleTableEntry 10 }
+
+gbicVendorOUI OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "	The vendor organizationally unique identifier field (vendor OUI) is a 3-byte
+	field that contains the IEEE Company Identifier for the vendor. A value of 
+	all zero in the 3-byte field indicates that the Vendor OUI is unspecified."
+    ::= { gbicModuleTableEntry 11 }
+
+gbicVendorPN OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "	The vendor part number (vendor PN) is a 16-byte field that contains ASCII 
+	characters, left-aligned and padded on the right with ASCII spaces (20h),
+	defining the vendor part number or product name. A value of all zero in 
+	the 16-byte field indicates that the vendor PN is unspecified."
+    ::= { gbicModuleTableEntry 12 }
+
+gbicVendorSN OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "	The vendor serial number (vendor SN) is a 16 character field that contains ASCII 
+	 characters, left-aligned and padded on the right with ASCII spaces (20h), 
+	 defining the vendor's serial number for the GBIC. A value of all zero in the 
+	 16-byte field indicates that the vendor PN is unspecified."
+    ::= { gbicModuleTableEntry 13 }
+
+gbicLaserWaveLength OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "	This object describes the fibre channel transmitter wave laser length(nm)."
+    ::= { gbicModuleTableEntry 14 }
+
+
+END

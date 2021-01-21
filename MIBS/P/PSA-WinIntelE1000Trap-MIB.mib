@@ -1,0 +1,872 @@
+PSA-WinIntelE1000Trap-MIB DEFINITIONS ::= BEGIN
+
+--PRIMEQUEST system management MIB for Partition
+--
+--
+--$Copyright$
+--Copyright Fujitsu Limited 2004
+--All rights reserved
+--
+--
+--MIB Revision: 01010001
+--
+
+IMPORTS
+	OBJECT-TYPE								FROM RFC-1212
+	TRAP-TYPE								FROM RFC-1215
+	mib-2, DisplayString					FROM RFC1213-MIB
+	TimeTicks, Counter, Gauge, IpAddress	FROM RFC1155-SMI
+	mgmt, enterprises						FROM RFC1155-SMI;
+
+--enterprises	OBJECT IDENTIFIER ::={ iso org(3) dod(6) internet(1) private(4) 1 }
+--
+--PRIMEQUEST system management MIB nodes
+--fujitsu:                    1.3.6.1.4.1.211
+-- products:                  1.3.6.1.4.1.211.1
+--  iaServer:                 1.3.6.1.4.1.211.1.31
+--   primequest:              1.3.6.1.4.1.211.1.31.1
+--    partition:	           1.3.6.1.4.1.211.1.31.1.2
+--
+--Trap enterprise is "psaWinIntelE1000Trap"
+
+--FUJITSU PRIMEQUEST system management MIB nodes for Partition
+  fujitsu        OBJECT IDENTIFIER  ::={ enterprises 211 }
+  products       OBJECT IDENTIFIER  ::={ fujitsu 1 }
+  iaServer       OBJECT IDENTIFIER  ::={ products 31 }
+  primequest     OBJECT IDENTIFIER  ::={ iaServer 1 }
+   partition     OBJECT IDENTIFIER  ::={ primequest 2 }
+    parititonVariables	OBJECT IDENTIFIER	::={ partition	200 }
+    partitionEnterprise	OBJECT IDENTIFIER  ::={ partition 201 }
+     psaComTrap			OBJECT IDENTIFIER  ::={ partitionEnterprise 1 }
+     psaWinIntelE100Trap	OBJECT IDENTIFIER  ::={ partitionEnterprise 51 }
+     psaWinIntelE1000Trap	OBJECT IDENTIFIER  ::={ partitionEnterprise 52 }
+     psaWinBcm5700Trap		OBJECT IDENTIFIER  ::={ partitionEnterprise 53 }
+     psaWinEmulexTrap		OBJECT IDENTIFIER  ::={ partitionEnterprise 54 }
+     psaWinLsiLogicTrap	OBJECT IDENTIFIER  ::={ partitionEnterprise 55 }
+     psaWinGrmpdTrap		OBJECT IDENTIFIER  ::={ partitionEnterprise 57 }
+
+--***************************************************************************************
+--
+--FUJITSU PRIMEQUEST system management trap parameter variables for Partition
+--	They aren't directly accessibles(can't use snmp get/set command), but sent with trap
+--
+--***************************************************************************************
+
+     trapVarComInfo	OBJECT IDENTIFIER	::={ parititonVariables 1 }
+
+trapPartitionName OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Partition name which trap is generated."
+   ::= { trapVarComInfo 1 }
+
+trapPartitionId OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Paritition identifier which trap is generated."
+   ::= { trapVarComInfo 2 }
+
+trapEventLevel OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Event level"
+   ::= { trapVarComInfo 3 }
+
+trapEventId OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Event Identifier"
+   ::= { trapVarComInfo 4 }
+
+trapUnitName OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Unit name which trap is generated."
+   ::= { trapVarComInfo 5 }
+
+trapMmbVip OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Management board vertual IP address."
+   ::= { trapVarComInfo 6 }
+
+     trapVarDivInfo	OBJECT IDENTIFIER	::={ parititonVariables 2 }
+
+trapPartNo OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Part number of trap source."
+   ::= { trapVarDivInfo 1 }
+
+trapStepping OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 2 }
+
+trapSerialNo OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Serial number of trap source. "
+   ::= { trapVarDivInfo 3 }
+
+trapModelNo OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Model number of trap source."
+   ::= { trapVarDivInfo 4 }
+
+trapSuspect OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Logical name or pci bus number of trap source."
+   ::= { trapVarDivInfo 5 }
+
+trapVendorId OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Vendor identifier of trap source."
+   ::= { trapVarDivInfo 6 }
+
+trapDeviceId OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Device identifier of trap source."
+   ::= { trapVarDivInfo 7 }
+
+trapRevision OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Revision of trap source."
+   ::= { trapVarDivInfo 8 }
+
+trapCardName OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Device name of trap source."
+   ::= { trapVarDivInfo 9 }
+
+trapErrDetail OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 10 }
+
+trapErrCode OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 11 }
+
+trapIrpCode OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 12 }
+
+trapHbaNo OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 13 }
+
+trapErrCause OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 14 }
+
+trapPathNo OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 15 }
+
+trapDiskId OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 16 }
+
+trapFmrDiskId OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 17 }
+
+trapCurDiskId OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 18 }
+
+trapPathId OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 19 }
+
+trapPhysIf OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 20 }
+
+trapVirtualIf OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 21 }
+
+trapLogicalIp OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 22 }
+
+trapWatchIp OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 23 }
+
+trapInterface OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 24 }
+
+trapSourceIp OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 25 }
+
+trapDestIp OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 26 }
+
+--***************************************************************************************
+--
+--FUJITSU PRIMEQUEST system management TRAP definition for Partition
+--	Trap enterprise:	psaWinIntelE1000Trap (.1.3.6.1.4.1.211.1.31.1.2.201.52)
+--
+--***************************************************************************************
+
+e1000WinEvent0 TRAP-TYPE
+   ENTERPRISE   psaWinIntelE1000Trap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "e1000: Adapter or Software error (Adapter not found)"
+   --#TYPE			"E1000 Win Event 0"
+   --#SUMMARY		"%s(PID=%d) %s %d %s e1000:%s Adapter or Software error (Adapter not found)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 21200
+
+e1000WinEvent1 TRAP-TYPE
+   ENTERPRISE   psaWinIntelE1000Trap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "e1000: Adapter or Software error (Driver load error)"
+   --#TYPE			"E1000 Win Event 1"
+   --#SUMMARY		"%s(PID=%d) %s %d %s e1000:%s Adapter or Software error (Driver load error)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 21201
+
+e1000WinEvent2 TRAP-TYPE
+   ENTERPRISE   psaWinIntelE1000Trap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "e1000: Software error (Could not allocate The MAP REGISTRES)"
+   --#TYPE			"E1000 Win Event 2"
+   --#SUMMARY		"%s(PID=%d) %s %d %s e1000:%s Software error (Could not allocate The MAP REGISTRES)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 21202
+
+e1000WinEvent3 TRAP-TYPE
+   ENTERPRISE   psaWinIntelE1000Trap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "e1000: Software error (Could not assign an interrupt)"
+   --#TYPE			"E1000 Win Event 3"
+   --#SUMMARY		"%s(PID=%d) %s %d %s e1000:%s Software error (Could not assign an interrupt)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 21203
+
+e1000WinEvent4 TRAP-TYPE
+   ENTERPRISE   psaWinIntelE1000Trap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "e1000: Software error (Could not allocate memory)"
+   --#TYPE			"E1000 Win Event 4"
+   --#SUMMARY		"%s(PID=%d) %s %d %s e1000:%s Software error (Could not allocate memory)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 21204
+
+e1000WinEvent5 TRAP-TYPE
+   ENTERPRISE   psaWinIntelE1000Trap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "e1000: Software error (Could not allocate shared memory)"
+   --#TYPE			"E1000 Win Event 5"
+   --#SUMMARY		"%s(PID=%d) %s %d %s e1000:%s Software error (Could not allocate shared memory)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 21205
+
+e1000WinEvent6 TRAP-TYPE
+   ENTERPRISE   psaWinIntelE1000Trap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "e1000: Software error (Could not allocate memory)"
+   --#TYPE			"E1000 Win Event 6"
+   --#SUMMARY		"%s(PID=%d) %s %d %s e1000:%s Software error (Could not allocate memory)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 21206
+
+e1000WinEvent7 TRAP-TYPE
+   ENTERPRISE   psaWinIntelE1000Trap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "e1000: Software error (Could not allocate memory)"
+   --#TYPE			"E1000 Win Event 7"
+   --#SUMMARY		"%s(PID=%d) %s %d %s e1000:%s Software error (Could not allocate memory)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 21207
+
+e1000WinEvent8 TRAP-TYPE
+   ENTERPRISE   psaWinIntelE1000Trap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "e1000: Software error (Could not allocate memory)"
+   --#TYPE			"E1000 Win Event 8"
+   --#SUMMARY		"%s(PID=%d) %s %d %s e1000:%s Software error (Could not allocate memory)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 21208
+
+e1000WinEvent9 TRAP-TYPE
+   ENTERPRISE   psaWinIntelE1000Trap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "e1000: Adapter error (Could not establish link)"
+   --#TYPE			"E1000 Win Event 9"
+   --#SUMMARY		"%s(PID=%d) %s %d %s e1000:%s Adapter error (Could not establish link) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 21209
+
+e1000WinEvent10 TRAP-TYPE
+   ENTERPRISE   psaWinIntelE1000Trap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "e1000: Adapter error (NOT properly configured)"
+   --#TYPE			"E1000 Win Event 10"
+   --#SUMMARY		"%s(PID=%d) %s %d %s e1000:%s Adapter error (NOT properly configured) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 21210
+
+e1000WinEvent11 TRAP-TYPE
+   ENTERPRISE   psaWinIntelE1000Trap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "e1000: Adapter error (Not configured for bus mastering)"
+   --#TYPE			"E1000 Win Event 11"
+   --#SUMMARY		"%s(PID=%d) %s %d %s e1000:%s Adapter error (Not configured for bus mastering) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 21211
+
+e1000WinEvent12 TRAP-TYPE
+   ENTERPRISE   psaWinIntelE1000Trap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "e1000: Software error (Could not allocate the NDIS receive packets)"
+   --#TYPE			"E1000 Win Event 12"
+   --#SUMMARY		"%s(PID=%d) %s %d %s e1000:%s Software error (Could not allocate the NDIS receive packets)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 21212
+
+e1000WinEvent13 TRAP-TYPE
+   ENTERPRISE   psaWinIntelE1000Trap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "e1000: Software error (Could not allocate the NDIS receive buffers)"
+   --#TYPE			"E1000 Win Event 13"
+   --#SUMMARY		"%s(PID=%d) %s %d %s e1000:%s Software error (Could not allocate the NDIS receive buffers)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 21213
+
+e1000WinEvent14 TRAP-TYPE
+   ENTERPRISE   psaWinIntelE1000Trap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "e1000: Software error (unable to assign PCI resources)"
+   --#TYPE			"E1000 Win Event 14"
+   --#SUMMARY		"%s(PID=%d) %s %d %s e1000:%s Software error (unable to assign PCI resources)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 21214
+
+e1000WinEvent15 TRAP-TYPE
+   ENTERPRISE   psaWinIntelE1000Trap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "e1000: Software error (unable to claim PCI resources)"
+   --#TYPE			"E1000 Win Event 15"
+   --#SUMMARY		"%s(PID=%d) %s %d %s e1000:%s Software error (unable to claim PCI resources)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 21215
+
+e1000WinEvent16 TRAP-TYPE
+   ENTERPRISE   psaWinIntelE1000Trap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "e1000: Adapter error (EEPROM error)"
+   --#TYPE			"E1000 Win Event 16"
+   --#SUMMARY		"%s(PID=%d) %s %d %s e1000:%s Adapter error (EEPROM error) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 21216
+
+e1000WinEvent17 TRAP-TYPE
+   ENTERPRISE   psaWinIntelE1000Trap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "e1000: Software error (Could not start)"
+   --#TYPE			"E1000 Win Event 17"
+   --#SUMMARY		"%s(PID=%d) %s %d %s e1000:%s Software error (Could not start)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 21217
+
+e1000WinEvent18 TRAP-TYPE
+   ENTERPRISE   psaWinIntelE1000Trap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "e1000: Software error (MDIX setting conflict with the AutoNeg Settings)"
+   --#TYPE			"E1000 Win Event 18"
+   --#SUMMARY		"%s(PID=%d) %s %d %s e1000:%s Software error (MDIX setting conflict with the AutoNeg Settings)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 21218
+
+e1000WinEvent19 TRAP-TYPE
+   ENTERPRISE   psaWinIntelE1000Trap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "e1000: Adapter error (Could not start)"
+   --#TYPE			"E1000 Win Event 19"
+   --#SUMMARY		"%s(PID=%d) %s %d %s e1000:%s Adapter error (Could not start) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 21219
+
+e1000WinEvent20 TRAP-TYPE
+   ENTERPRISE   psaWinIntelE1000Trap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "e1000: Software error (Could not allocate all resources)"
+   --#TYPE			"E1000 Win Event 20"
+   --#SUMMARY		"%s(PID=%d) %s %d %s e1000:%s Software error (Could not allocate all resources)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 21220
+
+e1000WinEvent21 TRAP-TYPE
+   ENTERPRISE   psaWinIntelE1000Trap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "e1000: Software error (failed to initialize properly)"
+   --#TYPE			"E1000 Win Event 21"
+   --#SUMMARY		"%s(PID=%d) %s %d %s e1000:%s Software error (failed to initialize properly)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 21221
+
+e1000WinEvent22 TRAP-TYPE
+   ENTERPRISE   psaWinIntelE1000Trap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "e1000: Software error (Could not find a supported gigabit network connection)"
+   --#TYPE			"E1000 Win Event 22"
+   --#SUMMARY		"%s(PID=%d) %s %d %s e1000:%s Software error (Could not find a supported gigabit network connection)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 21222
+
+e1000WinEvent23 TRAP-TYPE
+   ENTERPRISE   psaWinIntelE1000Trap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "e1000: Adapter or Software error (Driver load error)"
+   --#TYPE			"E1000 Win Event 23"
+   --#SUMMARY		"%s(PID=%d) %s %d %s e1000:%s Adapter or Software error (Driver load error)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 21223
+
+e1000WinEvent24 TRAP-TYPE
+   ENTERPRISE   psaWinIntelE1000Trap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "e1000: Software error (Could not assign an interrupt)"
+   --#TYPE			"E1000 Win Event 24"
+   --#SUMMARY		"%s(PID=%d) %s %d %s e1000:%s Software error (Could not assign an interrupt)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 21224
+
+e1000WinEvent25 TRAP-TYPE
+   ENTERPRISE   psaWinIntelE1000Trap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "e1000: Adapter error (NOT properly configured)"
+   --#TYPE			"E1000 Win Event 25"
+   --#SUMMARY		"%s(PID=%d) %s %d %s e1000:%s Adapter error (NOT properly configured) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 21225
+
+e1000WinEvent26 TRAP-TYPE
+   ENTERPRISE   psaWinIntelE1000Trap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "e1000: Adapter error (Not configured for bus mastering)"
+   --#TYPE			"E1000 Win Event 26"
+   --#SUMMARY		"%s(PID=%d) %s %d %s e1000:%s Adapter error (Not configured for bus mastering) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 21226
+
+e1000WinEvent27 TRAP-TYPE
+   ENTERPRISE   psaWinIntelE1000Trap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "e1000: Software error (unable to assign PCI resources)"
+   --#TYPE			"E1000 Win Event 27"
+   --#SUMMARY		"%s(PID=%d) %s %d %s e1000:%s Software error (unable to assign PCI resources)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 21227
+
+e1000WinEvent28 TRAP-TYPE
+   ENTERPRISE   psaWinIntelE1000Trap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "e1000: Software error (unable to claim PCI resources)"
+   --#TYPE			"E1000 Win Event 28"
+   --#SUMMARY		"%s(PID=%d) %s %d %s e1000:%s Software error (unable to claim PCI resources)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 21228
+
+e1000WinEvent29 TRAP-TYPE
+   ENTERPRISE   psaWinIntelE1000Trap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "e1000: Adapter error (EEPROM error)"
+   --#TYPE			"E1000 Win Event 29"
+   --#SUMMARY		"%s(PID=%d) %s %d %s e1000:%s Adapter error (EEPROM error) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 21229
+
+e1000WinEvent30 TRAP-TYPE
+   ENTERPRISE   psaWinIntelE1000Trap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "e1000: Software error (Could not start)"
+   --#TYPE			"E1000 Win Event 30"
+   --#SUMMARY		"%s(PID=%d) %s %d %s e1000:%s Software error (Could not start)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 21230
+
+END

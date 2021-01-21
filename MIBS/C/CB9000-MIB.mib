@@ -1,0 +1,11 @@
+CB9000-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	coreBuilder9000-mib   FROM A3Com-products-MIB;
+
+cb9000-generic-mib        OBJECT IDENTIFIER ::= { coreBuilder9000-mib 1 }
+cb9000-eme-mib            OBJECT IDENTIFIER ::= { coreBuilder9000-mib 2 }
+cb9000-module-mib         OBJECT IDENTIFIER ::= { coreBuilder9000-mib 3 }
+
+END
+

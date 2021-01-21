@@ -1,0 +1,66 @@
+AVVIRUSES-STATISTICS-MIB DEFINITIONS ::= BEGIN
+
+--	
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, Integer32,
+	NOTIFICATION-TYPE, Unsigned32, Counter64, Counter32
+		FROM SNMPv2-SMI
+	DateAndTime, DisplayString,TimeStamp
+		FROM SNMPv2-TC
+	SnmpAdminString
+		FROM SNMP-FRAMEWORK-MIB
+	statistics
+		FROM KAV4FS-STATISTICS-MIB
+;
+
+avVirusesStatistics MODULE-IDENTITY
+	LAST-UPDATED "201602241200Z"
+	ORGANIZATION "www.kaspersky.com"
+	CONTACT-INFO "Kaspersky Lab"
+	DESCRIPTION "Viruses statistics"
+	-- revisions
+	REVISION "201602241200Z"
+	DESCRIPTION  "Automatically generated."
+ ::= { statistics 8 }
+
+
+avVirusesStatisticsTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF AVVirusesStatisticsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		""
+	::= { avVirusesStatistics 1 }
+
+avVirusesStatisticsEntry OBJECT-TYPE
+	SYNTAX AVVirusesStatisticsEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		""
+	INDEX { avVirusName }
+	::= { avVirusesStatisticsTable 1 }
+
+AVVirusesStatisticsEntry ::= SEQUENCE {
+	avVirusName SnmpAdminString,
+	avInfectedObjects Counter64
+}
+
+avVirusName OBJECT-TYPE
+	SYNTAX SnmpAdminString
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		""
+	::= { avVirusesStatisticsEntry 1 }
+
+avInfectedObjects OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		""
+	::= { avVirusesStatisticsEntry 2 }
+
+END

@@ -1,0 +1,125 @@
+NSCRTV-EXTENSION-GY DEFINITIONS ::= BEGIN
+
+-- *****************************************************************************
+-- *****************************************************************************
+
+IMPORTS
+  OBJECT-TYPE
+    FROM RFC-1212
+  TRAP-TYPE
+    FROM RFC-1215
+  IpAddress
+    FROM RFC1155-SMI
+  system, PhysAddress, DisplayString, sysName, sysLocation, sysObjectID
+    FROM RFC1213-MIB;
+
+  gyEntry   OBJECT IDENTIFIER ::= { system 1000 }
+  gyCommon  OBJECT IDENTIFIER ::= { gyEntry 1 }
+
+
+  gyTrapVersion OBJECT-TYPE
+    SYNTAX INTEGER { trapv1(0), trapv2(1) }
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION ""
+    ::= { system 101 }
+
+  gyAgentStpVersion OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION ""
+    ::= { system 102 }
+
+
+
+  gyUpdateIdentifier OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION ""
+    ::= { gyCommon 2 }
+
+  gyTrapVariables OBJECT IDENTIFIER
+    ::= { gyCommon 99 }
+
+
+
+
+-- *****************************************************************************
+--                          
+-- *****************************************************************************
+  gyhbMacAddress OBJECT-TYPE
+    SYNTAX PhysAddress
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION ""
+    ::= { gyTrapVariables 1 }
+
+  gyhbIpAddress OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION ""
+    ::= { gyTrapVariables 2 }
+
+  gyhbLogicalID OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION ""
+    ::= { gyTrapVariables 3 }
+
+  gyhbModelNumber OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION ""
+    ::= { gyTrapVariables 4 }
+
+  gyhbSerialNumber OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION ""
+    ::= { gyTrapVariables 5 }
+
+  gyhbROCommunity OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION ""
+    ::= { gyTrapVariables 6 }
+
+  gyhbRWCommunity OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION ""
+    ::= { gyTrapVariables 7 }
+
+
+
+  gyHeartBeat TRAP-TYPE
+    ENTERPRISE gyEntry
+    VARIABLES {
+      gyhbMacAddress,
+      gyhbIpAddress,
+      gyhbLogicalID,
+      gyhbModelNumber,
+      gyhbSerialNumber,
+      gyhbROCommunity,
+      gyhbRWCommunity,
+      sysObjectID,
+      sysLocation,
+      sysName
+    }
+    DESCRIPTION ""
+    ::= 0
+
+
+-- *****************************************************************************
+--                             
+-- *****************************************************************************
+
+END

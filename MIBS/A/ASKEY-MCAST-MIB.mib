@@ -1,0 +1,352 @@
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+--
+--  File         : askeyMcast.mib
+--  Description  : ASEKY Multicast Enterprise MIB - Hardward Independent
+--  Version      : 1.0
+--  Date         : April 26, 2004
+--
+--  Copyright (c) 2004-2005 ASKEY Computer Inc.  All Rights Reserved.
+--
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+--  ASKEY Multicast Enterprise MIB
+--
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+
+    ASKEY-MCAST-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE,
+        IpAddress                              FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION,
+        RowStatus                              FROM SNMPv2-TC
+        SnmpAdminString                        FROM SNMP-FRAMEWORK-MIB
+        ipDslam                                FROM ASKEY-DSLAM-MIB
+        ifIndex                           FROM IF-MIB
+        ;
+
+
+    ProfileListBitmap ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Each octet within this value specifies a set of eight
+        ports, with the first octet specifying profiles 1 through
+        8, the second octet specifying profiles 9 through 16, etc.
+        Within each octet, the most significant bit represents
+        the lowest numbered profile, and the least significant bit
+        represents the highest numbered profile.  Thus, each profile
+        of the device is represented by a single bit within the
+        value of this object.  If that bit has a value of '1'
+        then that profile is included in the set of profiles; the profile
+        is not included if its bit has a value of '0'."
+    SYNTAX      OCTET STRING
+
+    askeyMcastMib MODULE-IDENTITY
+        LAST-UPDATED    "200505110000Z"  -- May 11, 2005
+        ORGANIZATION    "ASKEY Inc."
+        CONTACT-INFO    "ASKEY Inc.
+                         E-mail: cwfu@askey.com.tw"
+
+        DESCRIPTION     "ASKEY MULTICAST PROFILE MIB OID defines and documentation."
+
+    ::= { ipDslam 5 }
+
+    mcastProfileObects OBJECT IDENTIFIER ::= { askeyMcastMib 1 }
+
+    mcastProfileCount    OBJECT-TYPE
+        SYNTAX          INTEGER
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object respresents the total count of configured multicast profiles."
+    ::= { mcastProfileObects 1}
+
+    mcastProfileTable    OBJECT-TYPE
+        SYNTAX          SEQUENCE OF McastProfileEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table contains information on the ADSL line
+            configuration.  One entry in this table reflects a
+            profile defined by a manager which can be used to
+            configure the ADSL line."
+    ::= { mcastProfileObects 2}
+
+    mcastProfileEntry    OBJECT-TYPE
+        SYNTAX          McastProfileEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Each entry consists of a list of parameters that
+            represents the configuration of an multicast group."
+        INDEX { mProfileId}
+    ::= { mcastProfileTable 1}
+
+    McastProfileEntry ::=
+      SEQUENCE {
+      mProfileId               INTEGER,
+      mProfileName          SnmpAdminString,
+      mProfileIpAddr        IpAddress,
+--      mProfileIpNetMask     IpAddress,
+      mProfileRate          INTEGER,
+      mProfilePriority      INTEGER,
+      mProfileRowStatus     RowStatus
+    }
+
+
+    mProfileId OBJECT-TYPE
+        SYNTAX     INTEGER (1..800)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+           "The unique sequential number for each profile entry,
+           starting from 1 and end with 256, which is referenced
+           one by one by mConfigProfileBitMap(256 bits) in mcastConfigLineEoaTable"
+        ::= { mcastProfileEntry 1 }
+
+    mProfileName    OBJECT-TYPE
+            SYNTAX          SnmpAdminString (SIZE (1..32))
+            MAX-ACCESS      read-create
+            STATUS          current
+            DESCRIPTION
+            "This object is used by the multicast configuration table
+            in order to give a row of this table a specific name which is unique.
+            For example: ESPN, HBO...etc. "
+        ::= { mcastProfileEntry 2 }
+
+    mProfileIpAddr OBJECT-TYPE
+        SYNTAX     IpAddress
+        MAX-ACCESS read-create
+        STATUS     current
+        DESCRIPTION
+            "The IP address of the multicast stream."
+        ::= { mcastProfileEntry 3 }
+
+--    mProfileIpNetMask OBJECT-TYPE
+--        SYNTAX     IpAddress
+--        MAX-ACCESS read-create
+--        STATUS     current
+--        DESCRIPTION
+--           "The IP subnet mask of the multicast stream. ipAddr and ipNetMask
+--             represent the multicast IPs that system allow."
+--        ::= { mcastProfileEntry 4 }
+
+    mProfileRate OBJECT-TYPE
+        SYNTAX     INTEGER  (32..29984)
+        MAX-ACCESS read-create
+        STATUS     current
+        DESCRIPTION
+           "The maximum transmit data rate in Kbps applied to
+            this multicast stream
+            The specified data rate will be rounded to the
+            largest multiple of 32."
+        ::= { mcastProfileEntry 4 }
+
+    mProfilePriority OBJECT-TYPE
+        SYNTAX     INTEGER (0..3)
+        MAX-ACCESS read-create
+        STATUS     current
+        DESCRIPTION
+           "The transmit priority applied to
+            this multicast stream
+            The value 0 indicateds the lowest priority,
+            the value 3 indicateds the highest priority"
+        ::= { mcastProfileEntry 5 }
+
+    mProfileRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            "This object is used to create a new row or modify or
+            delete an existing row in this table.
+            A profile activated by setting this object to
+            `active'.  When `active' is set, the system
+            will validate the profile.
+
+            Before a profile can be deleted or taken out of
+            service, (by setting this object to `destroy' or
+            `outOfService') it must be first unreferenced
+            from all associated lines.
+
+            If the implementator of this MIB has chosen not
+            to implement `dynamic assignment' of profiles, this
+            object's MIN-ACCESS is read-only and its value
+            is always to be `active'."
+    ::= { mcastProfileEntry 6 }
+
+
+--
+-- Multicast Line EOA Configuration Mib
+--
+    mcastConfigLineEoaTable    OBJECT-TYPE
+        SYNTAX          SEQUENCE OF McastConfigLineEoaEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table contains information on the ADSL line
+            configuration.  One entry in this table reflects a
+            profile defined by a manager which can be used to
+            configure the ADSL line."
+    ::= { askeyMcastMib 2}
+
+    mcastConfigLineEoaEntry    OBJECT-TYPE
+        SYNTAX          McastConfigLineEoaEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Each entry consists of a list of parameters that
+            represents the configuration of an multicast group."
+        INDEX { ifIndex }
+    ::= { mcastConfigLineEoaTable 1}
+
+    McastConfigLineEoaEntry ::=
+        SEQUENCE {
+        mConfigVpi                  INTEGER,
+        mConfigVci                  INTEGER,
+        mConfigVlanId               INTEGER,
+        mConfigStreamNum            INTEGER,
+        mConfigServiceProfile       SnmpAdminString,
+        mConfigRowStatus            RowStatus
+    }
+
+    mConfigVpi    OBJECT-TYPE
+        SYNTAX    INTEGER  (0..255)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION
+         "The VPI value of the VCL.
+          The maximum VPI value cannot
+          exceed the value allowable by the
+          atmInterfaceMaxVpiBits."
+        ::= {mcastConfigLineEoaEntry 1}
+
+    mConfigVci    OBJECT-TYPE
+        SYNTAX    INTEGER  (0..65535)
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION
+         "The VCI value of the VCL.
+          The maximum VCI value cannot
+          exceed the value allowable by the
+          atmInterfaceMaxVciBits."
+        ::= {mcastConfigLineEoaEntry 2}
+
+    mConfigVlanId OBJECT-TYPE
+        SYNTAX     INTEGER  (1..4094)
+        MAX-ACCESS read-create
+        STATUS     current
+        DESCRIPTION
+         "IEEE 802.1q VLAN tag number."
+        ::= { mcastConfigLineEoaEntry 3 }
+
+    mConfigStreamNum OBJECT-TYPE
+        SYNTAX     INTEGER  (1..5)
+        MAX-ACCESS read-create
+        STATUS     current
+        DESCRIPTION
+         "The maximum number of this multicast stream on the VCL link"
+        ::= { mcastConfigLineEoaEntry 4 }
+
+    mConfigServiceProfile OBJECT-TYPE
+        SYNTAX     SnmpAdminString (SIZE (1..32))
+        MAX-ACCESS read-create
+        STATUS     current
+        DESCRIPTION
+            "Each line may book 256 program set, we use 256 bits to
+                save what they booked"
+        ::= { mcastConfigLineEoaEntry 5 }
+
+    mConfigRowStatus OBJECT-TYPE
+        SYNTAX          RowStatus
+        MAX-ACCESS      read-create
+        STATUS          current
+        DESCRIPTION
+            ""
+    ::= { mcastConfigLineEoaEntry 6 }
+
+
+
+
+--
+-- Multicast Service Profile Configuration Table
+-- Add by Amy, 2005-05-11 Based on requirement of CHT tender to provide service profile
+--
+
+    mcastServiceObects OBJECT IDENTIFIER ::= { askeyMcastMib 3 }
+
+    mcastServiceProfileCount    OBJECT-TYPE
+        SYNTAX          INTEGER
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION
+            "This object respresents the total count of configured multicast service profiles."
+    ::= { mcastServiceObects 1}
+
+    mcastServiceProfileTable    OBJECT-TYPE
+        SYNTAX          SEQUENCE OF McastServiceProfileEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "This table contains multicast service profiles and each service profile
+            can be defined to represent a set of multicast profiles.
+            One entry in this table reflects a service profile defined by a manager
+            which can be used to assign to each the ADSL subscriber line.
+            Maximum number of multicast service profiles is 60."
+    ::= { mcastServiceObects 2}
+
+    mcastServiceProfileEntry    OBJECT-TYPE
+        SYNTAX          McastServiceProfileEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION
+            "Each entry consists of a list of parameters that
+            represents the configuration of an multicast group."
+        INDEX { IMPLIED mcastServiceProfileName }
+    ::= { mcastServiceProfileTable 1}
+
+    McastServiceProfileEntry ::=
+        SEQUENCE {
+        mcastServiceProfileName             SnmpAdminString ,
+        mcastServiceProfileBitMap           ProfileListBitmap,
+        mcastServiceProfileRowStatus        RowStatus
+    }
+
+    mcastServiceProfileName    OBJECT-TYPE
+        SYNTAX    SnmpAdminString (SIZE (1..32))
+        MAX-ACCESS     not-accessible
+        STATUS         current
+        DESCRIPTION
+         "The profile name is used to be the index of each serive profile.
+          It must be unique and can contains '0'~'9', 'A'~'Z', 'a'~'z', '-','_','.','@'
+          only."
+        ::= {mcastServiceProfileEntry 1}
+
+    mcastServiceProfileBitMap    OBJECT-TYPE
+        SYNTAX    ProfileListBitmap
+        MAX-ACCESS     read-create
+        STATUS         current
+        DESCRIPTION
+         "Each service profile may book a set of 800 program at most , we use 100 octets to
+          save what it books."
+        ::= {mcastServiceProfileEntry 2}
+
+
+    mcastServiceProfileRowStatus OBJECT-TYPE
+        SYNTAX     RowStatus
+        MAX-ACCESS read-create
+        STATUS     current
+        DESCRIPTION
+         "The rowStatus of a mcast service profile.
+         Set rowStatus to createAndGo to create a mcast service profile and
+         set to destory to delete a mcast service profile. If the profile is
+         used by any mcau entry, it is not allowed to be deleted."
+        ::= { mcastServiceProfileEntry 3 }
+
+
+-- END of ASKEY-MCAST-PROFILE-MIB
+--
+
+END

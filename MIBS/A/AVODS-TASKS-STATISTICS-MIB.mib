@@ -1,0 +1,125 @@
+AVODS-TASKS-STATISTICS-MIB DEFINITIONS ::= BEGIN
+
+--	
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, Integer32,
+	NOTIFICATION-TYPE, Unsigned32, Counter64, Counter32
+		FROM SNMPv2-SMI
+	DateAndTime, DisplayString,TimeStamp
+		FROM SNMPv2-TC
+	SnmpAdminString
+		FROM SNMP-FRAMEWORK-MIB
+	statistics
+		FROM KAV4FS-STATISTICS-MIB
+;
+
+avODSTasksStatistics MODULE-IDENTITY
+	LAST-UPDATED "201602241200Z"
+	ORGANIZATION "www.kaspersky.com"
+	CONTACT-INFO "Kaspersky Lab"
+	DESCRIPTION "ODS statistics till current time period"
+	-- revisions
+	REVISION "201602241200Z"
+	DESCRIPTION  "Automatically generated."
+ ::= { statistics 3 }
+
+
+	avODSTasksStatisticsScannedObjects OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		""
+	::= { avODSTasksStatistics 1 }
+
+	avODSTasksStatisticsThreatsFound OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		""
+	::= { avODSTasksStatistics 2 }
+
+	avODSTasksStatisticsInfectedObjects OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		""
+	::= { avODSTasksStatistics 3 }
+
+	avODSTasksStatisticsRiskwareObjects OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		""
+	::= { avODSTasksStatistics 4 }
+
+	avODSTasksStatisticsSuspiciousObjects OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		""
+	::= { avODSTasksStatistics 5 }
+
+	avODSTasksStatisticsCuredObjects OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		""
+	::= { avODSTasksStatistics 6 }
+
+	avODSTasksStatisticsMovedToQuarantine OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		""
+	::= { avODSTasksStatistics 7 }
+
+	avODSTasksStatisticsRemovedObjects OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		""
+	::= { avODSTasksStatistics 8 }
+
+	avODSTasksStatisticsNotCuredbjects OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		""
+	::= { avODSTasksStatistics 9 }
+
+	avODSTasksStatisticsScanErrors OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		""
+	::= { avODSTasksStatistics 10 }
+
+	avODSTasksStatisticsPasswordProtectedObjects OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		""
+	::= { avODSTasksStatistics 11 }
+
+	avODSTasksStatisticsCorruptedObjects OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		""
+	::= { avODSTasksStatistics 12 }
+
+
+END

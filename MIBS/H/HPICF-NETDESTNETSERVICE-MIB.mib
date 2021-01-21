@@ -1,0 +1,354 @@
+--**MOD+****************************************************************************
+--* Module:    hpicfNetDestNetService.mib
+--*
+--* Copyright (C) 2016 Hewlett Packard Enterprise Development LP
+--* All Rights Reserved.
+--* 
+--* The contents of this software are proprietary and confidential
+--* to the Hewlett Packard Enterprise Development LP.  No part of this
+--* program may be photocopied, reproduced, or translated into another
+--* programming language without prior written consent of the
+--* Hewlett Packard Enterprise Development LP.
+--*
+--* Purpose: This file contains MIB definition of HP-ICF-NET-DEST-NET-SERVICE-MIB
+--*
+--**MOD-****************************************************************************
+
+-- Do not Publish. 
+
+HPICF-NETDESTNETSERVICE-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS                       
+              OBJECT-TYPE, MODULE-IDENTITY, Unsigned32
+                     FROM SNMPv2-SMI
+              MODULE-COMPLIANCE, OBJECT-GROUP
+                     FROM SNMPv2-CONF
+              TEXTUAL-CONVENTION, RowStatus
+                     FROM SNMPv2-TC
+              InetAddressType,InetAddress,InetAddressPrefixLength
+                     FROM INET-ADDRESS-MIB
+              hpSwitch            
+                     FROM HP-ICF-OID;  
+
+       -- 1.3.6.1.4.1.11.2.14.11.5.1.58	
+       hpicfNetDestNetService MODULE-IDENTITY
+              LAST-UPDATED "201607250000Z" -- July 25, 2016
+              ORGANIZATION "HP Networking"
+              CONTACT-INFO "Hewlett Packard Enterprise Development LP.
+                                                 8000 Foothills Blvd.
+                                                 Roseville, CA 95747"
+              DESCRIPTION   "This MIB module contains HP proprietary objects for 
+                             managing the NetDestNetService feature."
+
+              REVISION      "201607250000Z" -- July 25, 2016 at 00:00 GMT
+              DESCRIPTION   "Initial revision."
+
+              ::= { hpSwitch 133 }
+
+-- -------------------------------------------------------------
+-- TEXTUAL Conventions
+-- -------------------------------------------------------------
+
+HpicfNetDestServName ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT "70a"
+        STATUS       current
+        DESCRIPTION  "Type definition for the name of a net-destination or
+                     net-service. A net-destination or net-service name is
+                     a printable string consisting of characters
+                     from the ASCII character set. It is case-sensitive, can
+                     be up to 64 characters in length and should not include
+                     characters ' ' or '.'."
+        SYNTAX       OCTET STRING (SIZE(1..64))
+
+
+
+-- -------------------------------------------------------------
+-- Start of MIB Objects
+-- -------------------------------------------------------------
+hpicfNetDestNetServiceObjects    OBJECT IDENTIFIER ::= { hpicfNetDestNetService 1 }
+hpicfNetDestNetServConformance   OBJECT IDENTIFIER ::= { hpicfNetDestNetService 2 }       
+
+
+--
+-- MIB objects
+--
+-- 
+--- Net Destination Master Table
+--
+
+hpicfNetDestMasterTable OBJECT-TYPE
+   SYNTAX            SEQUENCE OF HpicfNetDestinationMasterEntry
+   MAX-ACCESS        not-accessible
+   STATUS            current
+   DESCRIPTION       "Net Destination Table Entry"
+   ::= { hpicfNetDestNetServiceObjects 1 }
+
+hpicfNetDestMasterEntry OBJECT-TYPE
+   SYNTAX            HpicfNetDestinationMasterEntry
+   MAX-ACCESS        not-accessible
+   STATUS            current
+   DESCRIPTION       "An entry in this table specifies the net-destination
+                      name, address family, type and row status
+                      corresponding to each net-destination."
+   INDEX { hpicfNetDestType, hpicfNetDestName }
+   ::= { hpicfNetDestMasterTable 1 } 
+
+HpicfNetDestinationMasterEntry ::= SEQUENCE     
+   {
+      hpicfNetDestType        InetAddressType,
+      hpicfNetDestName        HpicfNetDestServName,
+      hpicfNetDestMasterRowStatus   RowStatus
+   }
+
+hpicfNetDestType OBJECT-TYPE
+   SYNTAX            InetAddressType
+   MAX-ACCESS        not-accessible
+   STATUS            current
+   DESCRIPTION       "The address family of net-destination table
+                      entries, representing IPV4 or IPV6 type."
+   ::= { hpicfNetDestMasterEntry 1 } 
+ 
+hpicfNetDestName OBJECT-TYPE
+   SYNTAX            HpicfNetDestServName
+   MAX-ACCESS        not-accessible
+   STATUS            current
+   DESCRIPTION       "The name of net-destination. The name of a net-destination
+                      is its unique identification.  It is a printable string
+                      consisting of characters from the ASCII character set. It is
+                      case-sensitive, can be up to 64 characters in length and should 
+                      not include characters ' ' or '. '."
+   ::= { hpicfNetDestMasterEntry 2 }
+
+hpicfNetDestMasterRowStatus OBJECT-TYPE
+   SYNTAX            RowStatus
+   MAX-ACCESS        read-create
+   STATUS            current
+   DESCRIPTION       "Netdestination Master table row status."
+   ::= { hpicfNetDestMasterEntry 3 }
+
+
+-- 
+--- Net Destination Table
+--
+
+hpicfNetDestTable OBJECT-TYPE
+   SYNTAX            SEQUENCE OF HpicfNetDestinationEntry
+   MAX-ACCESS        not-accessible
+   STATUS            current
+   DESCRIPTION       "Net-destination table entry"
+   ::= { hpicfNetDestNetServiceObjects 2 }
+
+hpicfNetDestEntry OBJECT-TYPE
+   SYNTAX            HpicfNetDestinationEntry
+   MAX-ACCESS        not-accessible
+   STATUS            current
+   DESCRIPTION       "An entry on this table specifies the host IP address,
+                      network address, position and row status
+                      corresponding to each net-destination."
+   INDEX { hpicfNetDestType, hpicfNetDestName, hpicfNetDestPos }
+   ::= { hpicfNetDestTable 1 } 
+
+HpicfNetDestinationEntry ::= SEQUENCE     
+   {
+      hpicfNetDestPos         Unsigned32,
+      hpicfNetDestAddrType    InetAddressType,         
+      hpicfNetDestAddr        InetAddress,
+      hpicfNetDestMask        InetAddressPrefixLength,
+      hpicfNetDestRowStatus   RowStatus
+   }
+
+hpicfNetDestPos OBJECT-TYPE
+   SYNTAX            Unsigned32
+   MAX-ACCESS        not-accessible
+   STATUS            current
+   DESCRIPTION       "The position of the entry in the net-destination table."
+   ::= { hpicfNetDestEntry 1 } 
+
+hpicfNetDestAddrType OBJECT-TYPE
+   SYNTAX            InetAddressType
+   MAX-ACCESS        read-create
+   STATUS            current
+   DESCRIPTION       "Net-destination host or network address type."
+   ::= { hpicfNetDestEntry 2 }
+  
+hpicfNetDestAddr OBJECT-TYPE
+   SYNTAX            InetAddress
+   MAX-ACCESS        read-create
+   STATUS            current
+   DESCRIPTION       "IP address of host or network."
+   ::= { hpicfNetDestEntry 3 }
+
+hpicfNetDestMask OBJECT-TYPE
+   SYNTAX            InetAddressPrefixLength
+   MAX-ACCESS        read-create
+   STATUS            current
+   DESCRIPTION       "IP mask of a network."
+   ::= { hpicfNetDestEntry 4 }
+
+hpicfNetDestRowStatus OBJECT-TYPE
+   SYNTAX            RowStatus
+   MAX-ACCESS        read-create
+   STATUS            current
+   DESCRIPTION       "Net-destination row status."
+   ::= { hpicfNetDestEntry 5 }
+
+--
+--- Net Service Table
+--
+hpicfNetServTable OBJECT-TYPE
+   SYNTAX            SEQUENCE OF HpicfNetServiceEntry
+   MAX-ACCESS        not-accessible
+   STATUS            current
+   DESCRIPTION       "Net Service table entry."
+   ::= { hpicfNetDestNetServiceObjects 3 }
+
+hpicfNetServEntry OBJECT-TYPE
+   SYNTAX            HpicfNetServiceEntry
+   MAX-ACCESS        not-accessible
+   STATUS            current
+   DESCRIPTION       "An entry in this table specifies the net-service name, protocol 
+                      and port list or single port or range of ports associated 
+                      with each net-service."
+   INDEX { hpicfNetServName }
+   ::= { hpicfNetServTable 1 }
+
+HpicfNetServiceEntry ::= SEQUENCE 
+   {
+      hpicfNetServName        HpicfNetDestServName,         
+      hpicfNetServProtocol    Unsigned32,
+      hpicfNetServConfigType  INTEGER,
+      hpicfNetServRangeStart  Unsigned32,
+      hpicfNetServRangeEnd    Unsigned32,
+      hpicfNetServPortList    OCTET STRING,
+      hpicfNetServRowStatus   RowStatus
+   }
+   
+hpicfNetServName OBJECT-TYPE
+   SYNTAX            HpicfNetDestServName
+   MAX-ACCESS        not-accessible
+   STATUS            current
+   DESCRIPTION       "The name of net-service. The name of a net-service
+                      is its unique identification.  It is a printable string
+                      consisting of characters from the ASCII character set. It is
+                      case-sensitive, can be up to 64 charaters in length and should
+                      not include characters ' ' or '.'."
+   ::= { hpicfNetServEntry 1 }
+
+hpicfNetServProtocol OBJECT-TYPE
+   SYNTAX            Unsigned32 (0..255)
+   MAX-ACCESS        read-create
+   STATUS            current
+   DESCRIPTION       "An IP protocol number (0-255)."
+   ::= { hpicfNetServEntry 2 }
+
+hpicfNetServConfigType OBJECT-TYPE
+   SYNTAX      INTEGER {
+                           noPort(1),
+                           singlePort(2),
+                           portRange(3),
+                           portList(4)
+                       }
+   MAX-ACCESS      read-create
+   STATUS          current
+   DESCRIPTION     "This is used to specify the type of port added to a netservice.
+                    Values are noPort(1) for no port specified, singlePort(2) for 
+                    a single port, portRange(3) for range of ports, portList(4)
+                    for list of ports."
+   ::= { hpicfNetServEntry 3 }
+
+hpicfNetServRangeStart OBJECT-TYPE
+   SYNTAX            Unsigned32 (1..65535)
+   MAX-ACCESS        read-create
+   STATUS            current
+   DESCRIPTION       "This is used to specify a single port or the lower
+                      limit in a range of ports.The minimum value is 1."
+   ::= { hpicfNetServEntry 4 }
+
+hpicfNetServRangeEnd OBJECT-TYPE
+   SYNTAX            Unsigned32 (1..65535)
+   MAX-ACCESS        read-create
+   STATUS            current
+   DESCRIPTION       "This is used to specify the upper limit in a 
+                      range of ports.The maximum value is 65535."
+   ::= { hpicfNetServEntry 5 }
+
+hpicfNetServPortList OBJECT-TYPE
+   SYNTAX            OCTET STRING ( SIZE (1..64))
+   MAX-ACCESS        read-create
+   STATUS            current
+   DESCRIPTION       "A list of non-contiguous port numbers 
+                      (1-65535) seperated by comma where comma is counted 
+                      in the size. A maximum of 6 ports can be specified
+                      in a list."
+   ::= { hpicfNetServEntry 6 }
+
+hpicfNetServRowStatus OBJECT-TYPE
+   SYNTAX            RowStatus
+   MAX-ACCESS        read-create
+   STATUS            current
+   DESCRIPTION       "Row status of entry."
+   ::= { hpicfNetServEntry 7 }
+
+------------------------------------------------------------------------------
+-- Conformance Information
+------------------------------------------------------------------------------
+
+hpicfNetDestNetServiceMIBGroups    OBJECT IDENTIFIER ::= {hpicfNetDestNetServConformance 1}
+hpicfNetDstNetSrvMIBCompliances    OBJECT IDENTIFIER ::= {hpicfNetDestNetServConformance 2}
+   
+-- Compiance statements
+
+hpicfNetDstNetSrvMIBCompliance MODULE-COMPLIANCE
+   STATUS            current
+   DESCRIPTION       "The compliance statement for HP routers 
+                      that implement HP-ICF-NetDestNetService-MIB."
+   MODULE            -- this module
+   MANDATORY-GROUPS 
+   {
+      hpicfNetDestMasterGroup,
+      hpicfNetDestGroup,
+      hpicfNetServGroup
+   }
+   ::= {hpicfNetDstNetSrvMIBCompliances 1}
+
+-- MIB Groupings
+
+hpicfNetDestMasterGroup OBJECT-GROUP
+   OBJECTS    
+   {
+      hpicfNetDestMasterRowStatus
+   }
+   STATUS            current
+   DESCRIPTION       "A collection of HP proprietary objects to support
+                      net-destination of HP-ICF-NetDestNetService-MIB "
+   ::= { hpicfNetDestNetServiceMIBGroups 1 }
+
+hpicfNetDestGroup OBJECT-GROUP
+   OBJECTS    
+   {
+      hpicfNetDestAddrType,
+      hpicfNetDestAddr,
+      hpicfNetDestMask,
+      hpicfNetDestRowStatus
+   }
+   STATUS            current
+   DESCRIPTION       "A collection of HP proprietary objects to support
+                      net-destination of HP-ICF-NetDestNetService-MIB "
+   ::= { hpicfNetDestNetServiceMIBGroups 2 }
+
+hpicfNetServGroup OBJECT-GROUP
+   OBJECTS
+   {                
+      hpicfNetServProtocol,
+      hpicfNetServConfigType,
+      hpicfNetServRangeStart,
+      hpicfNetServRangeEnd,
+      hpicfNetServPortList,
+      hpicfNetServRowStatus
+   }
+   STATUS            current
+   DESCRIPTION       "A collection of HP proprietary objects to support
+                      net-service of HP-ICF-NetDestNetService-MIB "
+   ::= {hpicfNetDestNetServiceMIBGroups 3}
+END 
+

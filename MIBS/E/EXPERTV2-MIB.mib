@@ -1,0 +1,2683 @@
+EXPERTV2-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    enterprises,
+    IpAddress, Counter,
+    OBJECT-TYPE         FROM RFC1155-SMI
+    TRAP-TYPE           FROM RFC-1215
+    DisplayString, DateAndTime
+                        FROM SNMPv2-TC;
+
+DisplayString ::= OCTET STRING
+HWRowStatus   ::= INTEGER{ valid(1),invalid(2),create(3) }
+
+huawei                  OBJECT IDENTIFIER ::= { enterprises 2011 }
+products                OBJECT IDENTIFIER ::= { huawei 2 }
+access-server           OBJECT IDENTIFIER ::= { products 3 }
+expert-v2               OBJECT IDENTIFIER ::= { access-server 4 }
+device                  OBJECT IDENTIFIER ::= { expert-v2 1 }
+smb-board               OBJECT IDENTIFIER ::= { expert-v2 2 }
+vsp-board               OBJECT IDENTIFIER ::= { expert-v2 3 }
+hrb-board               OBJECT IDENTIFIER ::= { expert-v2 4 }
+mstu-board              OBJECT IDENTIFIER ::= { expert-v2 5 }
+devBaseInfoGroup        OBJECT IDENTIFIER ::= { device 1 }
+devMaintainGroup        OBJECT IDENTIFIER ::= { device 2 }
+devConfigGroup          OBJECT IDENTIFIER ::= { device 3 }
+devTrapGroup            OBJECT IDENTIFIER ::= { device 4 }
+devAlarmMibGroup        OBJECT IDENTIFIER ::= { devTrapGroup 1 }
+devMainTainTrapGroup    OBJECT IDENTIFIER ::= { devTrapGroup 2 }
+devAlarmTrapGroup       OBJECT IDENTIFIER ::= { devTrapGroup 3 }
+smbBaseInfoGroup        OBJECT IDENTIFIER ::= { smb-board 1 }
+vspBaseInfoGroup        OBJECT IDENTIFIER ::= { vsp-board 1 }
+vspServiceInfoGroup     OBJECT IDENTIFIER ::= { vsp-board 2 }
+hrbBaseInfoGroup        OBJECT IDENTIFIER ::= { hrb-board 1 }
+mstuPerfomConfigGroup   OBJECT IDENTIFIER ::= { mstu-board 1 }
+mstuPerfomInfoGroup     OBJECT IDENTIFIER ::= { mstu-board 2 }
+mstuPerfomResetGroup    OBJECT IDENTIFIER ::= { mstu-board 3 }
+mstuPerfomSpendingGroup OBJECT IDENTIFIER ::= { mstu-board 4 }
+mstuSDHLoopGroup        OBJECT IDENTIFIER ::= { mstu-board 5 }
+mstuTributaryNumGroup   OBJECT IDENTIFIER ::= { mstu-board 6 }
+
+    deviceSystemInfomation OBJECT IDENTIFIER ::= { devBaseInfoGroup 1 }
+
+    sysDateAndTime  OBJECT-TYPE
+    SYNTAX          DateAndTime
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION      "The date and time of this device can be set.DateAndTime is in octet mode which does not include time-zone information."
+    ::= { deviceSystemInfomation 1 }
+
+    sysIPAddr       OBJECT-TYPE
+    SYNTAX          IpAddress
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The device lacks of IP address"
+    ::= { deviceSystemInfomation 2 }
+
+    sysVersion      OBJECT-TYPE
+    SYNTAX          INTEGER{
+                        r001(1),
+                        r002(2),
+                        r003(3),
+                        r004(4),
+                        r005(5)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "Expert V2 device version"
+    ::= { deviceSystemInfomation 3 }
+
+
+--Board information table
+    slotBoardTable  OBJECT-TYPE
+    SYNTAX          SEQUENCE OF SlotBoardEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION      "The board information table describes the information of the type, the status and the software version etc. of the boards in various slot of the EXPERT."
+    ::= { devBaseInfoGroup 2 }
+
+    slotBoardEntry  OBJECT-TYPE
+    SYNTAX          SlotBoardEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "The object defined by this line describes the information of the board in the slot."
+    INDEX           { slotBoardSlotNo }
+    ::= { slotBoardTable 1 }
+
+    SlotBoardEntry ::= SEQUENCE {
+        slotBoardSlotNo             INTEGER,
+        slotBoardType               INTEGER,
+        slotBoardNo                 INTEGER,
+        slotBoardStatus             INTEGER,
+        slotBoardTime               DateAndTime,
+        slotBoardPCBVersion         DisplayString,
+        slotBoardBIOSVersion        DisplayString,
+        slotBoardSoftwareVersion    DisplayString,
+        slotBoardLogicVersion       DisplayString,
+        slotBoardDSPVersion         DisplayString,
+        slotBoardOtherVersion       DisplayString,
+        slotBoardCPURatio           INTEGER,
+        slotBoardCPUStatus          INTEGER,
+        slotBoardMemorySize         INTEGER,
+        slotBoardUsableMemory       INTEGER
+    }
+
+    slotBoardSlotNo OBJECT-TYPE
+    SYNTAX          INTEGER(0..15)
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "Slot number, it forms the index for this table. The EXPERT includes 16 slots. The value range of which is from 0 to 15."
+    ::= { slotBoardEntry 1 }
+
+    slotBoardType   OBJECT-TYPE
+    SYNTAX          INTEGER{
+                        smb(0),
+                        vsp-ipp(1),  --VSP board supporting the services of IP Phone and IP FAX.
+                        vsp-nas(2),  --VSP board supporting access services.
+                        hrb(3),
+                        hsp(4),
+                        mstu(5),
+                        frb(6),
+                        null(100)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The type of slot board, it describes the type of board to be inserted in the slot 
+                     among which null (100) indicates null slot.
+                     When the variable value is null (100), the variable values of subsequent rows of 
+                     this row has no meaning, all of which are 0 or null.
+                     "
+    ::= { slotBoardEntry 2 }
+
+    slotBoardNo     OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "Board number, ranging from 0 to 11. When the slot is null, the returned value is 65535 indicating invalidation."
+    ::= { slotBoardEntry 3 }
+
+    slotBoardStatus OBJECT-TYPE
+    SYNTAX          INTEGER{
+                        not-install(0),
+                        normal(1),
+                        fault(2),
+                        active-normal(3),
+                        active-error(4),
+                        back-normal(5),
+                        back-error(6)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "
+                        Board status
+                        not-install(0)      Not-installed
+                        normal(1)           Normal
+                        fault(2)            Fault
+                        active-normal(3)    The active one is normal
+                        active-error(4)     The active one is faulty
+                        back-normal(5)      The backup one is normal
+                        back-error(6)       The backup one is faulty
+                        When the board type is null (100), the board status returns not-install (0) to indicate invalidation.
+                    "
+    ::= { slotBoardEntry 4 }
+
+    slotBoardTime   OBJECT-TYPE
+    SYNTAX          DateAndTime
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "system time"
+    ::= { slotBoardEntry 5 }
+
+    slotBoardPCBVersion OBJECT-TYPE
+    SYNTAX          DisplayString(SIZE(0..31))
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "Description of Board PCB version. When the board type is null (100), the returned value is \0 indicating invalidation."
+    ::= { slotBoardEntry 6 }
+
+    slotBoardBIOSVersion OBJECT-TYPE
+    SYNTAX          DisplayString(SIZE(0..31))
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "Description of Board BIOS version, when the board type is null (100), the returned value is \0 indicating invalidation."
+    ::= { slotBoardEntry 7 }
+
+    slotBoardSoftwareVersion OBJECT-TYPE
+    SYNTAX          DisplayString(SIZE(0..63))
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "Board system version number. When the board type is null (100), the returned value is \0 indicating invalidation."
+    ::= { slotBoardEntry 8 }
+
+    slotBoardLogicVersion OBJECT-TYPE
+    SYNTAX          DisplayString(SIZE(0..63))
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "Description of Board logic version. When the board type is null (100), the returned value is \0 indicating invalidation."
+    ::= { slotBoardEntry 9 }
+
+    slotBoardDSPVersion OBJECT-TYPE
+    SYNTAX          DisplayString(SIZE(0..63))
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "Description of Board DSP version. When the board type is null (100), the returned value is \0 indicating invalidation."
+    ::= { slotBoardEntry 10 }
+
+    slotBoardOtherVersion OBJECT-TYPE
+    SYNTAX          DisplayString(SIZE(0..31))
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "Description of other versions. When the board type is null (100), the returned value is \0  indicating invalidation."
+    ::= { slotBoardEntry 11 }
+
+    slotBoardCPURatio OBJECT-TYPE
+    SYNTAX          INTEGER(0..100)
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "Board CPU seizure ratio. When the board type is null (100), the returned value is \0 indicating invalidation."
+    ::= { slotBoardEntry 12 }
+
+    slotBoardCPUStatus OBJECT-TYPE
+    SYNTAX          INTEGER{
+                        no-meaning(0),
+                        normal(1),
+                        overload1(2),
+                        overload2(3),
+                        overload3(4),
+                        overload4(5)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "
+                    Board CPU status
+                        normal(1)       indicating CPU is normal
+                        overload1(2)    indicating CPU is in the status of level 1 overload
+                        overload2(3)    indicating CPU is in the status of level 2 overload
+                        overload3(4)    indicating CPU is in the status of level 3 overload
+                        overload4(5)    indicating CPU is in the status of level 4 overload
+                    When the board type is null (100), the returned value is no-meaning (0) indicating invalidation.
+                    "
+    ::= { slotBoardEntry 13 }
+
+    slotBoardMemorySize OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "Board memory size, including used part and unused part. When the board type is null (100), the returned value is \0 indicating invalidation."
+    ::= { slotBoardEntry 14 }
+
+    slotBoardUsableMemory OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "Board usable memory size. It means the unused memory of the board. When the board type is null (100), the returned value is \0 indicating invalidation."
+    ::= { slotBoardEntry 15 }
+
+
+--Board reset information table
+    boardResetInfoTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF BoardResetInfoEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "Board reset information table. It describes the causes and time of the previous reset of the EXPERT board."
+    ::= { devBaseInfoGroup 3 }
+
+    boardResetInfoEntry OBJECT-TYPE
+    SYNTAX          BoardResetInfoEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "The object defined by this line describes the causes and time of the previous reset of the board." 
+    INDEX           { boardResetInfoSlotNo }
+    ::= { boardResetInfoTable 1 }
+
+    BoardResetInfoEntry ::= SEQUENCE {
+        boardResetInfoSlotNo    INTEGER,
+        boardResetInfoReason    INTEGER,
+        boardResetInfoTime      DateAndTime
+    }
+
+    boardResetInfoSlotNo OBJECT-TYPE
+    SYNTAX          INTEGER(0..15)
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "Slot number. This object forms the index for this table. EXPERT includes 16 slots with the value range from 0 to 15."
+    ::= { boardResetInfoEntry 1 }
+
+    boardResetInfoReason OBJECT-TYPE
+    SYNTAX          INTEGER{
+                        slot-err(0),
+                        slot-nouse(1),
+                        no0-reset-record(2),
+                        lost-connect(3),
+                        user-cmd(4),
+                        smb-snd-msg(5),
+                        abnormal(6),
+                        board-fault(7),
+                        failed(8),
+                        swap-smb(20),
+                        mt-reboot(21),
+                        cfg-failed(110),
+                        failed-531(111),
+                        failed-528(112),
+                        failed-525(113)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "
+                    Board reset causes. The meaning of various enumeration values are as follows:
+                        slot-err(0),            he input slot number is wrong.
+                        slot-nouse(1),          The slot has not been configured with board.
+                        no-reset-record(2),     This board has no reset record.
+                        lost-connect(3),       The active SMB lost connection with this board.
+                        user-cmd(4),            User delivers reset command.
+                        smb-snd-msg(5),         SMD delivers reset message.
+                        abnormal(6),            Reset is caused by abnormal error 
+                        board-fault(7),         It is unable to query due to board fault
+                        failed(8),              Query failure
+                        /*SMB reset cause 20 ~ 49 */ 
+                        swap-smb(20),           Switching SMB board
+                        mt-reboot(21),         User delivers the command of reset board all.
+                        /* VSP reset cause 50 ~ 79 */
+                        /* HRB reset cause 80 ~ 109 */
+                         /* MSTU reset cause 80 ~ 109 */
+                        cfg-failed(110),        Configuration failure
+                        failed-531(111),        531 failure
+                        failed-528(112),        528 failure
+                        failed-525(113)         525 failure
+                    "
+    ::= { boardResetInfoEntry 2 }
+
+    boardResetInfoTime OBJECT-TYPE
+    SYNTAX          DateAndTime
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The time of previous board reset. If the board has not reset before, the returned date and time are not defined."
+    ::= { boardResetInfoEntry 3 }
+
+
+--E1 information table
+    e1InfoTable     OBJECT-TYPE
+    SYNTAX          SEQUENCE OF E1InfoEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION      "E1 information table. It describes the information of various E1 port on the VSP board and MSTU board."
+    ::= { devBaseInfoGroup 5 }
+
+    e1InfoEntry     OBJECT-TYPE
+    SYNTAX          E1InfoEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "The object defined by this line describes the information of the E1 port."
+    INDEX           { e1InfoSlotNo, e1InfoE1NoInBoard }
+    ::= { e1InfoTable 1 }
+
+    E1InfoEntry ::= SEQUENCE {
+        e1InfoSlotNo            INTEGER,
+        e1InfoE1NoInBoard       INTEGER,
+        e1InfoE1No              INTEGER,
+        e1InfoE1Type            INTEGER,
+        e1InfoE1Status          INTEGER,
+        e1InfoE1LoopBackStatus  INTEGER,
+        e1InfoE1PCMPara         INTEGER
+    }
+
+    e1InfoSlotNo    OBJECT-TYPE
+    SYNTAX          INTEGER(0..15)
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "
+                    Slot number. This object and e1InfoE1NoInBoard form the index for this table which is used as the only one flag indicating a E1 in certain board. The value range of slot number is from 0 to 15.
+                    "
+    ::= { e1InfoEntry 1 }
+
+    e1InfoE1NoInBoard OBJECT-TYPE
+    SYNTAX          INTEGER(0..62)
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "
+                    The E1 number inside the board. This object and e1InfoSlotNo form the index for this table with the value range  from 0 to 62. Actually, the VSP board contains four E1 ports but additional space for 12 ports is reserved. Thus for the VSP board, the value range of this object is from 0 to 15. The MSTU board contains 63 E1 ports. Thus for the MSTU board, the value range of this object is from 0 to 62.
+                    "
+    ::= { e1InfoEntry 2 }
+
+    e1InfoE1No      OBJECT-TYPE
+    SYNTAX          INTEGER(0..165)
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "
+                    The global E1 number in the EXPERT. When the device include 2 MSTU boards and 10 VSP boards, the number of E1s is the most which is up to 286; thus the value range of this object is from 0 to 285.
+                    "
+    ::= { e1InfoEntry 3 }
+
+    e1InfoE1Type    OBJECT-TYPE
+    SYNTAX          INTEGER{
+                        no1(0),
+                        tup(1),
+                        isup(2),
+                        pra(3)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "
+                    E1 type, the meaning of various enumeration valuesis as follows:
+                        no1(0)      China No. 1 or R2
+                        tup(1)      SS7 TUP
+                        isup(2)     SS7 ISUP
+                        pra(3)      ISDN DSS1
+                    "
+    ::= { e1InfoEntry 4 }
+
+    e1InfoE1Status  OBJECT-TYPE
+    SYNTAX          INTEGER{
+                        uninstall(0),
+                        fault(1),
+                        normal(2),
+                        alarm(3)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "
+                    The status of E1 port, the meaning of various enumeration values is as follows:
+                        uninstall(0)    Not-installed
+                        fault(1)        Fault
+                        normal(2)       Normal 
+                        alarm(3)        Alarm
+                    "
+    ::= { e1InfoEntry 5 }
+
+    e1InfoE1LoopBackStatus OBJECT-TYPE
+    SYNTAX          INTEGER{
+                        remote-loop(2),
+                        local-loop(4),
+                        rmt-lcl-loop(6),
+                        payload-loop(8),
+                        rmt-payload-loop(10),
+                        lcl-payload-loop(12),
+                        rmt-lcl-payload-loop(14),
+                        no-loop(16)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "
+                    The loop status of E1 port, the meaning of various enumeration valuesis as follows:
+                        remote-loop(2),             in the status of remote loop
+                        local-loop(4),              in the status of local loop
+                        rmt-lcl-loop(6),           in remote and local loop status simultaneously
+                        payload-loop(8),            in the status of payload loop
+                        rmt-payload-loop(10),       in remote and payload loop status simultaneously
+                        lcl-payload-loop(12),       in local and payload loop status simultaneously
+                        rmt-lcl-payload-loop(14),   in local, remote and payload loop status simultaneously
+                        no-loop(16)                  not in loop status
+                    There are three types of loop: local loop, remote loop and payload loop which are not exclusive to one another, and can exist simultaneously.
+
+                    "
+    ::= { e1InfoEntry 6 }
+
+    e1InfoE1PCMPara OBJECT-TYPE
+    SYNTAX          INTEGER (0..255)
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "
+                    PCM alarm parameter. This value is an 8-digit integer and each digit indicates one type of alarm as below:
+                    D7  D6  D5  D4  D3  D2  D1  D0
+                     |  |    |   |   |    |   |   |__  meaningless, fixed to 1
+                     |  |    |   |   |    |   |
+                     |  |    |   |   |    |   |__Remote multiframe alarm, RMF
+                     |  |    |   |   |    |
+                     |  |    |   |   |    |__ TS16 all 1
+                     |  |    |   |   |
+                     |  |    |   |   |__Slide code
+                     |  |    |   |
+                     |  |    |   |__Disconnection
+                     |  |    |
+                     |  |    |__Remote frame alarm, RFA
+                     |  |
+                     |  |___ Multiframe out-of-sync, MFA   
+                     |
+                     |___Frame out-of-sync, FAS
+
+                     Note: Dx = 0  Alarm 1 = normal
+                    "
+    ::= { e1InfoEntry 7 }
+
+
+--MFC information table
+    mfcInfoTable    OBJECT-TYPE
+    SYNTAX          SEQUENCE OF MfcInfoEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "MFC information table. It describes the status information of the MFC chip on the VSP boards."
+    ::= { devBaseInfoGroup 6 }
+
+    mfcInfoEntry    OBJECT-TYPE
+    SYNTAX          MfcInfoEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "The object defined by this line describes the status information of the MFC chip."
+    INDEX           { mfcInfoMfcNo }
+    ::= { mfcInfoTable 1 }
+
+    MfcInfoEntry ::= SEQUENCE {
+        mfcInfoMfcNo        INTEGER,
+        mfcInfoMfcStatus    INTEGER
+    }
+
+    mfcInfoMfcNo    OBJECT-TYPE
+    SYNTAX          INTEGER(0..11)
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION      "Global MFC number. This variable value equals to the logic board number of the MFC-located VSP board with the range from 0 to 11."
+    ::= { mfcInfoEntry 1 }
+
+    mfcInfoMfcStatus OBJECT-TYPE
+    SYNTAX          INTEGER{
+                        normal(0),
+                        error(1),
+                        num-err(2),
+                        num-nouse(3)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "
+                    The status of the MFC chip, the meaning of various enumeration values is as follows:
+                        normal(0),      The MFC is in normal status.
+                        error(1),       MFC fault
+                        num-err(2),     The input MFC number is wrong.
+                        num-nouse(3)   The MFC with this number is not configured.
+                    "
+    ::= { mfcInfoEntry 2 }
+
+-- Online user statistics group
+    userStatisticsGroup OBJECT IDENTIFIER ::= { devBaseInfoGroup 15 }
+
+--User statistics table
+    userStatisticsDevTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF UserStatisticsDevEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "The user statistics device table. It describes the number of various types of users within the device."
+    ::= { userStatisticsGroup 1 }
+
+    userStatisticsDevEntry OBJECT-TYPE
+    SYNTAX          UserStatisticsDevEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "This line contains the object describing the user statistics information."
+    INDEX           { userStatisticsDevIndex }
+    ::= { userStatisticsDevTable 1 }
+
+    UserStatisticsDevEntry ::= SEQUENCE {
+        userStatisticsDevIndex      INTEGER,
+        userStatisticsDevISDN       INTEGER,
+        userStatisticsDevMODEM      INTEGER,
+        userStatisticsDevNormal     INTEGER,
+        userStatisticsDevVPN        INTEGER,
+        userStatisticsDevMP         INTEGER,
+        userStatisticsDevRLogin     INTEGER,
+        userStatisticsDevCallback   INTEGER,
+        userStatisticsDevV110       INTEGER,
+        userStatisticsDevV120       INTEGER
+    }
+
+    userStatisticsDevIndex OBJECT-TYPE
+    SYNTAX          INTEGER{
+                        idx(1)
+                    }
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION    "Table index. It is meaningless and is fixed to 1. It is just for facilitating Agent to deliver multiple variable request."
+    ::= { userStatisticsDevEntry 1 }
+
+    userStatisticsDevISDN OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION    "The number of ISDN ports (without identifying 1B or 2B, due to repetition with MP)"
+    ::= { userStatisticsDevEntry 2 }
+
+    userStatisticsDevMODEM OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number MODEM ports"
+    ::= { userStatisticsDevEntry 3 }
+
+    userStatisticsDevNormal OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of Normal users (General ppp users)"
+    ::= { userStatisticsDevEntry 4 }
+
+    userStatisticsDevVPN OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of VPN users"
+    ::= { userStatisticsDevEntry 5 }
+
+    userStatisticsDevMP OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of MP users (including Modem bundling, ISDN2B and ISDN+Modem)"
+    ::= { userStatisticsDevEntry 6 }
+
+    userStatisticsDevRLogin OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of RLoging users (including Rlogin, TCP and TCP clear)"
+    ::= { userStatisticsDevEntry 7 }
+
+    userStatisticsDevCallback OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of Callback users (not supported by R100)"
+    ::= { userStatisticsDevEntry 8 }
+
+    userStatisticsDevV110 OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of V.110 users"
+    ::= { userStatisticsDevEntry 9 }
+
+    userStatisticsDevV120 OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of V.120 users"
+    ::= { userStatisticsDevEntry 10 }
+
+
+--Board user statistics table
+    userStatisticsBoardTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF UserStatisticsBoardEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "Board user statistics table. It describes the statistics of various types of users through certain board."
+    ::= { userStatisticsGroup 2 }
+
+    userStatisticsBoardEntry OBJECT-TYPE
+    SYNTAX          UserStatisticsBoardEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "This line contains the object describing the board user statistics information."
+    INDEX           { userStatisticsBoardSlotNo }
+    ::= { userStatisticsBoardTable 1 }
+
+    UserStatisticsBoardEntry ::= SEQUENCE {
+        userStatisticsBoardSlotNo   INTEGER,
+        userStatisticsBoardISDN     INTEGER,
+        userStatisticsBoardMODEM    INTEGER,
+        userStatisticsBoardNormal   INTEGER,
+        userStatisticsBoardVPN      INTEGER,
+        userStatisticsBoardMP       INTEGER,
+        userStatisticsBoardRLogin   INTEGER,
+        userStatisticsBoardCallback INTEGER,
+        userStatisticsBoardV110     INTEGER,
+        userStatisticsBoardV120     INTEGER
+    }
+
+    userStatisticsBoardSlotNo OBJECT-TYPE
+    SYNTAX          INTEGER(0..15)
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "Slot number"
+    ::= { userStatisticsBoardEntry 1 }
+
+    userStatisticsBoardISDN OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of ISDN ports (without identifying 1B or 2B due to repetition with MP)"
+    ::= { userStatisticsBoardEntry 2 }
+
+    userStatisticsBoardMODEM OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of MODEM ports"
+    ::= { userStatisticsBoardEntry 3 }
+
+    userStatisticsBoardNormal OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of Normal users(general ppp users)"
+    ::= { userStatisticsBoardEntry 4 }
+
+    userStatisticsBoardVPN OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of VPN users"
+    ::= { userStatisticsBoardEntry 5 }
+
+    userStatisticsBoardMP OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+DESCRIPTION     "The number of MP users (including Modem bundling, ISDN2B and ISDN+Modem)"
+    ::= { userStatisticsBoardEntry 6 }
+
+    userStatisticsBoardRLogin OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of Rlogin users (including Rlogin, TCP and TCP clear)"
+    ::= { userStatisticsBoardEntry 7 }
+
+    userStatisticsBoardCallback OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of Callback users (not supported by R100)"
+    ::= { userStatisticsBoardEntry 8 }
+
+    userStatisticsBoardV110 OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of V.110 users"
+    ::= { userStatisticsBoardEntry 9 }
+
+    userStatisticsBoardV120 OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of V.120 users"
+    ::= { userStatisticsBoardEntry 10 }
+
+
+--E1 port user statistics table
+    userStatisticsE1Table OBJECT-TYPE
+    SYNTAX          SEQUENCE OF UserStatisticsE1Entry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "E1-port user statistics table. It describes the statistics information of varied types of users through a certain E1 port."
+    ::= { userStatisticsGroup 3 }
+
+    userStatisticsE1Entry OBJECT-TYPE
+    SYNTAX          UserStatisticsE1Entry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION   "This line contains the object describing E1-port user statistics information." 
+    INDEX           { userStatisticsE1SlotNo, userStatisticsE1PortNo }
+    ::= { userStatisticsE1Table 1 }
+
+    UserStatisticsE1Entry ::= SEQUENCE {
+        userStatisticsE1SlotNo   INTEGER,
+        userStatisticsE1PortNo   INTEGER,
+        userStatisticsE1ISDN     INTEGER,
+        userStatisticsE1MODEM    INTEGER,
+        userStatisticsE1Normal   INTEGER,
+        userStatisticsE1VPN      INTEGER,
+        userStatisticsE1MP       INTEGER,
+        userStatisticsE1RLogin   INTEGER,
+        userStatisticsE1Callback INTEGER,
+        userStatisticsE1V110     INTEGER,
+        userStatisticsE1V120     INTEGER
+    }
+
+    userStatisticsE1SlotNo OBJECT-TYPE
+    SYNTAX          INTEGER(0..15)
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "Slot number"
+    ::= { userStatisticsE1Entry 1 }
+
+    userStatisticsE1PortNo OBJECT-TYPE
+    SYNTAX          INTEGER(0..62)
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "E1 port number in board" 
+    ::= { userStatisticsE1Entry 2 }
+
+    userStatisticsE1ISDN OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "the number of ISDN ports(without identifying 1B or 2B due to repetition with MP)"
+    ::= { userStatisticsE1Entry 3 }
+
+    userStatisticsE1MODEM OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of MODEM ports"
+    ::= { userStatisticsE1Entry 4 }
+
+    userStatisticsE1Normal OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of Normal users(general ppp users)"
+    ::= { userStatisticsE1Entry 5 }
+
+    userStatisticsE1VPN OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of VPN users"
+    ::= { userStatisticsE1Entry 6 }
+
+    userStatisticsE1MP OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of MP users (including Modem bundling, ISDN2B and ISDN+Modem)"
+    ::= { userStatisticsE1Entry 7 }
+
+    userStatisticsE1RLogin OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of Rlogin users (including Rlogin, TCP and TCP clear)"
+    ::= { userStatisticsE1Entry 8 }
+
+    userStatisticsE1Callback OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of Callback users (not supported by R100)"
+    ::= { userStatisticsE1Entry 9 }
+
+    userStatisticsE1V110 OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of V.110 users"
+    ::= { userStatisticsE1Entry 10 }
+
+    userStatisticsE1V120 OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of V1.20 users"
+    ::= { userStatisticsE1Entry 11 }
+
+
+--Table of user statistics according to access code
+    userStatisticsAccCodeTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF UserStatisticsAccCodeEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "The table of user statistics according to access code. It describes the statistics of various types of users with the same access code."
+    ::= { userStatisticsGroup 4 }
+
+    userStatisticsAccCodeEntry OBJECT-TYPE
+    SYNTAX          UserStatisticsAccCodeEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "This line contains the object describing the user statistics according to access code."
+    INDEX           { userStatisticsAccCodeIndex }
+    ::= { userStatisticsAccCodeTable 1 }
+
+    UserStatisticsAccCodeEntry ::= SEQUENCE {
+        userStatisticsAccCodeIndex      OCTET STRING,
+        userStatisticsAccCodeISDN       INTEGER,
+        userStatisticsAccCodeMODEM      INTEGER,
+        userStatisticsAccCodeNormal     INTEGER,
+        userStatisticsAccCodeVPN        INTEGER,
+        userStatisticsAccCodeMP         INTEGER,
+        userStatisticsAccCodeRLogin     INTEGER,
+        userStatisticsAccCodeCallback   INTEGER,
+        userStatisticsAccCodeV110       INTEGER,
+        userStatisticsAccCodeV120       INTEGER
+    }
+
+    userStatisticsAccCodeIndex OBJECT-TYPE
+    SYNTAX          OCTET STRING(SIZE(0..16))
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "Access code"
+    ::= { userStatisticsAccCodeEntry 1 }
+
+    userStatisticsAccCodeISDN OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of ISDN ports (without identifying 1B or 2B due to repetition with MP)"
+    ::= { userStatisticsAccCodeEntry 2 }
+
+    userStatisticsAccCodeMODEM OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of MODEM ports"
+    ::= { userStatisticsAccCodeEntry 3 }
+
+    userStatisticsAccCodeNormal OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of Normal users (general ppp users)"
+    ::= { userStatisticsAccCodeEntry 4 }
+
+    userStatisticsAccCodeVPN OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of VPN users"
+    ::= { userStatisticsAccCodeEntry 5 }
+
+    userStatisticsAccCodeMP OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of MP users (including Modem bundling, ISDN and ISDN+Modem)"
+    ::= { userStatisticsAccCodeEntry 6 }
+
+    userStatisticsAccCodeRLogin OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of RLoging users (including Rlogin, TCP and TCP clear) "
+    ::= { userStatisticsAccCodeEntry 7 }
+
+    userStatisticsAccCodeCallback OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of Callback users (not supported by R100)"
+    ::= { userStatisticsAccCodeEntry 8 }
+
+    userStatisticsAccCodeV110 OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of V.110 users"
+    ::= { userStatisticsAccCodeEntry 9 }
+
+    userStatisticsAccCodeV120 OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of V1.20 users"
+    ::= { userStatisticsAccCodeEntry 10 }
+
+
+--Table of user statistics according to access code (the index of which is group number and intra-group ID)
+    userStatisticsAccCode2Table OBJECT-TYPE
+    SYNTAX          SEQUENCE OF UserStatisticsAccCode2Entry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "
+                    Both this and the previous tables of user statistics are according to access code and the only difference is that the index of this table is group number and intra-group ID in stead of access code. Thus, it is available to go through all configured access code and perform the statistics of port seizure and the statistics of variious types of users according to each access code.
+                    "
+    ::= { userStatisticsGroup 5 }
+
+    userStatisticsAccCode2Entry OBJECT-TYPE
+    SYNTAX          UserStatisticsAccCode2Entry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "This line contains the object describing the user statistics according to access code."
+    INDEX           { userStatisticsAccCode2GrpNo, userStatisticsAccCode2Index }
+    ::= { userStatisticsAccCode2Table 1 }
+
+    UserStatisticsAccCode2Entry ::= SEQUENCE {
+        userStatisticsAccCode2GrpNo     INTEGER,
+        userStatisticsAccCode2Index     INTEGER,
+        userStatisticsAccCode2Value     OCTET STRING,
+        userStatisticsAccCode2ISDN      INTEGER,
+        userStatisticsAccCode2MODEM     INTEGER,
+        userStatisticsAccCode2Normal    INTEGER,
+        userStatisticsAccCode2VPN       INTEGER,
+        userStatisticsAccCode2MP        INTEGER,
+        userStatisticsAccCode2RLogin    INTEGER,
+        userStatisticsAccCode2Callback  INTEGER,
+        userStatisticsAccCode2V110      INTEGER,
+        userStatisticsAccCode2V120      INTEGER
+    }
+
+    userStatisticsAccCode2GrpNo OBJECT-TYPE
+    SYNTAX          INTEGER(1..300)
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "Group number"
+    ::= { userStatisticsAccCode2Entry 1 }
+
+    userStatisticsAccCode2Index OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "Intra-group ID"
+    ::= { userStatisticsAccCode2Entry 2 }
+
+    userStatisticsAccCode2Value OBJECT-TYPE
+    SYNTAX          OCTET STRING(SIZE(0..16))
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "Access code"
+    ::= { userStatisticsAccCode2Entry 3 }
+
+    userStatisticsAccCode2ISDN OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION      "The number of ISDN ports (without identifying 1B or 2B due to repetition with MP) "
+    ::= { userStatisticsAccCode2Entry 4 }
+
+    userStatisticsAccCode2MODEM OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION      "The number of MODEM ports"
+    ::= { userStatisticsAccCode2Entry 5 }
+
+    userStatisticsAccCode2Normal OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of Normal users (general ppp users) "
+    ::= { userStatisticsAccCode2Entry 6 }
+
+    userStatisticsAccCode2VPN OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of VPN users"
+    ::= { userStatisticsAccCode2Entry 7 }
+
+    userStatisticsAccCode2MP OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of MP users (including Modem binding, ISDN2B and ISDN+Modem)"
+    ::= { userStatisticsAccCode2Entry 8 }
+
+    userStatisticsAccCode2RLogin OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of RLoging users (including Rlogin, TCP and TCP clear)"
+    ::= { userStatisticsAccCode2Entry 9 }
+
+    userStatisticsAccCode2Callback OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of Call back users ( not supported by R001)"
+    ::= { userStatisticsAccCode2Entry 10 }
+
+    userStatisticsAccCode2V110 OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of V.110 users"
+    ::= { userStatisticsAccCode2Entry 11 }
+
+    userStatisticsAccCode2V120 OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of V1.20 users"
+    ::= { userStatisticsAccCode2Entry 12 }
+
+
+--Table of user statistics according to access domain"
+    userStatisticsAccDomainTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF UserStatisticsAccDomainEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION    "The table of user statistics based on access field. It describes the statistics of various types of users with the same access domain."
+    ::= { userStatisticsGroup 6 }
+
+    userStatisticsAccDomainEntry OBJECT-TYPE
+    SYNTAX          UserStatisticsAccDomainEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "This line contains the object describing the user statistics accroding to access domain."
+    INDEX           { userStatisticsAccDomainIndex }
+    ::= { userStatisticsAccDomainTable 1 }
+
+    UserStatisticsAccDomainEntry ::= SEQUENCE {
+        userStatisticsAccDomainIndex    OCTET STRING,
+        userStatisticsAccDomainISDN     INTEGER,
+        userStatisticsAccDomainMODEM    INTEGER,
+        userStatisticsAccDomainNormal   INTEGER,
+        userStatisticsAccDomainVPN      INTEGER,
+        userStatisticsAccDomainMP       INTEGER,
+        userStatisticsAccDomainRLogin   INTEGER,
+        userStatisticsAccDomainCallback INTEGER,
+        userStatisticsAccDomainV110     INTEGER,
+        userStatisticsAccDomainV120     INTEGER
+    }
+
+    userStatisticsAccDomainIndex OBJECT-TYPE
+    SYNTAX          OCTET STRING(SIZE(0..32))
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "Domain"
+    ::= { userStatisticsAccDomainEntry 1 }
+
+    userStatisticsAccDomainISDN OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of ISDN ports (without identifying 1B or 2B due to repetition with MP)"
+    ::= { userStatisticsAccDomainEntry 2 }
+
+    userStatisticsAccDomainMODEM OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION      "The number of MODEM ports"
+    ::= { userStatisticsAccDomainEntry 3 }
+
+    userStatisticsAccDomainNormal OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of Normal users (general ppp users)"
+    ::= { userStatisticsAccDomainEntry 4 }
+
+    userStatisticsAccDomainVPN OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of VPN users"
+    ::= { userStatisticsAccDomainEntry 5 }
+
+    userStatisticsAccDomainMP OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of MP users (including Modem binding, ISDN2B and ISDN+Modem)"
+    ::= { userStatisticsAccDomainEntry 6 }
+
+    userStatisticsAccDomainRLogin OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of RLoging users (including Rlogin, TCP and TCP clear)"
+    ::= { userStatisticsAccDomainEntry 7 }
+
+    userStatisticsAccDomainCallback OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of Call back users (not supported by R001)"
+    ::= { userStatisticsAccDomainEntry 8 }
+
+    userStatisticsAccDomainV110 OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of V.110 users"
+    ::= { userStatisticsAccDomainEntry 9 }
+
+    userStatisticsAccDomainV120 OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of V1.20 users"
+    ::= { userStatisticsAccDomainEntry 10 }
+
+
+--Table of user statistics based on access domain (the index of which is the group number and intra-group ID)
+    userStatisticsAccDomain2Table OBJECT-TYPE
+    SYNTAX          SEQUENCE OF UserStatisticsAccDomain2Entry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "
+                    The user statistics in both this and the previous tables are performed according to access domain. 
+                    The only difference is that the index of this table is group number and intra-group ID in stead of access code. 
+                    Thus, it is able to go through all configured access domain and perform the statistics of port seizure and the statistics of varied types of users according to each access domain.
+                    "
+    ::= { userStatisticsGroup 7 }
+
+    userStatisticsAccDomain2Entry OBJECT-TYPE
+    SYNTAX          UserStatisticsAccDomain2Entry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "This line contains the object describing the user statistics according access domain."
+    INDEX           { userStatisticsAccDomain2GrpNo, userStatisticsAccDomain2Index }
+    ::= { userStatisticsAccDomain2Table 1 }
+
+    UserStatisticsAccDomain2Entry ::= SEQUENCE {
+        userStatisticsAccDomain2GrpNo       INTEGER,
+        userStatisticsAccDomain2Index       INTEGER,
+        userStatisticsAccDomain2Value       OCTET STRING,
+        userStatisticsAccDomain2ISDN        INTEGER,
+        userStatisticsAccDomain2MODEM       INTEGER,
+        userStatisticsAccDomain2Normal      INTEGER,
+        userStatisticsAccDomain2VPN         INTEGER,
+        userStatisticsAccDomain2MP          INTEGER,
+        userStatisticsAccDomain2RLogin      INTEGER,
+        userStatisticsAccDomain2Callback    INTEGER,
+        userStatisticsAccDomain2V110        INTEGER,
+        userStatisticsAccDomain2V120        INTEGER
+    }
+
+    userStatisticsAccDomain2GrpNo OBJECT-TYPE
+    SYNTAX          INTEGER(1..300)
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "Group number"
+    ::= { userStatisticsAccDomain2Entry 1 }
+
+    userStatisticsAccDomain2Index OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "Intra-group ID"
+    ::= { userStatisticsAccDomain2Entry 2 }
+
+    userStatisticsAccDomain2Value OBJECT-TYPE
+    SYNTAX          OCTET STRING(SIZE(0..32))
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "Domain"
+    ::= { userStatisticsAccDomain2Entry 3 }
+
+    userStatisticsAccDomain2ISDN OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of ISDN ports (without identifying 1B or 2B due to repetition with MP)"
+    ::= { userStatisticsAccDomain2Entry 4 }
+
+    userStatisticsAccDomain2MODEM OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION      "The number of MODEM ports"
+    ::= { userStatisticsAccDomain2Entry 5 }
+
+    userStatisticsAccDomain2Normal OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of Normal users (general ppp users)"
+    ::= { userStatisticsAccDomain2Entry 6 }
+
+    userStatisticsAccDomain2VPN OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of VPN users"
+    ::= { userStatisticsAccDomain2Entry 7 }
+
+    userStatisticsAccDomain2MP OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of MP users (including Modem binding, ISDN2B and ISDN+Modem)"
+    ::= { userStatisticsAccDomain2Entry 8 }
+
+    userStatisticsAccDomain2RLogin OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of RLoging users (including Rlogin, TCP and TCP clear)"
+    ::= { userStatisticsAccDomain2Entry 9 }
+
+    userStatisticsAccDomain2Callback OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of Callback users (not supported by R001)"
+    ::= { userStatisticsAccDomain2Entry 10 }
+
+    userStatisticsAccDomain2V110 OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of V.110 users"
+    ::= { userStatisticsAccDomain2Entry 11 }
+
+    userStatisticsAccDomain2V120 OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of V1.20 users"
+    ::= { userStatisticsAccDomain2Entry 12 }
+
+
+--Table of user statistics based on office direction
+    userStatisticsOdnTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF UserStatisticsOdnEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "The table of user statistics based on office direction. It describes the statistics of varied types of users with the same office direction."
+    ::= { userStatisticsGroup 8 }
+
+    userStatisticsOdnEntry OBJECT-TYPE
+    SYNTAX          UserStatisticsOdnEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "This line contains the object describing the user statistics according to office direction."
+    INDEX           { userStatisticsOdnIndex }
+    ::= { userStatisticsOdnTable 1 }
+
+    UserStatisticsOdnEntry ::= SEQUENCE {
+        userStatisticsOdnIndex      INTEGER,
+        userStatisticsOdnISDN       INTEGER,
+        userStatisticsOdnMODEM      INTEGER,
+        userStatisticsOdnNormal     INTEGER,
+        userStatisticsOdnVPN        INTEGER,
+        userStatisticsOdnMP         INTEGER,
+        userStatisticsOdnRLogin     INTEGER,
+        userStatisticsOdnCallback   INTEGER,
+        userStatisticsOdnV110       INTEGER,
+        userStatisticsOdnV120       INTEGER
+    }
+
+    userStatisticsOdnIndex OBJECT-TYPE
+    SYNTAX          INTEGER(0..255)
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "Office direction number"
+    ::= { userStatisticsOdnEntry 1 }
+
+    userStatisticsOdnISDN OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION      "The number of ISDN ports (without identifying 1B or 2B due to repetition with MP)"
+    ::= { userStatisticsOdnEntry 2 }
+
+    userStatisticsOdnMODEM OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION      "The number of MODEM ports"
+    ::= { userStatisticsOdnEntry 3 }
+
+    userStatisticsOdnNormal OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of Normal users (general ppp users)"
+    ::= { userStatisticsOdnEntry 4 }
+
+    userStatisticsOdnVPN OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of VPN users"
+    ::= { userStatisticsOdnEntry 5 }
+
+    userStatisticsOdnMP OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of MP users (including Modem binding, ISDN2B and ISDN+Modem)"
+    ::= { userStatisticsOdnEntry 6 }
+
+    userStatisticsOdnRLogin OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of RLoging users (including Rlogin, TCP and TCP clear)"
+    ::= { userStatisticsOdnEntry 7 }
+
+    userStatisticsOdnCallback OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of Callback users (not supported by R001)"
+    ::= { userStatisticsOdnEntry 8 }
+
+    userStatisticsOdnV110 OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of V.110 users"
+    ::= { userStatisticsOdnEntry 9 }
+
+    userStatisticsOdnV120 OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "The number of V1.20 users"
+    ::= { userStatisticsOdnEntry 10 }
+
+--nas board user query table
+    seekUserTable   OBJECT-TYPE
+    SYNTAX          SEQUENCE OF SeekUserEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "nas board user query table"
+    ::= { devMaintainGroup 27 }
+
+    seekUserEntry   OBJECT-TYPE
+    SYNTAX          SeekUserEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "This table contains operation objects for nas board user query."
+    INDEX           { seekUserType }
+    ::= { seekUserTable 1 }
+
+    SeekUserEntry ::= SEQUENCE
+    {
+        seekUserType            INTEGER,
+        seekUserIP              IpAddress,
+        seekUserName            DisplayString,
+        seekUserCallingNumber   DisplayString,
+        seekUserRst             INTEGER,
+        seekUserBoard           INTEGER,
+        seekUserPort            INTEGER,
+        seekUserGroupNo         INTEGER,
+        seekUserServiceType     INTEGER,
+        seekUserAccessType      INTEGER,
+        seekUserSessionTime     INTEGER,
+        seekUserRxRate          INTEGER,
+        seekUserTxRate          INTEGER,
+        seekUserCalledNumber    DisplayString
+    }
+
+    seekUserType    OBJECT-TYPE
+    SYNTAX          INTEGER{
+                        byip(0),
+                        byusername(1),
+                        bycallingnumber(2)
+                    }
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "
+                    User query operation types:
+                        ByIP(0):            Query on the basis of IP addresses.
+                        ByUserName(1):      Query on the basis of user names.
+                        ByCallingNumber(2): Query on the basis of calling numbers.
+                    "
+    ::= { seekUserEntry 1 }
+
+    seekUserIP      OBJECT-TYPE
+    SYNTAX          IpAddress
+    ACCESS          write-only
+    STATUS          mandatory
+    DESCRIPTION     "User IP address (network byte sequence)"
+    ::= { seekUserEntry 2 }
+
+    seekUserName    OBJECT-TYPE
+    SYNTAX          DisplayString(SIZE(1..64))
+    ACCESS          write-only
+    STATUS          mandatory
+    DESCRIPTION     "User name"
+    ::= { seekUserEntry 3 }
+
+    seekUserCallingNumber OBJECT-TYPE
+    SYNTAX          DisplayString(SIZE(1..24))
+    ACCESS          write-only
+    STATUS          mandatory
+    DESCRIPTION     "Calling number"
+    ::= { seekUserEntry 4 }
+
+    seekUserRst     OBJECT-TYPE
+    SYNTAX          INTEGER{
+                        success(0),
+                        fail(1),
+                        end(2)
+                    }
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "Query results:
+                        success(0):The query succeeds.
+                        fail(1):   The query fails.
+                        end(2):    The query ends.
+                    "
+    ::= { seekUserEntry 5 }
+
+    seekUserBoard   OBJECT-TYPE
+    SYNTAX          INTEGER(0..11)
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "VSP board number"
+    ::= { seekUserEntry 6 }
+
+    seekUserPort    OBJECT-TYPE
+    SYNTAX          INTEGER(0..123)
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "User port number 0-119 (MODEM), 0-123(ISDN)"
+    ::= { seekUserEntry 7 }
+
+    seekUserGroupNo OBJECT-TYPE
+    SYNTAX          INTEGER(1..300)
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "Group number"
+    ::= { seekUserEntry 8 }
+
+    seekUserServiceType OBJECT-TYPE
+    SYNTAX          INTEGER{
+                        none(1),
+                        other(2),               --none of the following
+                        ppp(3),                 --Point-To-Point Protocol
+                        slip(4),                --Serial Line IP
+                        mpp(5),                 --Multichannel PPP
+                        x25(6),                 --X.25
+                        combinet(7),            --Combinet
+                        frameRelay(8),          --Frame Relay
+                        euraw(9),
+                        euui(10),
+                        txt-telnet(11),         --telnet
+                        bin-telnet(12),         --binary telnet
+                        rawtcp-suffix(13),      --raw TCP
+                        terminalserver(14),     --terminal server
+                        mp(15),                 --Multilink PPP
+                        vpn-suffix(16),         --Virtual Private Network
+                        callback(17),
+                        rlogin-suffix(18),
+                        tcpclear(19)
+                    }
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "Primitive port type"
+    ::= { seekUserEntry 9 }
+
+    seekUserAccessType OBJECT-TYPE
+    SYNTAX          INTEGER{
+                        modem-asyn(0),
+                        modem-syn(1),
+                        hdlc-syn(2),
+                        hdlc-asyn-v120(3),
+                        hdlc-asyn-v110(4)
+                    }
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "User access type"
+    ::= { seekUserEntry 10 }
+
+    seekUserSessionTime OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "Session duration (second)"
+    ::= { seekUserEntry 11 }
+
+    seekUserRxRate  OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "Receiving speed rate"
+    ::= { seekUserEntry 12 }
+
+    seekUserTxRate  OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "Sending speed rate"
+    ::= { seekUserEntry 13 }
+
+    seekUserCalledNumber OBJECT-TYPE
+    SYNTAX          DisplayString(SIZE(1..24))
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "Called number"
+    ::= { seekUserEntry 14 }
+
+
+--Forced user disconnection table
+    kickUserTable   OBJECT-TYPE
+    SYNTAX          SEQUENCE OF KickUserEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "nas-board forced user disconnection table"
+    ::= { devMaintainGroup 28 }
+
+    kickUserEntry   OBJECT-TYPE
+    SYNTAX          KickUserEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "This table contains operation objects for nas-board forced user disconnection."
+    INDEX           { kickUserType }
+    ::= { kickUserTable 1 }
+
+    KickUserEntry ::= SEQUENCE
+    {
+        kickUserType            INTEGER,
+        kickUserIP              IpAddress,
+        kickUserName            DisplayString,
+        kickUserCallingNumber   DisplayString,
+        kickUserRst             INTEGER,
+        kickUserBoard           INTEGER,
+        kickUserPort            INTEGER,
+        kickUserGroupNo         INTEGER,
+        kickUserServiceType     INTEGER,
+        kickUserAccessType      INTEGER,
+        kickUserSessionTime     INTEGER,
+        kickUserRxRate          INTEGER,
+        kickUserTxRate          INTEGER,
+        kickUserCalledNumber    DisplayString
+    }
+
+    kickUserType    OBJECT-TYPE
+    SYNTAX          INTEGER{
+                        byip(0),
+                        byusername(1),
+                        bycallingnumber(2)
+                    }
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "User disconnection operation types:
+                        byip(0):            Disconnection users are determined on the basis of IP addresses.
+                        byusername(1):      Disconnection users are determined on the basis of user names.
+                        bycallingnumber(2): Disconnection users are determined on the basis of calling numbers.
+                    "
+    ::= { kickUserEntry 1 }
+
+    kickUserIP      OBJECT-TYPE
+    SYNTAX          IpAddress
+    ACCESS          write-only
+    STATUS          mandatory
+    DESCRIPTION     "User IP address (network byte sequence)"
+    ::= { kickUserEntry 2 }
+
+    kickUserName    OBJECT-TYPE
+    SYNTAX          DisplayString(SIZE(1..64))
+    ACCESS          write-only
+    STATUS          mandatory
+    DESCRIPTION     "User name"
+    ::= { kickUserEntry 3 }
+
+    kickUserCallingNumber OBJECT-TYPE
+    SYNTAX          DisplayString(SIZE(1..24))
+    ACCESS          write-only
+    STATUS          mandatory
+    DESCRIPTION     "Calling number"
+    ::= { kickUserEntry 4 }
+
+    kickUserRst     OBJECT-TYPE
+    SYNTAX          INTEGER{
+                        success(0),
+                        fail(1),
+                        end(2)
+                    }
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "Operation results:
+                        success(0): The query succeeds.
+                        fail(1):    The query fails.
+                        end(2):     The query ends.
+                    "
+    ::= { kickUserEntry 5 }
+
+    kickUserBoard   OBJECT-TYPE
+    SYNTAX          INTEGER(0..11)
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "VSP board number"
+    ::= { kickUserEntry 6 }
+
+    kickUserPort    OBJECT-TYPE
+    SYNTAX          INTEGER(0..123)
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "User port number 0-119(MODEM), 0-123(ISDN)"
+    ::= { kickUserEntry 7 }
+
+    kickUserGroupNo OBJECT-TYPE
+    SYNTAX          INTEGER(1..300)
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "Group number"
+    ::= { kickUserEntry 8 }
+
+    kickUserServiceType OBJECT-TYPE
+    SYNTAX          INTEGER{
+                        none(1),
+                        other(2),               --none of the following
+                        ppp(3),                 --Point-To-Point Protocol
+                        slip(4),                --Serial Line IP
+                        mpp(5),                 --Multichannel PPP
+                        x25(6),                 --X.25
+                        combinet(7),            --Combinet
+                        frameRelay(8),          --Frame Relay
+                        euraw(9),
+                        euui(10),
+                        txt-telnet(11),         --telnet
+                        bin-telnet(12),         --binary telnet
+                        rawtcp-suffix(13),      --raw TCP
+                        terminalserver(14),     --terminal server
+                        mp(15),                 --Multilink PPP
+                        vpn-suffix(16),         --Virtual Private Network
+                        callback(17),
+                        rlogin-suffix(18),
+                        tcpclear(19)
+                    }
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "Primitive port type"
+    ::= { kickUserEntry 9 }
+
+    kickUserAccessType OBJECT-TYPE
+    SYNTAX          INTEGER{
+                        modem-asyn(0),
+                        modem-syn(1),
+                        hdlc-syn(2),
+                        hdlc-asyn-v120(3),
+                        hdlc-asyn-v110(4)
+                    }
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "User access type"
+    ::= { kickUserEntry 10 }
+
+    kickUserSessionTime OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "Session duration (second)"
+    ::= { kickUserEntry 11 }
+
+    kickUserRxRate  OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "Receiving rate"
+    ::= { kickUserEntry 12 }
+
+    kickUserTxRate  OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "Sending speed rate"
+    ::= { kickUserEntry 13 }
+
+    kickUserCalledNumber OBJECT-TYPE
+    SYNTAX          DisplayString(SIZE(1..24))
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "Called number"
+    ::= { kickUserEntry 14 }
+
+
+--VSP board and HSP board
+
+--Basic information of VSP board and HSP board
+
+--Port status table of VSP board and HSP board. It contains the status information of DSP and ISDN ports
+
+    vspPortStatusTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF VspPortStatusEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     " Port status table of VSP board and HSP board. It indicates the statuses of DSP ports and ISDN ports of VSP board or HSP board."
+    ::= { vspBaseInfoGroup 1 }
+
+    vspPortStatusEntry OBJECT-TYPE
+    SYNTAX          VspPortStatusEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "It contains objects describing statuses of DSP ports and ISDN ports of VSP board or HSP board."
+    INDEX           { vspPortStatusSlotNo }
+    ::= { vspPortStatusTable 1 }
+
+    VspPortStatusEntry ::= SEQUENCE {
+        vspPortStatusSlotNo         INTEGER,
+        vspPortStatusISDNPortStatus OCTET STRING,
+        vspPortStatusDSPPortStatus  OCTET STRING
+    }
+
+    vspPortStatusSlotNo OBJECT-TYPE
+    SYNTAX          INTEGER(0..15)
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "Slot number of VSP board or HSP board, forming the index of this table. The value range is 0-15."
+    ::= { vspPortStatusEntry 1 }
+
+    vspPortStatusISDNPortStatus OBJECT-TYPE
+    SYNTAX          OCTET STRING(SIZE(62))
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "
+                    ISDN port statuses. There are  62 bytes totally. Every byte indicates the statuses of two ports. That is, every 4 bits indicate status of one port. This object can totally indicate statuses of 124 ISDN ports. The following is the corresponding relations between port statuses and 4-bit values indicating corresponding port status.
+                        0       NOINSTALL       Uninstalled
+                        1       IDLE            Idle
+                        2       BUSY            Busy
+                        3       FAULT           Fault
+                        4       TESTING         Test
+                        5       BLOCK           Blocked
+                        6       OTHER           Other
+                        15      NO-MEANING      No meaning
+                    If VSP contains less than 124 ports, those exceeding the number of ISDN ports of this board are indicated with 15 NO-MEANING. For HSP board, this object has its meaning. For VSP board, only DSP ports are provided and NOINSTALL is used for all ports of this object.
+                    "
+    ::= { vspPortStatusEntry 2 }
+
+    vspPortStatusDSPPortStatus OBJECT-TYPE
+    SYNTAX          OCTET STRING(SIZE(60))
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "
+                    DSP port statuses. There are 60 bytes totally. Every byte indicates statuses of two ports. That is, every 4 bits indicate status of one port. This object can totally indicate statuses of 120 DSP ports. The following is the corresponding relations between port statuses and 4-bit values indicating corresponding port status.
+                        0       NOINSTALL       Uninstalled
+                        1       IDLE            Idle
+                        2       BUSY            Busy
+                        3       FAULT           Fault
+                        4       TESTING         Test
+                        5       BLOCK           Blocked
+                        6       OTHER           Other
+                        15      NO-MEANING      No meaning
+                    If VSP contains less than 120 ports, those exceeding the number of DSP ports of this board are indicated with 15 NO-MEANING. For VSP board, this object has its meaning. For HSP board, only ISDN ports are provided and NOINSTALL is used for all ports of this object.
+                    "
+    ::= { vspPortStatusEntry 3 }
+
+
+--Port statistics table of VSP board and HSP board. It contains the status statistics information of DSP and ISDN ports
+    vspPortStatisticsTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF VspPortStatisticsEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "Port statistics table of VSP board and HSP board. It contains the numbers of DSP ports and IDSN ports in various statuses of VSP board or HSP board."
+    ::= { vspBaseInfoGroup 3 }
+
+    vspPortStatisticsEntry OBJECT-TYPE
+    SYNTAX          VspPortStatisticsEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "It contains objects describing numbers of DSP ports and IDSN ports in various statuses of VSP board or HSP board."
+    INDEX           { vspPortStatisticsSlotNo }
+    ::= { vspPortStatisticsTable 1 }
+
+    VspPortStatisticsEntry ::= SEQUENCE {
+        vspPortStatisticsSlotNo             INTEGER,
+        vspPortStatisticsISDNTotalPorts     INTEGER,
+        vspPortStatisticsISDNNoInstallPorts INTEGER,
+        vspPortStatisticsISDNIdelPorts      INTEGER,
+        vspPortStatisticsISDNBusyPorts      INTEGER,
+        vspPortStatisticsISDNFaultPorts     INTEGER,
+        vspPortStatisticsISDNTestPorts      INTEGER,
+        vspPortStatisticsISDNBlockPorts     INTEGER,
+        vspPortStatisticsISDNOtherPorts     INTEGER,
+        vspPortStatisticsDSPTotalPorts      INTEGER,
+        vspPortStatisticsDSPNoInstallPorts  INTEGER,
+        vspPortStatisticsDSPIdelPorts       INTEGER,
+        vspPortStatisticsDSPBusyPorts       INTEGER,
+        vspPortStatisticsDSPFaultPorts      INTEGER,
+        vspPortStatisticsDSPTestPorts       INTEGER,
+        vspPortStatisticsDSPBlockPorts      INTEGER,
+        vspPortStatisticsDSPOtherPorts      INTEGER
+    }
+
+    vspPortStatisticsSlotNo OBJECT-TYPE
+    SYNTAX          INTEGER(0..15)
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "Slot number of VSP board or HSP board. It forms the index of this table."
+    ::= { vspPortStatisticsEntry 1 }
+
+    vspPortStatisticsISDNTotalPorts OBJECT-TYPE
+    SYNTAX          INTEGER (0..124)
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "Number of total ISDN ports of this HSP board. For VSP board, this object is 0."
+    ::= { vspPortStatisticsEntry 2 }
+
+    vspPortStatisticsISDNNoInstallPorts OBJECT-TYPE
+    SYNTAX          INTEGER (0..124)
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "Number of uninstalled ISDN ports of this HSP board. For VSP board, this object is 0."
+    ::= { vspPortStatisticsEntry 3 }
+
+    vspPortStatisticsISDNIdelPorts OBJECT-TYPE
+    SYNTAX          INTEGER (0..124)
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "Number of idle ISDN ports of this HSP board. For VSP board, this object is 0."
+    ::= { vspPortStatisticsEntry 4 }
+
+    vspPortStatisticsISDNBusyPorts OBJECT-TYPE
+    SYNTAX          INTEGER (0..124)
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "Number of busy ISDN ports of this HSP board. For VSP board, this object is 0."
+    ::= { vspPortStatisticsEntry 5 }
+
+    vspPortStatisticsISDNFaultPorts OBJECT-TYPE
+    SYNTAX          INTEGER (0..124)
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "Number of fault ISDN ports of this HSP board. For VSP board, this object is 0."
+    ::= { vspPortStatisticsEntry 6 }
+
+    vspPortStatisticsISDNTestPorts OBJECT-TYPE
+    SYNTAX          INTEGER (0..124)
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "Number of test ISDN ports of this HSP board. For VSP board, this object is 0."
+    ::= { vspPortStatisticsEntry 7 }
+
+    vspPortStatisticsISDNBlockPorts OBJECT-TYPE
+    SYNTAX          INTEGER (0..124)
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "Number of blocked ISDN ports of this HSP board. For VSP board, this object is 0."
+    ::= { vspPortStatisticsEntry 8 }
+
+    vspPortStatisticsISDNOtherPorts OBJECT-TYPE
+    SYNTAX          INTEGER (0..124)
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "Number of ISDN ports in other statuses of this HSP board. For VSP board, this object is 0."
+    ::= { vspPortStatisticsEntry 9 }
+
+    vspPortStatisticsDSPTotalPorts OBJECT-TYPE
+    SYNTAX          INTEGER (0..120)
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "Number of total DSP ports of this VSP board. For HSP board, this object is 0."
+    ::= { vspPortStatisticsEntry 10}
+
+    vspPortStatisticsDSPNoInstallPorts OBJECT-TYPE
+    SYNTAX          INTEGER (0..120)
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "Number of uninstalled DSP ports of this VSP board. For HSP board, this object is 0."
+    ::= { vspPortStatisticsEntry 11}
+
+    vspPortStatisticsDSPIdelPorts OBJECT-TYPE
+    SYNTAX          INTEGER (0..120)
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "Number of idle DSP ports of this VSP board. For HSP board, this object is 0."
+    ::= { vspPortStatisticsEntry 12}
+
+    vspPortStatisticsDSPBusyPorts OBJECT-TYPE
+    SYNTAX          INTEGER (0..120)
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "Number of busy DSP ports of this VSP board. For HSP board, this object is 0."
+    ::= { vspPortStatisticsEntry 13}
+
+    vspPortStatisticsDSPFaultPorts OBJECT-TYPE
+    SYNTAX          INTEGER (0..120)
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "Number of fault DSP ports of this VSP board. For HSP board, this object is 0."
+    ::= { vspPortStatisticsEntry 14}
+
+    vspPortStatisticsDSPTestPorts OBJECT-TYPE
+    SYNTAX          INTEGER (0..120)
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "Number of test DSP ports of this VSP board. For HSP board, this object is 0."
+    ::= { vspPortStatisticsEntry 15}
+
+    vspPortStatisticsDSPBlockPorts OBJECT-TYPE
+    SYNTAX          INTEGER (0..120)
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "Number of blocked DSP ports of this VSP board. For HSP board, this object is 0."
+    ::= { vspPortStatisticsEntry 16}
+
+    vspPortStatisticsDSPOtherPorts OBJECT-TYPE
+    SYNTAX          INTEGER (0..120)
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "Number of DSP ports in other statuses of this VSP board. For HSP board, this object is 0."
+    ::= { vspPortStatisticsEntry 17}
+
+
+--NAS service information of VSP board and HSP board
+
+--Access service call status table of VSP board and HSP board
+    vspNASCallTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF VspNASCallEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "Access service call status table of VSP board and HSP board. It describes the information of various statuses of calls through ports of VSP board and HSP board."
+    ::= { vspServiceInfoGroup 1 }
+
+    vspNASCallEntry OBJECT-TYPE
+    SYNTAX          VspNASCallEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "It contains objects describing call status information of VSP board and HSP board."
+    INDEX           { vspNASCallSlotNo,vspNASCallPortNo }
+    ::= { vspNASCallTable 1 }
+
+    VspNASCallEntry ::= SEQUENCE {
+        vspNASCallSlotNo        INTEGER,
+        vspNASCallPortNo        INTEGER,
+        vspNASCallPortType      INTEGER,
+        vspNASCallValidFlag     INTEGER,
+        vspNASCallStartingTime  DateAndTime,
+        vspNASCallCallingNumber DisplayString,
+        vspNASCallCalledNumber  DisplayString,
+        vspNASCallDataRate      INTEGER,
+        vspNASCallXmitRate      INTEGER,
+        vspNASCallDirection     INTEGER
+    }
+
+    vspNASCallSlotNo OBJECT-TYPE
+    SYNTAX          INTEGER(0..15)
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "Slot number of VSP board or HSP board. It forms the index of this table."
+    ::= { vspNASCallEntry 1 }
+
+    vspNASCallPortNo OBJECT-TYPE
+    SYNTAX          INTEGER(0..123)
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "
+                    Port number of VSP board or HSP board. For VSP board, it is DSP port number and the range is 0-199. For HSP board, it is ISDN port and the range is 0-123.
+                    "
+    ::= { vspNASCallEntry 2 }
+
+    vspNASCallPortType OBJECT-TYPE
+    SYNTAX          INTEGER {
+                       modem(1),
+                       isdn(2)
+                      }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "
+                    Port type. It indicates the port is an MODEM port or an ISDN port. MODEM port is DSP port that we usually say.
+                    "
+    ::= { vspNASCallEntry 3 }
+
+    vspNASCallValidFlag OBJECT-TYPE
+    SYNTAX          INTEGER{
+                        invalid(1),
+                        valid(2)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "
+                    Call validity flag. It indicates whether there is any call through this port currently. invalid(1) indicates that there is no call through the port currently and the data has no meaning. valid(2) indicates that there is a call through this port.
+                    "
+    ::= { vspNASCallEntry 4 }
+
+    vspNASCallStartingTime OBJECT-TYPE
+    SYNTAX          DateAndTime
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "
+                    Start time of this call. If vspNASCallValidFlag is invalid, this object returns 0000 year 0 moth 0 date 0 hour 0 minute 0 second.
+                    "
+    ::= { vspNASCallEntry 5 }
+
+    vspNASCallCallingNumber OBJECT-TYPE
+    SYNTAX          DisplayString(SIZE(0..24))
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "
+                    Calling number of this call. If vspNASCallValidFlag is invalid, this object will return NULL.
+                    "
+    ::= { vspNASCallEntry 6 }
+
+    vspNASCallCalledNumber OBJECT-TYPE
+    SYNTAX          DisplayString(SIZE(0..24))
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "
+                    Called number of this call. If vspNASCallValidFlag is invalid, this object will return NULL.
+                    "
+    ::= { vspNASCallEntry 7 }
+
+    vspNASCallDataRate OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "
+                    Receiving speed rate. The receive rate for ISDN calls or the baud rate
+                    for modem calls. A  value of 0 is returned if entry
+                    is  invalid. 
+                    "
+    ::= { vspNASCallEntry 8 }
+
+    vspNASCallXmitRate OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "
+                    Sending speed rate. The transmit rate for ISDN calls or the baud rate
+                    for modem calls. A  value of 0 is returned if entry
+                    is invalid. "
+    ::= { vspNASCallEntry 9 }
+
+    vspNASCallDirection OBJECT-TYPE
+    SYNTAX          INTEGER{
+                        callOutgoing(1),  --Outgoing
+                        callIncoming(2),  --Incoming
+                        no-meaning(3)     --No meaning
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "Call direction. A value of no-meaning(3) is returned if entry is invalid"
+    ::= { vspNASCallEntry 10 }
+
+
+--Access service session information table of VSP board and HSP board
+    vspNASSessionTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF VspNASSessionEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "Access service session information table of VSP board and HSP board. It describes the information of various statuses of connection users through ports of VSP board."
+    ::= { vspServiceInfoGroup 2 }
+
+    vspNASSessionEntry OBJECT-TYPE
+    SYNTAX          VspNASSessionEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "It contains objects describing connection user information of VSP board and HSP board."
+    INDEX           { vspNASSessionSlotNo, vspNASSessionPortNo }
+    ::= { vspNASSessionTable 1 }
+
+    VspNASSessionEntry ::= SEQUENCE {
+        vspNASSessionSlotNo             INTEGER,
+        vspNASSessionPortNo             INTEGER,
+        vspNASSessionValidFlag          INTEGER,
+        vspNASSessionUserGroup          INTEGER,
+        vspNASSessionUserName           DisplayString,
+        vspNASSessionUserIPAddress      IpAddress,
+        vspNASSessionUserSubNetMask     IpAddress,
+        vspNASSessionServiceType        INTEGER,
+        vspNASSessionUserCallingNumber  DisplayString,
+        vspNASSessionUserOnlineTime     INTEGER
+    }
+
+    vspNASSessionSlotNo OBJECT-TYPE
+    SYNTAX          INTEGER(0..15)
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "Slot number of VSP board or HSP board. It forms the index of this table"
+    ::= { vspNASSessionEntry 1 }
+
+    vspNASSessionPortNo OBJECT-TYPE
+    SYNTAX          INTEGER(0..123)
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "
+                    Port number of VSP board or HSP board. For VSP board, it is a DSP port and the range is 0-119. For HSP board, it is an ISDN port and the range is 0-123.
+                    "
+    ::= { vspNASSessionEntry 2 }
+
+    vspNASSessionValidFlag OBJECT-TYPE
+    SYNTAX          INTEGER{
+                        invalid(1),
+                        valid(2)
+                    }
+    ACCESS          read-write
+    STATUS          mandatory
+    DESCRIPTION     "
+                    Session validity flag. invalid(1) indicates that there is no user connected through this port currently and the data has no meaning. valid(2) indicates that there is an user connected through this port currently. If this object is valid(2), setting this object to be invalid(1) via NM station will break user connection through this port.
+                    "
+    ::= { vspNASSessionEntry 3 }
+
+    vspNASSessionUserGroup OBJECT-TYPE
+    SYNTAX          INTEGER(0..300)
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "
+                    User group. This device supports virtual ISP and there is user group concept. The user group range is 1-300. If the validity flag is invalid(1), this object returns 0.
+                    "
+    ::= { vspNASSessionEntry 4 }
+
+    vspNASSessionUserName OBJECT-TYPE
+    SYNTAX          DisplayString(SIZE(0..64))
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "User name. If the validity flag is invalid(1), this object will return NULL."
+    ::= { vspNASSessionEntry 5 }
+
+    vspNASSessionUserIPAddress OBJECT-TYPE
+    SYNTAX          IpAddress
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "User IP address. If the validity flag is invalid(1), this object will return 0.0.0.0."
+    ::= { vspNASSessionEntry 6 }
+
+    vspNASSessionUserSubNetMask OBJECT-TYPE
+    SYNTAX          IpAddress
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "User IP address subnet mask. If the validity flag is invalid(1), this object will return 0.0.0.0."
+    ::= { vspNASSessionEntry 7 }
+
+    vspNASSessionServiceType OBJECT-TYPE
+    SYNTAX          INTEGER{
+                        none(1),
+                        other(2),               --none of the following
+                        ppp(3),                 --Point-To-Point Protocol
+                        slip(4),                --Serial Line IP
+                        mpp(5),                 --Multichannel PPP
+                        x25(6),                 --X.25
+                        combinet(7),            --Combinet
+                        frameRelay(8),          --Frame Relay
+                        euraw(9),
+                        euui(10),
+                        txt-telnet(11),         --telnet
+                        bin-telnet(12),         --binary telnet
+                        rawtcp-suffix(13),      --raw TCP
+                        terminalserver(14),     --terminal server
+                        mp(15),                 --Multilink PPP
+                        vpn-suffix(16),         --Virtual Private Network
+                        callback(17),
+                        rlogin-suffix(18),
+                        tcpclear(19)
+                    }
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "User service type. If the validity flag is invalid(1), this object will return none(1)."
+    ::= { vspNASSessionEntry 8 }
+
+    vspNASSessionUserCallingNumber OBJECT-TYPE
+    SYNTAX          DisplayString(SIZE(0..25))
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "Calling number. If the validity flag is invalid(1), this object will return NULL."
+    ::= { vspNASSessionEntry 9 }
+
+    vspNASSessionUserOnlineTime OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "Connection duration. The unit is second. If the validity flag is invalid(1), this object will return NULL."
+    ::= { vspNASSessionEntry 10 }
+
+
+--Access service call statistics table of VSP board and HSP board
+    vspNASCallStatisticsTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF VspNASCallStatisticsEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "Access service call statistics table of VSP board and HSP board. It contains the connection information statistics of various calls since board reset."
+    ::= { vspServiceInfoGroup 5 }
+
+    vspNASCallStatisticsEntry OBJECT-TYPE
+    SYNTAX          VspNASCallStatisticsEntry
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "It contains objects describing call connection statistics information of VSP board and HSP board."
+    INDEX           { vspNASCallStatisticsSlotNo }
+    ::= { vspNASCallStatisticsTable 1 }
+
+    VspNASCallStatisticsEntry ::= SEQUENCE {
+        vspNASCallStatisticsSlotNo                  INTEGER,
+        vspNASCallStatisticsCurrentAnalogIncoming   INTEGER,
+        vspNASCallStatisticsCurrentAnalogOutgoing   INTEGER,
+        vspNASCallStatisticsCurrentDigitalIncoming  INTEGER,
+        vspNASCallStatisticsCurrentDigitalOutgoing  INTEGER,
+        vspNASCallStatisticsCurrentV110Incoming     INTEGER,
+        vspNASCallStatisticsCurrentV110Outgoing     INTEGER,
+        vspNASCallStatisticsCurrentV120Incoming     INTEGER,
+        vspNASCallStatisticsCurrentV120Outgoing     INTEGER,
+        vspNASCallStatisticsCurrentAnalogLogonSuc   INTEGER,
+        vspNASCallStatisticsCurrentDigitalLogonSuc  INTEGER,
+        vspNASCallStatisticsCurrentV110LogonSuc     INTEGER,
+        vspNASCallStatisticsCurrentV120LogonSuc     INTEGER,
+        vspNASCallStatisticsTotalAnalogIncoming     INTEGER,
+        vspNASCallStatisticsTotalAnalogOutgoing     INTEGER,
+        vspNASCallStatisticsTotalDigitalIncoming    INTEGER,
+        vspNASCallStatisticsTotalDigitalOutgoing    INTEGER,
+        vspNASCallStatisticsTotalV110Incoming       INTEGER,
+        vspNASCallStatisticsTotalV110Outgoing       INTEGER,
+        vspNASCallStatisticsTotalV120Incoming       INTEGER,
+        vspNASCallStatisticsTotalV120Outgoing       INTEGER,
+        vspNASCallStatisticsTotalAnalogLogonSuc     INTEGER,
+        vspNASCallStatisticsTotalDigitalLogonSuc    INTEGER,
+        vspNASCallStatisticsTotalV110LogonSuc       INTEGER,
+        vspNASCallStatisticsTotalV120LogonSuc       INTEGER,
+        vspNASCallStatisticsTotalAnalogLogoutSuc    INTEGER,
+        vspNASCallStatisticsTotalDigitalLogoutSuc   INTEGER,
+        vspNASCallStatisticsTotalV110LogoutSuc      INTEGER,
+        vspNASCallStatisticsTotalV120LogoutSuc      INTEGER
+    }
+
+    vspNASCallStatisticsSlotNo OBJECT-TYPE
+    SYNTAX          INTEGER(0..15)
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "Slot number of VSP board or HSP board. It forms the index of this table."
+    ::= { vspNASCallStatisticsEntry 1 }
+
+    vspNASCallStatisticsCurrentAnalogIncoming OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "
+                    Number of current analog incoming calls. The number of current analog incoming calls
+                    on this VSP board is returned.
+                    "
+    ::= { vspNASCallStatisticsEntry 2 }
+
+    vspNASCallStatisticsCurrentAnalogOutgoing OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "
+                    Number of current analog outgoing calls. The number of current analog outgoing calls
+                    on this board is returned
+                    "
+    ::= { vspNASCallStatisticsEntry 3 }
+
+    vspNASCallStatisticsCurrentDigitalIncoming OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "
+                    Number of current digital incoming calls. The number of current analog incoming calls
+                    on this VSP board is returned.
+                    "
+    ::= { vspNASCallStatisticsEntry 4 }
+
+    vspNASCallStatisticsCurrentDigitalOutgoing OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "
+                    Number of current digital outgoing calls. The number of current digital outgoing calls
+                    on this board is returned
+                    "
+    ::= { vspNASCallStatisticsEntry 5 }
+
+    vspNASCallStatisticsCurrentV110Incoming OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "
+                    Number of current V110 incoming calls. The current number of V.110 incoming calls
+                    since system bootup or last clear of the variable is returned.
+                    "
+    ::= { vspNASCallStatisticsEntry 6 }
+
+    vspNASCallStatisticsCurrentV110Outgoing OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "
+                    Number of current V110 outgoing calls. The current number of V.110 outgoing calls
+                    since system bootup or last clear of the variable is returned.
+                    "
+    ::= { vspNASCallStatisticsEntry 7 }
+
+    vspNASCallStatisticsCurrentV120Incoming OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "
+                    Number of current V120 incoming calls. The current number of V.120 incoming calls
+                    since system bootup or last clear of the variable is returned.
+                    "
+    ::= { vspNASCallStatisticsEntry 8 }
+
+    vspNASCallStatisticsCurrentV120Outgoing OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "
+                    Number of current V120 outgoing calls. The current number of V.120 outgoing calls
+                    since system bootup or last clear of the variable is returned.
+                    "
+    ::= { vspNASCallStatisticsEntry 9 }
+
+    vspNASCallStatisticsCurrentAnalogLogonSuc OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "Number of current analog connection successes. Connection success means that an user gets online normally."
+    ::= { vspNASCallStatisticsEntry 10 }
+
+    vspNASCallStatisticsCurrentDigitalLogonSuc OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "Number of current digital connection successes"
+    ::= { vspNASCallStatisticsEntry 11 }
+
+    vspNASCallStatisticsCurrentV110LogonSuc OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "Number of current V110 connection successes"
+    ::= { vspNASCallStatisticsEntry 12 }
+
+    vspNASCallStatisticsCurrentV120LogonSuc OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "Number of current V120 connection successes"
+    ::= { vspNASCallStatisticsEntry 13 }
+
+    vspNASCallStatisticsTotalAnalogIncoming OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "
+                    Number of total analog incoming calls since the last board restart or the last variable clear.
+                    The total number of analog incoming calls since system
+                    bootup or last clear of the variable is returned.
+                    s"
+    ::= { vspNASCallStatisticsEntry 14 }
+
+    vspNASCallStatisticsTotalAnalogOutgoing OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "
+                     Number of total analog outgoing calls since the last board restart or the last variable clear.
+                    The total number of analog outgoing calls
+                    since system bootup or last clear of the
+                    variable is returned.
+                    "
+    ::= { vspNASCallStatisticsEntry 15 }
+
+    vspNASCallStatisticsTotalDigitalIncoming OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "
+                     Number of total digital incoming calls since the last board restart or the last variable clear.
+                    The total number of digital incoming calls
+                    since system bootup or last clear of the
+                    variable is returned.
+                    "
+    ::= { vspNASCallStatisticsEntry 16 }
+
+    vspNASCallStatisticsTotalDigitalOutgoing OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "
+                     Number of total digital outgoing calls since the last board restart or the last variable clear.
+                    The total number of digital outgoing calls
+                    since system bootup or last clear of the
+                    variable is returned.
+                    "
+    ::= { vspNASCallStatisticsEntry 17 }
+
+
+    vspNASCallStatisticsTotalV110Incoming OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "
+                     Number of total V110 incoming calls since the last board restart or the last variable clear.
+                    The total number of V.110 incoming calls
+                    since system bootup or last clear of the
+                    variable is returned.
+                    "
+    ::= { vspNASCallStatisticsEntry 18 }
+
+    vspNASCallStatisticsTotalV110Outgoing OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "
+                     Number of total V110 outgoing calls since the last board restart or the last variable clear.
+                    The total number of V.110 outgoing calls
+                    since system bootup or last clear of the
+                    variable is returned.
+                    "
+    ::= { vspNASCallStatisticsEntry 19 }
+
+    vspNASCallStatisticsTotalV120Incoming OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "
+                     Number of total V120 incoming calls since the last board restart or the last variable clear.
+                    The total number of V.120 incoming calls
+                    since system bootup or last clear of the
+                    variable is returned.
+                    "
+    ::= { vspNASCallStatisticsEntry 20 }
+
+    vspNASCallStatisticsTotalV120Outgoing OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "
+                     Number of total V120 outgoing calls since the last board restart or the last variable clear.
+                    The total number of V.120 outgoing calls
+                    since system bootup or last clear of the
+                    variable is returned.
+                    "
+    ::= { vspNASCallStatisticsEntry 21 }
+
+    vspNASCallStatisticsTotalAnalogLogonSuc OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     " Number of total analog connection successes since the last board restart or the last variable clear."
+    ::= { vspNASCallStatisticsEntry 22 }
+
+    vspNASCallStatisticsTotalDigitalLogonSuc OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     " Number of total digital connection successes since the last board restart or the last variable clear."
+    ::= { vspNASCallStatisticsEntry 23 }
+
+    vspNASCallStatisticsTotalV110LogonSuc OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     " Number of total V110 connection successes since the last board restart or the last variable clear."
+    ::= { vspNASCallStatisticsEntry 24 }
+
+    vspNASCallStatisticsTotalV120LogonSuc OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     " Number of total V120 connection successes since the last board restart or the last variable clear."
+
+    ::= { vspNASCallStatisticsEntry 25 }
+
+    vspNASCallStatisticsTotalAnalogLogoutSuc OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "
+                    Number of total normal analog disconnections since the last board restart or the last variable clear. Normal disconnection means that an user, after he succeeds in connection, makes an active hangup and then is disconnected instead of being disconnected due to other abnormal causes.
+                    "
+    ::= { vspNASCallStatisticsEntry 26 }
+
+    vspNASCallStatisticsTotalDigitalLogoutSuc OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "Number of total normal digital disconnections since the last board restart or the last variable clear."
+    ::= { vspNASCallStatisticsEntry 27 }
+
+    vspNASCallStatisticsTotalV110LogoutSuc OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "Number of total normal V110 disconnections since the last board restart or the last variable clear."
+    ::= { vspNASCallStatisticsEntry 28 }
+
+    vspNASCallStatisticsTotalV120LogoutSuc OBJECT-TYPE
+    SYNTAX          INTEGER
+    ACCESS          read-only
+    STATUS          mandatory
+    DESCRIPTION     "Number of total normal V120 disconnections since the last board restart or the last variable clear."
+    ::= { vspNASCallStatisticsEntry 29 }
+
+
+
+
+--Maintenance and alarm part. It implements maintenance operation cooperating with network management. 
+
+
+    seekUserTrap    TRAP-TYPE
+    ENTERPRISE      devMainTainTrapGroup
+    VARIABLES       {
+                        seekUserType,
+                        seekUserIP,
+                        seekUserName,
+                        seekUserCallingNumber,
+                        seekUserRst,
+                        seekUserBoard,
+                        seekUserPort,
+                        seekUserGroupNo,
+                        seekUserServiceType,
+                        seekUserAccessType,
+                        seekUserSessionTime,
+                        seekUserRxRate,
+                        seekUserTxRate,
+                        seekUserCalledNumber
+                    }
+    DESCRIPTION     "The result of querying user of NAS board"
+    ::= 27
+
+    kickUserTrap    TRAP-TYPE
+    ENTERPRISE      devMainTainTrapGroup
+    VARIABLES       {
+                        kickUserType,
+                        kickUserIP,
+                        kickUserName,
+                        kickUserCallingNumber,
+                        kickUserRst,
+                        kickUserBoard,
+                        kickUserPort,
+                        kickUserGroupNo,
+                        kickUserServiceType,
+                        kickUserAccessType,
+                        kickUserSessionTime,
+                        kickUserRxRate,
+                        kickUserTxRate,
+                        kickUserCalledNumber
+                    }
+    DESCRIPTION     "The result of NAS board kicking user offline"
+    ::= 28
+
+--Equipment alrm
+
+--In order to define the alarm, some MIB objects should be defined. For those objects, operations such as SNMP GET are not supported.
+    alarmLevel      OBJECT-TYPE
+    SYNTAX          INTEGER{
+                       emergencyAlarm(1),
+                       importantAlarm(2),
+                       generalAlarm(3),
+                       promptAlarm(4)
+
+                    }
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "
+                        Alarm level: 
+                        emergencyAlarm(1):  emergency Alarm
+                        importantAlarm(2):  important Alarm
+                        generalAlarm(3):    eneral Alarm
+                        promptAlarm(4):     prompt Alarm
+                    Please refer Regulations of C&C08 Switch Network Management Alarm Report for the specific definitions.
+                    "
+    ::= { devAlarmMibGroup 1 }
+
+    alarmNMCategory OBJECT-TYPE
+    SYNTAX          INTEGER{
+                        powerSupply(1),
+                        environment(2),
+                        signaling(3),
+                        trunk(4),
+                        hardware(5),
+                        software(6),
+                        operation(7),
+                        communicationFault(8),
+                        serviceQuality(9),
+                        handlingError(10)
+                    }
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "
+                     Classification of network management alarm:
+                        powerSupply:    Power Supply Alarm
+                        environment:    Environment Alarm 
+                        signaling:      Signaling Alarm
+                        trunk:          Trunk Alarm
+                        hardware:       Hardware Alarm
+                        software:       Software Alarm
+                        operation:      Operation Alarm
+                        communicationFault:   Communication Fault Alarm
+                        serviceQuality:  Service Quality Alarm
+                        handlingError:    HandlingError Alarm
+                    Please refer to Regulations of C&C08 Switch Network Management Alarm Report for the specific definitions.
+                    "
+    ::= { devAlarmMibGroup 2 }
+
+    alarmContents   OBJECT-TYPE
+    SYNTAX          DisplayString
+    ACCESS          not-accessible
+    STATUS          mandatory
+    DESCRIPTION     "
+                    The content of MML alarm is a string of a certain format.
+                    Please refer to Regulations of C&C08 Switch Network Management Alarm Report for the specific formats.
+                    "
+    ::= { devAlarmMibGroup 3 }
+
+
+--Definition of alarm
+    alarmMML        TRAP-TYPE
+    ENTERPRISE      devAlarmTrapGroup
+    VARIABLES       {
+                        alarmLevel,
+                        alarmNMCategory,
+                        alarmContents
+                    }
+    DESCRIPTION     "
+                    The MMl alarm is transmitted in Trap mode. Alarm level indicates the alarm level and Alarm NM Category indicates the alarm category.
+                    Alarm contents indicate the string contents of MML alarm and the string is accordant with the Regulations of cc08 Network Management Alarm Report.
+                    "
+    ::= 1
+
+    alarmSlotBoardChange TRAP-TYPE
+    ENTERPRISE      devAlarmTrapGroup
+    VARIABLES       {
+                        slotBoardSlotNo,
+                        slotBoardType,
+                        slotBoardStatus
+                    }
+    DESCRIPTION     "Board position changes TRAP. When the status of an equipment board or board type changes, it will be sent out by the equipment. "
+    ::= 2
+
+    alarmBoardLed   TRAP-TYPE
+    ENTERPRISE      devAlarmTrapGroup
+    VARIABLES       {
+                        boardLedStatusSlotNo,
+                        boardLedStatusAlmLed
+                    }
+    DESCRIPTION     "Board alarm indicator changes TRAP. When the status of an equipment board alarm indicator changes, it will be sent out by the equipment."
+    ::= 10001
+
+END
+
+

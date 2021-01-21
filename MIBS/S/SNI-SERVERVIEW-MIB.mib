@@ -1,0 +1,495 @@
+SNI-SERVERVIEW-MIB DEFINITIONS ::= BEGIN
+
+-- Fujitsu Siemens ServerView FrontEnd Application MIB
+
+--
+-- $Copyright$
+-- Copyright (C) Siemens Nixdorf Informationssysteme AG 1997
+-- Copyright (C) Fujitsu Siemens Computers GmbH 2001
+-- All rights reserved
+--
+
+IMPORTS
+        OBJECT-TYPE                             FROM RFC-1212
+        mib-2, DisplayString                    FROM RFC1213-MIB
+        TimeTicks, Counter, Gauge, enterprises  FROM RFC1155-SMI;
+
+--
+-- The Windows NT MIB compiler doesn't do IMPORTS.
+-- So, include these definitions here. NT defines "DisplayString" as
+-- OCTET STRING (SIZE(0..255)), in RFC1213 it has no explicit size.
+--
+-- DisplayString ::= OCTET  STRING
+-- enterprises     OBJECT IDENTIFIER ::= { iso org(3) dod(6) internet(1) private(4) 1 }
+--
+
+-- Trap IDs for all ServerView MIBs:
+-- Trap enterprise is "sniServerMgmt".
+
+-- SNI Trap MIB:            000..199, 300..399  (enterprise "sni"!!)
+-- SNI Mylex MIB:           200..299
+-- SNI ServerControl MIB:   600..699
+-- SNI ServerView MIB:      700..749  (this MIB)
+-- SNI Harddisk MIB:        750..800
+
+-- SNI Server Management MIB nodes
+
+	sni					OBJECT IDENTIFIER       ::= { enterprises    231 }
+
+	sniProductMibs		OBJECT IDENTIFIER       ::= { sni              2 }
+	sniExtensions		OBJECT IDENTIFIER       ::= { sniProductMibs  10 }
+	sniServerMgmt		OBJECT IDENTIFIER		::= { sniExtensions    2 }
+	sniInventory		OBJECT IDENTIFIER       ::= { sniServerMgmt    1 }
+	sniCommon			OBJECT IDENTIFIER		::= { sniServerMgmt    2 }
+	  sniBios			OBJECT IDENTIFIER		::= { sniCommon        1 }
+	  sniEisa			OBJECT IDENTIFIER		::= { sniCommon        2 }
+	  sniHd				OBJECT IDENTIFIER		::= { sniCommon        3 }
+	  sniBus			OBJECT IDENTIFIER		::= { sniCommon        4 }
+	  sniServerControl	OBJECT IDENTIFIER		::= { sniCommon        5 }
+	sniPcSpecific		OBJECT IDENTIFIER		::= { sniServerMgmt    3 }
+	sniScb				OBJECT IDENTIFIER		::= { sniServerMgmt    4 }
+	sniOsSpecific		OBJECT IDENTIFIER		::= { sniServerMgmt    5 }
+	  sniNetware		OBJECT IDENTIFIER		::= { sniOsSpecific    1 }
+	  sniWinNt			OBJECT IDENTIFIER		::= { sniOsSpecific    2 }
+	  sniOs2			OBJECT IDENTIFIER		::= { sniOsSpecific    3 }
+	  sniUnix			OBJECT IDENTIFIER		::= { sniOsSpecific    4 }
+	sniOemComponents	OBJECT IDENTIFIER		::= { sniServerMgmt    6 }
+	  sniOemDpt			OBJECT IDENTIFIER		::= { sniOemComponents 1 }
+	  sniOemMylex		OBJECT IDENTIFIER		::= { sniOemComponents 2 }
+	    sniMlxDiskArray	OBJECT IDENTIFIER		::= { sniOemMylex      1 }
+	sniSecurity			OBJECT IDENTIFIER		::= { sniServerMgmt    7 }
+	  sniSmSecurity		OBJECT IDENTIFIER		::= { sniSecurity      1 }
+	sniServerView		OBJECT IDENTIFIER       ::= { sniServerMgmt    8 }
+	sniTrapMib			OBJECT IDENTIFIER       ::= { sniExtensions    5 }
+
+  
+-- ServerView-MIB groups
+
+	sniServerViewTrapInfo  OBJECT IDENTIFIER	::= { sniServerView 1  }
+
+
+
+-- GROUP: sniServerViewTrapInfo
+-- Implementation of this group is mandatory
+
+
+-- trap info variables
+
+ sniServerViewServerName   OBJECT-TYPE
+     SYNTAX          DisplayString
+     ACCESS          read-only
+     STATUS          mandatory
+     DESCRIPTION     "Name of server the trap occured"
+
+     ::= { sniServerViewTrapInfo 1 }
+
+ sniServerViewTrapTime   OBJECT-TYPE
+     SYNTAX          INTEGER
+     ACCESS          not-accessible
+     STATUS          mandatory
+     DESCRIPTION	 "Time the trap occured (in seconds since 01/01/1970 00:00h)"
+
+     ::= { sniServerViewTrapInfo 2 }
+
+ sniServerViewOrigServerName   OBJECT-TYPE
+     SYNTAX          DisplayString
+     ACCESS          not-accessible
+     STATUS          mandatory
+     DESCRIPTION     "Name of the server this forwarded trap originally comes from"
+     ::= { sniServerViewTrapInfo 3 }
+
+ sniServerViewOrigTrapTime   OBJECT-TYPE
+     SYNTAX          INTEGER
+     ACCESS          not-accessible
+     STATUS          mandatory
+     DESCRIPTION     "Time this forwarded trap originally was sent"
+     ::= { sniServerViewTrapInfo 4 }
+
+ sniServerViewOrigTrapName   OBJECT-TYPE
+     SYNTAX          DisplayString
+     ACCESS          not-accessible
+     STATUS          mandatory
+     DESCRIPTION     "Name this forwarded trap originally had"
+     ::= { sniServerViewTrapInfo 5 }
+
+ sniServerViewNumber   OBJECT-TYPE
+     SYNTAX          INTEGER
+     ACCESS          not-accessible
+     STATUS          mandatory
+     DESCRIPTION     "Generic parameter for any numeric number"
+     ::= { sniServerViewTrapInfo 6 }
+
+ sniServerViewState   OBJECT-TYPE
+     SYNTAX          DisplayString
+     ACCESS          not-accessible
+     STATUS          mandatory
+     DESCRIPTION     "New state of server"
+     ::= { sniServerViewTrapInfo 7 }
+
+sniServerViewOrigTrapDetails	OBJECT-TYPE
+     SYNTAX          DisplayString
+     ACCESS          not-accessible
+     STATUS          mandatory
+     DESCRIPTION     "Original alarm details"
+     ::= { sniServerViewTrapInfo 8 }
+
+sieServerViewAlarmServiceCommand	OBJECT-TYPE
+     SYNTAX          INTEGER {
+		connect(1), 
+		disconnect(2), 
+		ping(3),
+		echo(4)
+		}
+     ACCESS          not-accessible
+     STATUS          mandatory
+     DESCRIPTION     "Command code for the communication protocol between Alarm Service
+     				  and Front End."
+     ::= { sniServerViewTrapInfo 9 }
+
+sieServerViewTrapSeverity   OBJECT-TYPE
+     SYNTAX          INTEGER {
+     	unknown(0),
+		critical(1), 
+		major(2), 
+		minor(3),
+		informational(4)
+		}
+     ACCESS          not-accessible
+     STATUS          mandatory
+     DESCRIPTION	 "Alarm severity"
+
+     ::= { sniServerViewTrapInfo 10 }
+
+fscSvObjectName   OBJECT-TYPE
+     SYNTAX          DisplayString
+     ACCESS          not-accessible
+     STATUS          mandatory
+     DESCRIPTION     "Name of an object (server/group)"
+     ::= { sniServerViewTrapInfo 11 }
+
+fscSvObjectId	OBJECT-TYPE
+     SYNTAX          INTEGER
+     ACCESS          not-accessible
+     STATUS          mandatory
+     DESCRIPTION     "Any object ID or number"
+     ::= { sniServerViewTrapInfo 12 }
+
+fscSvServerIPAddress	OBJECT-TYPE
+	SYNTAX 		DisplayString
+	ACCESS 		read-only
+	STATUS 		mandatory
+	DESCRIPTION 	"IPAddress of server"
+	::= { sniServerViewTrapInfo 13 }
+
+
+
+--
+-- the trap definitions
+--
+
+sniSvGenericTrapForward	TRAP-TYPE
+	ENTERPRISE      sniServerMgmt
+	VARIABLES 
+	{ 
+		sniServerViewServerName, 
+		sniServerViewTrapTime,
+		sniServerViewOrigServerName, 
+		sniServerViewOrigTrapName
+	}
+	DESCRIPTION
+		"Forwarded if ServerView application receives a trap to be forwarded - 
+		 it is a generic trap"
+    --#TYPE		"ServerView alarm received"
+    --#SUMMARY		"The server %s sent the trap <%s> to ServerView application at station %s"
+    --#ARGUMENTS	{ 2, 3, 0}
+    --#SEVERITY		INFORMATIONAL
+    --#TIMEINDEX	1
+    --#STATE		OPERATIONAL
+	::= 700
+
+
+sniSvPagerOff        TRAP-TYPE
+     ENTERPRISE      sniServerMgmt
+     VARIABLES       { sniServerViewServerName, sniServerViewTrapTime, sniServerViewNumber }
+     DESCRIPTION
+         "Turn off the specified pager at the ServerView frontend application.
+		  This trap was moved from the SNI Trap-MIB to this MIB because of 
+		  a trap ID conflict with SNI Mylex-MIB."
+     --#TYPE      "Pager turn off"
+     --#SUMMARY   "Pager number %d should be turned off."
+     --#ARGUMENTS { 2 }
+     --#SEVERITY  INFORMATIONAL
+     --#TIMEINDEX 1
+     --#STATE     OPERATIONAL
+     ::= 701
+
+sniSvServerStateChanged	TRAP-TYPE
+	ENTERPRISE      sniServerMgmt
+	VARIABLES 
+	{ 
+		sniServerViewServerName, 
+		sniServerViewTrapTime,
+		sniServerViewState
+	}
+	DESCRIPTION
+		"Generated by ServerView application if Server changes state (manageable/not manageable)"
+    --#TYPE			"Server changed state"
+    --#SUMMARY		"The server %s has changed its state to %s"
+    --#ARGUMENTS	{ 0, 2}
+    --#SEVERITY		INFORMATIONAL
+    --#TIMEINDEX	1
+    --#STATE		OPERATIONAL
+	::= 702
+
+sniSvPassThroughTrapForward	TRAP-TYPE
+	ENTERPRISE      sniServerMgmt
+	VARIABLES 
+	{ 
+		sniServerViewServerName, 
+		sniServerViewTrapTime,
+		sniServerViewOrigServerName, 
+		sniServerViewOrigTrapName,
+		sniServerViewOrigTrapDetails
+	}
+	DESCRIPTION
+		"Forwarded if ServerView application receives a trap to be forwarded  - 
+		 the original ServerName and Severity is retained"
+    --#TYPE		"ServerView alarm passed through"
+    --#SUMMARY		"%s"
+    --#ARGUMENTS	{ 4 }
+    --#SEVERITY		INFORMATIONAL
+    --#TIMEINDEX	1
+    --#STATE		OPERATIONAL
+	::= 703
+
+sieSvAlarmServiceCommand	TRAP-TYPE
+	ENTERPRISE      sniServerMgmt
+	VARIABLES 
+	{ 
+		sniServerViewServerName, 
+		sniServerViewTrapTime,
+		sieServerViewAlarmServiceCommand
+	}
+	DESCRIPTION
+		"Command of the communication protocol between Alarm Service
+     	 and Front End."
+    --#TYPE		"Alarm Service Command"
+    --#SUMMARY		"Command %d from server %s."
+    --#ARGUMENTS	{ 2, 0 }
+    --#SEVERITY		INFORMATIONAL
+    --#TIMEINDEX	1
+    --#STATE		OPERATIONAL
+	::= 704
+	
+fscSvServerAdded	TRAP-TYPE
+	ENTERPRISE      sniServerMgmt
+	VARIABLES 
+	{ 
+		sniServerViewServerName, 
+		sniServerViewTrapTime,
+		fscSvObjectName
+	}
+	DESCRIPTION
+		"Sent to all ServerView clients that had registered a notification port if
+		 one or more servers were added to the server list.
+		 The argument fscSvObjectName may be empty. In that case the SeverView database must be explored."
+    --#TYPE		"Server added"
+    --#SUMMARY		"Server %s was added."
+    --#ARGUMENTS	{ 2 }
+    --#SEVERITY		INFORMATIONAL
+    --#TIMEINDEX	1
+    --#STATE		OPERATIONAL
+	::= 705
+	
+fscSvServerRemoved	TRAP-TYPE
+	ENTERPRISE      sniServerMgmt
+	VARIABLES 
+	{ 
+		sniServerViewServerName, 
+		sniServerViewTrapTime,
+		fscSvObjectName
+	}
+	DESCRIPTION
+		"Sent to all ServerView clients that had registered a notification port if
+		 one or more servers were removed from the server list.
+		 The argument fscSvObjectName may be empty. In that case the SeverView database must be explored."
+    --#TYPE		"Server removed"
+    --#SUMMARY		"Server %s was removed."
+    --#ARGUMENTS	{ 2 }
+    --#SEVERITY		INFORMATIONAL
+    --#TIMEINDEX	1
+    --#STATE		OPERATIONAL
+	::= 706
+
+fscSvServerChanged	TRAP-TYPE
+	ENTERPRISE      sniServerMgmt
+	VARIABLES 
+	{ 
+		sniServerViewServerName, 
+		sniServerViewTrapTime,
+		fscSvObjectName
+	}
+	DESCRIPTION
+		"Sent to all ServerView clients that had registered a notification port if
+		 one or more servers were changed in the server list.
+		 The argument fscSvObjectName may be empty. In that case the SeverView database must be explored."
+    --#TYPE		"Server changed"
+    --#SUMMARY		"Server %s was changed."
+    --#ARGUMENTS	{ 2 }
+    --#SEVERITY		INFORMATIONAL
+    --#TIMEINDEX	1
+    --#STATE		OPERATIONAL
+	::= 707
+	
+fscSvServerStatusChanged	TRAP-TYPE
+	ENTERPRISE      sniServerMgmt
+	VARIABLES 
+	{ 
+		sniServerViewServerName, 
+		sniServerViewTrapTime,
+		fscSvObjectName
+	}
+	DESCRIPTION
+		"Sent to all ServerView clients that had registered a notification port if
+		 one or more servers changed their status in the server list.
+		 The argument fscSvObjectName may be empty. In that case the SeverView database must be explored."
+    --#TYPE		"Server status changed"
+    --#SUMMARY		"Server status %s was changed."
+    --#ARGUMENTS	{ 2 }
+    --#SEVERITY		INFORMATIONAL
+    --#TIMEINDEX	1
+    --#STATE		OPERATIONAL
+	::= 708
+	
+fscSvGroupAdded	TRAP-TYPE
+	ENTERPRISE      sniServerMgmt
+	VARIABLES 
+	{ 
+		sniServerViewServerName, 
+		sniServerViewTrapTime,
+		fscSvObjectName,
+		fscSvObjectId
+	}
+	DESCRIPTION
+		"Sent to all ServerView clients that had registered a notification port if
+		 a group was added to the server list."
+    --#TYPE		"Group added"
+    --#SUMMARY		"Group (%s, %d) was added."
+    --#ARGUMENTS	{ 2, 3 }
+    --#SEVERITY		INFORMATIONAL
+    --#TIMEINDEX	1
+    --#STATE		OPERATIONAL
+	::= 709
+	
+fscSvGroupRemoved	TRAP-TYPE
+	ENTERPRISE      sniServerMgmt
+	VARIABLES 
+	{ 
+		sniServerViewServerName, 
+		sniServerViewTrapTime,
+		fscSvObjectName,
+		fscSvObjectId
+	}
+	DESCRIPTION
+		"Sent to all ServerView clients that had registered a notification port if
+		 a group was removed from the server list."
+    --#TYPE		"Group removed"
+    --#SUMMARY		"Group (%s, %d) was removed."
+    --#ARGUMENTS	{ 2, 3 }
+    --#SEVERITY		INFORMATIONAL
+    --#TIMEINDEX	1
+    --#STATE		OPERATIONAL
+	::= 710
+
+fscSvGroupChanged	TRAP-TYPE
+	ENTERPRISE      sniServerMgmt
+	VARIABLES 
+	{ 
+		sniServerViewServerName, 
+		sniServerViewTrapTime,
+		fscSvObjectName,
+		fscSvObjectId
+	}
+	DESCRIPTION
+		"Sent to all ServerView clients that had registered a notification port if
+		 a group was changed in the server list."
+    --#TYPE		"Group changed"
+    --#SUMMARY		"Group (%s, %d) was changed."
+    --#ARGUMENTS	{ 2, 3 }
+    --#SEVERITY		INFORMATIONAL
+    --#TIMEINDEX	1
+    --#STATE		OPERATIONAL
+	::= 711
+
+fscSvExploreServer	TRAP-TYPE
+	ENTERPRISE      sniServerMgmt
+	VARIABLES 
+	{ 
+		sniServerViewServerName, 
+		sniServerViewTrapTime,
+		fscSvObjectName
+	}
+	DESCRIPTION
+		"Sent to a registered notification port of the ServerList Service if
+		 one or more servers should be explored immediately.
+		 The argument fscSvObjectName may be empty. In that case the SeverView database must be inspected."
+    --#TYPE		"Explore server"
+    --#SUMMARY		"Explore server %s."
+    --#ARGUMENTS	{ 2 }
+    --#SEVERITY		INFORMATIONAL
+    --#TIMEINDEX	1
+    --#STATE		OPERATIONAL
+	::= 712
+
+fscAsTestMail	TRAP-TYPE
+	ENTERPRISE      sniServerMgmt
+	VARIABLES 
+	{ 
+		sniServerViewServerName,
+		sniServerViewTrapTime
+	}
+	DESCRIPTION
+		"Generated by ServerView Alarm Service application if it sends a test mail"
+    --#TYPE			"Alarm Service Test Mail"
+    --#SUMMARY		"The Alarm Service on server %s sends a test mail."
+    --#ARGUMENTS	{ 0 }
+    --#SEVERITY		INFORMATIONAL
+    --#TIMEINDEX	1
+    --#STATE		OPERATIONAL
+	::= 747
+
+fscAsTestPager	TRAP-TYPE
+	ENTERPRISE      sniServerMgmt
+	VARIABLES 
+	{ 
+		sniServerViewServerName,
+		sniServerViewTrapTime
+	}
+	DESCRIPTION
+		"Generated by ServerView Alarm Service application if it tests a pager"
+    --#TYPE			"Alarm Service Test Pager"
+    --#SUMMARY		"The Alarm Service on server %s tests a pager."
+    --#ARGUMENTS	{ 0 }
+    --#SEVERITY		INFORMATIONAL
+    --#TIMEINDEX	1
+    --#STATE		OPERATIONAL
+	::= 748
+
+fscAsStopTrapListenService	TRAP-TYPE
+	ENTERPRISE      sniServerMgmt
+	VARIABLES 
+	{ 
+		sniServerViewServerName,
+		sniServerViewTrapTime
+	}
+	DESCRIPTION
+		"Generated by ServerView Alarm Service application to stop the TrapListen Service"
+    --#TYPE			"Alarm Service Stop Trap Listen Service"
+    --#SUMMARY		"The ServerView Alarm Service Trap Listen Service on server %s stops."
+    --#ARGUMENTS	{ 0 }
+    --#SEVERITY		INFORMATIONAL
+    --#TIMEINDEX	1
+    --#STATE		OPERATIONAL
+	::= 749
+
+END

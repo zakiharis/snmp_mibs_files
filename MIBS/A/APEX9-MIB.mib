@@ -1,0 +1,2470 @@
+-- Private MIB definition for CONVERGENCE TECHNOLOGIES
+-- CONVERGENCE TECHNOLOGIES OIDs - Enterprise 39229
+-- LL-1000 series of PtP microwave links
+-- Version:	1.0
+-- Date: January 23, 2012	
+--
+-- Reproduction of this document is authorized on condition that the
+-- foregoing copyright notice is included.
+
+-- MIB module for enterprise microwave link
+-- LL-1000
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+APEX9-MIB DEFINITIONS ::= BEGIN
+
+--------------------------------------------------------------------------------                                                                                
+IMPORTS
+	MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-TYPE,
+  enterprises, Counter64, Integer32, Counter32, TimeTicks, IpAddress, Unsigned32
+  FROM SNMPv2-SMI
+  TEXTUAL-CONVENTION, PhysAddress, RowStatus, 
+	MacAddress, DisplayString
+	FROM SNMPv2-TC;
+	
+--------------------------------------------------------------------------------
+apex9 MODULE-IDENTITY
+	LAST-UPDATED "201010200000Z"
+	ORGANIZATION 
+		"Apex9"
+	CONTACT-INFO 
+		"Apex9
+		 7934 South Madison
+		 BURR RIDGE, IL 60527
+		 Tel:   847.961.3170
+		 WWW:   www.apex9.com"
+	DESCRIPTION 
+		"MIB Definition for the Apex9 LL-1000:
+		 iso(1).org(3).dod(6).internet(1).private(4).enterprises(1).cti(39229)"
+::= { enterprises 39229 }
+--------------------------------------------------------------------------------
+
+brand      OBJECT IDENTIFIER ::= { apex9 1 }
+
+                                                                         
+products      OBJECT IDENTIFIER ::= { brand 1 }
+traps         OBJECT IDENTIFIER ::= { brand 2 }
+
+-- Product level definition
+--------------------------------------------------------------------------------
+ll1000         OBJECT IDENTIFIER ::= { products 2 }
+--------------------------------------------------------------------------------
+
+-- Function level definition
+--------------------------------------------------------------------------------
+sysFce        OBJECT IDENTIFIER ::= { ll1000 1 }
+cnfFce        OBJECT IDENTIFIER ::= { ll1000 2 }
+infoFce       OBJECT IDENTIFIER ::= { ll1000 3 }
+statFce       OBJECT IDENTIFIER ::= { ll1000 4 }
+--------------------------------------------------------------------------------
+--------------------------------------------------------------------------------
+
+
+--------------------------------------------------------------------------------
+-- 1. sysFce - System Function Level Section
+--------------------------------------------------------------------------------
+sysFceBas     OBJECT IDENTIFIER ::= { sysFce 1 }
+--------------------------------------------------------------------------------
+
+-- 1.1 SysFceBas - Basis System Function Level Section
+--------------------------------------------------------------------------------
+sysFceBasDev  OBJECT IDENTIFIER ::= { sysFceBas 1 }
+sysFceBasCmd  OBJECT IDENTIFIER ::= { sysFceBas 2 }
+--------------------------------------------------------------------------------
+
+-- 1.1.1  sysFceBasDev - Basic Device Description Section
+--------------------------------------------------------------------------------
+sysFceBasDevName      OBJECT-TYPE
+        SYNTAX        DisplayString(SIZE(2..24))
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Device Name"
+        ::= {sysFceBasDev 1}
+        
+sysFceBasDevAddDesc1  OBJECT-TYPE
+        SYNTAX        DisplayString(SIZE(0..70))
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Additional device desription #1"
+        ::= {sysFceBasDev 2}
+
+sysFceBasDevAddDesc2  OBJECT-TYPE
+        SYNTAX        DisplayString(SIZE(0..70))
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Additional device desription #2"
+        ::= {sysFceBasDev 3}
+                    
+sysFceBasDevAddDesc3  OBJECT-TYPE
+        SYNTAX        DisplayString(SIZE(0..70))
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Additional device desription #3"
+        ::= {sysFceBasDev 4}
+
+sysFceBasDevAddDesc4  OBJECT-TYPE
+        SYNTAX        DisplayString(SIZE(0..70))
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Additional device desription #4"
+        ::= {sysFceBasDev 5}
+        
+sysFceBasDevAddDesc5  OBJECT-TYPE
+        SYNTAX        DisplayString(SIZE(0..70))
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Additional device desription #5.
+                      The same text is displayed in web-browser page header"
+        ::= {sysFceBasDev 6}       
+
+sysFceBasDevDate      OBJECT-TYPE
+        SYNTAX        DisplayString(SIZE(10))
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Actual Date in format DD.MM.YYYY"
+        ::= {sysFceBasDev 7}
+
+sysFceBasDevTime      OBJECT-TYPE
+        SYNTAX        DisplayString(SIZE(8))
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Actual Time in format HH:MM:SS"
+        ::= {sysFceBasDev 8}
+
+sysFceBasDevIduProNum OBJECT-TYPE
+        SYNTAX        DisplayString(SIZE(20))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "IDU Product Number"
+        ::= {sysFceBasDev 9}
+
+sysFceBasDevIduSerNum OBJECT-TYPE
+        SYNTAX        DisplayString(SIZE(20))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "IDU Serial Number"
+        ::= {sysFceBasDev 10}
+
+sysFceBasDevOduProNum OBJECT-TYPE
+        SYNTAX        DisplayString(SIZE(20))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "ODU Product Number"
+        ::= {sysFceBasDev 11}
+
+sysFceBasDevOduSerNum OBJECT-TYPE
+        SYNTAX        DisplayString(SIZE(20))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "ODU Serial Number"
+        ::= {sysFceBasDev 12}
+
+sysFceBasDevIduHwBase OBJECT-TYPE
+        SYNTAX        DisplayString(SIZE(20))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "IDU firmware version - HwBase part"
+        ::= {sysFceBasDev 13}
+
+sysFceBasDevIduFwBase OBJECT-TYPE
+        SYNTAX        DisplayString(SIZE(20))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "IDU firmware version - FwBase part"
+        ::= {sysFceBasDev 14}
+
+sysFceBasDevIduOsKern OBJECT-TYPE
+        SYNTAX        DisplayString(SIZE(20))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "IDU firmware version - OsKernel part"
+        ::= {sysFceBasDev 15}        
+
+sysFceBasDevIduOsDev  OBJECT-TYPE
+        SYNTAX        DisplayString(SIZE(20))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "IDU firmware version - OsDev part"
+        ::= {sysFceBasDev 16}
+
+sysFceBasDevOduSwVer  OBJECT-TYPE
+        SYNTAX        DisplayString(SIZE(20))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "ODU firmware version"
+        ::= {sysFceBasDev 17}
+
+sysFceBasDevCpuMac    OBJECT-TYPE
+        SYNTAX        DisplayString(SIZE(20))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "MAC address of management CPU"
+        ::= {sysFceBasDev 18}
+        
+sysFceBasDevSysStat   OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      ok (0),
+                      warning (1),
+                      error (2)
+                      }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Actual System Status"
+        ::= {sysFceBasDev 19}
+        
+sysFceBasDevDesc1     OBJECT-TYPE
+        SYNTAX        DisplayString(SIZE(20))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "System Info - Desription 1"
+        ::= {sysFceBasDev 20}        
+
+sysFceBasDevDesc2     OBJECT-TYPE
+        SYNTAX        DisplayString(SIZE(20))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "System Info - Desription 2"
+        ::= {sysFceBasDev 21}
+        
+sysFceBasDevAddInfo   OBJECT-TYPE
+        SYNTAX        DisplayString(SIZE(20))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "System Info - Additional Info"
+        ::= {sysFceBasDev 22}
+               
+-- 1.1.2  sysFceBascmd - Basic System Commands Section
+--------------------------------------------------------------------------------
+sysFceBasCmdEn        OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      readonly (0),
+                      writeAccessSNMP (1),
+                      writeAccessCMD (2),
+                      writeAccessWEB (3)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Enable read write access over SNMP"
+        ::= {sysFceBasCmd 1}
+
+sysFceBasCmdWr        OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      none (0),
+                      w1 (1),
+                      w2 (2),
+                      w3 (3),
+                      startup (4) 
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Write configuration to flash memory"
+        DEFVAL        { none }
+        ::= {sysFceBasCmd 2}
+        
+sysFceBasCmdRn        OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      none (0),
+                      r1 (1),
+                      r2 (2),
+                      r3 (3),
+                      startup (4) 
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Run configuration from flash memory"
+        DEFVAL        { none }
+        ::= {sysFceBasCmd 3}
+        
+sysFceBasCmdDsg       OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      narrow (0),
+                      wide (1)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Select design type - narrow (301), wide (303)"
+        ::= {sysFceBasCmd 4}
+        
+sysFceBasCmdRem       OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      local (0),
+                      localANDremote (1)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Setting is valid for local or local&remote units"
+        ::= {sysFceBasCmd 5}                
+
+sysFceBasCmdAuto      OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      disable (0),
+                      enable (1)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Enable/Disable auto-reconfiguration after
+                      10 minutes without synchronization"
+        ::= {sysFceBasCmd 6}
+
+sysFceBasCmdAlm       OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      none (0),
+                      validate (1),
+                      clear (2)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Validate current alarm status or
+                      clear alarm history log file and validate alarm status"
+        DEFVAL        { none }
+        ::= {sysFceBasCmd 7}
+        
+sysFceBasCmdClr       OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      none (0),
+                      all (1),
+                      rfi (2),
+                      lan (3),
+                      ber (4)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Clear appropriate counters in system"
+        DEFVAL        { none }
+        ::= {sysFceBasCmd 8}
+               
+sysFceBasCmdRst       OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      none (0),
+                      reboot (1),
+                      ip (2),
+                      odu (3)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Reboot unit or just several system part"
+        DEFVAL        { none }
+        ::= {sysFceBasCmd 9}
+                        
+--------------------------------------------------------------------------------
+-- 2. Config Function Level Section
+--------------------------------------------------------------------------------
+cnfFceMng     OBJECT IDENTIFIER ::= { cnfFce 1 }
+cnfFceDat     OBJECT IDENTIFIER ::= { cnfFce 2 }
+cnfFceRad     OBJECT IDENTIFIER ::= { cnfFce 3 }
+cnfFceAlm     OBJECT IDENTIFIER ::= { cnfFce 4 }
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+-- 2.1 Management Config Function Level Section
+--------------------------------------------------------------------------------
+cnfFceMngIp   OBJECT IDENTIFIER ::= { cnfFceMng 1 }
+cnfFceMngSnmp OBJECT IDENTIFIER ::= { cnfFceMng 2 }
+--------------------------------------------------------------------------------
+
+-- 2.1.1  cnfFceMngIp- IP Setting Section
+--------------------------------------------------------------------------------
+cnfFceMngIpEthAddr    OBJECT-TYPE
+        SYNTAX        IpAddress
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Primary IP address for management access,
+                      default value is 192.168.2.90"
+        DEFVAL        { 'c0a8025a'H }
+        ::= {cnfFceMngIp 1}
+
+cnfFceMngIpEthMask    OBJECT-TYPE
+        SYNTAX        IpAddress
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Netmask of primary IP address,
+                      default value is 255.255.255.0"
+        DEFVAL        { 'ffffff00'H }
+        ::= {cnfFceMngIp 2}
+
+cnfFceMngIpRemote     OBJECT-TYPE
+        SYNTAX        IpAddress
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "IP address of remote unit,
+                      default value is 192.168.2.91"
+        DEFVAL        { 'c0a8025b'H }
+        ::= {cnfFceMngIp 3}     
+
+cnfFceMngIpGtwAddr    OBJECT-TYPE
+        SYNTAX        IpAddress
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Default Gateway IP address,
+                      default value is 192.168.2.1"
+        DEFVAL        { 'c0a80201'H }
+        ::= {cnfFceMngIp 4}
+        
+cnfFceMngIpFtpUsb     OBJECT-TYPE
+        SYNTAX        DisplayString(SIZE(0..70))
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Selection of source/destination for firmware download
+                      or files upload.
+                      example for FTP server - ftp://192.168.1.1
+                      example for USB - usb"
+        ::= {cnfFceMngIp 5}
+                
+cnfFceMngIpSecEthaddr OBJECT-TYPE
+        SYNTAX        IpAddress
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Secondary IP address,
+                      default value is 10.10.10.10"
+        DEFVAL        { '0a0a0a0a'H }
+        ::= {cnfFceMngIp 6}
+        
+cnfFceMngIpSecEthMask OBJECT-TYPE
+        SYNTAX        IpAddress
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Netmask of secondary IP address,
+                      default value is 255.255.255.0"
+        DEFVAL        { 'ffffff00'H }
+        ::= {cnfFceMngIp 7}
+
+cnfFceMngIpSecProxyArp OBJECT-TYPE
+        SYNTAX         INTEGER
+                       {
+                       off (0),
+                       on (1)
+                       }
+        MAX-ACCESS     read-write
+        STATUS         current
+        DESCRIPTION    "Proxy ARP function setting"
+        ::= {cnfFceMngIp 8}
+
+-- 2.1.2  cnfFceMngSnmp- SNMP IP Setting Section
+--------------------------------------------------------------------------------
+cnfFceMngSnmpRstring  OBJECT-TYPE
+        SYNTAX        DisplayString(SIZE(0..20))
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Read only access level community string"
+        ::= {cnfFceMngSnmp 1}
+        
+cnfFceMngSnmpWstring  OBJECT-TYPE
+        SYNTAX        DisplayString(SIZE(0..20))
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Read/Write access level community string"
+        ::= {cnfFceMngSnmp 2}     
+
+cnfFceMngSnmpDport    OBJECT-TYPE
+        SYNTAX        Unsigned32 (1..65535)
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "IP port number for SNMP deamon access - input port"
+        ::= {cnfFceMngSnmp 3} 
+
+cnfFceMngSnmpTport    OBJECT-TYPE
+        SYNTAX        Unsigned32 (1..65535)
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "IP port number for SNMP traps - output port"
+        ::= {cnfFceMngSnmp 4} 
+
+cnfFceMngSnmpTrap1Ip  OBJECT-TYPE
+        SYNTAX        IpAddress
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Destination IP address #1 for sending SNMP traps"
+        ::= {cnfFceMngSnmp 5}
+
+cnfFceMngSnmpTrap2Ip  OBJECT-TYPE
+        SYNTAX        IpAddress
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Destination IP address #2 for sending SNMP traps"
+        ::= {cnfFceMngSnmp 6}
+
+cnfFceMngSnmpTrap3Ip  OBJECT-TYPE
+        SYNTAX        IpAddress
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Destination IP address #3 for sending SNMP traps"
+        ::= {cnfFceMngSnmp 7}
+
+--------------------------------------------------------------------------------
+-- 2.2 Data(traffic) Config Function Level Section
+--------------------------------------------------------------------------------
+cnfFceDatTdm  OBJECT IDENTIFIER ::= { cnfFceDat 1 }
+cnfFceDatEth  OBJECT IDENTIFIER ::= { cnfFceDat 2 }
+cnfFceDatBer  OBJECT IDENTIFIER ::= { cnfFceDat 3 }
+
+-- 2.2.1  cnfFceDatTdm - Data Traffic Setting Section - TDM channels
+--------------------------------------------------------------------------------
+cnfFceDatTdmE3Ena     OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      off (0),
+                      on (1)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "E3/DS3 channel in PBPS framer is disabled/enabled"
+        ::= {cnfFceDatTdm 1}
+
+cnfFceDatTdmE3Frm     OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      off (0),
+                      on (1)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "E3 channel in non-framed/framed mode"
+        ::= {cnfFceDatTdm 2}
+
+cnfFceDatTdmE3Loop    OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      off (0),
+                      on (1)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "E3/DS3 channel loopback mode
+                      off - transparent mode
+                      on - two-sided loopback (local and remote)"
+        ::= {cnfFceDatTdm 3}
+
+cnfFceDatTdmE21Mod    OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      through (0),
+                      rfi (1),
+                      ber (2)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "E2_2 channel mode
+                      through - E2 channel is again framed to the E3 frame
+                      rfi - output from PBPS_E22 is connected in HSI direction
+                      ber - BER is connected to the E2 stream in HSI direction"
+        ::= {cnfFceDatTdm 4}
+
+cnfFceDatTdmE22Ena    OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      off (0),
+                      on (1)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "E2_2 channel in PBPS framer is disabled/enabled"
+        ::= {cnfFceDatTdm 5}
+
+cnfFceDatTdmE22Loop   OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      off (0),
+                      on (1)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "E2_2 channel loopback mode
+                      off - transparent mode
+                      on - two-sided loopback (local and remote)"
+        ::= {cnfFceDatTdm 6}
+
+cnfFceDatTdmE22Mod    OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      through (0),
+                      rfi (1),
+                      ber (2)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "E2_2 channel mode
+                      through - E2 channel is again framed to the E3 frame
+                      rfi - output from PBPS_E22 is connected in HSI direction
+                      ber - BER is connected to the E2 stream in HSI direction"
+        ::= {cnfFceDatTdm 7}
+        
+cnfFceDatTdmE23Ena    OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      off (0),
+                      on (1)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "E2_3 channel in PBPS framer is disabled/enabled"
+        ::= {cnfFceDatTdm 8}
+
+cnfFceDatTdmE23Loop   OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      off (0),
+                      on (1)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "E2_3 channel loopback mode
+                      off - transparent mode
+                      on - two-sided loopback (local and remote)"
+        ::= {cnfFceDatTdm 9}
+
+cnfFceDatTdmE23Mod    OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      through (0),
+                      rfi (1),
+                      ber (2)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "E2_3 channel mode
+                      through - E2 channel is again framed to the E3 frame
+                      rfi - output from PBPS_E23 is connected in HSI direction
+                      ber - BER is connected to the E2 stream in HSI direction"
+        ::= {cnfFceDatTdm 10}
+        
+cnfFceDatTdmE24Ena    OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      off (0),
+                      on (1)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "E2_4 channel in PBPS framer is disabled/enabled"
+        ::= {cnfFceDatTdm 11}
+
+cnfFceDatTdmE24Loop   OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      off (0),
+                      on (1)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "E2_4 channel loopback mode
+                      off - transparent mode
+                      on - two-sided loopback (local and remote)"
+        ::= {cnfFceDatTdm 12}
+        
+cnfFceDatTdmE24Mod    OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      through (0),
+                      rfi (1),
+                      ber (2)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "E2_4 channel mode
+                      through - E2 channel is again framed to the E3 frame
+                      rfi - output from PBPS_E24 is connected in HSI direction
+                      ber - BER is connected to the E2 stream in HSI direction"
+        ::= {cnfFceDatTdm 13}
+        
+cnfFceDatTdmE11Ena    OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      off (0),
+                      on (1)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "E/T1_1 channel in PBPS framer is disabled/enabled"
+        ::= {cnfFceDatTdm 14}
+
+cnfFceDatTdmE11Loop   OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      off (0),
+                      on (1)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "E/T1_1 channel loopback mode
+                      off - transparent mode
+                      on - two-sided loopback (local and remote)"
+        ::= {cnfFceDatTdm 15}
+        
+cnfFceDatTdmE11Mod    OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      rfi (1),
+                      ber (2)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "E/T1_1 channel mode
+                      rfi - output from PBPS_E/T11 is connected in HSI direction
+                      ber - BER is connected to the E1 stream in HSI direction"
+        ::= {cnfFceDatTdm 16}
+
+cnfFceDatTdmE12Ena    OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      off (0),
+                      on (1)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "E/T1_2 channel in PBPS framer is disabled/enabled"
+        ::= {cnfFceDatTdm 17}
+
+cnfFceDatTdmE12Loop   OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      off (0),
+                      on (1)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "E/T1_2 channel loopback mode
+                      off - transparent mode
+                      on - two-sided loopback (local and remote)"
+        ::= {cnfFceDatTdm 18}
+        
+cnfFceDatTdmE12Mod    OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      rfi (1),
+                      ber (2)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "E/T1_2 channel mode
+                      rfi - output from PBPS_E/T12 is connected in HSI direction
+                      ber - BER is connected to the E1 stream in HSI direction"
+        ::= {cnfFceDatTdm 19}
+
+cnfFceDatTdmE13Ena    OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      off (0),
+                      on (1)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "E1_3 channel in PBPS framer is disabled/enabled"
+        ::= {cnfFceDatTdm 20}
+
+cnfFceDatTdmE13Loop   OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      off (0),
+                      on (1)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "E1_3 channel loopback mode
+                      off - transparent mode
+                      on - two-sided loopback (local and remote)"
+        ::= {cnfFceDatTdm 21}
+        
+cnfFceDatTdmE13Mod    OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      rfi (1),
+                      ber (2)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "E1_3 channel mode
+                      rfi - output from PBPS_E/T11 is connected in HSI direction
+                      ber - BER is connected to the E1 stream in HSI direction"
+        ::= {cnfFceDatTdm 22}
+
+cnfFceDatTdmE14Ena    OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      off (0),
+                      on (1)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "E1_4 channel in PBPS framer is disabled/enabled"
+        ::= {cnfFceDatTdm 23}
+
+cnfFceDatTdmE14Loop   OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      off (0),
+                      on (1)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "E1_4 channel loopback mode
+                      off - transparent mode
+                      on - two-sided loopback (local and remote)"
+        ::= {cnfFceDatTdm 24}
+        
+cnfFceDatTdmE14Mod    OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      rfi (1),
+                      ber (2)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "E1_4 channel mode
+                      rfi - output from PBPS_E/T11 is connected in HSI direction
+                      ber - BER is connected to the E1 stream in HSI direction"
+        ::= {cnfFceDatTdm 25}
+
+-- 2.2.2  cnfFceDatEth - Data Traffic Setting Section - ETH channel
+--------------------------------------------------------------------------------
+cnfFceDatEthLanAb     OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      off (0),
+                      on (1)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "LAN A-B interconnection disabled/enabled
+                       on - in-band management
+                       off - out-of-band management"
+        ::= {cnfFceDatEth 1}
+
+cnfFceDatEthSpeed     OBJECT-TYPE
+        SYNTAX        Unsigned32 (0..400)
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "ETH WAN capacity alocation (over air speed limitation)"
+        ::= {cnfFceDatEth 2}
+
+cnfFceDatEthA1Aneg    OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      off (0),
+                      on (1)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Autonegotiation on port LANA1 (GbitETH) disabled/enabled"
+        ::= {cnfFceDatEth 3}
+
+cnfFceDatEthA1Dupl    OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      half (0),
+                      full (1)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Duplex mode on port LANA1 (GbitETH) disabled/enabled
+                      setting is valid only for manual mode when
+                      autonegotiation is disabled"
+        ::= {cnfFceDatEth 4}
+
+cnfFceDatEthA1Speed   OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      eth (0),
+                      fasteth (1),
+                      gbiteth (2)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Speed mode on port LANA1 (GbitETH)
+                      eth - 10BaseT mode when autonegotiation is disabled
+                      fasteth - 100BaseTx mode when autonegotiation is disabled
+                      gbiteth - 1000BaseT mode when autonegotiation is disabled"
+        ::= {cnfFceDatEth 5}
+                      
+cnfFceDatEthA1Mdix    OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      auto (0),
+                      mdi (1),
+                      mdx (2)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Cable crossing mode on port LANA1 (GbitETH)
+                      auto - automode for mdix
+                      mdi - staight connection
+                      mdx - cross connection"
+        ::= {cnfFceDatEth 6}
+
+cnfFceDatEthB1Aneg    OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      off (0),
+                      on (1)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Autonegotiation on port LANB1 (FastETH) disabled/enabled"
+        ::= {cnfFceDatEth 7}
+
+cnfFceDatEthB1Dupl    OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      half (0),
+                      full (1)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Duplex mode on port LANB1 (FastETH) disabled/enabled
+                      setting is valid only for manual mode when
+                      autonegotiation is disabled"
+        ::= {cnfFceDatEth 8}
+
+cnfFceDatEthB1Speed   OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      eth (0),
+                      fastEth (1)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Speed mode on port LANB1 (FastETH)
+                      eth - 10BaseT mode when autonegotiation is disabled
+                      fasteth - 100BaseTx mode when autonegotiation is disabled"
+        ::= {cnfFceDatEth 9}
+
+cnfFceDatEthB1Mdix   OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      auto (0),
+                      mdi (1),
+                      mdx (2)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Cable crossing mode on port LANB1 (FastETH)
+                      auto - automode for mdix
+                      mdi - staight connection
+                      mdx - cross connection"
+        ::= {cnfFceDatEth 10}
+
+-- 2.2.3  cnfFceDatBer - Data Traffic Setting Section - BER channel
+--------------------------------------------------------------------------------
+cnfFceDatBerSpeed     OBJECT-TYPE
+        SYNTAX        Unsigned32 (0..100)
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "BER WAN capacity alocation (over air speed limitation)"
+        ::= {cnfFceDatBer 1}
+
+cnfFceDatBerInerr     OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      none (0),
+                      insert (1)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Insert one Bit error to the BER stream"
+        DEFVAL        { none }
+        ::= {cnfFceDatBer 2}
+     
+--------------------------------------------------------------------------------
+-- 2.3 Radio Config Function Level Sectio
+--------------------------------------------------------------------------------
+cnfFceRadRf   OBJECT IDENTIFIER ::= { cnfFceRad 1 }
+cnfFceRadMod  OBJECT IDENTIFIER ::= { cnfFceRad 2 }
+cnfFceRadOpt  OBJECT IDENTIFIER ::= { cnfFceRad 3 }
+--------------------------------------------------------------------------------
+
+-- 2.3.1  cnfFceRadRf - Radio Setting Section - RF parameters
+--------------------------------------------------------------------------------
+cnfFceRadRfTxPwr        OBJECT-TYPE
+        SYNTAX        INTEGER (-20..40)
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Radio TX Power in dBm (output RF power)"
+        ::= {cnfFceRadRf 1}
+
+cnfFceRadRfTxFreq     OBJECT-TYPE
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Radio TX frequency in kHz (output RF frequency)"
+        ::= {cnfFceRadRf 2}
+
+cnfFceRadRfRxFreq     OBJECT-TYPE
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Radio RX frequency in kHz (input RF frequency)"
+        ::= {cnfFceRadRf 3}
+
+cnfFceRadRfAtpcEna    OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      disable (0),
+                      enable (1)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "ATPC function disabled/enabled"
+        ::= {cnfFceRadRf 4}
+
+cnfFceRadRfAtpcRxl    OBJECT-TYPE
+        SYNTAX        INTEGER (-90..0)
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "ATPC receive level in dBm (optimal Rx level)"
+        ::= {cnfFceRadRf 5}
+
+-- 2.3.2  cnfFceRadMod - Radio Setting Section - Modem parameters
+--------------------------------------------------------------------------------
+cnfFceRadModActMod    OBJECT-TYPE
+        SYNTAX        DisplayString(SIZE(0..20))
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Actual modulation scheme
+                      ACM mode off - setting and reading of actual scheme
+                      ACM mode on - only reading of actual scheme"
+        ::= {cnfFceRadMod 1}
+        
+cnfFceRadModAcmEna    OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      disable (0),
+                      enable (1)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "ACM function disabled/enable"
+        ::= {cnfFceRadMod 2}
+
+cnfFceRadModAcmMod0   OBJECT-TYPE
+        SYNTAX        DisplayString(SIZE(0..20))
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "ACM modulation scheme #0
+                      highest speed and lowes sensitivity
+                      write --del-- for no modulation setting"
+        ::= {cnfFceRadMod 3}
+
+cnfFceRadModAcmMod1   OBJECT-TYPE
+        SYNTAX        DisplayString(SIZE(0..20))
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "ACM modulation scheme #1
+                      medium speed and medium sensitivity
+                      write --del-- for no modulation setting"
+        ::= {cnfFceRadMod 4}
+
+cnfFceRadModAcmMod2   OBJECT-TYPE
+        SYNTAX        DisplayString(SIZE(0..20))
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "ACM modulation scheme #2
+                      lowest speed and highest sensitivity
+                      write --del-- for no modulation setting"
+        ::= {cnfFceRadMod 5}        
+
+cnfFceRadModTable     OBJECT-TYPE
+        SYNTAX        SEQUENCE OF CnfFceRadModEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION   "This table shows available modulation in license file"
+        ::= { cnfFceRadMod 6 } 
+
+cnfFceRadModEntry     OBJECT-TYPE
+        SYNTAX        CnfFceRadModEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION   "This parameter represents the entry for
+                      List of modulation table"
+        INDEX         { cnfFceRadModTableIndex }
+        ::= { cnfFceRadModTable 1 }
+
+CnfFceRadModEntry  ::= SEQUENCE {
+        cnfFceRadModTableIndex  Unsigned32,
+        cnfFceRadModTableMod    DisplayString
+        }
+        
+cnfFceRadModTableIndex OBJECT-TYPE
+        SYNTAX        Unsigned32 (0..100)
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "This parameter represents index
+                      in List of modulation table"
+        ::= { cnfFceRadModEntry 1 }
+                    
+cnfFceRadModTableMod  OBJECT-TYPE
+        SYNTAX        DisplayString(SIZE(0..20))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Modulation scheme record from List of modulation table"
+        ::= { cnfFceRadModEntry 2 }
+                                
+-- 2.3.3  cnfFceRadOpt - Radio Setting Section - Optional parameters
+--------------------------------------------------------------------------------
+cnfFceRadOptOduMute   OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      auto (0),
+                      mute (1)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "ODU mute setting
+                      auto - mute command is set automaticaly when incorect
+                      setting of radio parameters is required
+                      mute - manual acivating of mute command"
+        ::= {cnfFceRadOpt 1}
+
+cnfFceRadOptOduMuteStat OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      unmuted (0),
+                      muted (1)
+                      }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Actual ODU mute status. Status can be unmuted or muted
+                      in auto mode"
+        ::= {cnfFceRadOpt 2}
+
+cnfFceRadOptPwrDown   OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      oduPWRup (0),
+                      oduPWRdown (1)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "ODU power down setting
+                      oduPWRdown - ODU is not powered from IDU
+                      oduPWRup - ODU is powerd from IDU"
+        ::= {cnfFceRadOpt 3}
+
+cnfFceRadOptOduFlt    OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      auto (0),
+                      narrow (1),
+                      wide (2),
+                      notAvailable (3)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Setting of IF filter inside ODU
+                      auto - filter is automaticaly selected
+                      according to selected modulation scheme
+                      narrow - narrow filter is manualy configured
+                      wide - wide filter is manualy configured
+                      notAvailable - not defined in ODU"
+        ::= {cnfFceRadOpt 4}
+
+cnfFceRadOptOduFltStat  OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Actual ODU IF filter status"
+        ::= {cnfFceRadOpt 5}
+
+cnfFceRadOptOduSp     OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      auto (0),
+                      noinversion (1),
+                      inversion (2)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Setting of Spectral inversion at modem input
+                      auto - inversion is automaticaly selected 
+                      according to ODU specification
+                      noinversion - no Spectrum Inversion is manualy configured
+                      inversion - Spectrum Inversion is manualy configured"
+        ::= {cnfFceRadOpt 6}
+
+cnfFceRadOptSpStat    OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      noinversion (0),
+                      inversion (1)
+                      }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Actual Spectrum Inversion status"
+        ::= {cnfFceRadOpt 7}
+
+cnfFceRadOptLat       OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      standard (0),
+                      low (1)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Low latency mode disabled/enabled"
+        ::= {cnfFceRadOpt 8}
+
+
+cnfFceRadOptCw        OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      off (0),
+                      on (1)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Continuous Wave mode disabled/enabled
+                      off - actual modulation scheme is active
+                      on - CW wave insted of modulation scheme"
+        ::= {cnfFceRadOpt 9}
+
+cnfFceRadOptAgc       OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      auto (0),
+                      slow (1),
+                      fast (2),
+                      freeze (3)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "AGC loop modes for cable length compensation
+                      auto - agc automatic mode
+                      fast - fast loop setting
+                      freez - loop is off, no agc regualation
+                      slow - slow loop setting"
+        ::= {cnfFceRadOpt 10}
+
+--------------------------------------------------------------------------------
+-- 2.4 Alarm Config Function Level Section
+--------------------------------------------------------------------------------
+cnfFceAlmPort OBJECT IDENTIFIER ::= { cnfFceAlm 1 }
+cnfFceAlmMux  OBJECT IDENTIFIER ::= { cnfFceAlm 2 }
+cnfFceAlmMod  OBJECT IDENTIFIER ::= { cnfFceAlm 3 }
+cnfFceAlmIdu  OBJECT IDENTIFIER ::= { cnfFceAlm 4 }
+cnfFceAlmOdu  OBJECT IDENTIFIER ::= { cnfFceAlm 5 }
+------------------------------------------------------------------------------
+
+-- 2.4.1  cnfFceAlmPort - Alarm Setting Section - Port's parameters
+--------------------------------------------------------------------------------
+cnfFceAlmPortE11Link  OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      inactiveANDnoalarm (0),
+                      activeANDnoalarm (1),
+                      inactiveANDalarm (2),
+                      activeANDalarm (3)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Alarm setting and status for no link at E/T1_1 port
+                      inactive - no influence to system status
+                      active -  influence to system status
+                      alarm - alarm status of parameter
+                      noalarm - correct status of parameter"
+        ::= {cnfFceAlmPort 1}
+
+cnfFceAlmPortE11Ais   OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      inactiveANDnoalarm (0),
+                      activeANDnoalarm (1),
+                      inactiveANDalarm (2),
+                      activeANDalarm (3)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Alarm setting for AIS at E/T1_1 port
+                      inactive - no influence to system status
+                      active -  influence to system status
+                      alarm - alarm status of parameter
+                      noalarm - correct status of parameter"
+        ::= {cnfFceAlmPort 2}
+
+cnfFceAlmPortE12Link  OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      inactiveANDnoalarm (0),
+                      activeANDnoalarm (1),
+                      inactiveANDalarm (2),
+                      activeANDalarm (3)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Alarm setting for no link at E/T1_2 port
+                      inactive - no influence to system status
+                      active -  influence to system status
+                      alarm - alarm status of parameter
+                      noalarm - correct status of parameter"
+        ::= {cnfFceAlmPort 3}
+
+cnfFceAlmPortE12Ais   OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      inactiveANDnoalarm (0),
+                      activeANDnoalarm (1),
+                      inactiveANDalarm (2),
+                      activeANDalarm (3)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Alarm setting for AIS at E/T1_2 port
+                      inactive - no influence to system status
+                      active -  influence to system status
+                      alarm - alarm status of parameter
+                      noalarm - correct status of parameter"
+        ::= {cnfFceAlmPort 4}
+
+cnfFceAlmPortLanA1Link  OBJECT-TYPE
+        SYNTAX          INTEGER
+                        {
+                        inactiveANDnoalarm (0),
+                        activeANDnoalarm (1),
+                        inactiveANDalarm (2),
+                        activeANDalarm (3)
+                        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "Alarm setting for no link at LanA1 (GbitETH) port
+                        inactive - no influence to system status
+                        active -  influence to system status
+                        alarm - alarm status of parameter
+                        noalarm - correct status of parameter"
+        ::= {cnfFceAlmPort 5}
+
+cnfFceAlmPortLanB1Link  OBJECT-TYPE
+        SYNTAX          INTEGER
+                        {
+                        inactiveANDnoalarm (0),
+                        activeANDnoalarm (1),
+                        inactiveANDalarm (2),
+                        activeANDalarm (3)
+                        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "Alarm setting for no link at LanB1 (FastETH) port
+                        inactive - no influence to system status
+                        active -  influence to system status
+                        alarm - alarm status of parameter
+                        noalarm - correct status of parameter"
+        ::= {cnfFceAlmPort 6}
+
+cnfFceAlmPortE3Los    OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      inactiveANDnoalarm (0),
+                      activeANDnoalarm (1),
+                      inactiveANDalarm (2),
+                      activeANDalarm (3)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Alarm setting for LOSS at E3/DS3 port
+                      inactive - no influence to system status
+                      active -  influence to system status
+                      alarm - alarm status of parameter
+                      noalarm - correct status of parameter"
+        ::= {cnfFceAlmPort 7}
+
+cnfFceAlmPortE3Fer    OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      inactiveANDnoalarm (0),
+                      activeANDnoalarm (1),
+                      inactiveANDalarm (2),
+                      activeANDalarm (3)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Alarm setting for frame error rate over fixed threshold
+                      at E3demux from HSI
+                      inactive - no influence to system status
+                      active -  influence to system status
+                      alarm - alarm status of parameter
+                      noalarm - correct status of parameter"
+        ::= {cnfFceAlmPort 8}
+
+
+-- 2.4.2  cnfFceAlmMux - Alarm Setting Section - PBPS mux parameters
+--------------------------------------------------------------------------------
+cnfFceAlmMuxRfiLos    OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      inactiveANDnoalarm (0),
+                      activeANDnoalarm (1),
+                      inactiveANDalarm (2),
+                      activeANDalarm (3)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Alarm setting for no sysnc at PBPS (RFI) mux
+                      inactive - no influence to system status
+                      active -  influence to system status
+                      alarm - alarm status of parameter
+                      noalarm - correct status of parameter"
+        ::= {cnfFceAlmMux 1}
+        
+cnfFceAlmMuxRfiFer    OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      inactiveANDnoalarm (0),
+                      activeANDnoalarm (1),
+                      inactiveANDalarm (2),
+                      activeANDalarm (3)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Alarm setting for frame error rate over threshold
+                      at PBPS (RFI) mux
+                      inactive - no influence to system status
+                      active -  influence to system status
+                      alarm - alarm status of parameter
+                      noalarm - correct status of parameter"
+        ::= {cnfFceAlmMux 2}
+
+cnfFceAlmMuxRfiFerThr OBJECT-TYPE
+        SYNTAX        Unsigned32 (0..60)
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Threshold setting for cnfFceAlmMuxRfiFer alarm"
+        ::= {cnfFceAlmMux 3}
+
+
+-- 2.4.3  cnfFceAlmMod - Alarm Setting Section - Modem parameters
+--------------------------------------------------------------------------------
+cnfFceAlmModLos    OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      inactiveANDnoalarm (0),
+                      activeANDnoalarm (1),
+                      inactiveANDalarm (2),
+                      activeANDalarm (3)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Alarm setting for no sysnc at QAM demodulator
+                      inactive - no influence to system status
+                      active -  influence to system status
+                      alarm - alarm status of parameter
+                      noalarm - correct status of parameter"
+        ::= {cnfFceAlmMod 1}
+        
+cnfFceAlmModMse       OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      inactiveANDnoalarm (0),
+                      activeANDnoalarm (1),
+                      inactiveANDalarm (2),
+                      activeANDalarm (3)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Alarm setting for MSE (quality of signal)over threshold
+                      inactive - no influence to system status
+                      active -  influence to system status
+                      alarm - alarm status of parameter
+                      noalarm - correct status of parameter"
+        ::= {cnfFceAlmMod 2}
+
+cnfFceAlmModMseThr    OBJECT-TYPE
+        SYNTAX        INTEGER (-40..0)
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Threshold setting for cnfFceAlmModMse alarm"
+        ::= {cnfFceAlmMod 3}
+
+-- 2.4.4  cnfFceAlmIdu - Alarm Setting Section - IDU parameters
+--------------------------------------------------------------------------------
+cnfFceAlmIduLic       OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      inactiveANDnoalarm (0),
+                      activeANDnoalarm (1),
+                      inactiveANDalarm (2),
+                      activeANDalarm (3)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Alarm setting for invalid license key
+                      inactive - no influence to system status
+                      active -  influence to system status
+                      alarm - alarm status of parameter
+                      noalarm - correct status of parameter"
+        ::= {cnfFceAlmIdu 1}
+
+cnfFceAlmIduTemp      OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      inactiveANDnoalarm (0),
+                      activeANDnoalarm (1),
+                      inactiveANDalarm (2),
+                      activeANDalarm (3)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Alarm setting for IDU temp out of range -50 up to +600C
+                      inactive - no influence to system status
+                      active -  influence to system status
+                      alarm - alarm status of parameter
+                      noalarm - correct status of parameter"
+        ::= {cnfFceAlmIdu 2}
+
+cnfFceAlmIduHw        OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      inactiveANDnoalarm (0),
+                      activeANDnoalarm (1),
+                      inactiveANDalarm (2),
+                      activeANDalarm (3)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Alarm setting for overall HW alarm
+                      inactive - no influence to system status
+                      active -  influence to system status
+                      alarm - alarm status of parameter
+                      noalarm - correct status of parameter"
+        ::= {cnfFceAlmIdu 3}
+
+cnfFceAlmIduSw        OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      inactiveANDnoalarm (0),
+                      activeANDnoalarm (1),
+                      inactiveANDalarm (2),
+                      activeANDalarm (3)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Alarm setting for overall SW alarm
+                      inactive - no influence to system status
+                      active -  influence to system status
+                      alarm - alarm status of parameter
+                      noalarm - correct status of parameter"
+        ::= {cnfFceAlmIdu 4}
+        
+
+-- 2.4.5  cnfFceAlmOdu - Alarm Setting Section - ODU parameters
+--------------------------------------------------------------------------------
+cnfFceAlmOduTemp      OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      inactiveANDnoalarm (0),
+                      activeANDnoalarm (1),
+                      inactiveANDalarm (2),
+                      activeANDalarm (3)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Alarm setting for ODU temp out of range -250 up to +600C
+                      inactive - no influence to system status
+                      active -  influence to system status
+                      alarm - alarm status of parameter
+                      noalarm - correct status of parameter"
+        ::= {cnfFceAlmOdu 1}
+
+cnfFceAlmOduComm      OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      inactiveANDnoalarm (0),
+                      activeANDnoalarm (1),
+                      inactiveANDalarm (2),
+                      activeANDalarm (3)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Alarm setting for ODU-IDU communication problem
+                      inactive - no influence to system status
+                      active -  influence to system status
+                      alarm - alarm status of parameter
+                      noalarm - correct status of parameter"
+        ::= {cnfFceAlmOdu 2}
+
+cnfFceAlmOduAlm      OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      inactiveANDnoalarm (0),
+                      activeANDnoalarm (1),
+                      inactiveANDalarm (2),
+                      activeANDalarm (3)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Alarm setting for overall ODU alarm
+                      inactive - no influence to system status
+                      active -  influence to system status
+                      alarm - alarm status of parameter
+                      noalarm - correct status of parameter"
+        ::= {cnfFceAlmOdu 3}
+
+cnfFceAlmOduRxl       OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      inactiveANDnoalarm (0),
+                      activeANDnoalarm (1),
+                      inactiveANDalarm (2),
+                      activeANDalarm (3)
+                      }
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Alarm setting for Rx level under threshold
+                      inactive - no influence to system status
+                      active -  influence to system status
+                      alarm - alarm status of parameter
+                      noalarm - correct status of parameter"
+        ::= {cnfFceAlmOdu 4}
+
+cnfFceAlmOduRxlThr    OBJECT-TYPE
+        SYNTAX        INTEGER (-40..0)
+        MAX-ACCESS    read-write
+        STATUS        current
+        DESCRIPTION   "Threshold setting for cnfFceAlmModRxl alarm"
+        ::= {cnfFceAlmOdu 5}
+
+cnfFceAlmOduAlmByte   OBJECT-TYPE
+        SYNTAX        DisplayString(SIZE(0..20))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "ODU alarm byte - HEX form"
+        ::= {cnfFceAlmOdu 6}        
+
+
+--------------------------------------------------------------------------------
+-- 3. Info Function Level Section
+--------------------------------------------------------------------------------
+infoFceMng    OBJECT IDENTIFIER ::= { infoFce 1 }
+infoFceDat    OBJECT IDENTIFIER ::= { infoFce 2 }
+infoFceRad    OBJECT IDENTIFIER ::= { infoFce 3 }
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+-- 3.1 Basic Management Info
+--------------------------------------------------------------------------------
+infoFceMngSnmp  OBJECT IDENTIFIER ::= { infoFceMng 2 }
+
+-- 3.1.2  infoFceMngSnmp - Basic information about SNMP 
+--------------------------------------------------------------------------------
+infoFceMngSnmpVer     OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      v1 (1),
+                      v2 (2),
+                      v1ANDv2 (3),
+                      v3 (4),
+                      v1ANDv2ANDv3 (5)
+                      }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Supported SNMP version"
+        ::= {infoFceMngSnmp 1}
+
+infoFceMngSnmpAnt     OBJECT-TYPE
+        SYNTAX        DisplayString(SIZE(0..20))
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Version of SNMP agent"
+        ::= {infoFceMngSnmp 2}        
+
+--------------------------------------------------------------------------------
+-- 3.2 Basic Data Traffic Info
+--------------------------------------------------------------------------------
+infoFceDatTdm  OBJECT IDENTIFIER ::= { infoFceDat 1 }
+infoFceDatEth  OBJECT IDENTIFIER ::= { infoFceDat 2 }
+
+
+-- 3.2.1  infoFceDatTdm - Basic information about TDM ports
+--------------------------------------------------------------------------------
+infoFceDatTdmE11port  OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      loss (0),
+                      link (1),
+                      ais (2)
+                      }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Status of E1/T1 port No.1 (loss/link/ais)"
+        ::= {infoFceDatTdm 1}
+
+infoFceDatTdmE12port  OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      loss (0),
+                      link (1),
+                      ais (2)
+                      }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Status of E1/T1 port No.2 (loss/link/ais)"
+        ::= {infoFceDatTdm 2}       
+
+infoFceDatTdmE3port  OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      loss (0),
+                      sync (1)                      
+                      }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Status of E3/DS3 port (loss/sync)"
+        ::= {infoFceDatTdm 3}
+        
+-- 3.2.2  infoFceDatEth - Basic information about ETH ports 
+--------------------------------------------------------------------------------
+infoFceDatEthA1       OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      nolink (0),
+                      halfEth (1),
+                      fullEth (2),
+                      halfFast (3),
+                      fullFast (4),
+                      fullGiga (5)
+                      }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Status of LAN A1 port (GIGE)"
+        ::= {infoFceDatEth 1}        
+
+infoFceDatEthB1       OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      nolink (0),
+                      halfEth (1),
+                      fullEth (2),
+                      halfFast (3),
+                      fullFast (4)
+                      }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Status of LAN B1 port (FastETH)"
+        ::= {infoFceDatEth 2}
+        
+--------------------------------------------------------------------------------
+-- 3.3 Basic Radio Info
+--------------------------------------------------------------------------------
+infoFceRadRf   OBJECT IDENTIFIER ::= { infoFceRad 1 }
+infoFceRadMod  OBJECT IDENTIFIER ::= { infoFceRad 2 }
+infoFceRadOpt  OBJECT IDENTIFIER ::= { infoFceRad 3 }
+
+
+-- 3.3.1  infoFceRadRf - Basic information about ODU
+--------------------------------------------------------------------------------
+infoFceRadRfRSSI      OBJECT-TYPE
+        SYNTAX        INTEGER (-100..0)
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "ODU Receiver Level in dBm"
+        ::= {infoFceRadRf 1}
+
+-- 3.3.2  infoFceRadMod - Basic information about IDU
+--------------------------------------------------------------------------------
+infoFceRadModSync     OBJECT-TYPE
+        SYNTAX        INTEGER
+                      {
+                      nosync (0),
+                      sync (1)
+                      }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Modem part synchronization status"
+        ::= {infoFceRadMod 1}        
+       
+infoFceRadModMSE      OBJECT-TYPE
+        SYNTAX        INTEGER (-500..0)
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "Actual MSE level !!attention!! level in 0.1 dB"
+        ::= {infoFceRadMod 2}
+        
+-- 3.3.3  infoFceRadOpt - Optional ODU/IDU information
+--------------------------------------------------------------------------------
+infoFceRadOptIduTemp  OBJECT-TYPE
+        SYNTAX        INTEGER (-50..100)
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "IDU Temperature in 0C"
+        ::= {infoFceRadOpt 1}        
+
+infoFceRadOptOduTemp  OBJECT-TYPE
+        SYNTAX        INTEGER (-50..100)
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION   "ODU Temperature in 0C"
+        ::= {infoFceRadOpt 2}
+        
+infoFceRadOptIduExtAGC OBJECT-TYPE
+        SYNTAX         INTEGER
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "IDU External AGC gain (in 0.1 dB resolution)"
+        ::= {infoFceRadOpt 3}
+
+infoFceRadOptIduIntAGC OBJECT-TYPE
+        SYNTAX         INTEGER
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION    "IDU Internal AGC gain (in 0.1 dB resolution)"
+        ::= {infoFceRadOpt 4}
+        
+infoFceRadOptIduBitrate OBJECT-TYPE
+        SYNTAX          INTEGER
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Actual traffic bitrate (in Mbps)"
+        ::= {infoFceRadOpt 5}                                 
+                             
+--------------------------------------------------------------------------------
+-- 4. Statistic Function Level Section
+--------------------------------------------------------------------------------
+statFceBas    OBJECT IDENTIFIER ::= { statFce 1 }
+statFceDat    OBJECT IDENTIFIER ::= { statFce 2 }
+statFceHsi    OBJECT IDENTIFIER ::= { statFce 3 }
+statFceBer    OBJECT IDENTIFIER ::= { statFce 4 }
+--------------------------------------------------------------------------------
+
+--------------------------------------------------------------------------------
+-- 4.1 Basic System Statistics
+--------------------------------------------------------------------------------
+statFceBasRfi OBJECT IDENTIFIER ::= { statFceBas 1 }
+
+-- 4.1.1  statFceBasRfi - Detailed RFI counters 
+--------------------------------------------------------------------------------
+statFceBasRfiRxC    OBJECT-TYPE
+     SYNTAX         Counter64
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION    "Counter of received packets at RFI mux (PBPS)"
+     ::= { statFceBasRfi 1 }
+     
+statFceBasRfiRxErr  OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION    "Counter of received error packets at RFI mux (PBPS)"
+     ::= { statFceBasRfi 2 }     
+     
+statFceBasRfiRxSync OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION    "Counter of sync. events at RFI mux (PBPS)"
+     ::= { statFceBasRfi 3 }
+     
+statFceBasRfiEfs    OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION    "Time of Error Free Function in seconds at RFI mux (PBPS)"
+     ::= { statFceBasRfi 4 }     
+ 
+statFceBasRfiErs    OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION    "Time of Error Function in seconds at RFI mux (PBPS)"
+     ::= { statFceBasRfi 5 }
+     
+statFceBasRfiTle    OBJECT-TYPE
+     SYNTAX         Counter32
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION    "Time from Last Error in seconds at RFI mux (PBPS)"
+     ::= { statFceBasRfi 6 }    
+     
+--------------------------------------------------------------------------------
+-- 4.2 Detailed Data Traffic statistic
+--------------------------------------------------------------------------------
+etherIfBas      OBJECT IDENTIFIER ::= { statFceDat 1 }
+etherIfStats    OBJECT IDENTIFIER ::= { statFceDat 2 }
+
+-- 4.2.1  etherIfBas - Basic ETH counters 
+--------------------------------------------------------------------------------
+etherIfBasLanA1Disc   OBJECT-TYPE
+     SYNTAX           Counter32
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION      "Number of discarded packets at LAN A1 port
+                      (GIGE port) - FIFO overflow"
+     ::= { etherIfBas 1 }
+
+etherIfBasLanA1Filt   OBJECT-TYPE
+     SYNTAX           Counter32
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION      "Number of filtered packets at LAN A1 port
+                      (GIGE port) - MAC filtering"
+     ::= { etherIfBas 2 }
+
+etherIfBasLanA1Err    OBJECT-TYPE
+     SYNTAX           Counter32
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION      "Number of error packets at LAN A1 port
+                      (GIGE port) - CRC error, short or long packets"
+     ::= { etherIfBas 3 }
+
+etherIfBasWanADisc    OBJECT-TYPE
+     SYNTAX           Counter32
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION      "Number of discarded packets at WAN A port
+                      (RFI port) - FIFO overflow"
+     ::= { etherIfBas 4 }     
+     
+etherIfBasWanAFilt    OBJECT-TYPE
+     SYNTAX           Counter32
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION      "Number of filtered packets at WAN A port
+                      (RFI port) - MAC filtering"
+     ::= { etherIfBas 5 }
+
+etherIfBasWanARx      OBJECT-TYPE
+     SYNTAX           Counter32
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION      "Number of received packets at WAN A port
+                      (RFI port)"
+     ::= { etherIfBas 6 }     
+
+etherIfBasLanB1Tx     OBJECT-TYPE
+     SYNTAX           Counter32
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION      "Number of transmitted packets at LAN B1 port
+                      (FastETH port)"
+     ::= { etherIfBas 7 }
+
+etherIfBasLanB1Rx     OBJECT-TYPE
+     SYNTAX           Counter32
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION      "Number of received packets at LAN B1 port
+                      (FastETH port)"
+     ::= { etherIfBas 8 }
+
+etherIfBasLanB1Err    OBJECT-TYPE
+     SYNTAX           Counter32
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION      "Number of error packets at LAN B1 port
+                      (FastETH port)"
+     ::= { etherIfBas 9 }
+
+etherIfBasCpuTx       OBJECT-TYPE
+     SYNTAX           Counter32
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION      "Number of transmitted packets at WAN B port
+                      (CPU port)"
+     ::= { etherIfBas 10 }
+
+etherIfBasCpuRx       OBJECT-TYPE
+     SYNTAX           Counter32
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION      "Number of received packets at WAN B port
+                      (CPU port)"
+     ::= { etherIfBas 11 }
+
+etherIfBasCpuErr      OBJECT-TYPE
+     SYNTAX           Counter32
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION      "Number of error packets at WAN B port
+                      (CPU port)"
+     ::= { etherIfBas 12 }     
+
+etherIfBasWanATxUtil  OBJECT-TYPE
+     SYNTAX           Unsigned32
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION      "Actual WAN_A port per second Utilization  - Tx packets"
+     ::= { etherIfBas 13 }
+
+etherIfBasWanARxUtil  OBJECT-TYPE
+     SYNTAX           Unsigned32
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION      "Actual WAN_A port per second Utilization  - Rx packets"
+     ::= { etherIfBas 14 }
+     
+etherIfBasLanA2Disc   OBJECT-TYPE
+     SYNTAX           Counter32
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION      "Number of discarded packets at LAN A2 port
+                      (switch B interconnection) FIFO overflow"
+     ::= { etherIfBas 15 }
+
+etherIfBasLanA2Filt   OBJECT-TYPE
+     SYNTAX           Counter32
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION      "Number of filtered packets at LAN A2 port
+                      (switch B interconnection) MAC filtering"
+     ::= { etherIfBas 16 }
+
+etherIfBasLanA2Err    OBJECT-TYPE
+     SYNTAX           Counter32
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION      "Number of error packets at LAN A2 port
+                      (switch B interconnec.),CRC error, short or long packets"
+     ::= { etherIfBas 17 }
+
+etherIfBasLanB2Disc   OBJECT-TYPE
+     SYNTAX           Counter32
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION      "Number of discarded packets at LAN B2 port
+                      (switch A interconnection) FIFO overflow"
+     ::= { etherIfBas 18 }
+
+etherIfBasLanB2Filt   OBJECT-TYPE
+     SYNTAX           Counter32
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION      "Number of filtered packets at LAN B2 port
+                      (switch A interconnection) MAC filtering"
+     ::= { etherIfBas 19 }
+
+etherIfBasLanB2Err    OBJECT-TYPE
+     SYNTAX           Counter32
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION      "Number of error packets at LAN B2 port
+                      (switch A interconnec.),CRC error, short or long packets"
+     ::= { etherIfBas 20 }                            
+     
+-- 4.2.2  etherIfStats - Detailed ETH counters 
+--------------------------------------------------------------------------------
+etherIfStatsTable OBJECT-TYPE
+     SYNTAX     SEQUENCE OF EtherIfStatsEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+         "A list of Ethernet statistics entries."
+     ::= { etherIfStats 1 }
+
+etherIfStatsEntry OBJECT-TYPE
+     SYNTAX     EtherIfStatsEntry
+     MAX-ACCESS not-accessible
+     STATUS     current
+     DESCRIPTION
+         "A collection of statistics kept for a particular
+         Ethernet interface.  As an example, an instance of the
+         etherIfStatsPkts object might be named etherIfStatsPkts.1"
+     INDEX { etherIfStatsIndex }
+     ::= { etherIfStatsTable 1 }
+
+EtherIfStatsEntry ::= SEQUENCE {
+     etherIfStatsIndex                    Integer32,
+     etherIfStatsInGoodOctetsLo           Counter32,
+     etherIfStatsInGoodOctetsHi           Counter32,
+     etherIfStatsInBadOctets              Counter32,
+     etherIfStatsInUnicastPkts            Counter32,
+     etherIfStatsInBroadcastPkts          Counter32,
+     etherIfStatsInMulticastPkts          Counter32,
+     etherIfStatsInPausePkts              Counter32,
+     etherIfStatsInUndersizePkts          Counter32,
+     etherIfStatsInFragments              Counter32,
+     etherIfStatsInOversizePkts           Counter32,
+     etherIfStatsInJabbers                Counter32,
+     etherIfStatsInRxErr                  Counter32,
+     etherIfStatsInFCSErr                 Counter32,
+     etherIfStatsOutGoodOctetsLo          Counter32,
+     etherIfStatsOutGoodOctetsHi          Counter32,
+     etherIfStatsOutUnicastPkts           Counter32,
+     etherIfStatsOutBroadcastPkts         Counter32,
+     etherIfStatsOutMulticastPkts         Counter32,
+     etherIfStatsOutPausePkts             Counter32,
+     etherIfStatsOutFCSErr                Counter32,
+     etherIfStatsIOPkts64Octets           Counter32,
+     etherIfStatsIOPkts65to127Octets      Counter32,
+     etherIfStatsIOPkts128to255Octets     Counter32,
+     etherIfStatsIOPkts256to511Octets     Counter32,
+     etherIfStatsIOPkts512to1023Octets    Counter32,
+     etherIfStatsIOPkts1024toMaxOctets    Counter32
+ }
+
+etherIfStatsIndex OBJECT-TYPE
+     SYNTAX     Integer32 (1..3)
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The value of this object uniquely identifies this
+         etherIfStats entry."
+     ::= { etherIfStatsEntry 1 }
+
+etherIfStatsInGoodOctetsLo OBJECT-TYPE
+     SYNTAX     Counter32
+     UNITS      "Octets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The lower 32-bits of the 64-bit InGoodOctets counters."
+     ::= { etherIfStatsEntry 2 }
+
+etherIfStatsInGoodOctetsHi OBJECT-TYPE
+     SYNTAX     Counter32
+     UNITS      "Octets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The upper 32-bits of the 64-bit InGoodOctets counters."
+     ::= { etherIfStatsEntry 3 }
+
+etherIfStatsInBadOctets OBJECT-TYPE
+     SYNTAX     Counter32
+     UNITS      "Octets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The sum of lengths of all bad ETH frames received."
+     ::= { etherIfStatsEntry 4 }
+
+etherIfStatsInUnicastPkts OBJECT-TYPE
+     SYNTAX     Counter32
+     UNITS      "Packets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of good frames received that have
+         a Unicast destionation GMAC address."
+     ::= { etherIfStatsEntry 5 }
+
+etherIfStatsInBroadcastPkts OBJECT-TYPE
+     SYNTAX     Counter32
+     UNITS      "Packets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of good packets received that were
+         directed to the broadcast address.  Note that this
+         does not include multicast packets."
+     ::= { etherIfStatsEntry 6 }
+
+etherIfStatsInMulticastPkts OBJECT-TYPE
+     SYNTAX     Counter32
+     UNITS      "Packets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of good packets received that were
+         directed to a multicast address.  Note that this number
+         does not include packets directed to the broadcast
+         address."
+     ::= { etherIfStatsEntry 7 }
+
+etherIfStatsInPausePkts     OBJECT-TYPE
+     SYNTAX     Counter32
+     UNITS      "Packets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of good Flowcontrol packets received."
+     ::= { etherIfStatsEntry 8 }
+
+etherIfStatsInUndersizePkts OBJECT-TYPE
+     SYNTAX     Counter32
+     UNITS      "Packets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of packets received that were
+         less than 64 octets long (excluding framing bits,
+         but including FCS octets) and were otherwise well
+         formed."
+     ::= { etherIfStatsEntry 9 }
+
+etherIfStatsInFragments OBJECT-TYPE
+     SYNTAX     Counter32
+     UNITS      "Packets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of packets received that were less than
+         64 octets in length (excluding framing bits but including
+         FCS octets) and had a bad Frame Check Sequence(FCS)."
+     ::= { etherIfStatsEntry 10 }
+
+etherIfStatsInOversizePkts OBJECT-TYPE
+     SYNTAX     Counter32
+     UNITS      "Packets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of packets received that were
+         longer than MaxSize octets (excluding framing bits,
+         but including FCS octets) and were otherwise
+         well formed."
+     ::= { etherIfStatsEntry 11 }
+
+etherIfStatsInJabbers OBJECT-TYPE
+     SYNTAX     Counter32
+     UNITS      "Packets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of packets received that were
+         longer than MaxSize octets (excluding framing bits,
+         but including FCS octets), and had a bad
+         Frame Check Sequence (FCS)."
+     ::= { etherIfStatsEntry 12 }
+
+etherIfStatsInRxErr OBJECT-TYPE
+     SYNTAX     Counter32
+     UNITS      "Packets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of packets received with RxErr
+         signal from thePHY."
+     ::= { etherIfStatsEntry 13 }
+
+etherIfStatsInFCSErr OBJECT-TYPE
+     SYNTAX     Counter32
+     UNITS      "Packets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of packets received with a CRC
+         error not counted in InFragments, In Jabbers or InRxErr."
+     ::= { etherIfStatsEntry 14 }
+     
+etherIfStatsOutGoodOctetsLo OBJECT-TYPE
+     SYNTAX     Counter32
+     UNITS      "Octets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The lower 32-bits of the 64-bit OutGoodOctets counters."
+     ::= { etherIfStatsEntry 15 }
+
+etherIfStatsOutGoodOctetsHi OBJECT-TYPE
+     SYNTAX     Counter32
+     UNITS      "Octets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The upper 32-bits of the 64-bit OutGoodOctets counters."
+     ::= { etherIfStatsEntry 16 }
+
+etherIfStatsOutUnicastPkts OBJECT-TYPE
+     SYNTAX     Counter32
+     UNITS      "Packets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The number of good frames transmitted that have
+         a Unicast destination GMAC address."
+     ::= { etherIfStatsEntry 17 }
+
+etherIfStatsOutBroadcastPkts OBJECT-TYPE
+     SYNTAX     Counter32
+     UNITS      "Packets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of good packets transmitted that were
+         directed to the broadcast address.  Note that this
+         does not include multicast packets."
+     ::= { etherIfStatsEntry 18 }
+
+etherIfStatsOutMulticastPkts OBJECT-TYPE
+     SYNTAX     Counter32
+     UNITS      "Packets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of good packets transmitted that were
+         directed to a multicast address.  Note that this number
+         does not include packets directed to the broadcast
+         address."
+     ::= { etherIfStatsEntry 19 }
+
+etherIfStatsOutPausePkts     OBJECT-TYPE
+     SYNTAX     Counter32
+     UNITS      "Packets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of good Flowcontrol packets transmitted."
+     ::= { etherIfStatsEntry 20 }
+       
+etherIfStatsOutFCSErr OBJECT-TYPE
+     SYNTAX     Counter32
+     UNITS      "Packets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of packets tried to be transmitted
+         with a bad original CRC."
+     ::= { etherIfStatsEntry 21 }
+
+etherIfStatsIOPkts64Octets OBJECT-TYPE
+     SYNTAX     Counter32
+     UNITS      "Packets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of packets (including bad
+         packets) received/transmitted that were 64 octets in length
+         (excluding framing bits but including FCS octets)."
+     ::= { etherIfStatsEntry 22 }
+
+etherIfStatsIOPkts65to127Octets OBJECT-TYPE
+     SYNTAX     Counter32
+     UNITS      "Packets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of packets (including bad
+         packets) received/transmitted that were between
+         65 and 127 octets in length inclusive
+         (excluding framing bits but including FCS octets)."
+     ::= { etherIfStatsEntry 23 }
+
+etherIfStatsIOPkts128to255Octets OBJECT-TYPE
+     SYNTAX     Counter32
+     UNITS      "Packets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of packets (including bad
+         packets) received/transmitted that were between
+         128 and 255 octets in length inclusive
+         (excluding framing bits but including FCS octets)."
+     ::= { etherIfStatsEntry 24 }
+
+etherIfStatsIOPkts256to511Octets OBJECT-TYPE
+     SYNTAX     Counter32
+     UNITS      "Packets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of packets (including bad
+         packets) received/transmitted that were between
+         256 and 511 octets in length inclusive
+         (excluding framing bits but including FCS octets)."
+     ::= { etherIfStatsEntry 25 }
+
+etherIfStatsIOPkts512to1023Octets OBJECT-TYPE
+     SYNTAX     Counter32
+     UNITS      "Packets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of packets (including bad
+         packets) received/transmitted that were between
+         512 and 1023 octets in length inclusive
+         (excluding framing bits but including FCS octets)."
+     ::= { etherIfStatsEntry 26 }
+
+etherIfStatsIOPkts1024toMaxOctets OBJECT-TYPE
+     SYNTAX     Counter32
+     UNITS      "Packets"
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "The total number of packets (including bad
+         packets) received/transmitted that were between
+         1024 and MaxSize octets in length inclusive
+         (excluding framing bits but including FCS octets)."
+     ::= { etherIfStatsEntry 27 }
+
+--------------------------------------------------------------------------------
+-- 4.3 HSI Traffic statistic
+--------------------------------------------------------------------------------
+statFceHsiCnt      OBJECT IDENTIFIER ::= { statFceHsi 1 }
+
+-- 4.3.1  statFceHsiCnt - Basic HSI counters 
+--------------------------------------------------------------------------------
+statFceHsiCntRxC      OBJECT-TYPE
+     SYNTAX           Counter64
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION      "Counter of receive packets at HSI (E3frm)"
+     ::= { statFceHsiCnt 1 }
+     
+statFceHsiCntRxErr    OBJECT-TYPE
+     SYNTAX           Counter32
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION      "Counter of receive error packets at HSI (E3frm)"
+     ::= { statFceHsiCnt 2 }
+          
+statFceHsiCntRxSync   OBJECT-TYPE
+     SYNTAX           Counter32
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION      "Counter of sync events at internal BER"
+     ::= { statFceHsiCnt 3 }
+     
+--------------------------------------------------------------------------------
+-- 4.4 BER Traffic statistic
+--------------------------------------------------------------------------------
+statFceBerCnt      OBJECT IDENTIFIER ::= { statFceBer 1 }     
+
+-- 4.4.1  statFceBerCnt - Basic BER counters 
+--------------------------------------------------------------------------------     
+statFceBerCntRxC      OBJECT-TYPE
+     SYNTAX           Counter64
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION      "Counter of receive bits at internal BER"
+     ::= { statFceBerCnt 1 }
+
+statFceBerCntRxErr    OBJECT-TYPE
+     SYNTAX           Counter32
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION      "Counter of receive error bits at internal BER"
+     ::= { statFceBerCnt 2 }
+     
+statFceBerCntRxSync   OBJECT-TYPE
+     SYNTAX           Counter32
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION      "Counter of sync events at internal BER"
+     ::= { statFceBerCnt 3 }
+
+statFceBerCntEfs      OBJECT-TYPE
+     SYNTAX           Counter32
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION      "Counter of error free function in seconds (BER)"
+     ::= { statFceBerCnt 4 }
+
+statFceBerCntErs      OBJECT-TYPE
+     SYNTAX           Counter32
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION      "Counter of error function in seconds (BER)"
+     ::= { statFceBerCnt 5 }
+
+statFceBerCntTle      OBJECT-TYPE
+     SYNTAX           Counter32
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION      "Time from last error (BER)"
+     ::= { statFceBerCnt 6 }
+     
+statFceBerCntTbe      OBJECT-TYPE
+     SYNTAX           Counter32
+     MAX-ACCESS       read-only
+     STATUS           current
+     DESCRIPTION      "Time between last errors (BER)"
+     ::= { statFceBerCnt 7 }                                          
+
+END

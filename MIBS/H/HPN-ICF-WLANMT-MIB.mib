@@ -1,0 +1,135 @@
+-- =============================================================================
+-- Copyright (c) 2010-2015 Hewlett-Packard Development Company, L.P.
+--
+-- Description:
+--   The file defines a MIB to provide wlan access controler maitenace feature.
+-- Reference:
+-- Version: V1.0
+-- History:
+--   V1.0 created by haoshitong 10530
+--     Initial version 2014-09-28
+-- =============================================================================
+HPN-ICF-WLANMT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Unsigned32, OBJECT-TYPE, MODULE-IDENTITY, Counter64
+        FROM SNMPv2-SMI
+    hpnicfCommon
+        FROM HPN-ICF-OID-MIB;
+
+hpnicfWlanMt MODULE-IDENTITY
+    LAST-UPDATED "201409281747Z"        -- September 28, 2014 at 14:50 GMT
+    ORGANIZATION
+        ""
+    CONTACT-INFO
+        ""
+    DESCRIPTION
+        "This MIB provides information about WlanMt(Wlan Maintenance) feature.
+
+        WlanMt is designed to be employed in an area that is serviced
+        by an existing wireless network.
+        It reflect the running situation on VCpu whitch used to forward packets.
+        These information include: VCpu-Usage(Past 5 secons), Total Rx\Tx\Drop
+        packets per VCpu.
+        "
+    REVISION "201409281747Z"        -- September 28, 2014 at 14:50 GMT
+    DESCRIPTION
+        "The initial revision of this MIB module."
+    ::= {  hpnicfCommon 157 }
+
+--
+-- Node definitions
+--
+
+hpnicfWlanMtVCpuInfoGroup OBJECT IDENTIFIER ::= { hpnicfWlanMt 1 }
+
+hpnicfWlanMtVCpuInfoTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF HpnicfWlanMtVCpuInfoEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table represents the list of possible VCpu information."
+    ::= { hpnicfWlanMtVCpuInfoGroup 1 }
+
+hpnicfWlanMtVCpuInfoEntry OBJECT-TYPE
+    SYNTAX HpnicfWlanMtVCpuInfoEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains possible information of each VCpu."
+    INDEX { hpnicfWlanMtVcpuID }
+    ::= { hpnicfWlanMtVCpuInfoTable 1 }
+
+HpnicfWlanMtVCpuInfoEntry ::=
+    SEQUENCE {
+        hpnicfWlanMtVcpuID
+            Unsigned32,
+        hpnicfWlanMtVcpuUsage
+            Unsigned32,
+        hpnicfWlanMtVcpuRx
+            Counter64,
+        hpnicfWlanMtVcpuTx
+            Counter64,
+        hpnicfWlanMtVcpuDrop
+            Counter64
+    }
+
+hpnicfWlanMtVcpuID OBJECT-TYPE
+    SYNTAX Unsigned32 (0..255)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Represents the Id of the VCpu."
+    ::= { hpnicfWlanMtVCpuInfoEntry 1 }
+
+hpnicfWlanMtVcpuUsage OBJECT-TYPE
+    SYNTAX Unsigned32 (0..100)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the usage of the VCpu."
+    ::= { hpnicfWlanMtVCpuInfoEntry 2 }
+
+hpnicfWlanMtVcpuRx OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the number of packets whitch vcpu has recieved."
+    ::= { hpnicfWlanMtVCpuInfoEntry 3 }
+
+hpnicfWlanMtVcpuTx OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the number of packets whitch vcpu has transmitted."
+    ::= { hpnicfWlanMtVCpuInfoEntry 4 }
+
+hpnicfWlanMtVcpuDrop OBJECT-TYPE
+    SYNTAX Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Represents the number of packets whitch vcpu has Dropped."
+    ::= { hpnicfWlanMtVCpuInfoEntry 5 }
+
+hpnicfWlanMtFrameToCpu OBJECT IDENTIFIER ::= { hpnicfWlanMt 2 }
+
+hpnicfWlanMtToCpuTxFrameCnt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total packets send to cpu successfully."
+    ::= { hpnicfWlanMtFrameToCpu 1 }
+
+hpnicfWlanMtToCpuDropFrameCnt OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total packets send to cpu failed."
+    ::= { hpnicfWlanMtFrameToCpu 2 }
+
+END

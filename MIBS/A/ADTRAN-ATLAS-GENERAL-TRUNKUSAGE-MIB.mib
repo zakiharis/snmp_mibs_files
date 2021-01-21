@@ -1,0 +1,295 @@
+ADTRAN-ATLAS-GENERAL-TRUNKUSAGE-MIB      DEFINITIONS ::= BEGIN
+
+-- TITLE:                   ADTRAN ATLAS GENERAL TRUNK USAGE MIB (1200.180L1)
+-- FILENAME:                ADTRUNKUSE.MIB
+-- PARTNUMBER:
+-- AUTHOR:                  TIM PEARSON
+-- DATE:                    07/12/2000
+
+-- Adtran ATLAS General Trunk Usage
+
+-- The Adtran ATLAS General Trunk Usage contains ASN.1 objects that
+-- store the current state of the variables that are common to all option
+-- cards for the ATLAS Product Line.
+
+-- The Adtran ATLAS General Trunk Usage consists of the following:
+--      Adtran ATLAS General Trunk Table
+
+-- The Adtran Products that support this group are:
+--      ATLAS 800
+--      ATLAS 800 Plus
+--
+
+IMPORTS
+    enterprises
+        FROM RFC1155-SMI
+    OBJECT-TYPE
+        FROM RFC-1212;
+
+-- OBJECT IDENTIFIERS
+
+adtran          OBJECT IDENTIFIER ::= { enterprises 664 }
+adMgmt          OBJECT IDENTIFIER ::= { adtran 2 }
+adATLASmg       OBJECT IDENTIFIER ::= { adMgmt 154 }
+adGenATLASmg    OBJECT IDENTIFIER ::= { adATLASmg 1 }
+adAtlasTrunkUse OBJECT IDENTIFIER ::= { adGenATLASmg 4 }
+
+-- The Number of Enties in the Trunk Usage Table
+
+adTrnkNumberOfTypes        OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This variable indicates the number of Trunk types found in the
+        System."
+    ::= { adAtlasTrunkUse 1}
+
+adTrnkTypeSummaryTable        OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AdTrnkTypeSummaryEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "A list of ATLAS Trunk Usage entries.  The
+        purpose of this table is to describe the current trunk usage of
+        a particular TYPE of Trunk (User-PRI, etc)"
+    ::= { adAtlasTrunkUse 2}
+
+adTrnkTypeSummaryEntry        OBJECT-TYPE
+    SYNTAX  AdTrnkTypeSummaryEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION ""
+    INDEX { adTrnkTypeIndex }
+    ::= { adTrnkTypeSummaryTable 1}
+
+AdTrnkTypeSummaryEntry ::=
+    SEQUENCE {
+        adTrnkTypeIndex
+            INTEGER,
+        adTrnkUsageCurrentAvailDS0
+            INTEGER,
+        adTrnkUsageCurrentInUseDS0
+            INTEGER,
+        adTrnkUsageCurrentTotalDS0
+            INTEGER,
+        adTrnkUsageAvgAvailDS0
+            INTEGER,
+        adTrnkUsageAvgTotalDS0
+            INTEGER,
+        adTrnkUsageMinAvailDS0
+            INTEGER,
+        adTrnkUsageZeroAvailDS0
+            INTEGER,
+        adTrnkUsageResetStats
+            INTEGER
+    }
+
+adTrnkTypeIndex                  OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        ""
+    ::= { adTrnkTypeSummaryEntry 1}
+
+adTrnkUsageCurrentAvailDS0        OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        ""
+    ::= { adTrnkTypeSummaryEntry 2}
+
+adTrnkUsageCurrentInUseDS0        OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        ""
+    ::= { adTrnkTypeSummaryEntry 3}
+
+adTrnkUsageCurrentTotalDS0        OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        ""
+    ::= { adTrnkTypeSummaryEntry 4}
+
+adTrnkUsageAvgAvailDS0            OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        ""
+    ::= { adTrnkTypeSummaryEntry 5}
+
+adTrnkUsageAvgTotalDS0            OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        ""
+    ::= { adTrnkTypeSummaryEntry 6}
+
+adTrnkUsageMinAvailDS0            OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        ""
+    ::= { adTrnkTypeSummaryEntry 7}
+
+adTrnkUsageZeroAvailDS0            OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        ""
+    ::= { adTrnkTypeSummaryEntry 8}
+
+adTrnkUsageResetStats             OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        ""
+    ::= { adTrnkTypeSummaryEntry 9}
+
+
+adTrnkPortSummaryTable  OBJECT-TYPE
+	SYNTAX SEQUENCE OF AdTrnkPortSummaryTableEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+	DESCRIPTION
+		""
+        ::= { adAtlasTrunkUse 3 }
+
+adTrnkPortSummaryTableEntry  OBJECT-TYPE
+	SYNTAX 	AdTrnkPortSummaryTableEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+	DESCRIPTION
+		""
+        INDEX { adTrnkPortIfIndex }
+	::= { adTrnkPortSummaryTable 1 }
+
+AdTrnkPortSummaryTableEntry ::= SEQUENCE {
+        adTrnkPortIfIndex
+                INTEGER,
+        adTrnkPortSlotNumber
+                INTEGER,
+        adTrnkPortPortNumber
+                INTEGER,
+	adTrnkPortType
+                INTEGER,
+	adTrnkPortCurrentAvailDS0
+                INTEGER,
+        adTrnkPortCurrentInUseDS0
+                INTEGER,
+	adTrnkPortCurrentTotalDS0
+                INTEGER,
+	adTrnkPortAvgAvailDS0
+                INTEGER,
+	adTrnkPortAvgTotalDS0
+                INTEGER,
+	adTrnkPortMinAvailDS0
+                INTEGER,
+	adTrnkPortZeroAvailDS0
+                INTEGER
+}
+
+adTrnkPortIfIndex  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+	DESCRIPTION
+		""
+        ::= { adTrnkPortSummaryTableEntry 1 }
+
+adTrnkPortSlotNumber  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+	DESCRIPTION
+		""
+        ::= { adTrnkPortSummaryTableEntry 2 }
+
+adTrnkPortPortNumber  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+	DESCRIPTION
+		""
+        ::= { adTrnkPortSummaryTableEntry 3 }
+
+adTrnkPortType  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+	DESCRIPTION
+		""
+        ::= { adTrnkPortSummaryTableEntry 4 }
+
+
+adTrnkPortCurrentAvailDS0  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+	DESCRIPTION
+		""
+        ::= { adTrnkPortSummaryTableEntry 5 }
+
+adTrnkPortCurrentInUseDS0  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+	DESCRIPTION
+		""
+        ::= { adTrnkPortSummaryTableEntry 6 }
+
+adTrnkPortCurrentTotalDS0  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+	DESCRIPTION
+		""
+        ::= { adTrnkPortSummaryTableEntry 7 }
+
+adTrnkPortAvgAvailDS0  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+	DESCRIPTION
+		""
+        ::= { adTrnkPortSummaryTableEntry 8 }
+
+adTrnkPortAvgTotalDS0  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+	DESCRIPTION
+		""
+        ::= { adTrnkPortSummaryTableEntry 9 }
+
+adTrnkPortMinAvailDS0  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+	DESCRIPTION
+		""
+        ::= { adTrnkPortSummaryTableEntry 10 }
+
+adTrnkPortZeroAvailDS0  OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+	DESCRIPTION
+		""
+        ::= { adTrnkPortSummaryTableEntry 11 }
+
+
+
+END
+

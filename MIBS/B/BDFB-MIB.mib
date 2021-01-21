@@ -1,0 +1,372 @@
+BDFB-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+    Integer32, Counter32, enterprises, mib-2             FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString, DateAndTime       FROM SNMPv2-TC
+    MODULE-COMPLIANCE, OBJECT-GROUP,NOTIFICATION-GROUP   FROM SNMPv2-CONF;
+
+
+bdfbMIB MODULE-IDENTITY
+    LAST-UPDATED "201103021100Z"
+    ORGANIZATION "
+        Emerson Energy Systems North America (ESNA)"
+    CONTACT-INFO "
+        Emerson Energy Systems North America
+        1510 Kansas Ave.
+        Lorain, OH 44052
+        USA "
+    DESCRIPTION "
+        Emerson Energy Systems North America(ESNA) mini-BDFB MIB. revision 1.0.0.0"
+    ::= {enterprises 885 5 }
+
+
+    emersonESNA             OBJECT IDENTIFIER ::= { enterprises 885 }
+
+    bdfbInformation         OBJECT IDENTIFIER ::= { bdfbMIB 1 }
+    bdfbStatus              OBJECT IDENTIFIER ::= { bdfbMIB 2 }
+    bdfbMeasurement         OBJECT IDENTIFIER ::= { bdfbStatus 1 }
+    bdfbTraps               OBJECT IDENTIFIER ::= { bdfbMIB 3 }
+    bdfbGroups              OBJECT IDENTIFIER ::= { bdfbMIB 4 }
+    bdfbSystemTraps         OBJECT IDENTIFIER ::= { bdfbTraps 0 }
+    bdfbBusTypeTraps        OBJECT IDENTIFIER ::= { bdfbTraps 1 }
+    bdfbBusTraps            OBJECT IDENTIFIER ::= { bdfbBusTypeTraps 0 }
+
+bdfbInformationGroup    OBJECT-GROUP
+    OBJECTS { bdfbMeterPanelVersionNumber, bdfbEthernetCardVersionNumber,
+              bdfbIdentifier }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing information to identify
+             the BDFB plant and the version of monitoring software."
+    ::= { bdfbGroups 1 }
+
+bdfbMeasurementGroup    OBJECT-GROUP
+    OBJECTS { bdfbAverageBusVoltage, bdfbTotalBusCurrent,
+              bdfbAlarm, bdfbBusIndex, bdfbBusIdentifier,
+              bdfbBusVoltage, bdfbBusCurrent, bdfbRelayIndex,
+              bdfbRelayIdentifier, bdfbRelayStatus}
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects providing BDFB Plant measurements
+            and status."
+    ::= { bdfbGroups 2 }
+
+bdfbNotificationsGroup  NOTIFICATION-GROUP
+    NOTIFICATIONS { alarmTrapBDFBRelay1, alarmTrapBDFBRelay2,
+                    alarmTrapBDFBRelay3, alarmTrapBDFBRelay4,
+                    alarmTrapBDFBAuxABSFuse, alarmTrapBDFBCommFail,
+                    trapBDFBBusFuse, trapBDFBBusLowVoltage, 
+                    trapBDFBBusPowerLost, trapBDFBBusHighCurrent1,
+                    trapBDFBBusHighCurrent2 }
+    STATUS  current
+    DESCRIPTION
+            "The notifications which indicate BDFB Plant alarms."
+    ::= { bdfbGroups 3 }
+
+-- ******** 5.1 PLANT INFORMATION (bdfbInformation)      ********
+
+    bdfbMeterPanelVersionNumber         OBJECT-TYPE
+    SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Meter Panel Firmware Version Number."
+    ::= { bdfbInformation 1}
+
+    bdfbEthernetCardVersionNumber         OBJECT-TYPE
+    SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Ethernet Card Firmware Version Number."
+    ::= { bdfbInformation 2}
+
+    bdfbIdentifier                        OBJECT-TYPE
+    SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "BDFB Identifier String."
+    ::= { bdfbInformation 3}
+
+
+-- ******** 5.2 BDFB Status (bdfbStatus)       ********
+
+-- ******** 5.2.1 BDFB MEASUREMENTS (bdfbMeasurement)  ********
+
+    bdfbAverageBusVoltage OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Average Bus Voltage."
+    ::= { bdfbMeasurement 1}
+
+    bdfbTotalBusCurrent      OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Ttotal Bus Current."
+    ::= { bdfbMeasurement 2}
+
+    bdfbAlarm OBJECT-TYPE
+        SYNTAX                  INTEGER {
+          false(0),
+          true(1)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                "An Alarm Is Active."
+    ::= { bdfbMeasurement 3 }
+
+--    bdfbHighestSeverityLevel     OBJECT-TYPE
+--    SYNTAX                 INTEGER {
+--        normal(0),
+--        minor(1),
+--        major(2)
+--        }
+--        MAX-ACCESS read-only
+--        STATUS current
+--        DESCRIPTION
+--                "The severity level is the highest active alarm level.
+--                Values: 0 = Normal, 1 = Minor, 2 = Major"
+--    ::= { bdfbMeasurement 4}
+
+
+-- ******** 5.2.2 BDFB Bus Status (bdfbBusTable)           ********
+
+-- ****** START OF BDFB Bus MEASUREMENT TABLE ********
+
+    bdfbBusTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF BDFBBusEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION     
+                "BDFB Bus Table."
+    ::= { bdfbStatus 2 }
+  
+    bdfbBusEntry OBJECT-TYPE
+        SYNTAX BDFBBusEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "BDFB Bus Table Entry."
+        INDEX { bdfbBusIndex }
+    ::= { bdfbBusTable 1 }
+
+    BDFBBusEntry ::= SEQUENCE {
+        bdfbBusIndex   INTEGER,
+        bdfbBusIdentifier    DisplayString,
+        bdfbBusVoltage       DisplayString,
+        bdfbBusCurrent INTEGER
+    }
+
+    bdfbBusIndex OBJECT-TYPE
+        SYNTAX                  INTEGER (1..8)
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+                "BDFB Bus Number."
+    ::= { bdfbBusEntry 1 }
+
+    bdfbBusIdentifier    OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "BDFB Bus Identifier."
+    ::= { bdfbBusEntry 2}
+
+    bdfbBusVoltage    OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "BDFB Bus Voltage."
+    ::= { bdfbBusEntry 3}
+
+    bdfbBusCurrent    OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "BDFB Bus Current."
+    ::= { bdfbBusEntry 4}
+
+-- ******** FINISH BDFB Bus MEASUREMENT TABLE ********
+
+
+-- ******** 5.2.3 BDFB Relay Status (bdfbRelayTable)           ********
+
+-- ****** START OF BDFB Relay Status TABLE ********
+
+    bdfbRelayTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF BDFBRelayEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION     
+                "BDFB Relay Table."
+    ::= { bdfbStatus 3 }
+  
+    bdfbRelayEntry OBJECT-TYPE
+        SYNTAX BDFBRelayEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "BDFB Relay Table Entry."
+        INDEX { bdfbRelayIndex }
+    ::= { bdfbRelayTable 1 }
+
+    BDFBRelayEntry ::= SEQUENCE {
+        bdfbRelayIndex        INTEGER,
+        bdfbRelayIdentifier   DisplayString,
+        bdfbRelayStatus       INTEGER
+    }
+
+    bdfbRelayIndex OBJECT-TYPE
+        SYNTAX                  INTEGER  (1..4)
+        MAX-ACCESS              read-only
+        STATUS                  current
+        DESCRIPTION
+                "BDFB Relay Number."
+    ::= { bdfbRelayEntry 1 }
+
+    bdfbRelayIdentifier    OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "BDFB Relay Identifier String."
+    ::= { bdfbRelayEntry 2}
+
+    bdfbRelayStatus    OBJECT-TYPE
+        SYNTAX                  INTEGER {
+          off(0),
+          on(1)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "BDFB Relay Status String."
+    ::= { bdfbRelayEntry 3}
+
+-- ******** FINISH BDFB Relay Status TABLE ********
+
+
+-- ******** 5.3 BDFB SYSTEM TRAPS (bdfbTraps)     ********
+
+
+-- ******** 5.3.0 SYSTEM TRAPS (bdfbSystemTraps)     ********
+
+
+    alarmTrapBDFBRelay1 NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "BDFB Relay 1 Typically Configured as Major Remote."
+        --#SUMMARY "BDFB Major"
+        --#SEVERITY MAJOR
+        ::= { bdfbSystemTraps 1 }
+
+    alarmTrapBDFBRelay2 NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "BDFB Relay 2 Typically Configured as Minor Remote."
+        --#SUMMARY "BDFB Minor"
+        --#SEVERITY MIMOR
+        ::= { bdfbSystemTraps 2 }
+
+
+    alarmTrapBDFBRelay3 NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "BDFB Relay 3 Typically Configured as Custom Remote."
+        --#SUMMARY "BDFB Minor"
+        --#SEVERITY MIMOR
+        ::= { bdfbSystemTraps 3 }
+
+    alarmTrapBDFBRelay4 NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "BDFB Relay 4 Typically Configured as Custom Remote."
+        --#SUMMARY "BDFB Minor"
+        --#SEVERITY MIMOR
+        ::= { bdfbSystemTraps 4 }
+
+    alarmTrapBDFBAuxABSFuse NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "Auxillary ABS Fuse Trap."
+        --#SUMMARY "Auxillary ABS Fuse"
+        --#SEVERITY MAJOR
+        ::= { bdfbSystemTraps 5 }
+
+    alarmTrapBDFBCommFail NOTIFICATION-TYPE
+        STATUS  current
+        DESCRIPTION
+                "Communication failure between ethernet card and main board."
+        --#SUMMARY "Communication failure between ethernet card and main board"
+        --#SEVERITY MAJOR
+        ::= { bdfbSystemTraps 6 }
+
+-- ****** FINISH BDFB SYSTEM ALARM TRAPS ********
+
+
+-- ******** 5.3.1 BDFB BUS TYPE TRAPS (bdfbBusTypeTraps)   ********
+
+-- ******** 5.3.1.0 START OF BDFB BUS ALARM TRAPS (bdfbBusTraps)   ********
+
+    trapBusIdentifier OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Bus Identifier. This object cannot be accessed. 
+            It is used to clarify the source of a Bus trap"
+    ::= { bdfbBusTraps 2}
+
+    trapBDFBBusFuse NOTIFICATION-TYPE
+        STATUS                  current
+        DESCRIPTION
+                "BDFB Bus Fuse Alarm."
+        --#SUMMARY "BDFB Bus Fuse Alarm"
+        --#SEVERITY MAJOR
+    ::= { bdfbBusTraps 3 }
+
+    trapBDFBBusLowVoltage NOTIFICATION-TYPE
+        STATUS                  current
+        DESCRIPTION
+                "BDFB Bus Low Voltage Alarm."
+        --#SUMMARY "BDFB Bus Low Voltage Alarm"
+        --#SEVERITY MINOR
+    ::= { bdfbBusTraps 4 }
+
+    trapBDFBBusPowerLost NOTIFICATION-TYPE
+        STATUS                  current
+        DESCRIPTION
+                "BDFB Bus Power Lost Alarm."
+        --#SUMMARY "BDFB Bus Power Lost Alarm"
+        --#SEVERITY MAJOR
+    ::= { bdfbBusTraps 5 }
+
+    trapBDFBBusHighCurrent1 NOTIFICATION-TYPE
+        STATUS                  current
+        DESCRIPTION
+                "BDFB Bus High Current 1 Alarm."
+        --#SUMMARY "BDFB Bus High Current 1 Alarm"
+        --#SEVERITY MINOR
+    ::= { bdfbBusTraps 6 }
+
+    trapBDFBBusHighCurrent2 NOTIFICATION-TYPE
+        STATUS                  current
+        DESCRIPTION
+                "BDFB Bus High Current 2 Alarm."
+        --#SUMMARY "BDFB Bus High Current 2 Alarm"
+        --#SEVERITY MAJOR
+    ::= { bdfbBusTraps 7 }
+
+-- ******** FINISH BDFB BUS ALARM TRAPS ********
+
+END

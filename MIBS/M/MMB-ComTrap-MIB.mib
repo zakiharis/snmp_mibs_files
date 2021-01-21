@@ -1,0 +1,5521 @@
+MMB-ComTrap-MIB DEFINITIONS ::= BEGIN
+
+--PRIMEQUEST system management MIB for MMB
+--
+--
+--$Copyright$
+--Copyright Fujitsu Limited 2004 - 2014
+--All rights reserved
+--
+--
+--MIB Revision: 03000001
+--
+
+IMPORTS
+	OBJECT-TYPE								FROM RFC-1212
+	TRAP-TYPE								FROM RFC-1215
+	mib-2, DisplayString					FROM RFC1213-MIB
+	TimeTicks, Counter, Gauge, IpAddress	FROM RFC1155-SMI
+	mgmt, enterprises						FROM RFC1155-SMI;
+
+--enterprises	OBJECT IDENTIFIER ::={ iso org(3) dod(6) internet(1) private(4) 1 }
+--
+--PRIMEQUEST system management MIB nodes
+--fujitsu:                    1.3.6.1.4.1.211
+-- products:                  1.3.6.1.4.1.211.1
+--  iaServer:                 1.3.6.1.4.1.211.1.31
+--   primequest:              1.3.6.1.4.1.211.1.31.1
+--    mmb:			           1.3.6.1.4.1.211.1.31.1.1
+--
+--Trap enterprise is "mmbComTrap"
+
+--FUJITSU PRIMEQUEST system management MIB nodes for MMB
+  fujitsu        OBJECT IDENTIFIER  ::={ enterprises 211 }
+  products       OBJECT IDENTIFIER  ::={ fujitsu 1 }
+  iaServer       OBJECT IDENTIFIER  ::={ products 31 }
+  primequest     OBJECT IDENTIFIER  ::={ iaServer 1 }
+   mmb			  OBJECT IDENTIFIER  ::={ primequest 1 }
+   partition     OBJECT IDENTIFIER  ::={ primequest 2 }
+    mmbVariables	OBJECT IDENTIFIER	::={ mmb	2 }
+    mmbEnterprise			OBJECT IDENTIFIER  ::={ mmb 3 }
+     mmbComTrap			OBJECT IDENTIFIER  ::={ mmbEnterprise 1 }
+
+--***************************************************************************************
+--
+--FUJITSU PRIMEQUEST system management trap parameter variables for MMB
+--	They aren't directly accessibles(can't use snmp get/set command), but sent with trap
+--
+--***************************************************************************************
+
+     trapVarComInfo	OBJECT IDENTIFIER	::={ mmbVariables 1 }
+
+trapSystemName OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "System name of the trap source."
+   ::= { trapVarComInfo 1 }
+
+trapSelEventLevel OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "SEL event level"
+   ::= { trapVarComInfo 2 }
+
+trapSelEventId OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "SEL event Identifier"
+   ::= { trapVarComInfo 3 }
+
+trapUnitName OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Unit name of the trap source."
+   ::= { trapVarComInfo 4 }
+
+trapPartitionId OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Partition identifier.
+                If the event does not relate to the Partition; this value is -1."
+   ::= { trapVarComInfo 5 }
+
+trapSelMessage OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "SEL message."
+   ::= { trapVarComInfo 6 }
+
+trapDetailId OBJECT-TYPE
+   SYNTAX   OCTET STRING (SIZE (4))
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Event detail identifier."
+   ::= { trapVarComInfo 7 }
+
+trapMmbVip OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Virtual IP address of Management board."
+   ::= { trapVarComInfo 8 }
+
+     trapVarDivInfo	OBJECT IDENTIFIER	::={ mmbVariables 2 }
+
+trapPartNo OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Part number of trap source. (NULL; if unknown.)"
+   ::= { trapVarDivInfo 1 }
+
+trapSerialNo OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Serial number of trap source. (NULL; if unknown.)"
+   ::= { trapVarDivInfo 2 }
+
+--***************************************************************************************
+--
+--FUJITSU PRIMEQUEST system management TRAP definition for MMB
+--	Trap enterprise:	mmbComTrap (.1.3.6.1.4.1.211.1.31.1.1.3.1)
+--
+--***************************************************************************************
+
+testTrap TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapMmbVip
+   }
+   DESCRIPTION "test trap"
+   --#TYPE			"Test Trap"
+   --#SUMMARY		"Test trap from %s."
+   --#ARGUMENTS		{ 0 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 1
+
+tempInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Temperature sensor: informational event occurred."
+   --#TYPE			"Temp Info "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 257
+
+volInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Voltage sensor: informational event occurred."
+   --#TYPE			"Vol Info "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 258
+
+fanInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Fan sensor: informational event occurred."
+   --#TYPE			"Fan Info "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 260
+
+platSecVioAttInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Platform Security Violation Attempt sensor: informational event occurred."
+   --#TYPE			"Plat Sec Vio Att Info "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 262
+
+cpuInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "CPU sensor: informational event occurred."
+   --#TYPE			"Cpu Info "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 263
+
+pwSupplyInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Power supply sensor: informational event occurred."
+   --#TYPE			"Pw Supply Info "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 264
+
+pwUnitInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Power unit sensor: informational event occurred."
+   --#TYPE			"Pw Unit Info "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 265
+
+dimmInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "DIMM sensor: informational event occurred."
+   --#TYPE			"Dimm Info "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 268
+
+postMemResizeInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "POST memory resize sensor: informational event occurred."
+   --#TYPE			"Post Mem Resize Info "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 270
+
+postErrInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "POST error sensor: informational event occurred."
+   --#TYPE			"Post Err Info "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 271
+
+eventLogDisableInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Event Logging Disabled sensor: informational event occurred."
+   --#TYPE			"Event Log Disable Info "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 272
+
+sysEventInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "System Event sensor: informational event occurred."
+   --#TYPE			"Sys Event Info "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 274
+
+criticalInterruptInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Critical Interrupt sensor: informational event occurred."
+   --#TYPE			"Critical Interrupt Info "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 275
+
+moduleBoardInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Module Board sensor: information event occurred."
+   --#TYPE			"Module Board Info"
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 277
+
+chassisInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Chassis sensor: informational event occurred."
+   --#TYPE			"Chassis Info "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 280
+
+cableInterconnectInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Cable Interconnect sensor: informational event occurred."
+   --#TYPE			"Cable Interconnect Info "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 283
+
+sysBootInitInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "System Boot Initiated sensor: informational event occurred."
+   --#TYPE			"Sys Boot Init Info "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 285
+
+phpSlotInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "PHP Slot sensor: informational event occurred."
+   --#TYPE			"Php Slot Info "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 289
+
+watchdogInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Watchdog sensor: informational event occurred."
+   --#TYPE			"Watchdog Info "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 291
+
+mmbSubsysHealthInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Management Subsystem Health sensor: informational event occurred."
+   --#TYPE			"Mmb Subsys Health Info"
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 296
+
+batteryInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Battery sensor: informational event occurred."
+   --#TYPE			"Battery Info "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 297
+
+versionChangeInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Version Change sensor: informational event occurred."
+   --#TYPE			"Version Change Info "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 299
+
+fruStatInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "FRU State sensor: informational event occurred."
+   --#TYPE			"Fru Stat Info "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 300
+
+sysStatInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "System Status sensor: informational event occurred."
+   --#TYPE			"Sys Stat Info "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 448
+
+fanSpeedCtlInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Fan Speed Control sensor: informational event occurred."
+   --#TYPE			"Fan Speed Ctl Info"
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 449
+
+mgmtFirmProgInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Management Firmware Progress sensor: informational event occurred."
+   --#TYPE			"Mgmt Firm Prog Info "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 453
+
+upcIfInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "UPC Interface sensor: informational event occurred."
+   --#TYPE			"Upc If Info "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 454
+
+clockInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Clock sensor: informational event occurred."
+   --#TYPE			"Clock Info "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 455
+
+chipsetInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Chipset sensor: informational event occurred."
+   --#TYPE			"Chipset Info "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 456
+
+moduleInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Module sensor: informational event occurred."
+   --#TYPE			"Module Info "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 457
+
+configurationInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Configuration sensor: informational event occurred."
+   --#TYPE			"Configuration Info "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 458
+
+mainteModeInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Maintenance Mode sensor: informational event occurred."
+   --#TYPE			"Maintenance Mode Info "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 460
+
+firmUpModeInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Firmware Update Mode sensor: informational event occurred."
+   --#TYPE			"Firmware Update Mode Info "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 462
+
+storageDrvStatusInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Storage Drive Status sensor: informational event occurred."
+   --#TYPE			"Storage Drive Status Info "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 487
+
+tempMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Temperature sensor: minor event occurred."
+   --#TYPE			"Temp Minor "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MINOR
+   ::= 513
+
+volMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Voltage sensor: minor event occurred."
+   --#TYPE			"Vol Minor "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MINOR
+   ::= 514
+
+fanMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Fan sensor: minor event occurred."
+   --#TYPE			"Fan Minor "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MINOR
+   ::= 516
+
+platSecVioAttMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Platform Security Violation Attempt sensor: minor event occurred."
+   --#TYPE			"Plat Sec Vio Att Minor "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 518
+
+cpuMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "CPU sensor: minor event occurred."
+   --#TYPE			"Cpu Minor "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MINOR
+   ::= 519
+
+pwSupplyMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Power supply sensor: minor event occurred."
+   --#TYPE			"Pw Supply Minor "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MINOR
+   ::= 520
+
+pwUnitMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Power unit sensor: minor event occurred."
+   --#TYPE			"Pw Unit Minor "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MINOR
+   ::= 521
+
+dimmMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "DIMM sensor: minor event occurred."
+   --#TYPE			"Dimm Minor "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MINOR
+   ::= 524
+
+postMemResizeMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "POST memory resize sensor: minor event occurred."
+   --#TYPE			"Post Mem Resize Minor "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 526
+
+postErrMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "POST error sensor: minor event occurred."
+   --#TYPE			"Post Err Minor "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 527
+
+eventLogDisableMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Event Logging Disabled sensor: minor event occurred."
+   --#TYPE			"Event Log Disable Minor "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 528
+
+sysEventMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "System Event sensor: minor event occurred."
+   --#TYPE			"Sys Event Minor "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 530
+
+criticalInterruptMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Critical Interrupt sensor: minor event occurred."
+   --#TYPE			"Critical Interrupt Minor "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 531
+
+moduleBoardMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Module Board sensor: minor event occurred."
+   --#TYPE			"Module Board Minor"
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MINOR
+   ::= 533
+
+chassisMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Chassis sensor: minor event occurred."
+   --#TYPE			"Chassis Minor "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MINOR
+   ::= 536
+
+cableInterconnectMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Cable Interconnect sensor: minor event occurred."
+   --#TYPE			"Cable Interconnect Minor "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MINOR
+   ::= 538
+
+sysBootInitMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "System Boot Interrupt sensor: minor event occurred."
+   --#TYPE			"Sys Boot Init Minor "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 541
+
+phpSlotMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "PHP Slot sensor: minor event occurred."
+   --#TYPE			"Php Slot Minor "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MINOR
+   ::= 545
+
+watchdogMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Watchdog sensor: minor event occurred."
+   --#TYPE			"Watchdog Minor "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 547
+
+mmbSubsysHealthMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Management Subsystem Health sensor: minor event occurred."
+   --#TYPE			"Mmb Subsys Health Minor"
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MINOR
+   ::= 552
+
+batteryMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Battery sensor: minor event occurred."
+   --#TYPE			"Battery Minor "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MINOR
+   ::= 553
+
+versionChangeMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Version Change sensor: minor event occurred."
+   --#TYPE			"Version Change Minor "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MINOR
+   ::= 555
+
+fruStatMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "FRU State sensor: minor event occurred."
+   --#TYPE			"Fru Stat Minor "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MINOR
+   ::= 556
+
+sysStatMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "System Status sensor: minor event occurred."
+   --#TYPE			"Sys Stat Minor "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 704
+
+fanSpeedCtlMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Fan Speed Control sensor: minor event occurred."
+   --#TYPE			"Fan Speed Ctl Minor"
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MINOR
+   ::= 705
+
+mgmtFirmProgMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Management Firmware Progress sensor: minor event occurred."
+   --#TYPE			"Mgmt Firm Prog Minor "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MINOR
+   ::= 709
+
+upcIfMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "UPC Interface sensor: minor event occurred."
+   --#TYPE			"Upc If Minor "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MINOR
+   ::= 710
+
+clockMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Clock sensor: minor event occurred."
+   --#TYPE			"Clock Minor "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MINOR
+   ::= 711
+
+chipsetMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Chipset sensor: minor event occurred."
+   --#TYPE			"Chipset Minor "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MINOR
+   ::= 712
+
+moduleMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Module sensor: minor event occurred."
+   --#TYPE			"Module Minor "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MINOR
+   ::= 713
+
+configurationMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Configuration sensor: minor event occurred."
+   --#TYPE			"Configuration Minor "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MINOR
+   ::= 714
+
+mainteModeMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Maintenance Mode sensor: minor event occurred."
+   --#TYPE			"Maintenance Mode Minor "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MINOR
+   ::= 716
+
+firmUpModeMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Firmware Update Mode sensor: minor event occurred."
+   --#TYPE			"Firmware Update Mode Minor "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MINOR
+   ::= 718
+
+storageDrvStatusMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Storage Drive Status sensor: minor event occurred."
+   --#TYPE			"Storage Drive Status Minor "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MINOR
+   ::= 743
+
+tempMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Temperature sensor: major event occurred."
+   --#TYPE			"Temp Major "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MAJOR
+   ::= 769
+
+volMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Voltage sensor: major event occurred."
+   --#TYPE			"Vol Major "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MAJOR
+   ::= 770
+
+fanMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Fan sensor: major event occurred."
+   --#TYPE			"Fan Major "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MAJOR
+   ::= 772
+
+platSecVioAttMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Platform Security Violation Attempt sensor: major event occurred."
+   --#TYPE			"Plat Sec Vio Att Major "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 774
+
+cpuMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "CPU sensor: major event occurred."
+   --#TYPE			"Cpu Major "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MAJOR
+   ::= 775
+
+pwSupplyMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Power supply sensor: major event occurred."
+   --#TYPE			"Pw Supply Major "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MAJOR
+   ::= 776
+
+pwUnitMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Power unit sensor: major event occurred."
+   --#TYPE			"Pw Unit Major "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MAJOR
+   ::= 777
+
+dimmMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "DIMM sensor: major event occurred."
+   --#TYPE			"Dimm Major "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MAJOR
+   ::= 780
+
+postMemResizeMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "POST memory resize sensor: major event occurred."
+   --#TYPE			"Post Mem Resize Major "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 782
+
+postErrMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "POST error sensor: major event occurred."
+   --#TYPE			"Post Err Major "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 783
+
+eventLogDisableMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Event Logging Disabled sensor: major event occurred."
+   --#TYPE			"Event Log Disable Major "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 784
+
+sysEventMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "System Event sensor: major event occurred."
+   --#TYPE			"Sys Event Major "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 786
+
+criticalInterruptMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Critical Interrupt sensor: major event occurred."
+   --#TYPE			"Critical Interrupt Major "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 787
+
+moduleBoardMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Module Board sensor: major event occurred."
+   --#TYPE			"Module Board Major"
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MAJOR
+   ::= 789
+
+chassisMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Chassis sensor: major event occurred."
+   --#TYPE			"Chassis Major "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MAJOR
+   ::= 792
+
+cableInterconnectMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Cable Interconnect sensor: major event occurred."
+   --#TYPE			"Cable Interconnect Major "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MAJOR
+   ::= 795
+
+sysBootInitMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "System Boot Initiated sensor: major event occurred."
+   --#TYPE			"Sys Boot Init Major "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 797
+
+phpSlotMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "PHP Slot sensor: major event occurred."
+   --#TYPE			"Php Slot Major "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MAJOR
+   ::= 801
+
+watchdogMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Watchdog sensor: major event occurred."
+   --#TYPE			"Watchdog Major "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 803
+
+mmbSubsysHealthMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Management Subsystem Health sensor: major event occurred."
+   --#TYPE			"Mmb Subsys Health Major"
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MAJOR
+   ::= 808
+
+batteryMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Battery sensor: major event occurred."
+   --#TYPE			"Battery Major "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MAJOR
+   ::= 809
+
+versionChangeMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Version Change sensor: major event occurred."
+   --#TYPE			"Version Change Major "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MAJOR
+   ::= 811
+
+fruStatMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "FRU State sensor: major event occurred."
+   --#TYPE			"Fru Stat Major "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MAJOR
+   ::= 812
+
+sysStatMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "System Status sensor: major event occurred."
+   --#TYPE			"Sys Stat Major "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 960
+
+fanSpeedCtlMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Fan Speed Control sensor: major event occurred."
+   --#TYPE			"Fan Speed Ctl Major"
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MAJOR
+   ::= 961
+
+mgmtFirmProgMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Management Firmware Progress sensor: major event occurred."
+   --#TYPE			"Mgmt Firm Prog Major "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MAJOR
+   ::= 965
+
+upcIfMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "UPC Interface sensor: major event occurred."
+   --#TYPE			"Upc If Major "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MAJOR
+   ::= 966
+
+clockMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Clock sensor: major event occurred."
+   --#TYPE			"Clock Major "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MAJOR
+   ::= 967
+
+chipsetMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Chipset sensor: major event occurred."
+   --#TYPE			"Chipset Major "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MAJOR
+   ::= 968
+
+moduleMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Module sensor: major event occurred."
+   --#TYPE			"Module Major "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MAJOR
+   ::= 969
+
+configurationMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Configuration sensor: major event occurred."
+   --#TYPE			"Configuration Major "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MAJOR
+   ::= 970
+
+mainteModeMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Maintenance Mode sensor: major event occurred."
+   --#TYPE			"Maintenance Mode Major "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MAJOR
+   ::= 972
+
+firmUpModeMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Firmware Update Mode sensor: major event occurred."
+   --#TYPE			"Firmware Update Mode Major "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MAJOR
+   ::= 974
+
+storageDrvStatusMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Storage Drive Status sensor: major event occurred."
+   --#TYPE			"Storage Drive Status Major "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MAJOR
+   ::= 999
+
+tempCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Temperature sensor: critical event occurred."
+   --#TYPE			"Temp Critical "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 1025
+
+volCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Voltage sensor: critical event occurred."
+   --#TYPE			"Vol Critical "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 1026
+
+fanCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Fan sensor: critical event occurred."
+   --#TYPE			"Fan Critical "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 1028
+
+platSecVioAttCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Platform Security Violation Attempt sensor: critical event occurred."
+   --#TYPE			"Plat Sec Vio Att Critical "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 1030
+
+cpuCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "CPU sensor: critical event occurred."
+   --#TYPE			"Cpu Critical "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 1031
+
+pwSupplyCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Power supply sensor: critical event occurred."
+   --#TYPE			"Pw Supply Critical "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 1032
+
+pwUnitCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Power unit sensor: critical event occurred."
+   --#TYPE			"Pw Unit Critical "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 1033
+
+dimmCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "DIMM sensor: critical event occurred."
+   --#TYPE			"Dimm Critical "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 1036
+
+postMemResizeCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "POST memory resize sensor: critical event occurred."
+   --#TYPE			"Post Mem Resize Critical "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 1038
+
+postErrCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "POST error sensor: critical event occurred."
+   --#TYPE			"Post Err Critical "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 1039
+
+eventLogDisableCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Event Logging Disabled sensor: critical event occurred."
+   --#TYPE			"Event Log Disable Critical "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 1040
+
+sysEventCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "System Event sensor: critical event occurred."
+   --#TYPE			"Sys Event Critical "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 1042
+
+criticalInterruptCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Critical Interrupt sensor: critical event occurred."
+   --#TYPE			"Critical Interrupt Critical "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 1043
+
+moduleBoardCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Module Board sensor: critical event occurred."
+   --#TYPE			"Module Board Critical"
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 1045
+
+chassisCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Chassis sensor: critical event occurred."
+   --#TYPE			"Chassis Critical "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 1048
+
+cableInterconnectCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Cable Interconnect sensor: critical event occurred."
+   --#TYPE			"Cable Interconnect Critical "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 1051
+
+sysBootInitCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "System Boot Initiated sensor: critical event occurred."
+   --#TYPE			"Sys Boot Init Critical "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 1053
+
+phpSlotCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "PHP Slot sensor: critical event occurred."
+   --#TYPE			"Php Slot Critical "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 1057
+
+watchdogCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Watchdog sensor: critical event occurred."
+   --#TYPE			"Watchdog Critical "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 1059
+
+mmbSubsysHealthCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Management Subsystem Health sensor: critical event occurred."
+   --#TYPE			"Mmb Subsys Health Critical"
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 1064
+
+batteryCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Battery sensor: critical event occurred."
+   --#TYPE			"Battery Critical "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 1065
+
+versionChangeCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Version Change sensor: critical event occurred."
+   --#TYPE			"Version Change Critical "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 1067
+
+fruStatCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "FRU State sensor: critical event occurred."
+   --#TYPE			"Fru Stat Critical "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 1068
+
+sysStatCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "System Status sensor: critical event occurred."
+   --#TYPE			"Sys Stat Critical "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 1216
+
+fanSpeedCtlCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Fan Speed Control sensor: critical event occurred."
+   --#TYPE			"Fan Speed Ctl Critical"
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 1217
+
+mgmtFirmProgCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Management Firmware Progress sensor: critical event occurred."
+   --#TYPE			"Mgmt Firm Prog Critical "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 1221
+
+upcIfCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "UPC Interface sensor: critical event occurred."
+   --#TYPE			"Upc If Critical "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 1222
+
+clockCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Clock sensor: critical event occurred."
+   --#TYPE			"Clock Critical "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 1223
+
+chipsetCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Chipset sensor: critical event occurred."
+   --#TYPE			"Chipset Critical "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 1224
+
+moduleCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Module sensor: critical event occurred."
+   --#TYPE			"Module Critical "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 1225
+
+configurationCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Configuration sensor: critical event occurred."
+   --#TYPE			"Configuration Critical "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 1226
+
+mainteModeCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Maintenance Mode sensor: critical event occurred."
+   --#TYPE			"Maintenance Mode Critical "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 1228
+
+firmUpModeCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Firmware Update Mode sensor: critical event occurred."
+   --#TYPE			"Firmware Update Mode Critical "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 1230
+
+storageDrvStatusCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "Storage Drive Status sensor: critical event occurred."
+   --#TYPE			"Storage Drive Status Critical "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 1255
+
+bmcTempInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Temperature sensor: informational event occurred."
+   --#TYPE			"Bmc Temp Info "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 65793
+
+bmcCurrentInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Current sensor: informational event occurred."
+   --#TYPE			"Bmc Current Info "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 65795
+
+bmcCpuInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC CPU sensor: informational event occurred."
+   --#TYPE			"Bmc Cpu Info "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 65799
+
+bmcDimmInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC DIMM sensor: informational event occurred."
+   --#TYPE			"Bmc Dimm Info "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 65804
+
+bmcPostMemResizeInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC POST Memory Resize sensor: informational event occurred."
+   --#TYPE			"Bmc Post Mem Resize Info "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 65806
+
+bmcSysFwProgInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC System Firmware Progress sensor: informational event occurred."
+   --#TYPE			"Bmc Sys Fw Prog Info "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 65807
+
+bmcEventLogDisableInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Event Logging Disabled sensor: informational event occurred."
+   --#TYPE			"Bmc Event Log Disable Info "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 65808
+
+bmcSysEvtInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC System Event sensor: informational event occurred."
+   --#TYPE			"Bmc Sys Evt Info "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 65810
+
+bmcCriticalIntrruptInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Critical Interrupt sensor: informational event occurred."
+   --#TYPE			"Bmc Critical Interrupt Info"
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 65811
+
+bmcModuleBoardInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Module Board sensor: informational event occurred."
+   --#TYPE			"Bmc Module Board Info"
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 65813
+
+bmcChipSetInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Chip Set sensor: informational event occurred."
+   --#TYPE			"Bmc Chip Set Info"
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 65817
+
+bmcCableInterconInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Cable Interconnect sensor: informational event occurred."
+   --#TYPE			"Bmc Cable Intercon Info"
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 65819
+
+bmcOSStpInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC OS Stop sensor: informational event occurred."
+   --#TYPE			"Bmc OS Stop Info"
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 65824
+
+bmcSlotConInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Slot Connector sensor: informational event occurred."
+   --#TYPE			"Bmc Slot Con Info"
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 65825
+
+bmcWatchdogInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Watchdog sensor: informational event occurred."
+   --#TYPE			"Bmc Watchdog Info "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 65827
+
+bmcBatteryInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Battery sensor: informational event occurred."
+   --#TYPE			"Bmc Battery Info "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 65833
+
+bmcVersionChangeInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Version Change sensor: informational event occurred."
+   --#TYPE			"Bmc Version Change Info "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 65835
+
+bmcI2cErrInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC I2c Error sensor: informational event occurred."
+   --#TYPE			"Bmc I2c Err Info "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 65984
+
+bmcDiagnosticInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Diagnostic sensor: informational event occurred."
+   --#TYPE			"Bmc Diagnostic Info "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 65995
+
+bmcCpuStatusInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC CPU Status sensor: informational event occurred."
+   --#TYPE			"Bmc Cpu Status Info "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 66011
+
+bmcMemMdStatInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Memory Module Status sensor: informational event occurred."
+   --#TYPE			"Bmc Mem Md Stat Info "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 66014
+
+bmcMemMdConfigStatInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Memory Module Configuration Status sensor: informational event occurred."
+   --#TYPE			"Bmc Mem Md Config Stat Info "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 66015
+
+bmcMemMdInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Memory Module sensor: informational event occurred."
+   --#TYPE			"Bmc Mem Md Info "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 66017
+
+bmcSysFirmErrExtInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC System Firmware Error Extended sensor: informational event occurred."
+   --#TYPE			"Bmc Sys Firm Err Ext Info "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 66019
+
+bmcPlatformConfigInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Platform Configuration sensor: informational event occurred."
+   --#TYPE			"Bmc Platform Config Info "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 66020
+
+bmcDataSyncInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Data Sync sensor: informational event occurred."
+   --#TYPE			"Bmc Data Sync Info "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 66031
+
+bmcTempMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Temperature sensor: minor event occurred."
+   --#TYPE			"Bmc Temp Minor "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MINOR
+   ::= 66049
+
+bmcCurrentMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Current sensor: minor event occurred."
+   --#TYPE			"Bmc Current Minor "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MINOR
+   ::= 66051
+
+bmcCpuMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC CPU sensor: minor event occurred."
+   --#TYPE			"Bmc Cpu Minor "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MINOR
+   ::= 66055
+
+bmcDimmMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC DIMM sensor: minor event occurred."
+   --#TYPE			"Bmc Dimm Minor "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MINOR
+   ::= 66060
+
+bmcPostMemResizeMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC POST Memory Resize sensor: minor event occurred."
+   --#TYPE			"Bmc Post Mem Resize Minor "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MINOR
+   ::= 66062
+
+bmcSysFwProgMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC System Firmware Progress sensor: minor event occurred."
+   --#TYPE			"Bmc Sys Fw Prog Minor "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 66063
+
+bmcEventLogDisableMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Event Logging Disabled sensor: minor event occurred."
+   --#TYPE			"Bmc Event Log Disable Minor "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 66064
+
+bmcSysEvtMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC System Event sensor: minor event occurred."
+   --#TYPE			"Bmc Sys Evt Minor"
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MINOR
+   ::= 66066
+
+bmcCriticalIntrruptMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Critical Interrupt sensor: minor event occurred."
+   --#TYPE			"Bmc Critical Interrupt Minor"
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MINOR
+   ::= 66067
+
+bmcModuleBoardMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Module Board sensor: minor event occurred."
+   --#TYPE			"Bmc Module Board Minor"
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MINOR
+   ::= 66069
+
+bmcChipSetMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Chip Set sensor: minor event occurred."
+   --#TYPE			"Bmc Chip Set Minor"
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MINOR
+   ::= 66073
+
+bmcCableInterconMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Cable Interconnect sensor: minor event occurred."
+   --#TYPE			"Bmc Cable Intercon Minor"
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MINOR
+   ::= 66075
+
+bmcOSStpMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC OS Stop sensor: minor event occurred."
+   --#TYPE			"Bmc OS Stop Minor"
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 66080
+
+bmcSlotConMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Slot Connector sensor: minor event occurred."
+   --#TYPE			"Bmc Slot Con Minor"
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MINOR
+   ::= 66081
+
+bmcWatchdogMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Watchdog sensor: minor event occurred."
+   --#TYPE			"Bmc Watchdog Minor "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 66083
+
+bmcBatteryMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Battery sensor: minor event occurred."
+   --#TYPE			"Bmc Battery Minor "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MINOR
+   ::= 66089
+
+bmcVersionChangeMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Version Change sensor: minor event occurred."
+   --#TYPE			"Bmc Version Change Minor "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MINOR
+   ::= 66091
+
+bmcI2cErrMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC I2c Error sensor: minor event occurred."
+   --#TYPE			"Bmc I2c Err Minor "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MINOR
+   ::= 66240
+
+bmcDiagnosticMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Diagnostic sensor: minor event occurred."
+   --#TYPE			"Bmc Diagnostic Minor "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MINOR
+   ::= 66251
+
+bmcCpuStatusMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC CPU Status sensor: minor event occurred."
+   --#TYPE			"Bmc Cpu Status Minor "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MINOR
+   ::= 66267
+
+bmcMemMdStatMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Memory Module Status sensor: minor event occurred."
+   --#TYPE			"Bmc Mem Md Stat Minor "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MINOR
+   ::= 66270
+
+bmcMemMdConfigStatMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Memory Module Configuration Status sensor: minor event occurred."
+   --#TYPE			"Bmc Mem Md Config Stat Minor "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MINOR
+   ::= 66271
+
+bmcMemMdMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Memory Module sensor: minor event occurred."
+   --#TYPE			"Bmc Mem Md Minor "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MINOR
+   ::= 66273
+
+bmcSysFirmErrExtMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC System Firmware Error Extended sensor: minor event occurred."
+   --#TYPE			"Bmc Sys Firm Err Ext Minor "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MINOR
+   ::= 66275
+
+bmcPlatformConfigMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Platform Configuration sensor: minor event occurred."
+   --#TYPE			"Bmc Platform Config Minor "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MINOR
+   ::= 66276
+
+bmcDataSyncMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Data Sync sensor: minor event occurred."
+   --#TYPE			"Bmc Data Sync Minor "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MINOR
+   ::= 66287
+
+bmcTempMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Temperature sensor: major event occurred."
+   --#TYPE			"Bmc Temp Major "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MAJOR
+   ::= 66305
+
+bmcCurrentMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Current sensor: major event occurred."
+   --#TYPE			"Bmc Current Major "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MAJOR
+   ::= 66307
+
+bmcCpuMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC CPU sensor: major event occurred."
+   --#TYPE			"Bmc Cpu Major "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MAJOR
+   ::= 66311
+
+bmcDimmMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC DIMM sensor: major event occurred."
+   --#TYPE			"Bmc Dimm Major "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MAJOR
+   ::= 66316
+
+bmcPostMemResizeMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC POST Memory Resize sensor: major event occurred."
+   --#TYPE			"Bmc Post Mem Resize Major "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MAJOR
+   ::= 66318
+
+bmcSysFwProgMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC System Firmware Progress sensor: major event occurred."
+   --#TYPE			"Bmc Sys Fw Prog Major "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 66319
+
+bmcEventLogDisableMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Event Logging Disabled sensor: major event occurred."
+   --#TYPE			"Bmc Event Log Disable Major "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 66320
+
+bmcSysEvtMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC System Event sensor: major event occurred."
+   --#TYPE			"Bmc Sys Evt Major"
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MAJOR
+   ::= 66322
+
+bmcCriticalInterruptMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Critical Interrupt sensor: major event occurred."
+   --#TYPE			"Bmc Critical Interrupt Major "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MAJOR
+   ::= 66323
+
+bmcModuleBoardMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Module Board sensor: major event occurred."
+   --#TYPE			"Bmc Module Board Major"
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MAJOR
+   ::= 66325
+
+bmcChipSetMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Chip Set sensor: major event occurred."
+   --#TYPE			"Bmc Chip Set Major"
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MAJOR
+   ::= 66329
+
+bmcCableInterconMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Cable Interconnect sensor: major event occurred."
+   --#TYPE			"Bmc Cable Intercon Major"
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MAJOR
+   ::= 66331
+
+bmcOSStpMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC OS Stop sensor: major event occurred."
+   --#TYPE			"Bmc OS Stop Major"
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 66336
+
+bmcSlotConMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Slot Connector sensor: major event occurred."
+   --#TYPE			"Bmc Slot Con Major"
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MAJOR
+   ::= 66337
+
+bmcWatchdogMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Watchdog sensor: major event occurred."
+   --#TYPE			"Bmc Watchdog Major "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 66339
+
+bmcBatteryMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Battery sensor: major event occurred."
+   --#TYPE			"Bmc Battery Major "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MAJOR
+   ::= 66345
+
+bmcVersionChangeMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Version Change sensor: major event occurred."
+   --#TYPE			"Bmc Version Change Major "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MAJOR
+   ::= 66347
+
+bmcI2cErrMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC I2c Error sensor: major event occurred."
+   --#TYPE			"Bmc I2c Err Major "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MAJOR
+   ::= 66496
+
+bmcDiagnosticMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Diagnostic sensor: major event occurred."
+   --#TYPE			"Bmc Diagnostic Major "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MAJOR
+   ::= 66507
+
+bmcCpuStatusMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Cpu Status sensor: major event occurred."
+   --#TYPE			"Bmc Cpu Status Major "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MAJOR
+   ::= 66523
+
+bmcMemMdStatMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Memory Module Status sensor: major event occurred."
+   --#TYPE			"Bmc Mem Md Stat Major "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MAJOR
+   ::= 66526
+
+bmcMemMdConfigStatMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Memory Module Configuration Status sensor: major event occurred."
+   --#TYPE			"Bmc Mem Md Config Stat Major "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MAJOR
+   ::= 66527
+
+bmcMemMdMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Memory Module sensor: major event occurred."
+   --#TYPE			"Bmc Mem Md Major "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MAJOR
+   ::= 66529
+
+bmcSysFirmErrExtMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC System Firmware Error Extended sensor: major event occurred."
+   --#TYPE			"Bmc Sys Firm Err Ext Major "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MAJOR
+   ::= 66531
+
+bmcPlatformConfigMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Platform Configuration sensor: major event occurred."
+   --#TYPE			"Bmc Platform Config Major "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MAJOR
+   ::= 66532
+
+bmcDataSyncMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Data Sync sensor: major event occurred."
+   --#TYPE			"Bmc Data Sync Major "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MAJOR
+   ::= 66543
+
+bmcTempCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Temperature sensor: critical event occurred."
+   --#TYPE			"Bmc Temp Critical "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 66561
+
+bmcCurrentCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Current sensor: critical event occurred."
+   --#TYPE			"Bmc Current Critical "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 66563
+
+bmcCpuCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC CPU sensor: critical event occurred."
+   --#TYPE			"Bmc Cpu Critical "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 66567
+
+bmcDimmCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC DIMM sensor: critical event occurred."
+   --#TYPE			"Bmc Dimm Critical "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 66572
+
+bmcPostMemResizeCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC POST Memory Resize sensor: critical event occurred."
+   --#TYPE			"Bmc Post Mem Resize Critical "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 66574
+
+bmcSysFwProgCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC System Firmware Progress sensor: critical event occurred."
+   --#TYPE			"Bmc Sys Fw Prog Critical "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 66575
+
+bmcEventLogDisableCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Event Logging Disabled sensor: critical event occurred."
+   --#TYPE			"Bmc Event Log Disable Critical "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 66576
+
+bmcSysEvtCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC System Event sensor: critical event occurred."
+   --#TYPE			"Bmc Sys Evt Critical"
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 66578
+
+bmcCriticalInterruptCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Critical Interrupt sensor: critical event occurred."
+   --#TYPE			"Bmc Critical Interrupt Critical "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 66579
+
+bmcModuleBoardCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Module Board sensor: critical event occurred."
+   --#TYPE			"Bmc Module Board Critical"
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 66581
+
+bmcChipSetCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Chip Set sensor: critical event occurred."
+   --#TYPE			"Bmc Chip Set Critical"
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 66585
+
+bmcCableInterconCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Cable Interconnect sensor: critical event occurred."
+   --#TYPE			"Bmc Cable Intercon Critical"
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 66587
+
+bmcOSStpCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC OS Stop sensor: critical event occurred."
+   --#TYPE			"Bmc OS Stop Critical"
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 66592
+
+bmcSlotConCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Slot Connector sensor: critical event occurred."
+   --#TYPE			"Bmc Slot Con Critical"
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 66593
+
+bmcWatchdogCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Watchdog sensor: critical event occurred."
+   --#TYPE			"Bmc Watchdog Critical "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 66595
+
+bmcBatteryCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Battery sensor: critical event occurred."
+   --#TYPE			"Bmc Battery Critical "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 66601
+
+bmcVersionChangeCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Version Change sensor: critical event occurred."
+   --#TYPE			"Bmc Version Change Critical "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 66603
+
+bmcI2cErrCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC I2c Error sensor: critical event occurred."
+   --#TYPE			"Bmc I2c Err Critical "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 66752
+
+bmcDiagnosticCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Diagnostic sensor: critical event occurred."
+   --#TYPE			"Bmc Diagnostic Critical "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 66763
+
+bmcCpuStatusCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Cpu Status sensor: critical event occurred."
+   --#TYPE			"Bmc Cpu Status Critical "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 66779
+
+bmcMemMdStatCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Memory Module Status sensor: critical event occurred."
+   --#TYPE			"Bmc Mem Md Stat Critical "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 66782
+
+bmcMemMdConfigStatCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Memory Module Configuration Status sensor: critical event occurred."
+   --#TYPE			"Bmc Mem Md Config Stat Critical "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 66783
+
+bmcMemMdCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Memory Module sensor: critical event occurred."
+   --#TYPE			"Bmc Mem Md Critical "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 66785
+
+bmcSysFirmErrExtCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC System Firmware Error Extended sensor: critical event occurred."
+   --#TYPE			"Bmc Sys Firm Err Ext Critical "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MAJOR
+   ::= 66787
+
+bmcPlatformConfigCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Platform Configuration sensor: critical event occurred."
+   --#TYPE			"Bmc Platform Config Critical "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MAJOR
+   ::= 66788
+
+bmcDataSyncCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC Data Sync sensor: critical event occurred."
+   --#TYPE			"Bmc Data Sync Critical "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MAJOR
+   ::= 66789
+
+bmcPCIDeviceInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC PCIDevice event: informational event occurred."
+   --#TYPE			"Bmc PCIDevice Info "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 131525
+
+bmcOSBootInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC OSBoot event: informational event occurred."
+   --#TYPE			"Bmc OSBoot Info "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 131548
+
+bmcOSShutdownInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC OSShutdown event: informational event occurred."
+   --#TYPE			"Bmc OSShutdown Info "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 131804
+
+bmcOSBugcheckInfo TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC OSBugcheck event: informational event occurred."
+   --#TYPE			"Bmc OSBugcheck Info "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 131805
+
+bmcPCIDeviceMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC PCIDevice event: minor event occurred."
+   --#TYPE			"Bmc PCIDevice Minor "
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MINOR
+   ::= 131781
+
+bmcOSBootMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC OSBoot event: minor event occurred."
+   --#TYPE			"Bmc OSBoot Minor "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 131806
+
+bmcOSShutdownMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC OSShutdown event: minor event occurred."
+   --#TYPE			"Bmc OSShutdown Minor "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 131549
+
+bmcOSBugcheckMinor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC OSBugcheck event: minor event occurred."
+   --#TYPE			"Bmc OSBugcheck Minor "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 131550
+
+bmcPCIDeviceMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC PCIDevice event: major event occurred."
+   --#TYPE			"Bmc PCIDevice Major"
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		MAJOR
+   ::= 132037
+
+bmcOSBootMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC OSBoot event: major event occurred."
+   --#TYPE			"Bmc OSBoot Major"
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 132060
+
+bmcOSShutdownMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC OSShutdown event: critical event occurred."
+   --#TYPE			"Bmc OSShutdown Major "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 132316
+
+bmcOSBugcheckMajor TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC OSBugcheck event: critical event occurred."
+   --#TYPE			"Bmc OSBugcheck Major "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 132317
+
+bmcPCIDeviceCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC PCIDevice event: critical event occurred."
+   --#TYPE			"Bmc PCIDevice Critical"
+   --#SUMMARY		"%s %s %s %s %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 132293
+
+bmcOSBootCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC OSBoot event: critical event occurred."
+   --#TYPE			"Bmc OSBoot Critical"
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 132318
+
+bmcOSShutdownCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC OSShutdown event: major event occurred."
+   --#TYPE			"Bmc OSShutdown Critical "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 132061
+
+bmcOSBugcheckCritical TRAP-TYPE
+   ENTERPRISE   mmbComTrap
+   VARIABLES {
+      trapSystemName,
+      trapSelEventLevel,
+      trapSelEventId,
+      trapUnitName,
+      trapPartitionId,
+      trapSelMessage,
+      trapPartNo,
+      trapSerialNo,
+      trapDetailId,
+      trapMmbVip
+   }
+   DESCRIPTION "BMC OSBugcheck event: major event occurred."
+   --#TYPE			"Bmc OSBugcheck Critical "
+   --#SUMMARY		"%s %s %s %s(PID=%d) %s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		CRITICAL
+   ::= 132062
+
+END

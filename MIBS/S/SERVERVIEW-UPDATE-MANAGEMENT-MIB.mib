@@ -1,0 +1,659 @@
+SERVERVIEW-UPDATE-MANAGEMENT-MIB DEFINITIONS ::= BEGIN
+
+--#FILENAME        "SVUpdate.MIB"
+--#DESCRIPTION     "ServerView update management MIB - Installed/available PRIMERGY update components"
+--#REVISION        "6.21.00.00"
+--#VENDOR          "Fujitsu Technology Solutions"
+--#TRAP-ENTERPRISE svupdNotifications
+--#TRAP-VARIABLES  svupdNotificationsTrapInfo
+
+-- Copyright (C) Fujitsu Technology Solutions 2013
+-- All rights reserved
+
+   IMPORTS
+   OBJECT-TYPE                            FROM RFC-1212
+   mib-2                                  FROM RFC1213-MIB
+   DisplayString                          FROM RFC1213-MIB
+   PhysAddress                            FROM RFC1213-MIB
+   Counter, Gauge, IpAddress, enterprises FROM RFC1155-SMI;
+
+-- The Windows MIB compiler doesn't support IMPORTS.
+-- In this case uncomment the next few lines.
+-- 
+-- DisplayString ::= OCTET STRING
+-- PhysAddress   ::= OCTET STRING
+-- enterprises       OBJECT IDENTIFIER   ::= { iso org(3) dod(6) internet(1) private(4) 1 }
+
+   sni               OBJECT IDENTIFIER   ::= { enterprises    231 }
+   sniProductMibs    OBJECT IDENTIFIER   ::= { sni              2 }
+   sniExtensions     OBJECT IDENTIFIER   ::= { sniProductMibs  10 }
+   sniServerMgmt     OBJECT IDENTIFIER   ::= { sniExtensions    2 }
+
+   svUpdateMIB OBJECT IDENTIFIER   ::= { sniServerMgmt 12 }
+   svupdObjects OBJECT IDENTIFIER   ::= { svUpdateMIB 1 }
+   svupdNotifications OBJECT IDENTIFIER   ::= { svUpdateMIB 2 }
+
+   --
+   -- Textual conventions
+   --
+
+   YesNo ::= INTEGER
+   {
+      yes(1),
+      no(2)
+   }
+
+   TrueFalse ::= INTEGER
+   {
+      false(1),
+      true(2)
+   }
+
+
+-- **********************************************************************************************
+--
+-- GROUP        svupdAgentInfo
+-- DESCRIPTION  "This group defines agent specific objects like agent name,
+--               vendor name and version"
+--
+--      svupdAgentInfo group: 1.3.6.1.4.1.231.2.10.2.12.1.1
+--
+-- **********************************************************************************************
+
+svupdAgentInfo OBJECT IDENTIFIER		::= { svupdObjects 1 }
+
+svupdAgentId OBJECT-TYPE
+    SYNTAX       DisplayString
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Agent identification string"
+    ::= { svupdAgentInfo 1 }
+
+svupdAgentCompany OBJECT-TYPE
+    SYNTAX       DisplayString
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Agent's company name (e.g. Fujitsu Technology Solutions)"
+    ::= { svupdAgentInfo 2 }
+
+svupdAgentVersion OBJECT-TYPE
+    SYNTAX       DisplayString
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Agent's version string (e.g. 6.20)"
+    ::= { svupdAgentInfo 3 }
+
+svupdAgentBuild OBJECT-TYPE
+    SYNTAX       DisplayString
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Compilation time and date of agent program"
+    ::= { svupdAgentInfo 4 }
+
+
+-- **********************************************************************************************
+--
+-- GROUP        svupdComponentInfo
+-- DESCRIPTION  "This group contains information about available update components"
+--
+--      svupdComponentInfo group: 1.3.6.1.4.1.231.2.10.2.12.1.2
+--
+-- **********************************************************************************************
+
+svupdComponentInfo OBJECT IDENTIFIER		::= { svupdObjects 2 }
+
+svupdNumberComponentTableEntries OBJECT-TYPE
+    SYNTAX       INTEGER
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Number of available update components (size of svupdComponentTable table)."
+    ::= { svupdComponentInfo 1 }
+
+-- ----------------------------------------------------------------------------------------------
+--
+-- TABLE        svupdComponentTable
+-- STATUS       mandatory
+-- DESCRIPTION  "Table of available PRIMERGY update components and their rankings to installed updates"
+--
+--      svupdComponentTable: 1.3.6.1.4.1.231.2.10.2.12.1.2.2
+--
+-- ----------------------------------------------------------------------------------------------
+
+svupdComponentTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF SvupdComponentEntry
+    ACCESS       not-accessible
+    STATUS       mandatory
+    DESCRIPTION  "Table of available PRIMERGY update components and their rankings to installed updates"
+    ::= { svupdComponentInfo 2 }
+
+svupdComponentEntry OBJECT-TYPE
+    SYNTAX       SvupdComponentEntry
+    ACCESS       not-accessible
+    STATUS       mandatory
+    DESCRIPTION  ""
+    INDEX   { svupdComponentId }
+    ::= { svupdComponentTable 1 }
+
+SvupdComponentEntry ::= SEQUENCE
+{
+    svupdComponentId
+        INTEGER,
+    svupdComponentPath
+        DisplayString,
+    svupdComponentType
+        DisplayString,
+    svupdComponentSubType
+        DisplayString,
+    svupdComponentVersion
+        DisplayString,
+    svupdComponentInstalledVersion
+        DisplayString,
+    svupdComponentName
+        DisplayString,
+    svupdRepos2InstRanking
+        INTEGER,
+    svupdIsMandatoryComponent
+        YesNo,
+    svupdPreRequirements
+        DisplayString,
+    svupdVendorSeverity
+        INTEGER,
+    svupdApplicableStatus
+        INTEGER,
+    svupdApplicableErrorText
+        DisplayString,
+    svupdMinStepVersion
+        DisplayString,
+    svupdRebootRequired
+        INTEGER,
+    svupdInstallDuration
+        INTEGER,
+    svupdDownloadSize
+        INTEGER,
+    svupdPSPPackageVersion
+        DisplayString,
+    svupdReleaseNote
+        DisplayString,
+    svupdVendor
+        DisplayString,
+    svupdCompIdentifier
+        DisplayString,
+    svupdBinaryLoaded
+        YesNo
+}
+
+svupdComponentId OBJECT-TYPE
+    SYNTAX       INTEGER
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Unique component identifier (index, 1..n)"
+    ::= { svupdComponentEntry 1 }
+
+svupdComponentPath OBJECT-TYPE
+    SYNTAX       DisplayString
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Relative path of update component in repository file system"
+    ::= { svupdComponentEntry 2 }
+
+svupdComponentType OBJECT-TYPE
+    SYNTAX       DisplayString
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Type of repository component (e.g. 'Agent-Win')"
+    ::= { svupdComponentEntry 3 }
+
+svupdComponentSubType OBJECT-TYPE
+    SYNTAX       DisplayString
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Subtype of repository component (e.g. 'SV-Update-Agent')"
+    ::= { svupdComponentEntry 4 }
+
+svupdComponentVersion OBJECT-TYPE
+    SYNTAX       DisplayString
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Version of repository component"
+    ::= { svupdComponentEntry 5 }
+
+svupdComponentInstalledVersion OBJECT-TYPE
+    SYNTAX       DisplayString
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Version of installed component"
+    ::= { svupdComponentEntry 6 }
+
+svupdComponentName OBJECT-TYPE
+    SYNTAX       DisplayString
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Name of repository component (format is 'subtype:version')"
+    ::= { svupdComponentEntry 7 }
+
+svupdRepos2InstRanking OBJECT-TYPE
+    SYNTAX       INTEGER
+    {
+        unknown(1),
+        repositoryNewest(2),
+        repositoryNewer(3),
+        equal(4),
+        highestDowngrade(5),
+        repositoryOlder(6)
+    }
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Rank of update version versus installed version"
+    ::= { svupdComponentEntry 8 }
+
+svupdIsMandatoryComponent OBJECT-TYPE
+    SYNTAX       YesNo
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Flag; yes, if component must be installed"
+    ::= { svupdComponentEntry 9 }
+
+svupdPreRequirements OBJECT-TYPE
+    SYNTAX       DisplayString
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Description of prerequires for installation"
+    ::= { svupdComponentEntry 10 }
+
+svupdVendorSeverity OBJECT-TYPE
+    SYNTAX       INTEGER
+    {
+        severityOptional(1),
+        severityRecommended(2),
+        severityMandatory(3)
+    }
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Vendor severity of installing this update"
+    ::= { svupdComponentEntry 11 }
+
+svupdApplicableStatus OBJECT-TYPE
+    SYNTAX       INTEGER
+    {
+        ok(1),
+        wrongOS(2),
+        predecessorStepVersionMissing(3),
+        other(256)
+    }
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Reason why component is not applicable"
+    ::= { svupdComponentEntry 12 }
+
+svupdApplicableErrorText OBJECT-TYPE
+    SYNTAX       DisplayString
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Detailed message text corrsponding to 'svupdApplicableStatus'"
+    ::= { svupdComponentEntry 13 }
+
+svupdMinStepVersion OBJECT-TYPE
+    SYNTAX       DisplayString
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Lowest installed version required for update"
+    ::= { svupdComponentEntry 14 }
+
+svupdRebootRequired OBJECT-TYPE
+    SYNTAX       INTEGER
+    {
+        rebootNo(1),
+        rebootImmediate(2),
+        rebootAsConfigured(3),
+        rebootDynamic(4)
+    }
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Flag if reboot after update installation is required"
+    ::= { svupdComponentEntry 15 }
+
+svupdInstallDuration OBJECT-TYPE
+    SYNTAX       INTEGER
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Number of seconds needed for installation"
+    ::= { svupdComponentEntry 16 }
+
+svupdDownloadSize OBJECT-TYPE
+    SYNTAX       INTEGER
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Number of MB of this update package"
+    ::= { svupdComponentEntry 17 }
+
+svupdPSPPackageVersion OBJECT-TYPE
+    SYNTAX       DisplayString
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Internal version of PSP package"
+    ::= { svupdComponentEntry 18 }
+
+svupdReleaseNote OBJECT-TYPE
+    SYNTAX       DisplayString
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Release notes for this update"
+    ::= { svupdComponentEntry 19 }
+
+svupdVendor OBJECT-TYPE
+    SYNTAX       DisplayString
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Vendor of this update"
+    ::= { svupdComponentEntry 20 }
+
+svupdCompIdentifier OBJECT-TYPE
+    SYNTAX       DisplayString
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Component id (e.g. PCI Id) this update belongs to"
+    ::= { svupdComponentEntry 21 }
+
+svupdBinaryLoaded OBJECT-TYPE
+    SYNTAX       YesNo
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Flag; yes, if update package binary is available in repository"
+    ::= { svupdComponentEntry 22 }
+
+
+svupdComponentTableCount OBJECT-TYPE
+    SYNTAX       Counter
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Counter defining the update revision of the svupdComponentTable table.
+                  This counter is incremented with every table contents change/update."
+    ::= { svupdComponentInfo 3 }
+
+
+-- **********************************************************************************************
+--
+-- GROUP        svupdServerUpdateInfo
+-- DESCRIPTION  "This group contains overall update status information for server"
+--
+--      svupdServerUpdateInfo group: 1.3.6.1.4.1.231.2.10.2.12.1.3
+--
+-- **********************************************************************************************
+
+svupdServerUpdateInfo OBJECT IDENTIFIER		::= { svupdObjects 3 }
+
+svupdServerStatus OBJECT-TYPE
+    SYNTAX       INTEGER
+    {
+        statusOk(1),
+        statusWarning(2),
+        statusCritical(3),
+        statusUnknown(4)
+    }
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Flag indicating update status of server"
+    ::= { svupdServerUpdateInfo 1 }
+
+svupdServerLastCheckStamp OBJECT-TYPE
+    SYNTAX       INTEGER
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Timestamp of last update check (time_t format: seconds since 1970/01/01)"
+    ::= { svupdServerUpdateInfo 2 }
+
+svupdServerConfigCheckStatus OBJECT-TYPE
+    SYNTAX       INTEGER
+    {
+        ok(1),
+        accessModeIllegal(2),
+        repositoryAccessFailed(3),
+        repositoryCreationOrAccessFailed(4),
+        deleteNotAllowed(5),
+        updateNotAllowed(6),
+        updateFailed(7),
+        checkIsRunning(101)
+    }
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Result of last check of configuration data"
+    ::= { svupdServerUpdateInfo 3 }
+
+svupdServerLogFile OBJECT-TYPE
+    SYNTAX       DisplayString
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Log file contents of last update check"
+    ::= { svupdServerUpdateInfo 4 }
+
+svupdServerCheckStatus OBJECT-TYPE
+    SYNTAX       INTEGER
+    {
+        doneOk(1),
+        doneError(2),
+        downloading(3),
+        checking(4)
+    }
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Status of current/last update check"
+    ::= { svupdServerUpdateInfo 5 }
+
+svupdServerCheckError OBJECT-TYPE
+    SYNTAX       INTEGER
+    {
+        ok(1),
+        missingInventory(2),
+        accessRepositoryFailed(3)
+    }
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Error detail code of last update check"
+    ::= { svupdServerUpdateInfo 6 }
+
+
+-- **********************************************************************************************
+--
+-- GROUP        svupdInstalledComponentInfo
+-- DESCRIPTION  "This group contains information about currently installed update components"
+--
+--      svupdInstalledComponentInfo group: 1.3.6.1.4.1.231.2.10.2.12.1.4
+--
+-- **********************************************************************************************
+
+svupdInstalledComponentInfo OBJECT IDENTIFIER		::= { svupdObjects 4 }
+
+svupdNumberInstalledComponentTableEntries OBJECT-TYPE
+    SYNTAX       INTEGER
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Number of installed update components (size of svupdInstalledComponentTable table)."
+    ::= { svupdInstalledComponentInfo 1 }
+
+-- ----------------------------------------------------------------------------------------------
+--
+-- TABLE        svupdInstalledComponentTable
+-- STATUS       mandatory
+-- DESCRIPTION  "Table of installed PRIMERGY update components"
+--
+--      svupdInstalledComponentTable: 1.3.6.1.4.1.231.2.10.2.12.1.4.2
+--
+-- ----------------------------------------------------------------------------------------------
+
+svupdInstalledComponentTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF SvupdInstalledComponentEntry
+    ACCESS       not-accessible
+    STATUS       mandatory
+    DESCRIPTION  "Table of installed PRIMERGY update components"
+    ::= { svupdInstalledComponentInfo 2 }
+
+svupdInstalledComponentEntry OBJECT-TYPE
+    SYNTAX       SvupdInstalledComponentEntry
+    ACCESS       not-accessible
+    STATUS       mandatory
+    DESCRIPTION  ""
+    INDEX   { svupdInstalledComponentId }
+    ::= { svupdInstalledComponentTable 1 }
+
+SvupdInstalledComponentEntry ::= SEQUENCE
+{
+    svupdInstalledComponentId
+        INTEGER,
+    svupdInstalledComponentType
+        DisplayString,
+    svupdInstalledComponentSubType
+        DisplayString,
+    svupdInstalledComponentVersion
+        DisplayString,
+    svupdInstalledPCIId
+        DisplayString,
+    svupdInstalledPSPVersion
+        DisplayString
+}
+
+svupdInstalledComponentId OBJECT-TYPE
+    SYNTAX       INTEGER
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Unique component identifier (index, 1..n)"
+    ::= { svupdInstalledComponentEntry 1 }
+
+svupdInstalledComponentType OBJECT-TYPE
+    SYNTAX       DisplayString
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Name of highest directory of 'svupdInstalledComponentPath' (e.g. 'Agent-Win')"
+    ::= { svupdInstalledComponentEntry 2 }
+
+svupdInstalledComponentSubType OBJECT-TYPE
+    SYNTAX       DisplayString
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Name of second directory of 'svupdInstalledComponentPath' (e.g. 'SV-Update-Agent')"
+    ::= { svupdInstalledComponentEntry 3 }
+
+svupdInstalledComponentVersion OBJECT-TYPE
+    SYNTAX       DisplayString
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Version of installed update component"
+    ::= { svupdInstalledComponentEntry 4 }
+
+svupdInstalledPCIId OBJECT-TYPE
+    SYNTAX       DisplayString
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "PCI ID for components of type PCI (empty for other component types)"
+    ::= { svupdInstalledComponentEntry 5 }
+
+svupdInstalledPSPVersion OBJECT-TYPE
+    SYNTAX       DisplayString
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Actual component version for 'PrimSupportPack-Win' components (empty for non-PSPs)"
+    ::= { svupdInstalledComponentEntry 6 }
+
+
+svupdInstalledComponentTableCount OBJECT-TYPE
+    SYNTAX       Counter
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Counter defining the update revision of the svupdInstalledComponentTable table.
+                  This counter is incremented with every table contents change/update."
+    ::= { svupdInstalledComponentInfo 3 }
+
+
+-- **********************************************************************************************
+--
+-- GROUP        svupdNotificationsTrapInfo
+-- DESCRIPTION  "This group defines the notifications/traps and their parameter variables.
+--               They are not accessible directly, but sent together with traps."
+--
+--      svupdNotificationsTrapInfo group: 1.3.6.1.4.1.231.2.10.2.12.2.1
+--
+-- **********************************************************************************************
+
+svupdNotificationsTrapInfo OBJECT IDENTIFIER		::= { svupdNotifications 1 }
+
+svupdTrapInfoServerName OBJECT-TYPE
+    SYNTAX       DisplayString
+    ACCESS       not-accessible
+    STATUS       mandatory
+    DESCRIPTION  "Name of the server the trap comes from"
+    ::= { svupdNotificationsTrapInfo 1 }
+
+svupdTrapInfoTime OBJECT-TYPE
+    SYNTAX       INTEGER
+    ACCESS       not-accessible
+    STATUS       mandatory
+    DESCRIPTION  "Time when the trap occured (in seconds since 01/01/1970 00:00h)"
+    ::= { svupdNotificationsTrapInfo 2 }
+
+svupdTrapInfoString OBJECT-TYPE
+    SYNTAX       DisplayString
+    ACCESS       not-accessible
+    STATUS       mandatory
+    DESCRIPTION  "Additional string to be displayed in the trap text"
+    ::= { svupdNotificationsTrapInfo 3 }
+
+svupdTrapInfoInteger OBJECT-TYPE
+    SYNTAX       INTEGER
+    ACCESS       not-accessible
+    STATUS       mandatory
+    DESCRIPTION  "Additional number to be displayed in the trap text"
+    ::= { svupdNotificationsTrapInfo 4 }
+
+
+-- **********************************************************************************************
+--
+-- GROUP        svupdNotificationsTraps
+-- DESCRIPTION  "This group defines the traps."
+--
+--     Trap enterprise: svupdNotifications (1.3.6.1.4.1.231.2.10.2.12.2)
+--
+-- **********************************************************************************************
+
+--
+-- Trap number range for this MIB: 3000..3199
+--
+
+svupdTrapUndefinedEvent TRAP-TYPE
+    ENTERPRISE svupdNotifications
+    VARIABLES {
+        svupdTrapInfoServerName,
+        svupdTrapInfoTime,
+        svupdTrapInfoString,
+        svupdTrapInfoInteger
+        }
+    DESCRIPTION     "Undefined Event."
+    --#TYPE			"Undefined Event"
+    --#SUMMARY		"Undefined Event (Server %s)"
+    --#ARGUMENTS	{ 0 }
+    --#SEVERITY		CRITICAL
+    --#TIMEINDEX	1
+    --#HELP			"This is an undefined event (up to now)."
+    --#STATE		NONOPERATIONAL
+    ::= 3000
+
+svupdTrapUpdateAlert TRAP-TYPE
+    ENTERPRISE svupdNotifications
+    VARIABLES {
+        svupdTrapInfoServerName,
+        svupdTrapInfoTime,
+        svupdTrapInfoString,
+        svupdTrapInfoInteger
+        }
+    DESCRIPTION     "Update Alert."
+    --#TYPE			"Update Alert"
+    --#SUMMARY		"Update Alert (Server %s)"
+    --#SUMMARY		"%s"
+    --#SUMMARY		"For further information look e.g. at ServerView System Monitor -> Updates"
+    --#ARGUMENTS	{ 0, 2 }
+    --#SEVERITY		INFORMATIONAL
+    --#TIMEINDEX	1
+    --#HELP			"This is an Update Alert event."
+    --#STATE		OPERATIONAL
+    ::= 3001
+
+
+END

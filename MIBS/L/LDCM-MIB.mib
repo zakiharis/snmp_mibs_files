@@ -1,0 +1,171 @@
+-- Copyright c 1996-1999 Intel Corporation
+-- Intel(r) LANDesk(r) Client Manager v6.0 MIB
+
+-- Author:		Patrick S. Morrow
+-- Modified:	May 26, 1999
+
+
+LDCM-MIB DEFINITIONS ::= BEGIN
+
+
+IMPORTS
+	enterprises, Counter, TimeTicks
+		FROM RFC1155-SMI
+
+	DisplayString
+		FROM RFC1213-MIB
+
+	TRAP-TYPE
+		FROM RFC-1215
+
+	OBJECT-TYPE
+		FROM RFC-1212;
+
+
+-- Intel OIDs
+
+intel          		OBJECT IDENTIFIER ::= {enterprises 343}
+products			OBJECT IDENTIFIER ::= {intel 2}
+network-products	OBJECT IDENTIFIER ::= {products 5}
+lanDesk 			OBJECT IDENTIFIER ::= {network-products 1}
+ldcm				OBJECT IDENTIFIER ::= {lanDesk 2}
+
+
+-- Get Information
+
+version				OBJECT-TYPE
+						SYNTAX			DisplayString(SIZE(0..10))
+						ACCESS			read-only
+						STATUS			mandatory
+						DESCRIPTION		"Intel(r) LANDesk(r) Client Manager's version."
+						::= {ldcm 1}
+
+pcHealth			OBJECT-TYPE
+						SYNTAX			INTEGER { unknown(0), normal(1), warning(2), critical(3) }
+						ACCESS			read-only
+						STATUS			mandatory
+						DESCRIPTION		"Intel(r) LANDesk(r) Client Manager's current PC Health."
+						::= {ldcm 2}
+
+httpPort			OBJECT-TYPE
+						SYNTAX			DisplayString(SIZE(0..10))
+						ACCESS			read-only
+						STATUS			mandatory
+						DESCRIPTION		"Intel(r) LANDesk(r) Client Manager's management HTTP port."
+						::= {ldcm 3}
+
+
+-- Trap Information
+
+computerName		OBJECT-TYPE
+						SYNTAX			DisplayString(SIZE(0..20))
+						ACCESS			not-accessible
+						STATUS			mandatory
+						DESCRIPTION		"The source computer that originated the event."
+						::= {ldcm 101}
+
+eventTime			OBJECT-TYPE
+						SYNTAX			DisplayString(SIZE(0..255))
+						ACCESS			not-accessible
+						STATUS			mandatory
+						DESCRIPTION		"The date and time the trap was sent from the source computer in GMT."
+						::= {ldcm 102}
+
+eventType			OBJECT-TYPE
+						SYNTAX			DisplayString(SIZE(0..255))
+						ACCESS			not-accessible
+						STATUS			mandatory
+						DESCRIPTION		"The type of event."
+						::= {ldcm 103}
+
+eventSymptom		OBJECT-TYPE
+						SYNTAX			DisplayString(SIZE(0..512))
+						ACCESS			not-accessible
+						STATUS			mandatory
+						DESCRIPTION		"The description of the event."
+						::= {ldcm 104}
+
+eventSeverity		OBJECT-TYPE
+						SYNTAX			DisplayString(SIZE(0..255))
+						ACCESS			not-accessible
+						STATUS			obsolete
+						DESCRIPTION		"This is obsolete check the specific SNMP Trap type for the severity."
+						::= {ldcm 105}
+
+
+-- Trap Macros
+
+ldcmUnknownTrap		TRAP-TYPE
+						ENTERPRISE	ldcm
+						VARIABLES  	{computerName, eventTime, eventType, eventSymptom}
+						DESCRIPTION	"Intel(R) LANDesk(R) Client Manager has reported an Unknown event."
+							--#SUMMARY "Client Manager has reported an event on the computer %s:  %s"
+							--#ARGUMENTS {0, 3}
+							--#SEVERITY NORMAL
+							--#TIMEINDEX 1
+							--#STATE OPERATIONAL
+							--#CATEGORY "Status Events"
+						::= 1
+
+
+ldcmInfoTrap		TRAP-TYPE
+						ENTERPRISE	ldcm
+						VARIABLES  	{computerName, eventTime, eventType, eventSymptom}
+						DESCRIPTION	"Intel(R) LANDesk(R) Client Manager has reported an Informational event."
+							--#SUMMARY "Client Manager has reported an event on the computer %s:  %s"
+							--#ARGUMENTS {0, 3}
+							--#SEVERITY NORMAL
+							--#TIMEINDEX 1
+							--#STATE OPERATIONAL
+							--#CATEGORY "Status Events"
+						::= 2
+
+ldcmOkTrap			TRAP-TYPE
+						ENTERPRISE	ldcm
+						VARIABLES  	{computerName, eventTime, eventType, eventSymptom}
+						DESCRIPTION	"Intel(R) LANDesk(R) Client Manager has reported a severity OK event."
+							--#SUMMARY "Client Manager has reported an event on the computer %s:  %s"
+							--#ARGUMENTS {0, 3}
+							--#SEVERITY NORMAL
+							--#TIMEINDEX 1
+							--#STATE OPERATIONAL
+							--#CATEGORY "Status Events"
+						::= 3
+
+ldcmWarningTrap		TRAP-TYPE
+						ENTERPRISE	ldcm
+						VARIABLES  	{computerName, eventTime, eventType, eventSymptom}
+						DESCRIPTION	"Intel(R) LANDesk(R) Client Manager has reported a severity Warning event."
+							--#SUMMARY "Client Manager has reported an event on the computer %s:  %s"
+							--#ARGUMENTS {0, 3}
+							--#SEVERITY MINOR
+							--#TIMEINDEX 1
+							--#STATE OPERATIONAL
+							--#CATEGORY "Status Events"
+						::= 4
+
+ldcmCriticalTrap	TRAP-TYPE
+						ENTERPRISE	ldcm
+						VARIABLES  	{computerName, eventTime, eventType, eventSymptom}
+						DESCRIPTION	"Intel(R) LANDesk(R) Client Manager has reported a severity Critical event."
+							--#SUMMARY "Client Manager has reported an event on the computer %s:  %s"
+							--#ARGUMENTS {0, 3}
+							--#SEVERITY CRITICAL
+							--#TIMEINDEX 1
+							--#STATE DEGRADED
+							--#CATEGORY "Status Events"
+						::= 5
+
+ldcmFatalTrap		TRAP-TYPE
+						ENTERPRISE	ldcm
+						VARIABLES  	{computerName, eventTime, eventType, eventSymptom}
+						DESCRIPTION	"Intel(R) LANDesk(R) Client Manager has reported a severity Fatal event."
+							--#SUMMARY "Client Manager has reported an event on the computer %s:  %s"
+							--#ARGUMENTS {0, 3}
+							--#SEVERITY CRITICAL
+							--#TIMEINDEX 1
+							--#STATE DEGRADED
+							--#CATEGORY "Status Events"
+						::= 6
+
+END

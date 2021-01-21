@@ -1,0 +1,52 @@
+--
+--  SBAX3 Series MIB
+--	Copyright FUJITSU LIMITED 2013
+--
+-- $Revision: 1.1 $
+
+SBAX3-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+	OBJECT-TYPE		FROM RFC-1212
+	TRAP-TYPE		FROM RFC-1215
+	enterprises		FROM RFC1155-SMI
+	DisplayString		FROM RFC1213-MIB;
+
+    fujitsu		OBJECT IDENTIFIER ::= { enterprises 211 }
+    product		OBJECT IDENTIFIER ::= { fujitsu 1 }
+    nonos		OBJECT IDENTIFIER ::= { product 127 }
+    pineapple		OBJECT IDENTIFIER ::= { nonos 118 }
+
+--
+-- sysObjectID
+--
+    sbax3	OBJECT IDENTIFIER ::= { pineapple 94 }
+
+--
+-- FUJITSU EXTENDED MIB
+--
+    nonosBase		OBJECT IDENTIFIER ::= { nonos 1 }
+
+--
+-- groups in nonosBase
+--
+    nonosSystem		OBJECT IDENTIFIER ::= { nonosBase 1 }
+
+--
+-- nonosSystem group
+--
+nosResetSystem OBJECT-TYPE
+    SYNTAX  INTEGER {
+    		none(1),
+		reset(2),
+		indicated-reset(3),
+		unindicated-reset(4)
+	    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+	"Refer to attached file ('SBAX3_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { nonosSystem 1 }
+
+END

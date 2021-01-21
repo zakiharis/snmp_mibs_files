@@ -1,0 +1,755 @@
+SERVERVIEW-OPERATING-SYSTEM-MIB DEFINITIONS ::= BEGIN
+
+--#FILENAME        "OS.MIB"
+--#DESCRIPTION     "MIB for operating system information"
+--#REVISION        "7.10.04.00"
+--#VENDOR          "Fujitsu Technology Solutions"
+
+-- Copyright (C) Fujitsu Technology Solutions 2015
+-- All rights reserved
+
+IMPORTS
+   OBJECT-TYPE                FROM RFC-1212
+   mib-2                      FROM RFC1213-MIB
+   DisplayString              FROM RFC1213-MIB
+   Counter, Gauge, IpAddress  FROM RFC1155-SMI;
+
+   PhysAddress   ::= OCTET STRING
+
+   enterprises       OBJECT IDENTIFIER   ::= { iso org(3) dod(6) internet(1) private(4) 1 }
+   sni               OBJECT IDENTIFIER   ::= { enterprises    231 }
+   sniProductMibs    OBJECT IDENTIFIER   ::= { sni              2 }
+   sniExtensions     OBJECT IDENTIFIER   ::= { sniProductMibs  10 }
+   sniServerMgmt     OBJECT IDENTIFIER   ::= { sniExtensions    2 }
+   sniOsSpecific     OBJECT IDENTIFIER   ::= { sniServerMgmt    5 }
+   sniNetware        OBJECT IDENTIFIER   ::= { sniOsSpecific    1 }
+   sniWinNt          OBJECT IDENTIFIER   ::= { sniOsSpecific    2 }
+   sniOs2            OBJECT IDENTIFIER   ::= { sniOsSpecific    3 }
+   sniUnix           OBJECT IDENTIFIER   ::= { sniOsSpecific    4 }
+
+   svOperatingSystem OBJECT IDENTIFIER   ::= { sniOsSpecific 5 }
+
+   --
+   -- Textual conventions
+   --
+
+   TrueFalse ::= INTEGER
+   {
+      false(1),
+      true(2)
+   }
+
+-- This MIB contains an index 'partition number' for all table values to be prepared for
+-- later use with multiple operating system partitions (if running on a management controller).
+-- When the agent for this MIB is located on the operating system, it contains only its own partition.
+
+
+-- **********************************************************************************************
+--
+-- GROUP        svOsAgentInfo
+-- DESCRIPTION  "This group defines agent specific objects like agent name,
+--               vendor name and versions"
+--
+--      svOsAgentInfo group: 1.3.6.1.4.1.231.2.10.2.5.5.1
+--
+-- **********************************************************************************************
+
+svOsAgentInfo OBJECT IDENTIFIER		::= { svOperatingSystem 1 }
+
+svOsAgentId OBJECT-TYPE
+    SYNTAX       DisplayString
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Agent identification string"
+    ::= { svOsAgentInfo 1 }
+
+svOsAgentCompany OBJECT-TYPE
+    SYNTAX       DisplayString
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Agent's company name (e.g. Fujitsu Technology Solutions)"
+    ::= { svOsAgentInfo 2 }
+
+svOsAgentVersion OBJECT-TYPE
+    SYNTAX       DisplayString
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Agent's version string (e.g. 1.05)"
+    ::= { svOsAgentInfo 3 }
+
+svOsAgentBuild OBJECT-TYPE
+    SYNTAX       DisplayString
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Compilation time and date of agent program"
+    ::= { svOsAgentInfo 4 }
+
+svOsAgentInterface OBJECT-TYPE
+    SYNTAX       INTEGER
+    {
+        other(1),
+        operatingSystem(2),
+        bmc(3)
+    }
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "The interface this agent is listening at"
+    ::= { svOsAgentInfo 5 }
+
+
+-- **********************************************************************************************
+--
+-- GROUP        svOsSystemInformation
+-- DESCRIPTION  "This group describes common operation system information values."
+--
+--      svOsSystemInformation group: 1.3.6.1.4.1.231.2.10.2.5.5.2
+--
+-- **********************************************************************************************
+
+svOsSystemInformation OBJECT IDENTIFIER		::= { svOperatingSystem 2 }
+
+svOsNumberPartitions OBJECT-TYPE
+    SYNTAX       INTEGER
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Number of available system partitions (1 for standalone systems)"
+    ::= { svOsSystemInformation 1 }
+
+-- ----------------------------------------------------------------------------------------------
+--
+-- TABLE        svOsInfoTable
+-- STATUS       mandatory
+-- DESCRIPTION  "Table with common operating system information"
+--
+--      svOsInfoTable: 1.3.6.1.4.1.231.2.10.2.5.5.2.2
+--
+-- ----------------------------------------------------------------------------------------------
+
+svOsInfoTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF SvOsInfoEntry
+    ACCESS       not-accessible
+    STATUS       mandatory
+    DESCRIPTION  "Table with common operating system information"
+    ::= { svOsSystemInformation 2 }
+
+svOsInfoEntry OBJECT-TYPE
+    SYNTAX       SvOsInfoEntry
+    ACCESS       not-accessible
+    STATUS       mandatory
+    DESCRIPTION  ""
+    INDEX   { svOsPartitionNumber }
+    ::= { svOsInfoTable 1 }
+
+SvOsInfoEntry ::= SEQUENCE
+{
+    svOsPartitionNumber
+        INTEGER,
+    svOsDesignation
+        DisplayString,
+    svOsName
+        INTEGER,
+    svOsPlatform
+        INTEGER,
+    svOsManufacturer
+        DisplayString,
+    svOsVersionDesignation
+        DisplayString,
+    svOsVersionMajor
+        INTEGER,
+    svOsVersionMinor
+        INTEGER,
+    svOsVersionRevision
+        INTEGER,
+    svOsKernelVersion
+        DisplayString,
+    svOsKernelVersionMajor
+        INTEGER,
+    svOsKernelVersionMinor
+        INTEGER,
+    svOsDomainName
+        DisplayString,
+    svOsSystemLocation
+        DisplayString,
+    svOsSystemContact
+        DisplayString
+}
+
+svOsPartitionNumber OBJECT-TYPE
+    SYNTAX       INTEGER
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "System partition number (index, 1..n for multi-partition systems; always 1 for standalone systems)"
+    ::= { svOsInfoEntry 1 }
+
+svOsDesignation OBJECT-TYPE
+    SYNTAX       DisplayString
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Operating system designation as it comes from the operating system (e.g. 'Windows Server 2008 R2 Enterprise (x64)')"
+    ::= { svOsInfoEntry 2 }
+
+svOsName OBJECT-TYPE
+    SYNTAX       INTEGER
+    {
+        other(1),
+        windows(2),
+        linux(3),
+        vmWare(4)
+    }
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Operating system name"
+    ::= { svOsInfoEntry 3 }
+
+svOsPlatform OBJECT-TYPE
+    SYNTAX       INTEGER
+    {
+        other(1),
+        x86-32(2),
+        x86-64(3)
+    }
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Reports about the current operating system platform (x86, x64)"
+    ::= { svOsInfoEntry 4 }
+
+svOsManufacturer OBJECT-TYPE
+    SYNTAX       DisplayString
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Operating system manufacturer (e.g. 'SuSE', 'Red Hat', 'Microsoft', 'VMware'...)"
+    ::= { svOsInfoEntry 5 }
+
+svOsVersionDesignation OBJECT-TYPE
+    SYNTAX       DisplayString
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Operating system version string as it comes from the operating system (e.g. '6.1 Build 7601 Service Pack 1')"
+    ::= { svOsInfoEntry 6 }
+
+svOsVersionMajor OBJECT-TYPE
+    SYNTAX       INTEGER
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Operating system major version number"
+    ::= { svOsInfoEntry 7 }
+
+svOsVersionMinor OBJECT-TYPE
+    SYNTAX       INTEGER
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Operating system minor version number"
+    ::= { svOsInfoEntry 8 }
+
+svOsVersionRevision OBJECT-TYPE
+    SYNTAX       INTEGER
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Operating system revision number (or service pack, patch level...)"
+    ::= { svOsInfoEntry 9 }
+
+svOsKernelVersion OBJECT-TYPE
+    SYNTAX       DisplayString
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Operating system kernel version string (only for Linux operating systems)"
+    ::= { svOsInfoEntry 10 }
+
+svOsKernelVersionMajor OBJECT-TYPE
+    SYNTAX       INTEGER
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Operating system kernel major version number"
+    ::= { svOsInfoEntry 11 }
+
+svOsKernelVersionMinor OBJECT-TYPE
+    SYNTAX       INTEGER
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Operating system kernel minor version number"
+    ::= { svOsInfoEntry 12 }
+
+svOsDomainName OBJECT-TYPE
+    SYNTAX       DisplayString
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Fully qualified domain name (FQDN) of the system"
+    ::= { svOsInfoEntry 13 }
+
+svOsSystemLocation OBJECT-TYPE
+    SYNTAX       DisplayString
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "The physical location of this managed node (e.g. '3rd floor', 'room 42')"
+    ::= { svOsInfoEntry 14 }
+
+svOsSystemContact OBJECT-TYPE
+    SYNTAX       DisplayString
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "The textual identification of the contact person for this managed node"
+    ::= { svOsInfoEntry 15 }
+
+
+-- ----------------------------------------------------------------------------------------------
+--
+-- TABLE        svOsPropertyTable
+-- STATUS       mandatory
+-- DESCRIPTION  "Table with common operating system information"
+--
+--      svOsPropertyTable: 1.3.6.1.4.1.231.2.10.2.5.5.2.3
+--
+-- ----------------------------------------------------------------------------------------------
+
+svOsPropertyTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF SvOsPropertyEntry
+    ACCESS       not-accessible
+    STATUS       mandatory
+    DESCRIPTION  "Table with common operating system information"
+    ::= { svOsSystemInformation 3 }
+
+svOsPropertyEntry OBJECT-TYPE
+    SYNTAX       SvOsPropertyEntry
+    ACCESS       not-accessible
+    STATUS       mandatory
+    DESCRIPTION  ""
+    INDEX   { svOsPartitionNumber }
+    ::= { svOsPropertyTable 1 }
+
+SvOsPropertyEntry ::= SEQUENCE
+{
+    svOsSystemTime
+        INTEGER,
+    svOsLocalTimeOffset
+        INTEGER,
+    svOsSystemStartTime
+        INTEGER,
+    svOsSystemUpTime
+        INTEGER,
+    svOsNumberCpus
+        INTEGER,
+    svOsOverallCpuLoad
+        Gauge,
+    svOsAvailableMemory
+        INTEGER,
+    svOsNumberProcesses
+        INTEGER,
+    svOsManagementSoftware
+        INTEGER,
+    svOsManagementSoftwareVersion
+        DisplayString
+}
+
+svOsSystemTime OBJECT-TYPE
+    SYNTAX       INTEGER
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Actual system time (GMT; time_t = seconds since 1/1/1970, 0:00 AM)"
+    ::= { svOsPropertyEntry 1 }
+
+svOsLocalTimeOffset OBJECT-TYPE
+    SYNTAX       INTEGER
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Local time offset to GMT (in hours)"
+    ::= { svOsPropertyEntry 2 }
+
+svOsSystemStartTime OBJECT-TYPE
+    SYNTAX       INTEGER
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Time the system was started (GMT; time_t = seconds since 1/1/1970, 0:00 AM)"
+    ::= { svOsPropertyEntry 3 }
+
+svOsSystemUpTime OBJECT-TYPE
+    SYNTAX       INTEGER
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "System up time in seconds"
+    ::= { svOsPropertyEntry 4 }
+
+svOsNumberCpus OBJECT-TYPE
+    SYNTAX       INTEGER
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Number of logical CPUs the operation system is currently using"
+    ::= { svOsPropertyEntry 5 }
+
+svOsOverallCpuLoad OBJECT-TYPE
+    SYNTAX       Gauge
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Overall CPU load (in percent)"
+    ::= { svOsPropertyEntry 6 }
+
+svOsAvailableMemory OBJECT-TYPE
+    SYNTAX       INTEGER
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Amount of main memory that is available for the operating system (in MBytes)"
+    ::= { svOsPropertyEntry 7 }
+
+svOsNumberProcesses OBJECT-TYPE
+    SYNTAX       INTEGER
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Number of processes currently running in operating system"
+    ::= { svOsPropertyEntry 8 }
+
+svOsManagementSoftware OBJECT-TYPE
+    SYNTAX       INTEGER
+    {
+        unknown(1),
+        none(2),
+        agentlessManagementService(3),
+        agents(4)
+    }
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "The type of management software (agents) that is installed on the managed node"
+    ::= { svOsPropertyEntry 9 }
+
+svOsManagementSoftwareVersion OBJECT-TYPE
+    SYNTAX       DisplayString
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Version of system management software"
+    ::= { svOsPropertyEntry 10 }
+
+
+-- ----------------------------------------------------------------------------------------------
+--
+-- TABLE        svOsFeatureTable
+-- STATUS       mandatory
+-- DESCRIPTION  "Table with installed/active operating system features. Each feature is a row in this table. Features may be enumerated or directly be queried."
+--
+--      svOsFeatureTable: 1.3.6.1.4.1.231.2.10.2.5.5.2.4
+--
+-- ----------------------------------------------------------------------------------------------
+
+svOsFeatureTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF SvOsFeatureEntry
+    ACCESS       not-accessible
+    STATUS       mandatory
+    DESCRIPTION  "Table with installed/active operating system features. Each feature is a row in this table. Features may be enumerated or directly be queried."
+    ::= { svOsSystemInformation 4 }
+
+svOsFeatureEntry OBJECT-TYPE
+    SYNTAX       SvOsFeatureEntry
+    ACCESS       not-accessible
+    STATUS       mandatory
+    DESCRIPTION  ""
+    INDEX   { svOsFeature }
+    ::= { svOsFeatureTable 1 }
+
+SvOsFeatureEntry ::= SEQUENCE
+{
+    svOsFeature
+        INTEGER
+}
+
+svOsFeature OBJECT-TYPE
+    SYNTAX       INTEGER
+    {
+        gui(1),
+        hyperV(2)
+    }
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Reports what features are installed:
+                    gui(1)    - Graphical user interface available (on Windows it is a core installation if not set)
+                    hyperV(2) - Windows Hyper-V virtualization role installed"
+    ::= { svOsFeatureEntry 1 }
+
+
+
+-- **********************************************************************************************
+--
+-- GROUP        svOsClusterInformation
+-- DESCRIPTION  "This group describes Windows clustering information values."
+--
+--      svOsClusterInformation group: 1.3.6.1.4.1.231.2.10.2.5.5.3
+--
+-- **********************************************************************************************
+
+svOsClusterInformation OBJECT IDENTIFIER		::= { svOperatingSystem 3 }
+
+-- ----------------------------------------------------------------------------------------------
+--
+-- TABLE        svOsClusterInfoTable
+-- STATUS       mandatory
+-- DESCRIPTION  "Table with common cluster information"
+--
+--      svOsClusterInfoTable: 1.3.6.1.4.1.231.2.10.2.5.5.3.1
+--
+-- ----------------------------------------------------------------------------------------------
+
+svOsClusterInfoTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF SvOsClusterInfoEntry
+    ACCESS       not-accessible
+    STATUS       mandatory
+    DESCRIPTION  "Table with common cluster information"
+    ::= { svOsClusterInformation 1 }
+
+svOsClusterInfoEntry OBJECT-TYPE
+    SYNTAX       SvOsClusterInfoEntry
+    ACCESS       not-accessible
+    STATUS       mandatory
+    DESCRIPTION  ""
+    INDEX   { svOsPartitionNumber }
+    ::= { svOsClusterInfoTable 1 }
+
+SvOsClusterInfoEntry ::= SEQUENCE
+{
+    svOsClusterMember
+        TrueFalse,
+    svOsClusterName
+        DisplayString,
+    svOsClusterIpAddress
+        DisplayString,
+    svOsClusterNrNodes
+        INTEGER
+}
+
+svOsClusterMember OBJECT-TYPE
+    SYNTAX       TrueFalse
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Reports whether this system is member of a cluster"
+    ::= { svOsClusterInfoEntry 1 }
+
+svOsClusterName OBJECT-TYPE
+    SYNTAX       DisplayString
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "The name of the cluster"
+    ::= { svOsClusterInfoEntry 2 }
+
+svOsClusterIpAddress OBJECT-TYPE
+    SYNTAX       DisplayString
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "IP address (IPv4 or IPv6) of the cluster"
+    ::= { svOsClusterInfoEntry 3 }
+
+svOsClusterNrNodes OBJECT-TYPE
+    SYNTAX       INTEGER
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Number of nodes in the cluster (number of rows of the svOsClusterNodeTable)"
+    ::= { svOsClusterInfoEntry 4 }
+
+
+-- ----------------------------------------------------------------------------------------------
+--
+-- TABLE        svOsClusterNodeTable
+-- STATUS       mandatory
+-- DESCRIPTION  "Table with cluster node information"
+--
+--      svOsClusterNodeTable: 1.3.6.1.4.1.231.2.10.2.5.5.3.2
+--
+-- ----------------------------------------------------------------------------------------------
+
+svOsClusterNodeTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF SvOsClusterNodeEntry
+    ACCESS       not-accessible
+    STATUS       mandatory
+    DESCRIPTION  "Table with cluster node information"
+    ::= { svOsClusterInformation 2 }
+
+svOsClusterNodeEntry OBJECT-TYPE
+    SYNTAX       SvOsClusterNodeEntry
+    ACCESS       not-accessible
+    STATUS       mandatory
+    DESCRIPTION  ""
+    INDEX   { svOsPartitionNumber, svOsClusterNodeNumber }
+    ::= { svOsClusterNodeTable 1 }
+
+SvOsClusterNodeEntry ::= SEQUENCE
+{
+    svOsClusterNodeNumber
+        INTEGER,
+    svOsClusterNodeName
+        DisplayString,
+    svOsClusterNodeState
+        INTEGER,
+    svOsClusterNodeDescription
+        DisplayString,
+    svOsClusterNodeIpAddress
+        DisplayString,
+    svOsClusterNodeIpAddress2
+        DisplayString,
+    svOsClusterNodeIpAddress3
+        DisplayString,
+    svOsClusterNodeIpAddress4
+        DisplayString
+}
+
+svOsClusterNodeNumber OBJECT-TYPE
+    SYNTAX       INTEGER
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Cluster node number (index, 1...n)"
+    ::= { svOsClusterNodeEntry 1 }
+
+svOsClusterNodeName OBJECT-TYPE
+    SYNTAX       DisplayString
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "The name of the cluster node"
+    ::= { svOsClusterNodeEntry 2 }
+
+svOsClusterNodeState OBJECT-TYPE
+    SYNTAX       INTEGER
+    {
+        unknown(1),
+        up(2),
+        down(3),
+        paused(4),
+        joining(5),
+        unavailable(6)
+    }
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "State of the node:
+                     1 - the state of the node cannot be determined
+                     2 - node is up and running
+                     3 - node is down
+                     4 - node has suspended cluster activity
+                     5 - node is resuming cluster activity, but is not yet ready"
+    ::= { svOsClusterNodeEntry 3 }
+
+svOsClusterNodeDescription OBJECT-TYPE
+    SYNTAX       DisplayString
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "The description for the cluster node"
+    ::= { svOsClusterNodeEntry 4 }
+
+svOsClusterNodeIpAddress OBJECT-TYPE
+    SYNTAX       DisplayString
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "First IP address (IPv4 or IPv6) of the node"
+    ::= { svOsClusterNodeEntry 5 }
+
+svOsClusterNodeIpAddress2 OBJECT-TYPE
+    SYNTAX       DisplayString
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Second IP address of the node (optional)"
+    ::= { svOsClusterNodeEntry 6 }
+
+svOsClusterNodeIpAddress3 OBJECT-TYPE
+    SYNTAX       DisplayString
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Third IP address of the node (optional)"
+    ::= { svOsClusterNodeEntry 7 }
+
+svOsClusterNodeIpAddress4 OBJECT-TYPE
+    SYNTAX       DisplayString
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Fourth IP address of the node (optional)"
+    ::= { svOsClusterNodeEntry 8 }
+
+
+
+-- **********************************************************************************************
+--
+-- GROUP        svOsUtilization
+-- DESCRIPTION  "This group describes operation system utilization values"
+--
+--      svOsUtilization group: 1.3.6.1.4.1.231.2.10.2.5.5.4
+--
+-- **********************************************************************************************
+
+svOsUtilization OBJECT IDENTIFIER		::= { svOperatingSystem 4 }
+
+-- ----------------------------------------------------------------------------------------------
+--
+-- TABLE        svOsProcessTable
+-- STATUS       mandatory
+-- DESCRIPTION  "Table with system process information. Table might be optional for out-of-band implementations."
+--
+--      svOsProcessTable: 1.3.6.1.4.1.231.2.10.2.5.5.4.1
+--
+-- ----------------------------------------------------------------------------------------------
+
+svOsProcessTable OBJECT-TYPE
+    SYNTAX       SEQUENCE OF SvOsProcessEntry
+    ACCESS       not-accessible
+    STATUS       mandatory
+    DESCRIPTION  "Table with system process information. Table might be optional for out-of-band implementations."
+    ::= { svOsUtilization 1 }
+
+svOsProcessEntry OBJECT-TYPE
+    SYNTAX       SvOsProcessEntry
+    ACCESS       not-accessible
+    STATUS       mandatory
+    DESCRIPTION  ""
+    INDEX   { svOsPartitionNumber, svOsProcessId }
+    ::= { svOsProcessTable 1 }
+
+SvOsProcessEntry ::= SEQUENCE
+{
+    svOsProcessId
+        INTEGER,
+    svOsProcessName
+        DisplayString,
+    svOsProcessDescription
+        DisplayString,
+    svOsProcessPath
+        DisplayString,
+    svOsProcessVersion
+        DisplayString,
+    svOsProcessUtilization
+        Gauge
+}
+
+svOsProcessId OBJECT-TYPE
+    SYNTAX       INTEGER
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Process identification number as created by the operating system (PID; index)"
+    ::= { svOsProcessEntry 1 }
+
+svOsProcessName OBJECT-TYPE
+    SYNTAX       DisplayString
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Process name"
+    ::= { svOsProcessEntry 2 }
+
+svOsProcessDescription OBJECT-TYPE
+    SYNTAX       DisplayString
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Process description"
+    ::= { svOsProcessEntry 3 }
+
+svOsProcessPath OBJECT-TYPE
+    SYNTAX       DisplayString
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Process executable file path"
+    ::= { svOsProcessEntry 4 }
+
+svOsProcessVersion OBJECT-TYPE
+    SYNTAX       DisplayString
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Process executable file version"
+    ::= { svOsProcessEntry 5 }
+
+svOsProcessUtilization OBJECT-TYPE
+    SYNTAX       Gauge
+    ACCESS       read-only
+    STATUS       mandatory
+    DESCRIPTION  "Process CPU load (in percent)"
+    ::= { svOsProcessEntry 6 }
+
+
+
+END

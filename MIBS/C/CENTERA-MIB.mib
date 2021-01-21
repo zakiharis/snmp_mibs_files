@@ -1,0 +1,104 @@
+-- Centera.MIB: EMC BDG Centera Manager MIB, version 2.0.1
+-- Copyright c 2003 EMC Corporation. All rights reserved.
+--
+-- The definition of this MIB derives from RFC 1902.
+
+CENTERA-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	enterprises, Counter32, OBJECT-TYPE,
+	MODULE-IDENTITY, NOTIFICATION-TYPE
+ 	FROM SNMPv2-SMI;
+
+
+centera MODULE-IDENTITY
+	LAST-UPDATED "200303121252Z"
+	ORGANIZATION "EMC BDG"
+	CONTACT-INFO
+		" Postal: EMC BDG
+                          Schalienhoevedreef 20 i
+                          B-2800 Mechelen
+                          Belgium"
+	DESCRIPTION
+		"The EMC BDG Centera Manager MIB module"
+	::= { emc 5 }
+
+emc	OBJECT IDENTIFIER ::= { enterprises 1139 }
+
+-- Top level groups
+
+notificationTrap	OBJECT IDENTIFIER ::= { centera 0 }
+notificationData	OBJECT IDENTIFIER ::= { centera 2 }
+
+-- The notificationData group
+-- The members of this group are the OIDs for VarBinds that contain
+-- notification data.
+
+genericNotify	OBJECT IDENTIFIER ::=  { notificationData 1 }
+
+notifyTimestamp OBJECT-TYPE
+	SYNTAX Counter32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The timestamp of the notification."
+	::= { genericNotify 1 }
+
+notifyServer OBJECT-TYPE
+	SYNTAX OCTET STRING
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The cluster ID."
+	::= { genericNotify 2 }
+
+notifyDescription OBJECT-TYPE
+	SYNTAX OCTET STRING
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"A complete description of the event."
+	::= { genericNotify 3 }
+
+notifySeverity OBJECT-TYPE
+	SYNTAX INTEGER {
+		informational (1),
+		warning (2),
+		severe (3)
+	}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+	"The severity level of the event is indicated by an integer number in the
+	 range from 1 to 3."
+	::= { genericNotify 4 }
+
+-- The Centera SNMP traps
+-- The definition of these objects mimics the SNMPv2 convention for
+-- sending traps. The enterprise OID gets appended with a 0
+-- and then with the specific trap code.
+
+trapNotification NOTIFICATION-TYPE
+	OBJECTS {	notifyTimestamp,
+			notifyServer,
+			notifyDescription,
+			notifySeverity
+		}
+	STATUS current
+	DESCRIPTION
+	"This trap describes the state of the Centera cluster."
+	::= { notificationTrap 1 }
+
+trapAlarmNotification NOTIFICATION-TYPE
+	OBJECTS	{	notifyTimestamp,
+			notifyServer,
+			notifyDescription,
+			notifySeverity
+		}
+	STATUS current
+	DESCRIPTION
+	"This trap identifies a problem on the Centera cluster.
+         The description can be used to describe the nature of the change."	
+	::= { notificationTrap 2 }
+	
+END

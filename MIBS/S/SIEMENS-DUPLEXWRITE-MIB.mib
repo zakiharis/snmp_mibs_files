@@ -1,0 +1,930 @@
+SIEMENS-DUPLEXWRITE-MIB DEFINITIONS ::= BEGIN
+
+--
+-- $Copyright$
+-- Copyright (C) Siemens AG 1999
+-- Copyright (C) Fujitsu Siemens Computers GmbH 2001
+-- All rights reserved
+--
+
+IMPORTS
+	OBJECT-TYPE				FROM RFC-1212
+	mib-2, DisplayString			FROM RFC1213-MIB
+	TimeTicks, Counter, Gauge, enterprises	FROM RFC1155-SMI;
+
+-- The Windows NT MIB compiler doesn't do IMPORTS.
+-- So, include these definitions here. NT defines "DisplayString" as
+-- OCTET STRING (SIZE(0..255)), in RFC1213 it has no explicit size.
+
+-- DisplayString ::= OCTET  STRING
+-- enterprises     OBJECT IDENTIFIER ::= { iso org(3) dod(6) internet(1) private(4) 1 }
+
+-- Siemens Server Management MIB nodes
+--	sni			OBJECT IDENTIFIER ::= { enterprises    231 }
+--	sniProductMibs		OBJECT IDENTIFIER ::= { sni              2 }
+--	sniExtensions		OBJECT IDENTIFIER ::= { sniProductMibs  10 }
+--	sniServerMgmt		OBJECT IDENTIFIER ::= { sniExtensions    2 }
+--	  sieInventory		OBJECT IDENTIFIER ::=   { sniServerMgmt    1 }
+--	  sniCommon		OBJECT IDENTIFIER ::=   { sniServerMgmt    2 }
+--	    sieBios		OBJECT IDENTIFIER ::=     { sniCommon        1 }
+--	    sieEisa		OBJECT IDENTIFIER ::=     { sniCommon        2 }
+--	    sieHd		OBJECT IDENTIFIER ::=     { sniCommon        3 }
+--	    sieBus		OBJECT IDENTIFIER ::=     { sniCommon        4 }
+--	    sieServerControl	OBJECT IDENTIFIER ::=     { sniCommon        5 }
+--	    sieDuplexWrite	OBJECT IDENTIFIER ::=     { sniCommon        8 }
+--	  siePcSpecific		OBJECT IDENTIFIER ::=   { sniServerMgmt    3 }
+--	  sieScb		OBJECT IDENTIFIER ::=   { sniServerMgmt    4 }
+--	  sieOsSpecific		OBJECT IDENTIFIER ::=   { sniServerMgmt    5 }
+--	  sieOemComponents	OBJECT IDENTIFIER ::=   { sniServerMgmt    6 }
+--	  sieSecurity		OBJECT IDENTIFIER ::=   { sniServerMgmt    7 }
+--	  sieServerView		OBJECT IDENTIFIER ::=   { sniServerMgmt    8 }
+--	  sieCluster		OBJECT IDENTIFIER ::=   { sniServerMgmt    9 }
+--	  sieVersionView	OBJECT IDENTIFIER ::=   { sniServerMgmt   10 }
+--	sieTrapMib		OBJECT IDENTIFIER ::= { sniExtensions    5 }
+
+--------------------------------------------------------------------------
+-- The path to sieDuplexWrite: root of this MIB                   --
+--------------------------------------------------------------------------
+
+sni				OBJECT IDENTIFIER ::= { enterprises    231 }
+sniProductMibs 	OBJECT IDENTIFIER ::= { sni              2 }
+sniExtensions  	OBJECT IDENTIFIER ::= { sniProductMibs  10 }
+sniServerMgmt  	OBJECT IDENTIFIER ::= { sniExtensions    2 }
+sniCommon		OBJECT IDENTIFIER ::= { sniServerMgmt	 2 }
+sieDuplexWrite	OBJECT IDENTIFIER ::= { sniCommon	     8 }
+
+sieDWAgentInfo	OBJECT IDENTIFIER ::= { sieDuplexWrite     1 }
+sieDWStatus		OBJECT IDENTIFIER ::= { sieDuplexWrite     2 }
+sieDWContainer	OBJECT IDENTIFIER ::= { sieDuplexWrite     3 }
+sieDWTrapInfo	OBJECT IDENTIFIER ::= { sieDuplexWrite    10 }
+
+--------------------------------------------------------------------------
+-- The DuplexWrite SNMP agent's info group (for debugging and   --
+-- info)                                                                --
+--                                                                      --
+-- Information concerning the agent's name, version, etc.               --
+--------------------------------------------------------------------------
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.8.1.1.0
+sieDWAgentId		OBJECT-TYPE
+    SYNTAX	DisplayString
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "DuplexWrite SNMP agent ID string"
+			::= { sieDWAgentInfo 1 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.8.1.2.0
+sieDWAgentCompany	OBJECT-TYPE
+    SYNTAX	DisplayString
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "DuplexWrite SNMP agent company string"
+			::= { sieDWAgentInfo 2 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.8.1.3.0
+sieDWAgentVersion	OBJECT-TYPE
+    SYNTAX	DisplayString
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "DuplexWrite SNMP agent version string"
+			::= { sieDWAgentInfo 3 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.8.1.4.0
+sieDWAgentBuild		OBJECT-TYPE
+    SYNTAX	DisplayString
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "DuplexWrite SNMP agent build date and time string"
+			::= { sieDWAgentInfo 4 }
+
+--------------------------------------------------------------------------
+-- The DuplexWrite SNMP agent's status group                             --
+--                                                                      --
+-- This is information that is necessary across DuplexWrite	            --
+-- groups.                                                              --
+--------------------------------------------------------------------------
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.8.2.1.0
+sieDWLastDate		OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "Date of last recent reconfiguration in time_t (seconds since 1/1/1970 00:00:00)"
+			::= { sieDWStatus 1 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.8.2.2.0
+sieDWCurrentStatus	OBJECT-TYPE
+	SYNTAX	INTEGER {
+			ok (1),
+			degraded (2),
+			error (3),
+			failed (4)
+		}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"This reflects the overall status of the driver, agent and the underlying ports.
+				Possible values are:
+				OK everything is fine
+				DEGRADED there was an event from the driver marking a change of DuplexWrite configuration or port status
+				ERROR software exception (software bug)
+				FAILED communication with driver fails (bug, driver not installed)"
+			::= { sieDWStatus 2 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.8.2.3.0
+sieDWRefresh	OBJECT-TYPE
+    SYNTAX	INTEGER {
+			none (0),
+			inquiry (1),
+			rescan (2)
+		}
+    ACCESS	read-write
+    STATUS	mandatory
+    DESCRIPTION "Command to refresh the data the agent is maintaining"
+			::= { sieDWStatus 3 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.8.2.4.0
+sieDWClusterPartner	OBJECT-TYPE
+    SYNTAX	DisplayString
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "If node is in a cluster this is the partner node"
+			::= { sieDWStatus 4 }
+
+--------------------------------------------------------------------------
+-- The DuplexWrite SNMP agent's container                               --
+--------------------------------------------------------------------------
+
+sieDWDeviceTable	OBJECT-TYPE
+    SYNTAX	SEQUENCE OF SieDWDevice
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION "Table of all devices DuplexWrite can detect"
+			::= { sieDWContainer 1}
+
+sieDWDevice		OBJECT-TYPE
+    SYNTAX	SieDWDevice
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION "Entry in table of DuplexWrite devices"
+    INDEX	{ sieDWDeviceID }
+			::= { sieDWDeviceTable 1}
+
+SieDWDevice		::= SEQUENCE {
+		sieDWDeviceID		INTEGER,
+		sieDWDevicePort		INTEGER,
+		sieDWActiveDevicePort	INTEGER,
+		sieDWPassiveDevicePort1	INTEGER,
+		sieDWPassiveDevicePort2	INTEGER,
+		sieDWPassiveDevicePort3	INTEGER,
+		sieDWDevicePath		INTEGER,
+		sieDWDeviceTarget	INTEGER,
+		sieDWDeviceLun		INTEGER,
+		sieDWDeviceDisk		INTEGER,
+		sieDWDeviceSizelo	INTEGER,
+		sieDWDeviceSizehi	INTEGER,
+		sieDWDeviceSizeMBlo	INTEGER,
+		sieDWDeviceSizeMBhi	INTEGER,
+		sieDWDeviceInquiryString	DisplayString,
+		sieDWDeviceDriverName	DisplayString,
+		sieDWDuplexStatus	INTEGER,
+		sieDWDuplexReason	INTEGER,
+		sieDWDuplexNumber	INTEGER,
+		sieDWDuplexPiece	INTEGER,
+		sieDWDuplexSizelo	INTEGER,
+		sieDWDuplexSizehi	INTEGER,
+		sieDWDuplexSizeMBlo	INTEGER,
+		sieDWDuplexSizeMBhi	INTEGER,
+		sieDWDuplexRecoverProgress	INTEGER,
+		sieDWDuplexCreate	INTEGER,
+		sieDWDuplexAdd		INTEGER,
+		sieDWDuplexCopy		INTEGER,
+		sieDWDuplexDelete	INTEGER,
+		sieDWDuplexBehavior	INTEGER,
+		sieDWDuplexName		DisplayString
+	}
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.8.3.1.1.1.0
+sieDWDeviceID		OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "A unique value for each device, starts at 0 and
+				remains unchanged from one re-initialization of
+				the agent to the next"
+			::= { sieDWDevice 1 }
+			
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.8.3.1.1.2.0			
+sieDWDevicePort	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "The SCSI port number where this device is attached"
+			::= { sieDWDevice 2 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.8.3.1.1.3.0			
+sieDWActiveDevicePort	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "The SCSI port number where this device is attached, when MultiPath
+    			is installed this is the active port"
+			::= { sieDWDevice 3 }
+			
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.8.3.1.1.4.0			
+sieDWPassiveDevicePort1	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "When MultiPath is installed this is the SCSI port number of the first
+				passive port where this device is attached"
+			::= { sieDWDevice 4 }
+			
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.8.3.1.1.5.0			
+sieDWPassiveDevicePort2	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "When MultiPath is installed this is the SCSI port number of the second
+				passive port where this device is attached"
+			::= { sieDWDevice 5 }
+			
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.8.3.1.1.6.0			
+sieDWPassiveDevicePort3	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "When MultiPath is installed this is the SCSI port number of the third
+				passive port where this device is attached"
+			::= { sieDWDevice 6 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.8.3.1.1.7.0			
+sieDWDevicePath	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "The SCSI path number (should be bus number) where this
+				device is attached"
+			::= { sieDWDevice 7 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.8.3.1.1.8.0			
+sieDWDeviceTarget	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "The SCSI target ID of this device"
+			::= { sieDWDevice 8 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.8.3.1.1.9.0			
+sieDWDeviceLun		OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "The SCSI lun of this device"
+			::= { sieDWDevice 9 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.8.3.1.1.10.0			
+sieDWDeviceDisk	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "The operating system's internal number for this device; e.g.
+				NT: disk 2"
+			::= { sieDWDevice 10 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.8.3.1.1.11.0	
+sieDWDeviceSizelo	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "Size of the device in blocks (low part)"
+			::= { sieDWDevice 11 }
+			
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.8.3.1.1.12.0	
+sieDWDeviceSizehi	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "Size of the device in blocks (high part)"
+			::= { sieDWDevice 12 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.8.3.1.1.13.0	
+sieDWDeviceSizeMBlo	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "Size of the device in MB (low part)"
+			::= { sieDWDevice 13 }
+			
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.8.3.1.1.14.0	
+sieDWDeviceSizeMBhi	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "Size of the device in MB (high part)"
+			::= { sieDWDevice 14 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.8.3.1.1.15.0	
+sieDWDeviceInquiryString	OBJECT-TYPE
+    SYNTAX	DisplayString
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "The SCSI inquiry string of this device"
+			::= { sieDWDevice 15 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.8.3.1.1.16.0	
+sieDWDeviceDriverName	OBJECT-TYPE
+    SYNTAX	DisplayString
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "The name of the operating system's driver that handles
+				the device"
+			::= { sieDWDevice 16 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.8.3.1.1.17.0	
+sieDWDuplexStatus	OBJECT-TYPE
+	SYNTAX	INTEGER {
+		online (1),
+		error (2),
+		recover (3),
+		disable (4),
+		simplex (5),
+		na (6),
+		preferred (7),
+		multipath (8),
+		cluster (9),
+		missing (10)
+	}
+    ACCESS	read-write
+    STATUS	mandatory
+    DESCRIPTION "The status of the DW group where this device is part of:
+				online: the device is in perfect order (GET/SET)
+				error: the device had a fault (GET/SET)
+				recover: the device is working on a catch-up (GET)
+				disable: stop operation of this device (GET/SET)
+				simplex: simple SCSI device (GET)
+				na: not available as DuplexDisk piece (GET)
+				preferred: piece used for read (GET)
+				multipath: disk not accessible (MultiPath) (GET)
+				cluster: disk on other cluster node (GET)
+				missing: one disk of the DW group is missing (GET)
+				
+				The highest 8 bit of the value are used for additional
+				status information:
+				Bit field: Bit 0 - most recent
+						   Bit 1 - root
+						   Bit 2 - force active
+						   Bit 3 - hotspare
+						   Bit 4 - broken
+						   Bit 5 - reserved
+						   ...
+						   Bit 7 - reserved"
+			::= { sieDWDevice 17 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.8.3.1.1.18.0	
+sieDWDuplexReason	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "The reason for an error of the DW group where this device
+				is part of"
+			::= { sieDWDevice 18 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.8.3.1.1.19.0	
+sieDWDuplexNumber	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "The DW internal number of the DW group where this device
+				is part of"
+			::= { sieDWDevice 19 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.8.3.1.1.20.0	
+sieDWDuplexPiece	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "The internal number this device has inside its DW group"
+			::= { sieDWDevice 20 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.8.3.1.1.21.0	
+sieDWDuplexSizelo		OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "The size of the DW group in blocks where this device is part of (low part)"
+			::= { sieDWDevice 21 }
+			
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.8.3.1.1.22.0	
+sieDWDuplexSizehi		OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "The size of the DW group in blocks where this device is part of (high part)"
+			::= { sieDWDevice 22 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.8.3.1.1.23.0	
+sieDWDuplexSizeMBlo	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "The size of the DW group in MB where this device is part of (low part)"
+			::= { sieDWDevice 23 }
+			
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.8.3.1.1.24.0	
+sieDWDuplexSizeMBhi	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "The size of the DW group in MB where this device is part of (high part)"
+			::= { sieDWDevice 24 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.8.3.1.1.25.0	
+sieDWDuplexRecoverProgress	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "The progress in percent of a recovery of the DW group where
+				this device is part of"
+			::= { sieDWDevice 25 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.8.3.1.1.26.0			
+sieDWDuplexCreate	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-write
+    STATUS	mandatory
+    DESCRIPTION "Command to create a DW group with this device"
+			::= { sieDWDevice 26 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.8.3.1.1.27.0			
+sieDWDuplexAdd		OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-write
+    STATUS	mandatory
+    DESCRIPTION "Command to add device <diskNumber> to the DW group with this device"
+			::= { sieDWDevice 27 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.8.3.1.1.28.0
+sieDWDuplexCopy	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-write
+    STATUS	mandatory
+    DESCRIPTION "Command to recover (catchup) device <diskNumber> inside its DW group"
+			::= { sieDWDevice 28 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.8.3.1.1.29.0			
+sieDWDuplexDelete		OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-write
+    STATUS	mandatory
+    DESCRIPTION "Command to delete this device from its DW group - if it's the last device
+				of its group the group is destroyed"
+			::= { sieDWDevice 29 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.8.3.1.1.30.0
+sieDWDuplexBehavior	OBJECT-TYPE
+	SYNTAX	INTEGER {
+		include (1),
+		exclude (2),
+		prefer (3)
+	}
+    ACCESS	read-write
+    STATUS	mandatory
+    DESCRIPTION "Command to include/exclude this device from being used by DW;
+				Command to set this device as preferred device in this DW for reading"
+			::= { sieDWDevice 30 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.8.3.1.1.31.0
+sieDWDuplexName	OBJECT-TYPE
+    SYNTAX	DisplayString
+    ACCESS	read-write
+    STATUS	mandatory
+    DESCRIPTION "The DW internal name of the DW group where this device
+				is part of"
+			::= { sieDWDevice 31 }
+
+--------------------------------------------------------------------------
+-- The DuplexWrite SNMP agent's traps                                   --
+--------------------------------------------------------------------------
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.8.10.1
+sieDWTrapServerName		OBJECT-TYPE
+    SYNTAX	DisplayString
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION "Name of the server where the trap occured"
+			::= { sieDWTrapInfo 1 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.8.10.2
+sieDWTrapTime		OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION "Time the trap occured (in seconds since 1/1/1970 00:00:00)"
+			::= { sieDWTrapInfo 2 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.8.10.3
+sieDWTrapGroupID		OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION "The DuplexWrite Group ID where the change occured"
+			::= { sieDWTrapInfo 3 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.8.10.4
+sieDWTrapPortID		OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION "The DuplexWrite Port ID where the change occured"
+			::= { sieDWTrapInfo 4 }
+			
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.8.10.5
+sieDWTrapPathID		OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION "The DuplexWrite Path ID where the change occured"
+			::= { sieDWTrapInfo 5 }
+			
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.8.10.6
+sieDWTrapTargetID		OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION "The DuplexWrite Target ID where the change occured"
+			::= { sieDWTrapInfo 6 }
+			
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.8.10.7
+sieDWTrapLunID		OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION "The DuplexWrite Lun ID where the change occured"
+			::= { sieDWTrapInfo 7 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.8.10.8
+sieDWTrapError		OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION "The DuplexWrite error code for certain traps"
+			::= { sieDWTrapInfo 8 }
+
+sieDWNewConfig	TRAP-TYPE
+    ENTERPRISE	sniServerMgmt
+    VARIABLES {
+	sieDWTrapServerName,
+	sieDWTrapTime,
+	sieDWTrapGroupID,
+	sieDWTrapPortID,
+	sieDWTrapPathID,
+	sieDWTrapTargetID,
+	sieDWTrapLunID,
+	sieDWTrapError
+    }
+    DESCRIPTION		"Trap occurs after the driver has created a new DuplexWrite group or has added a device to an existing DuplexWrite group as requested by the configuration utility."
+    --#TYPE		"DW: New configuration"
+    --#SUMMARY		"DuplexWrite configuration for group %d was created or updated on server %s."
+    --#ARGUMENTS	{ 2, 0 }
+    --#SEVERITY		INFORMATIONAL
+    --#TIMEINDEX	1
+    --#STATE		OPERATIONAL
+			::= 1300
+
+sieDWPieceRemoved	TRAP-TYPE
+    ENTERPRISE	sniServerMgmt
+    VARIABLES {
+	sieDWTrapServerName,
+	sieDWTrapTime,
+	sieDWTrapGroupID,
+	sieDWTrapPortID,
+	sieDWTrapPathID,
+	sieDWTrapTargetID,
+	sieDWTrapLunID,
+	sieDWTrapError
+    }
+    DESCRIPTION		"Trap occurs after the driver has removed a device from a DuplexWrite group. The action was requested by the configuration utility."
+    --#TYPE		"DW: Piece removed"
+    --#SUMMARY		"DuplexWrite configuration for group %d was changed on server %s. Device %d, %d, %d, %d was removed."
+    --#ARGUMENTS	{ 2, 0, 3, 4, 5, 6 }
+    --#SEVERITY		INFORMATIONAL
+    --#TIMEINDEX	1
+    --#STATE		OPERATIONAL
+			::= 1301
+
+sieDWConfigRemoved	TRAP-TYPE
+    ENTERPRISE	sniServerMgmt
+    VARIABLES {
+	sieDWTrapServerName,
+	sieDWTrapTime,
+	sieDWTrapGroupID,
+	sieDWTrapPortID,
+	sieDWTrapPathID,
+	sieDWTrapTargetID,
+	sieDWTrapLunID,
+	sieDWTrapError
+    }
+    DESCRIPTION		"Trap occurs after the driver has removed a DuplexWrite group. The action was requested by the configuration utility."
+    --#TYPE		"DW: Configuration removed"
+    --#SUMMARY		"DuplexWrite group %d was removed on server %s."
+    --#ARGUMENTS	{ 2, 0 }
+    --#SEVERITY		INFORMATIONAL
+    --#TIMEINDEX	1
+    --#STATE		OPERATIONAL
+			::= 1302
+
+sieDWStatusSet	TRAP-TYPE
+    ENTERPRISE	sniServerMgmt
+    VARIABLES {
+	sieDWTrapServerName,
+	sieDWTrapTime,
+	sieDWTrapGroupID,
+	sieDWTrapPortID,
+	sieDWTrapPathID,
+	sieDWTrapTargetID,
+	sieDWTrapLunID,
+	sieDWTrapError
+    }
+    DESCRIPTION		"Trap occurs after the driver has set the status of a DuplexWrite group. The action was requested by the configuration utility."
+    --#TYPE		"DW: Status changed"
+    --#SUMMARY		"Status of DuplexWrite group %d on server %s has changed (user request)."
+    --#ARGUMENTS	{ 2, 0 }
+    --#SEVERITY		MINOR
+    --#TIMEINDEX	1
+    --#STATE		OPERATIONAL
+			::= 1303
+
+sieDWUpdateStatus	TRAP-TYPE
+    ENTERPRISE	sniServerMgmt
+    VARIABLES {
+	sieDWTrapServerName,
+	sieDWTrapTime,
+	sieDWTrapGroupID,
+	sieDWTrapPortID,
+	sieDWTrapPathID,
+	sieDWTrapTargetID,
+	sieDWTrapLunID,
+	sieDWTrapError
+    }
+    DESCRIPTION		"Trap occurs after the driver has updated the status of a DuplexWrite group."
+    --#TYPE		"DW: Status updated"
+    --#SUMMARY		"Status of DuplexWrite group %d on server %s has changed (driver request)."
+    --#ARGUMENTS	{ 2, 0 }
+    --#SEVERITY		MINOR
+    --#TIMEINDEX	1
+    --#STATE		OPERATIONAL
+			::= 1304
+
+sieDWPieceRecovered	TRAP-TYPE
+    ENTERPRISE	sniServerMgmt
+    VARIABLES {
+	sieDWTrapServerName,
+	sieDWTrapTime,
+	sieDWTrapGroupID,
+	sieDWTrapPortID,
+	sieDWTrapPathID,
+	sieDWTrapTargetID,
+	sieDWTrapLunID,
+	sieDWTrapError
+    }
+    DESCRIPTION		"Trap occurs after the driver has sucessfully recovered a DuplexWrite group as requested by the configuration utility. Both pieces are ONLINE."
+    --#TYPE		"DW: Piece recovered"
+    --#SUMMARY		"DuplexWrite group %d on server %s: Recovery successful."
+    --#ARGUMENTS	{ 2, 0 }
+    --#SEVERITY		INFORMATIONAL
+    --#TIMEINDEX	1
+    --#STATE		OPERATIONAL
+			::= 1305
+
+sieDWRecoverAborted	TRAP-TYPE
+    ENTERPRISE	sniServerMgmt
+    VARIABLES {
+	sieDWTrapServerName,
+	sieDWTrapTime,
+	sieDWTrapGroupID,
+	sieDWTrapPortID,
+	sieDWTrapPathID,
+	sieDWTrapTargetID,
+	sieDWTrapLunID,
+	sieDWTrapError
+    }
+    DESCRIPTION		"Trap occurs after the driver has aborted the recovery process of a DuplexWrite group as requested by the configuration utility."
+    --#TYPE		"DW: Recover aborted"
+    --#SUMMARY		"DuplexWrite group %d on server %s: Recovery aborted."
+    --#ARGUMENTS	{ 2, 0 }
+    --#SEVERITY		MINOR
+    --#TIMEINDEX	1
+    --#STATE		OPERATIONAL
+			::= 1306
+
+sieDWReservationConflict	TRAP-TYPE
+    ENTERPRISE	sniServerMgmt
+    VARIABLES {
+	sieDWTrapServerName,
+	sieDWTrapTime,
+	sieDWTrapGroupID,
+	sieDWTrapPortID,
+	sieDWTrapPathID,
+	sieDWTrapTargetID,
+	sieDWTrapLunID,
+	sieDWTrapError
+    }
+    DESCRIPTION		"Trap occurs after the driver has detected a reservation conflict. A whole DuplexWrite group is not accessible from now on. This is only an error if it happens during operation (not initialization) of this group."
+    --#TYPE		"DW: Reservation conflict"
+    --#SUMMARY		"DuplexWrite group %d on server %s: Reservation conflict occured - group is not accessible."
+    --#ARGUMENTS	{ 2, 0 }
+    --#SEVERITY		MAJOR
+    --#TIMEINDEX	1
+    --#STATE		OPERATIONAL
+			::= 1307
+
+sieDWConfigChanged	TRAP-TYPE
+    ENTERPRISE	sniServerMgmt
+    VARIABLES {
+	sieDWTrapServerName,
+	sieDWTrapTime,
+	sieDWTrapGroupID,
+	sieDWTrapPortID,
+	sieDWTrapPathID,
+	sieDWTrapTargetID,
+	sieDWTrapLunID,
+	sieDWTrapError
+    }
+    DESCRIPTION		"Trap occurs after the driver has done a rescan/reread and found a new configuration."
+    --#TYPE		"DW: Configuration changed"
+    --#SUMMARY		"DuplexWrite on server %s: New configuration was found."
+    --#ARGUMENTS	{ 0 }
+    --#SEVERITY		INFORMATIONAL
+    --#TIMEINDEX	1
+    --#STATE		OPERATIONAL
+			::= 1308
+
+sieDWConfigInvalidated	TRAP-TYPE
+    ENTERPRISE	sniServerMgmt
+    VARIABLES {
+	sieDWTrapServerName,
+	sieDWTrapTime,
+	sieDWTrapGroupID,
+	sieDWTrapPortID,
+	sieDWTrapPathID,
+	sieDWTrapTargetID,
+	sieDWTrapLunID,
+	sieDWTrapError
+    }
+    DESCRIPTION		"Trap occurs after the driver has invalidated the configuration information for a device as requested by the DuplexWrite cluster service. The configuration information is reread before the next access of the device on this cluster element."
+    --#TYPE		"DW: Configuration invalidated"
+    --#SUMMARY		"DuplexWrite group %d on server %s: Configuration information was invalidated."
+    --#ARGUMENTS	{ 2, 0 }
+    --#SEVERITY		INFORMATIONAL
+    --#TIMEINDEX	1
+    --#STATE		OPERATIONAL
+			::= 1309
+
+sieDWActiveLunChanged	TRAP-TYPE
+    ENTERPRISE	sniServerMgmt
+    VARIABLES {
+	sieDWTrapServerName,
+	sieDWTrapTime,
+	sieDWTrapGroupID,
+	sieDWTrapPortID,
+	sieDWTrapPathID,
+	sieDWTrapTargetID,
+	sieDWTrapLunID,
+	sieDWTrapError
+    }
+    DESCRIPTION		"Trap occurs after the driver has changed the path for read commands to a specified device of a DuplexWrite group."
+    --#TYPE		"DW: Active LUN changed"
+    --#SUMMARY		"DuplexWrite group %d on server %s: Device (%d, %d, %d, %d) is used for read commands."
+    --#ARGUMENTS	{ 2, 0, 3, 4, 5, 6 }
+    --#SEVERITY		INFORMATIONAL
+    --#TIMEINDEX	1
+    --#STATE		OPERATIONAL
+			::= 1310
+
+sieDWPieceFailed	TRAP-TYPE
+    ENTERPRISE	sniServerMgmt
+    VARIABLES {
+	sieDWTrapServerName,
+	sieDWTrapTime,
+	sieDWTrapGroupID,
+	sieDWTrapPortID,
+	sieDWTrapPathID,
+	sieDWTrapTargetID,
+	sieDWTrapLunID,
+	sieDWTrapError
+    }
+    DESCRIPTION		"Trap occurs after the driver has detected an error on one of the devices of a DuplexWrite group."
+    --#TYPE		"DW: Piece failed"
+    --#SUMMARY		"DuplexWrite group %d on server %s: Device (%d, %d, %d, %d) failed."
+    --#ARGUMENTS	{ 2, 0, 3, 4, 5, 6 }
+    --#SEVERITY		CRITICAL
+    --#TIMEINDEX	1
+    --#STATE		DEGRADED
+			::= 1311
+			
+sieDWRootFlagChanged	TRAP-TYPE
+    ENTERPRISE	sniServerMgmt
+    VARIABLES {
+	sieDWTrapServerName,
+	sieDWTrapTime,
+	sieDWTrapGroupID,
+	sieDWTrapPortID,
+	sieDWTrapPathID,
+	sieDWTrapTargetID,
+	sieDWTrapLunID,
+	sieDWTrapError
+    }
+    DESCRIPTION		"Trap occurs after the driver has changed the root behavior of a DuplexWrite group."
+    --#TYPE		"DW: Root flag changed"
+    --#SUMMARY		"DuplexWrite group %d on server %s: Root flag changed."
+    --#ARGUMENTS	{ 2, 0 }
+    --#SEVERITY		INFORMATIONAL
+    --#TIMEINDEX	1
+    --#STATE		OPERATIONAL
+			::= 1312
+			
+sieDWNameChanged	TRAP-TYPE
+    ENTERPRISE	sniServerMgmt
+    VARIABLES {
+	sieDWTrapServerName,
+	sieDWTrapTime,
+	sieDWTrapGroupID,
+	sieDWTrapPortID,
+	sieDWTrapPathID,
+	sieDWTrapTargetID,
+	sieDWTrapLunID,
+	sieDWTrapError
+    }
+    DESCRIPTION		"Trap occurs after the driver has changed the name of a DuplexWrite group."
+    --#TYPE		"DW: Name changed"
+    --#SUMMARY		"DuplexWrite group %d on server %s: Name changed."
+    --#ARGUMENTS	{ 2, 0 }
+    --#SEVERITY		INFORMATIONAL
+    --#TIMEINDEX	1
+    --#STATE		OPERATIONAL
+			::= 1313
+			
+sieDWForceActive	TRAP-TYPE
+    ENTERPRISE	sniServerMgmt
+    VARIABLES {
+	sieDWTrapServerName,
+	sieDWTrapTime,
+	sieDWTrapGroupID,
+	sieDWTrapPortID,
+	sieDWTrapPathID,
+	sieDWTrapTargetID,
+	sieDWTrapLunID,
+	sieDWTrapError
+    }
+    DESCRIPTION		"Trap occurs after the driver has marked a disk of a DuplexWrite group forced active at next boot. The partner disk can be used for a snapshot."
+    --#TYPE		"DW: Disk forced active"
+    --#SUMMARY		"DuplexWrite group %d on server %s: Device (%d, %d, %d, %d) forced active at next boot (snapshot)."
+    --#ARGUMENTS	{ 2, 0, 3, 4, 5, 6 }
+    --#SEVERITY		INFORMATIONAL
+    --#TIMEINDEX	1
+    --#STATE		OPERATIONAL
+			::= 1314
+			
+sieDWRefreshFinished	TRAP-TYPE
+    ENTERPRISE	sniServerMgmt
+    VARIABLES {
+	sieDWTrapServerName,
+	sieDWTrapTime,
+	sieDWTrapGroupID,
+	sieDWTrapPortID,
+	sieDWTrapPathID,
+	sieDWTrapTargetID,
+	sieDWTrapLunID,
+	sieDWTrapError
+    }
+    DESCRIPTION		"Trap occurs after the driver interface has updated the internal data structures."
+    --#TYPE		"DW: Refresh finished"
+    --#SUMMARY		"DuplexWrite data on server %s was updated."
+    --#ARGUMENTS	{ 0 }
+    --#SEVERITY		INFORMATIONAL
+    --#TIMEINDEX	1
+    --#STATE		OPERATIONAL
+			::= 1350
+			
+sieDWDiskRegistered	TRAP-TYPE
+    ENTERPRISE	sniServerMgmt
+    VARIABLES {
+	sieDWTrapServerName,
+	sieDWTrapTime,
+	sieDWTrapGroupID,
+	sieDWTrapPortID,
+	sieDWTrapPathID,
+	sieDWTrapTargetID,
+	sieDWTrapLunID,
+	sieDWTrapError
+    }
+    DESCRIPTION		"Trap occurs after the driver interface has modified the registry so that after the next reboot a disk is registered/unregistered."
+    --#TYPE		"DW: Disk un-/registered"
+    --#SUMMARY		"A disk on server %s was registered/unregistered."
+    --#ARGUMENTS	{ 0 }
+    --#SEVERITY		INFORMATIONAL
+    --#TIMEINDEX	1
+    --#STATE		OPERATIONAL
+			::= 1351
+
+END

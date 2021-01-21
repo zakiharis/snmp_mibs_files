@@ -1,0 +1,476 @@
+--
+--	Copyright (c) 1985-1998 Phoenix Technologies Ltd.
+--	This program contains proprietary and confidential information. All
+--	rights reserved except as may be permitted by prior written consent.
+--
+--		  R E V I S I O N    H I S T O R Y
+--	$Log:   K:/nb/archive/nonbios/rompilot/docs/misc/rompilot.miv  $
+--	
+--	   Rev 1.0   24 Nov 1998 17:48:26
+--	Initial revision.
+-- 
+--
+
+ROMPILOT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	enterprises
+		FROM RFC1155-SMI
+	OBJECT-TYPE
+		FROM RFC-1212
+	sysDescr, sysUpTime, sysName, ifPhysAddress
+		FROM RFC1213-MIB
+	TRAP-TYPE
+		FROM RFC-1215;
+
+phoenix	OBJECT IDENTIFIER ::= { enterprises 2487 }
+phoenixMibs OBJECT IDENTIFIER ::= { phoenix 1 }
+
+rpMachineId OBJECT-TYPE
+	SYNTAX	OCTET STRING (SIZE(16))
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+		"The UUID of the RomPilot machine."
+	::= { phoenixMibs 1 }
+
+rpWarmResetTrap TRAP-TYPE
+	ENTERPRISE phoenix
+	VARIABLES { sysDescr, sysUpTime, sysName, ifPhysAddress,
+			rpMachineId }
+	DESCRIPTION
+		"A RomPilot enabled machine has been reset
+		and is running the BIOS POST. This is a WARM
+		RESET."
+
+-- Add Novell ManageWise NMS type annotation to the trap for use by
+-- compatible enterprise server systems.  See Novell documentation for
+-- specifications covering this data.
+
+--                                1         2         3         4
+--                       1234567890123456789012345678901234567890
+
+	--#TYPE		"RomPilot Warm Reset Trap."
+	--#SUMMARY	"RomPilot machine %s"
+	--#SUMMARY	"with MAC address %m"
+	--#SUMMARY	"has performed a warm reset and is"
+	--#SUMMARY	"running the BIOS POST."
+	--#ARGUMENTS	{2, 3}
+	--#SEVERITY	INFORMATIONAL
+	--#TIMEINDEX	5
+	--#STATE	OPERATIONAL
+
+	::= 257
+
+rpColdResetTrap TRAP-TYPE
+	ENTERPRISE phoenix
+	VARIABLES { sysDescr, sysUpTime, sysName, ifPhysAddress,
+			rpMachineId }
+	DESCRIPTION
+		"A RomPilot enabled machine has been reset
+		and is running the BIOS POST. This is a COLD
+		RESET."
+
+-- Add Novell ManageWise NMS type annotation to the trap for use by
+-- compatible enterprise server systems.  See Novell documentation for
+-- specifications covering this data.
+
+--                                1         2         3         4
+--                       1234567890123456789012345678901234567890
+
+	--#TYPE		"RomPilot Cold Reset Trap."
+	--#SUMMARY	"RomPilot machine %s"
+	--#SUMMARY	"with MAC address %m"
+	--#SUMMARY	"has performed a cold reset and is"
+	--#SUMMARY	"running the BIOS POST."
+	--#ARGUMENTS	{2, 3}
+	--#SEVERITY	INFORMATIONAL
+	--#TIMEINDEX	5
+	--#STATE	OPERATIONAL
+
+	::= 258
+
+rpDiagResetTrap TRAP-TYPE
+	ENTERPRISE phoenix
+	VARIABLES { sysDescr, sysUpTime, sysName, ifPhysAddress,
+			rpMachineId }
+	DESCRIPTION
+		"A RomPilot enabled machine has been reset
+		and is running the BIOS POST. This is a DIAGNOSTIC
+		RESET."
+
+-- Add Novell ManageWise NMS type annotation to the trap for use by
+-- compatible enterprise server systems.  See Novell documentation for
+-- specifications covering this data.
+
+--                                1         2         3         4
+--                       1234567890123456789012345678901234567890
+
+	--#TYPE		"RomPilot Diagnostic Reset Trap."
+	--#SUMMARY	"RomPilot machine %s"
+	--#SUMMARY	"with MAC address %m"
+	--#SUMMARY	"has performed a diagnostic reset and"
+	--#SUMMARY	"is running the BIOS POST."
+	--#ARGUMENTS	{2, 3}
+	--#SEVERITY	MINOR
+	--#TIMEINDEX	5
+	--#STATE	UNKNOWN
+
+	::= 259
+
+rpIDEResetTrap TRAP-TYPE
+	ENTERPRISE phoenix
+	VARIABLES { sysDescr, sysUpTime, sysName, ifPhysAddress,
+			rpMachineId }
+	DESCRIPTION
+		"A RomPilot enabled machine has been reset
+		and is running the BIOS POST. This is an IDE
+		DISK RESET."
+
+-- Add Novell ManageWise NMS type annotation to the trap for use by
+-- compatible enterprise server systems.  See Novell documentation for
+-- specifications covering this data.
+
+--                                1         2         3         4
+--                       1234567890123456789012345678901234567890
+
+	--#TYPE		"RomPilot IDE disk Reset Trap."
+	--#SUMMARY	"RomPilot machine %s"
+	--#SUMMARY	"with MAC address %m"
+	--#SUMMARY	"has performed an IDE disk reset and"
+	--#SUMMARY	"is running the BIOS POST."
+	--#ARGUMENTS	{2, 3}
+	--#SEVERITY	MINOR
+	--#TIMEINDEX	5
+	--#STATE	UNKNOWN
+
+	::= 260
+
+rpBootTrap TRAP-TYPE
+	ENTERPRISE phoenix
+	VARIABLES { sysDescr, sysUpTime, sysName, ifPhysAddress,
+			rpMachineId }
+	DESCRIPTION
+		"A RomPilot enabled machine has started to
+		boot the OS."
+
+-- Add Novell ManageWise NMS type annotation to the trap for use buy
+-- compatible enterprise server systems.  See Novell documentation for
+-- specifications covering this data.
+
+--                                1         2         3         4
+--                       1234567890123456789012345678901234567890
+
+	--#TYPE		"RomPilot OS Boot Trap."
+	--#SUMMARY	"RomPilot machine %s"
+	--#SUMMARY	"with MAC address %m"
+	--#SUMMARY	"is starting to boot its Operating"
+	--#SUMMARY	"System."
+	--#ARGUMENTS	{2, 3}
+	--#SEVERITY	INFORMATIONAL
+	--#TIMEINDEX	5
+	--#STATE	OPERATIONAL
+
+	::= 512
+
+rpPostFtlErrorTrap TRAP-TYPE
+	ENTERPRISE phoenix
+	VARIABLES { sysDescr, sysUpTime, sysName, ifPhysAddress,
+			rpMachineId }
+	DESCRIPTION
+		"A RomPilot enabled machine has detected a
+		fatal error during POST."
+
+-- Add Novell ManageWise NMS type annotation to the trap for use by
+-- compatible enterprise server systems.  See Novell documentation for
+-- specifications covering this data.
+
+--                                1         2         3         4
+--                       1234567890123456789012345678901234567890
+
+	--#TYPE		"RomPilot Fatal POST Error Trap."
+	--#SUMMARY	"RomPilot machine %s"
+	--#SUMMARY	"with MAC address %m"
+	--#SUMMARY	"has detected a fatal error during"
+	--#SUMMARY	"BIOS POST."
+	--#ARGUMENTS	{2, 3}
+	--#SEVERITY	MAJOR
+	--#TIMEINDEX	5
+	--#STATE	UNKNOWN
+
+	::= 769
+
+rpPostConErrorTrap TRAP-TYPE
+	ENTERPRISE phoenix
+	VARIABLES { sysDescr, sysUpTime, sysName, ifPhysAddress,
+			rpMachineId }
+	DESCRIPTION
+		"A RomPilot enabled machine has detected a
+		conditional error during POST."
+
+-- Add Novell ManageWise NMS type annotation to the trap for use by
+-- compatible enterprise server systems.  See Novell documentation for
+-- specifications covering this data.
+
+--                                1         2         3         4
+--                       1234567890123456789012345678901234567890
+
+	--#TYPE		"RomPilot Conditional POST Error Trap."
+	--#SUMMARY	"RomPilot machine %s"
+	--#SUMMARY	"with MAC address %m"
+	--#SUMMARY	"has detected a conditional error"
+	--#SUMMARY	"during BIOS POST."
+	--#ARGUMENTS	{2, 3}
+	--#SEVERITY	MINOR
+	--#TIMEINDEX	5
+	--#STATE	OPERATIONAL
+
+	::= 770
+
+rpPostWarngTrap TRAP-TYPE
+	ENTERPRISE phoenix
+	VARIABLES { sysDescr, sysUpTime, sysName, ifPhysAddress,
+			rpMachineId }
+	DESCRIPTION
+		"A RomPilot enabled machine has detected a
+		conditional error during POST."
+
+-- Add Novell ManageWise NMS type annotation to the trap for use by
+-- compatible enterprise server systems.  See Novell documentation for
+-- specifications covering this data.
+
+--                                1         2         3         4
+--                       1234567890123456789012345678901234567890
+
+	--#TYPE		"RomPilot Conditional POST Error Trap."
+	--#SUMMARY	"RomPilot machine %s"
+	--#SUMMARY	"with MAC address %m"
+	--#SUMMARY	"has detected a conditional error"
+	--#SUMMARY	"during BIOS POST."
+	--#ARGUMENTS	{2, 3}
+	--#SEVERITY	MINOR
+	--#TIMEINDEX	5
+	--#STATE	OPERATIONAL
+
+	::= 771
+
+rpSecurityTrap TRAP-TYPE
+	ENTERPRISE phoenix
+	VARIABLES { sysDescr, sysUpTime, sysName, ifPhysAddress,
+			rpMachineId }
+	DESCRIPTION
+		"A RomPilot enabled machine has detected an
+		attempted security breach."
+
+-- Add Novell ManageWise NMS type annotation to the trap for use by
+-- compatible enterprise server systems.  See Novell documentation for
+-- specifications covering this data.
+
+--                                1         2         3         4
+--                       1234567890123456789012345678901234567890
+
+	--#TYPE		"RomPilot Security Breach Trap."
+	--#SUMMARY	"RomPilot machine %s"
+	--#SUMMARY	"with MAC address %m"
+	--#SUMMARY	"has detected an attempted security"
+	--#SUMMARY	"breach."
+	--#ARGUMENTS	{2, 3}
+	--#SEVERITY	MAJOR
+	--#TIMEINDEX	5
+	--#STATE	OPERATIONAL
+
+	::= 1024
+
+rpNosUpTrap TRAP-TYPE
+	ENTERPRISE phoenix
+	VARIABLES { sysDescr, sysUpTime, sysName, ifPhysAddress,
+			rpMachineId }
+	DESCRIPTION
+		"A RomPilot enabled machine has loaded its
+		operating system."
+
+-- Add Novell ManageWise NMS type annotation to the trap for use by
+-- compatible enterprise server systems.  See Novell documentation for
+-- specifications covering this data.
+
+--                                1         2         3         4
+--                       1234567890123456789012345678901234567890
+
+	--#TYPE		"RomPilot OS Loaded Trap."
+	--#SUMMARY	"RomPilot machine %s"
+	--#SUMMARY	"with MAC address %m"
+	--#SUMMARY	"has loaded its Operating System."
+	--#ARGUMENTS	{2, 3}
+	--#SEVERITY	INFORMATIONAL
+	--#TIMEINDEX	5
+	--#STATE	OPERATIONAL
+
+	::= 1280
+
+rpCriticalTrap TRAP-TYPE
+	ENTERPRISE phoenix
+	VARIABLES { sysDescr, sysUpTime, sysName, ifPhysAddress,
+			rpMachineId }
+	DESCRIPTION
+		"A RomPilot enabled machine has sent a
+		critical trap."
+
+-- Add Novell ManageWise NMS type annotation to the trap for use by
+-- compatible enterprise server systems.  See Novell documentation for
+-- specifications covering this data.
+
+--                                1         2         3         4
+--                       1234567890123456789012345678901234567890
+
+	--#TYPE		"RomPilot Critical Trap."
+	--#SUMMARY	"RomPilot machine %s"
+	--#SUMMARY	"with MAC address %m"
+	--#SUMMARY	"has sent a critical trap."
+	--#ARGUMENTS	{2, 3}
+	--#SEVERITY	MAJOR
+	--#TIMEINDEX	5
+	--#STATE	UNKNOWN
+
+	::= 1536
+
+rpDisconnectTrap TRAP-TYPE
+	ENTERPRISE phoenix
+	VARIABLES { sysDescr, sysUpTime, sysName, ifPhysAddress,
+			rpMachineId }
+	DESCRIPTION
+		"A RomPilot enabled machine has sent a
+		disconnect trap. This means that the
+		RomPilot enabled machine is about to
+		end communications abruptly."
+
+-- Add Novell ManageWise NMS type annotation to the trap for use by
+-- compatible enterprise server systems.  See Novell documentation for
+-- specifications covering this data.
+
+--                                1         2         3         4
+--                       1234567890123456789012345678901234567890
+
+	--#TYPE		"RomPilot Disconnect Trap."
+	--#SUMMARY	"RomPilot machine %s"
+	--#SUMMARY	"with MAC address %m"
+	--#SUMMARY	"has sent a disconnect trap and will"
+	--#SUMMARY	"end communications abruptly."
+	--#ARGUMENTS	{2, 3}
+	--#SEVERITY	INFORMATIONAL
+	--#TIMEINDEX	5
+	--#STATE	UNKNOWN
+
+	::= 1792
+
+rpReconnectTrap TRAP-TYPE
+	ENTERPRISE phoenix
+	VARIABLES { sysDescr, sysUpTime, sysName, ifPhysAddress,
+			rpMachineId }
+	DESCRIPTION
+		"A RomPilot enabled machine has sent a
+		reconnect trap. This means that the
+		RomPilot enabled machine is able to
+		resume communications."
+
+-- Add Novell ManageWise NMS type annotation to the trap for use by
+-- compatible enterprise server systems.  See Novell documentation for
+-- specifications covering this data.
+
+--                                1         2         3         4
+--                       1234567890123456789012345678901234567890
+
+	--#TYPE		"RomPilot Reconnect Trap."
+	--#SUMMARY	"RomPilot machine %s"
+	--#SUMMARY	"with MAC address %m"
+	--#SUMMARY	"has sent a reconnect trap.  This means"
+	--#SUMMARY	"that the RomPilot enabled machine is"
+	--#SUMMARY	"able to resume communications."
+	--#ARGUMENTS	{2, 3}
+	--#SEVERITY	INFORMATIONAL
+	--#TIMEINDEX	5
+	--#STATE	OPERATIONAL
+
+	::= 2048
+
+rpPostWarningTrap TRAP-TYPE
+	ENTERPRISE phoenix
+	VARIABLES { sysDescr, sysUpTime, sysName, ifPhysAddress,
+			rpMachineId }
+	DESCRIPTION
+		"A RomPilot enabled machine has detected a
+		warning during POST."
+
+-- Add Novell ManageWise NMS type annotation to the trap for use by
+-- compatible enterprise server systems.  See Novell documentation for
+-- specifications covering this data.
+
+--                                1         2         3         4
+--                       1234567890123456789012345678901234567890
+
+	--#TYPE		"RomPilot POST Warning Trap."
+	--#SUMMARY	"RomPilot machine %s"
+	--#SUMMARY	"with MAC address %m"
+	--#SUMMARY	"has detected a warning during"
+	--#SUMMARY	"BIOS POST."
+	--#ARGUMENTS	{2, 3}
+	--#SEVERITY	MINOR
+	--#TIMEINDEX	5
+	--#STATE	OPERATIONAL
+
+	::= 16384
+
+rpPostConditionalTrap TRAP-TYPE
+	ENTERPRISE phoenix
+	VARIABLES { sysDescr, sysUpTime, sysName, ifPhysAddress,
+			rpMachineId }
+	DESCRIPTION
+		"A RomPilot enabled machine has detected a
+		conditional error during POST."
+
+-- Add Novell ManageWise NMS type annotation to the trap for use by
+-- compatible enterprise server systems.  See Novell documentation for
+-- specifications covering this data.
+
+--                                1         2         3         4
+--                       1234567890123456789012345678901234567890
+
+	--#TYPE		"RomPilot Conditional POST Error Trap."
+	--#SUMMARY	"RomPilot machine %s"
+	--#SUMMARY	"with MAC address %m"
+	--#SUMMARY	"has detected a conditional error"
+	--#SUMMARY	"during BIOS POST."
+	--#ARGUMENTS	{2, 3}
+	--#SEVERITY	MINOR
+	--#TIMEINDEX	5
+	--#STATE	OPERATIONAL
+
+	::= 32768
+
+rpPostFatalTrap TRAP-TYPE
+	ENTERPRISE phoenix
+	VARIABLES { sysDescr, sysUpTime, sysName, ifPhysAddress,
+			rpMachineId }
+	DESCRIPTION
+		"A RomPilot enabled machine has detected a
+		fatal error during POST."
+
+-- Add Novell ManageWise NMS type annotation to the trap for use by
+-- compatible enterprise server systems.  See Novell documentation for
+-- specifications covering this data.
+
+--                                1         2         3         4
+--                       1234567890123456789012345678901234567890
+
+	--#TYPE		"RomPilot Fatal POST Error Trap."
+	--#SUMMARY	"RomPilot machine %s"
+	--#SUMMARY	"with MAC address %m"
+	--#SUMMARY	"has detected a fatal error during"
+	--#SUMMARY	"BIOS POST."
+	--#ARGUMENTS	{2, 3}
+	--#SEVERITY	MAJOR
+	--#TIMEINDEX	5
+	--#STATE	UNKNOWN
+
+	::= 49152
+
+END

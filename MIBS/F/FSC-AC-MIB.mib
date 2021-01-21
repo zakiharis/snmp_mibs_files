@@ -1,0 +1,123 @@
+-- Automatically generated from file
+-- Wed Apr 27 09:24:29 W. Europe Standard Time 2005
+
+FSC-AC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        enterprises, Gauge, Counter, IpAddress, TimeTicks FROM RFC1155-SMI
+        OBJECT-TYPE 	  FROM RFC1212-MIB
+        TRAP-TYPE 	      FROM RFC1215-MIB
+		hpiDomainId, hpiResourceId FROM FSC-HPI-MIB;
+
+sni OBJECT IDENTIFIER ::= {enterprises 231}
+
+sniProductMibs OBJECT IDENTIFIER ::= {sni 2}
+
+fscHpi OBJECT IDENTIFIER ::= {sniProductMibs 60}
+
+fscAcMIB OBJECT IDENTIFIER ::= {fscHpi 7}
+
+DisplayString ::= OCTET STRING
+
+acObjects OBJECT IDENTIFIER ::= {fscAcMIB 1}
+
+acAdministration OBJECT IDENTIFIER ::= {acObjects 1}
+
+acHpiVersion 	OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"The interface version is the version of the actual interface and
+		 not the version of the implementation. It is a 24 bit value where
+		 the most significant 8 bits represent the compatibility level
+		 (with letters represented as the corresponding numbers);
+		 the next 8 bits represent the major version number; and
+		 the least significant 8 bits represent the minor version number."
+	::= { acAdministration 1 }
+
+acAgentVersion 	OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"The Agent Implementation Version"
+	::= { acAdministration 2 }
+
+acSystem 	OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"The Entity root"
+	::= { acAdministration 3 }
+
+acDomain OBJECT IDENTIFIER ::= {acObjects 2}
+
+acResourceIfCount 	OBJECT-TYPE
+	SYNTAX Counter
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		""
+	::= { acDomain 3 }
+
+acResourceIfTable 	OBJECT-TYPE
+	SYNTAX SEQUENCE OF AcResourceIfEntry
+	ACCESS not-accessible
+	STATUS mandatory
+	DESCRIPTION
+		""
+	::= { acDomain 4 }
+
+acResourceIfEntry 	OBJECT-TYPE
+	SYNTAX AcResourceIfEntry
+	ACCESS not-accessible
+	STATUS mandatory
+	DESCRIPTION
+		""
+	INDEX {
+		hpiDomainId,
+		hpiResourceId,
+		acResourceIfId
+	}
+	::= { acResourceIfTable 1 }
+
+AcResourceIfEntry ::= SEQUENCE {
+	acResourceIfId           Gauge,
+	acResourceIfIpAddress    IpAddress,
+	acResourceIfPhysAddress  OCTET STRING
+	}
+
+acResourceIfId 	OBJECT-TYPE
+	SYNTAX Gauge
+	ACCESS not-accessible
+	STATUS mandatory
+	DESCRIPTION
+		"experimental"
+	::= { acResourceIfEntry 1 }
+
+acResourceIfIpAddress 	OBJECT-TYPE
+	SYNTAX IpAddress
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"experimental"
+	::= { acResourceIfEntry 2 }
+
+acResourceIfPhysAddress 	OBJECT-TYPE
+	SYNTAX OCTET STRING
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		""
+	::= { acResourceIfEntry 3 }
+
+acNotifications OBJECT IDENTIFIER ::= {fscAcMIB 2}
+
+acTraps OBJECT IDENTIFIER ::= {acNotifications 0}
+
+acConformance OBJECT IDENTIFIER ::= {fscAcMIB 3}
+
+END
+

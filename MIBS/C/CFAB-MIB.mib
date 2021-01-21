@@ -1,0 +1,3563 @@
+--
+--  CFAB MIB
+--	Copyright FUJITSU LIMITED 2012-2013, 2014
+--
+-- $Revision: 1.7 $
+
+CFAB-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+	OBJECT-TYPE		FROM RFC-1212
+	TRAP-TYPE		FROM RFC-1215
+	enterprises, IpAddress	FROM RFC1155-SMI
+	DisplayString		FROM RFC1213-MIB
+	Ipv6Address		FROM IPV6-TC;
+
+    fujitsu			OBJECT IDENTIFIER ::= { enterprises 211 }
+    product			OBJECT IDENTIFIER ::= { fujitsu 1 }
+    nonos			OBJECT IDENTIFIER ::= { product 127 }
+    pineapple			OBJECT IDENTIFIER ::= { nonos 118 }
+
+    sbMibObjects		OBJECT IDENTIFIER ::= { pineapple 2 }
+--  sbNotifications		OBJECT IDENTIFIER ::= { sbMibObjects 0 } (reserved)
+    cfabMibObjects		OBJECT IDENTIFIER ::= { sbMibObjects 1 }
+
+-- FABRIC-MIB
+    cfabDomainManagementInfo	OBJECT IDENTIFIER ::= { cfabMibObjects 1 }
+    cfabDomainIpv4		OBJECT IDENTIFIER ::= { cfabMibObjects 2 }
+    cfabDomainIpv6		OBJECT IDENTIFIER ::= { cfabMibObjects 3 }
+    cfabDomainMac		OBJECT IDENTIFIER ::= { cfabMibObjects 4 }
+    cfabConstructInfo		OBJECT IDENTIFIER ::= { cfabMibObjects 5 }
+    cfabSwitchConfigureInfo	OBJECT IDENTIFIER ::= { cfabMibObjects 6 }
+    cfabPortSettingInfo		OBJECT IDENTIFIER ::= { cfabMibObjects 7 }
+    cfabFirmUpdateInfo		OBJECT IDENTIFIER ::= { cfabMibObjects 10 }
+    cfabConfigUpdateInfo	OBJECT IDENTIFIER ::= { cfabMibObjects 11 }
+    cfabMasterSwitchChangeInfo	OBJECT IDENTIFIER ::= { cfabMibObjects 12 }
+    cfabRollingResetInfo 	OBJECT IDENTIFIER ::= { cfabMibObjects 13 }
+    cfabConfigCommit		OBJECT IDENTIFIER ::= { cfabMibObjects 14 }
+    cfabDomainAdd		OBJECT IDENTIFIER ::= { cfabMibObjects 15 }
+    cfabSwitchAdd		OBJECT IDENTIFIER ::= { cfabMibObjects 16 }
+    cfabSystemError		OBJECT IDENTIFIER ::= { cfabMibObjects 101 }
+    cfabSwitchStatus		OBJECT IDENTIFIER ::= { cfabMibObjects 102 }
+    cfabTopology		OBJECT IDENTIFIER ::= { cfabMibObjects 103 }
+    cfabVfabInfo		OBJECT IDENTIFIER ::= { cfabMibObjects 104 }
+
+-- cfabSystemError in group
+    cfabSystemErrorInfo		OBJECT IDENTIFIER ::= { cfabSystemError 1 }
+    cfabSystemErrorSwitch	OBJECT IDENTIFIER ::= { cfabSystemError 2 }
+    cfabSystemErrorSwitch1	OBJECT IDENTIFIER ::= { cfabSystemErrorSwitch 1 }
+    cfabSystemErrorSwitch2	OBJECT IDENTIFIER ::= { cfabSystemErrorSwitch 2 }
+    cfabSystemErrorSwitch3	OBJECT IDENTIFIER ::= { cfabSystemErrorSwitch 3 }
+    cfabSystemErrorSwitch4	OBJECT IDENTIFIER ::= { cfabSystemErrorSwitch 4 }
+    cfabSystemErrorSwitch5	OBJECT IDENTIFIER ::= { cfabSystemErrorSwitch 5 }
+    cfabSystemErrorSwitch6	OBJECT IDENTIFIER ::= { cfabSystemErrorSwitch 6 }
+    cfabSystemErrorSwitch7	OBJECT IDENTIFIER ::= { cfabSystemErrorSwitch 7 }
+    cfabSystemErrorSwitch8	OBJECT IDENTIFIER ::= { cfabSystemErrorSwitch 8 }
+
+--
+-- cfabDomainManagementInfo Group
+--
+cfabDomainManagementInfoNumber	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabDomainManagementInfo 1 }
+
+cfabDomainManagementInfoTable	OBJECT-TYPE
+    SYNTAX	SEQUENCE OF CfabDomainManagementInfoEntry
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabDomainManagementInfo 2 }
+
+cfabDomainManagementInfoEntry	OBJECT-TYPE
+    SYNTAX	CfabDomainManagementInfoEntry
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    INDEX { cfabDomainManagementInfoIndex }
+    ::= { cfabDomainManagementInfoTable 1 }
+
+CfabDomainManagementInfoEntry	::= SEQUENCE {
+	cfabDomainManagementInfoIndex		INTEGER,
+	cfabDomainManagementInfoDomainId	INTEGER
+}
+
+cfabDomainManagementInfoIndex	OBJECT-TYPE
+    SYNTAX	INTEGER (1..32)
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabDomainManagementInfoEntry 1 }
+
+cfabDomainManagementInfoDomainId	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabDomainManagementInfoEntry 2 }
+
+--
+-- cfabDomainIpv4 Group
+--
+cfabDomainIpv4Number	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabDomainIpv4 1 }
+
+cfabDomainIpv4Table	OBJECT-TYPE
+    SYNTAX	SEQUENCE OF CfabDomainIpv4Entry
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabDomainIpv4 2 }
+
+cfabDomainIpv4Entry	OBJECT-TYPE
+    SYNTAX	CfabDomainIpv4Entry
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    INDEX { cfabDomainIpv4DomainIndex }
+    ::= { cfabDomainIpv4Table 1 }
+
+CfabDomainIpv4Entry	::= SEQUENCE {
+	cfabDomainIpv4DomainIndex	INTEGER,
+	cfabDomainIpv4FabricId		INTEGER
+}
+
+cfabDomainIpv4DomainIndex	OBJECT-TYPE
+    SYNTAX	INTEGER (1..32)
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabDomainIpv4Entry 1 }
+
+cfabDomainIpv4FabricId	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabDomainIpv4Entry 2 }
+
+cfabDomainIpv4SubTable 	OBJECT-TYPE
+    SYNTAX	SEQUENCE OF CfabDomainIpv4SubEntry
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabDomainIpv4 3 }
+
+cfabDomainIpv4SubEntry	OBJECT-TYPE
+    SYNTAX	CfabDomainIpv4SubEntry
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    INDEX{ cfabDomainIpv4DomainIndex, cfabDomainIpv4Index }
+    ::= { cfabDomainIpv4SubTable 1 }
+
+CfabDomainIpv4SubEntry	::= SEQUENCE {
+	cfabDomainIpv4Index		INTEGER,
+	cfabDomainIpv4VirtualAddress	IpAddress
+}
+
+cfabDomainIpv4Index	OBJECT-TYPE
+    SYNTAX	INTEGER (1..2147483647)
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabDomainIpv4SubEntry 1 }
+
+cfabDomainIpv4VirtualAddress	OBJECT-TYPE
+    SYNTAX	IpAddress
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabDomainIpv4SubEntry 2 }
+
+--
+-- cfabDomainIpv6 Group
+--
+cfabDomainIpv6Number	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabDomainIpv6 1 }
+
+cfabDomainIpv6Table	OBJECT-TYPE
+    SYNTAX	SEQUENCE OF CfabDomainIpv6Entry
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabDomainIpv6 2 }
+
+cfabDomainIpv6Entry	OBJECT-TYPE
+    SYNTAX	CfabDomainIpv6Entry
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    INDEX { cfabDomainIpv6DomainIndex }
+    ::= { cfabDomainIpv6Table 1 }
+
+CfabDomainIpv6Entry	::= SEQUENCE {
+	cfabDomainIpv6DomainIndex	INTEGER,
+	cfabDomainIpv6FabricId		INTEGER
+}
+
+cfabDomainIpv6DomainIndex	OBJECT-TYPE
+    SYNTAX	INTEGER (1..32)
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabDomainIpv6Entry 1 }
+
+cfabDomainIpv6FabricId	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabDomainIpv6Entry 2 }
+
+cfabDomainIpv6SubTable 	OBJECT-TYPE
+    SYNTAX	SEQUENCE OF CfabDomainIpv6SubEntry
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabDomainIpv6 3 }
+
+cfabDomainIpv6SubEntry	OBJECT-TYPE
+    SYNTAX	CfabDomainIpv6SubEntry
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    INDEX { cfabDomainIpv6DomainIndex, cfabDomainIpv6Index }
+    ::= { cfabDomainIpv6SubTable 1 }
+
+CfabDomainIpv6SubEntry	::= SEQUENCE {
+	cfabDomainIpv6Index		INTEGER,
+	cfabDomainIpv6VirtualAddress	Ipv6Address
+}
+
+cfabDomainIpv6Index	OBJECT-TYPE
+    SYNTAX	INTEGER (1..2147483647)
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabDomainIpv6SubEntry 1 }
+
+cfabDomainIpv6VirtualAddress	OBJECT-TYPE
+    SYNTAX	Ipv6Address
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabDomainIpv6SubEntry 2 }
+
+--
+-- cfabDomainMac Group
+--
+cfabDomainMacNumber	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabDomainMac 1 }
+
+cfabDomainMacTable	OBJECT-TYPE
+    SYNTAX	SEQUENCE OF CfabDomainMacEntry
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabDomainMac 2 }
+
+cfabDomainMacEntry	OBJECT-TYPE
+    SYNTAX	CfabDomainMacEntry
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    INDEX { cfabDomainMacIndex }
+    ::= { cfabDomainMacTable 1 }
+
+CfabDomainMacEntry	::= SEQUENCE {
+	cfabDomainMacIndex	INTEGER,
+	cfabDomainMacFabricId	INTEGER,
+	cfabDomainMacDomainId	INTEGER,
+	cfabDomainMacRepresentAddress	OCTET STRING
+}
+
+cfabDomainMacIndex	OBJECT-TYPE
+    SYNTAX	INTEGER (1..32)
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabDomainMacEntry 1 }
+
+cfabDomainMacFabricId	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabDomainMacEntry 2 }
+
+cfabDomainMacDomainId	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabDomainMacEntry 3 }
+
+cfabDomainMacRepresentAddress	OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE (6))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabDomainMacEntry 4 }
+
+--
+-- cfabConstructInfo Group
+--
+cfabConstructInfoFabricId	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabConstructInfo 1 }
+
+cfabConstructInfoRootDomainId	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabConstructInfo 2 }
+
+cfabConstructInfoRootMasterSwitchId	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabConstructInfo 3 }
+
+cfabConstructInfoStatus	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabConstructInfo 4 }
+
+cfabConstructInfoConfigVersion	OBJECT-TYPE
+    SYNTAX	DisplayString
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabConstructInfo 5 }
+
+cfabConstructInfoFirmVersion	OBJECT-TYPE
+    SYNTAX	DisplayString
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabConstructInfo 6 }
+
+cfabConstructInfoFcfLicense	OBJECT-TYPE
+    SYNTAX	DisplayString
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabConstructInfo 7 }
+
+cfabConstructInfoIpv4Number	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabConstructInfo 8 }
+
+cfabConstructInfoIpv4Table	OBJECT-TYPE
+    SYNTAX	SEQUENCE OF CfabConstructInfoIpv4Entry
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabConstructInfo 9 }
+
+cfabConstructInfoIpv4Entry	OBJECT-TYPE
+    SYNTAX	CfabConstructInfoIpv4Entry
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    INDEX { cfabConstructInfoIpv4Index }
+    ::= { cfabConstructInfoIpv4Table 1 }
+
+CfabConstructInfoIpv4Entry	::= SEQUENCE {
+	cfabConstructInfoIpv4Index		INTEGER,
+	cfabConstructInfoVirtualIpv4Address	IpAddress
+}
+
+cfabConstructInfoIpv4Index	OBJECT-TYPE
+    SYNTAX	INTEGER (1..2147483647)
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabConstructInfoIpv4Entry 1 }
+
+cfabConstructInfoVirtualIpv4Address	OBJECT-TYPE
+    SYNTAX	IpAddress
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabConstructInfoIpv4Entry 2 }
+
+cfabConstructInfoIpv6Number	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabConstructInfo 10 }
+
+cfabConstructInfoIpv6Table	OBJECT-TYPE
+    SYNTAX	SEQUENCE OF CfabConstructInfoIpv6Entry
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabConstructInfo 11 }
+
+cfabConstructInfoIpv6Entry	OBJECT-TYPE
+    SYNTAX	CfabConstructInfoIpv6Entry
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    INDEX { cfabConstructInfoIpv6Index }
+    ::= { cfabConstructInfoIpv6Table 1 }
+
+CfabConstructInfoIpv6Entry	::= SEQUENCE {
+	cfabConstructInfoIpv6Index		INTEGER,
+	cfabConstructInfoVirtualIpv6Address	Ipv6Address
+}
+
+cfabConstructInfoIpv6Index	OBJECT-TYPE
+    SYNTAX	INTEGER (1..2147483647)
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabConstructInfoIpv6Entry 1 }
+
+cfabConstructInfoVirtualIpv6Address	OBJECT-TYPE
+    SYNTAX	Ipv6Address
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabConstructInfoIpv6Entry 2 }
+
+--
+-- cfabSwitchConfigureInfo Group
+--
+cfabSwitchConfigureInfoNumber	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSwitchConfigureInfo 1 }
+
+cfabSwitchConfigureInfoTable	OBJECT-TYPE
+    SYNTAX	SEQUENCE OF CfabSwitchConfigureInfoEntry
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSwitchConfigureInfo 2 }
+
+cfabSwitchConfigureInfoEntry	OBJECT-TYPE
+    SYNTAX	CfabSwitchConfigureInfoEntry
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    INDEX { cfabSwitchConfigureInfoIndex}
+    ::= { cfabSwitchConfigureInfoTable 1 }
+
+CfabSwitchConfigureInfoEntry	::= SEQUENCE {
+	cfabSwitchConfigureInfoIndex		INTEGER,
+	cfabSwitchConfigureInfoFabricId		INTEGER,
+	cfabSwitchConfigureInfoDomainType	INTEGER,
+	cfabSwitchConfigureInfoDomainId		INTEGER,
+	cfabSwitchConfigureInfoSwitchId		INTEGER,
+	cfabSwitchConfigureInfoSwitchType	INTEGER,
+	cfabSwitchConfigureInfoSwitchStatus	INTEGER,
+	cfabSwitchConfigureInfoSwitchFcf	INTEGER
+}
+
+cfabSwitchConfigureInfoIndex	OBJECT-TYPE
+    SYNTAX	INTEGER (1..256)
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSwitchConfigureInfoEntry 1 }
+
+cfabSwitchConfigureInfoFabricId	OBJECT-TYPE
+    SYNTAX	INTEGER 
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSwitchConfigureInfoEntry 2 }
+
+cfabSwitchConfigureInfoDomainType	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSwitchConfigureInfoEntry 3 }
+
+cfabSwitchConfigureInfoDomainId	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSwitchConfigureInfoEntry 4 }
+
+cfabSwitchConfigureInfoSwitchId	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSwitchConfigureInfoEntry 5 }
+
+cfabSwitchConfigureInfoSwitchType	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSwitchConfigureInfoEntry 6 }
+
+cfabSwitchConfigureInfoSwitchStatus	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSwitchConfigureInfoEntry 7 }
+
+cfabSwitchConfigureInfoSwitchFcf	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSwitchConfigureInfoEntry 8 }
+
+--
+-- cfabPortSettingInfo Group
+--
+cfabPortSettingInfoNumber	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabPortSettingInfo 1 }
+
+cfabPortSettingInfoTable	OBJECT-TYPE
+    SYNTAX	SEQUENCE OF CfabPortSettingInfoEntry
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabPortSettingInfo 2 }
+
+cfabPortSettingInfoEntry	OBJECT-TYPE
+    SYNTAX	CfabPortSettingInfoEntry
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    INDEX { cfabPortSettingInfoifIndex }
+    ::= { cfabPortSettingInfoTable 1 }
+
+CfabPortSettingInfoEntry	::= SEQUENCE {
+	cfabPortSettingInfoifIndex	INTEGER,
+	cfabPortSettingInfoPort		DisplayString
+}
+
+cfabPortSettingInfoifIndex	OBJECT-TYPE
+    SYNTAX	INTEGER (1..2147483647)
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabPortSettingInfoEntry 1 }
+
+cfabPortSettingInfoPort	OBJECT-TYPE
+    SYNTAX	DisplayString
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabPortSettingInfoEntry 2 }
+
+--
+-- cfabFirmUpdateInfo Group
+--
+cfabFirmUpdateInfoFabricId	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabFirmUpdateInfo 1 }
+
+cfabFirmUpdateInfoDomainId	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabFirmUpdateInfo 2 }
+
+cfabFirmUpdateInfoSwitchId	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabFirmUpdateInfo 3 }
+
+--
+-- cfabConfigUpdateInfo Group
+--
+cfabConfigUpdateInfoFabricId	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabConfigUpdateInfo 1 }
+
+cfabConfigUpdateInfoDomainId	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabConfigUpdateInfo 2 }
+
+cfabConfigUpdateInfoSwitchId	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabConfigUpdateInfo 3 }
+
+--
+-- cfabMasterSwitchChangeInfo Group
+--
+cfabMasterSwitchChangeInfoFabricId	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabMasterSwitchChangeInfo 1 }
+
+cfabMasterSwitchChangeInfoDomainId	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabMasterSwitchChangeInfo 2 }
+
+cfabMasterSwitchChangeInfoMasterSwitchId	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabMasterSwitchChangeInfo 3 }
+
+--
+-- cfabRollingResetInfo Group
+--
+cfabRollingResetInfoFabricId	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabRollingResetInfo 1 }
+
+cfabRollingResetInfoDomainId	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabRollingResetInfo 2 }
+
+cfabRollingResetInfoSwitchId	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabRollingResetInfo 3 }
+
+--
+-- cfabConfigCommit Group
+--
+cfabConfigCommitFabricId	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabConfigCommit 1 }
+
+cfabConfigCommitDomainId	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabConfigCommit 2 }
+
+cfabConfigCommitSwitchId	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabConfigCommit 3 }
+
+--
+-- cfabDomainAdd Group
+--
+cfabDomainAddFabricId	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabDomainAdd 1 }
+
+cfabDomainAddDomainId	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabDomainAdd 2 }
+
+cfabDomainAddSwitchId	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabDomainAdd 3 }
+
+cfabDomainAddStatus	OBJECT-TYPE
+    SYNTAX  INTEGER {
+                remove(0),
+                add(1)
+            }
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabDomainAdd 4 }
+
+--
+-- cfabSwitchAdd Group
+--
+cfabSwitchAddFabricId	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSwitchAdd 1 }
+
+cfabSwitchAddDomainId	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSwitchAdd 2 }
+
+cfabSwitchAddSwitchId	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSwitchAdd 3 }
+
+cfabSwitchAddStatus	OBJECT-TYPE
+    SYNTAX  INTEGER {
+                remove(0),
+                add(1)
+            }
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSwitchAdd 4 }
+
+--
+-- cfabSystemErrorInfo Group
+--
+cfabSystemErrorInfoSwitch1	OBJECT-TYPE
+    SYNTAX  INTEGER {
+                elog-not-exist(1),
+                elog-exists(2),
+                not-connected(3),
+                other(4) -- cannot communicate
+            }
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorInfo 1 }
+
+cfabSystemErrorInfoSwitch2	OBJECT-TYPE
+    SYNTAX  INTEGER {
+                elog-not-exist(1),
+                elog-exists(2),
+                not-connected(3),
+                other(4) -- cannot communicate
+            }
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorInfo 2 }
+
+cfabSystemErrorInfoSwitch3	OBJECT-TYPE
+    SYNTAX  INTEGER {
+                elog-not-exist(1),
+                elog-exists(2),
+                not-connected(3),
+                other(4) -- cannot communicate
+            }
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorInfo 3 }
+
+cfabSystemErrorInfoSwitch4	OBJECT-TYPE
+    SYNTAX  INTEGER {
+                elog-not-exist(1),
+                elog-exists(2),
+                not-connected(3),
+                other(4) -- cannot communicate
+            }
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorInfo 4 }
+
+cfabSystemErrorInfoSwitch5	OBJECT-TYPE
+    SYNTAX  INTEGER {
+                elog-not-exist(1),
+                elog-exists(2),
+                not-connected(3),
+                other(4) -- cannot communicate
+            }
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorInfo 5 }
+
+cfabSystemErrorInfoSwitch6	OBJECT-TYPE
+    SYNTAX  INTEGER {
+                elog-not-exist(1),
+                elog-exists(2),
+                not-connected(3),
+                other(4) -- cannot communicate
+            }
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorInfo 6 }
+
+cfabSystemErrorInfoSwitch7	OBJECT-TYPE
+    SYNTAX  INTEGER {
+                elog-not-exist(1),
+                elog-exists(2),
+                not-connected(3),
+                other(4) -- cannot communicate
+            }
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorInfo 7 }
+
+cfabSystemErrorInfoSwitch8	OBJECT-TYPE
+    SYNTAX  INTEGER {
+                elog-not-exist(1),
+                elog-exists(2),
+                not-connected(3),
+                other(4) -- cannot communicate
+            }
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorInfo 8 }
+
+--
+-- cfabSystemErrorSwitch1 Group
+--
+cfabSystemErrorFabricIdSwitch1	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch1 1 }
+
+cfabSystemErrorDomainIdSwitch1	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch1 2 }
+
+cfabSystemErrorSwitchIdSwitch1	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch1 3 }
+
+cfabSystemErrorPointSwitch1	OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE (4))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch1 4 }
+
+cfabSystemErrorText1Switch1	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch1 5 }
+
+cfabSystemErrorText2Switch1	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch1 6 }
+
+cfabSystemErrorText3Switch1	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch1 7 }
+
+cfabSystemErrorText4Switch1	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch1 8 }
+
+cfabSystemErrorText5Switch1	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch1 9 }
+
+cfabSystemErrorText6Switch1	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch1 10 }
+
+cfabSystemErrorText7Switch1	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch1 11 }
+
+cfabSystemErrorText8Switch1	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch1 12 }
+
+cfabSystemErrorText9Switch1	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch1 13 }
+
+cfabSystemErrorText10Switch1	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch1 14 }
+
+cfabSystemErrorText11Switch1	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch1 15 }
+
+cfabSystemErrorText12Switch1	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch1 16 }
+
+cfabSystemErrorText13Switch1	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch1 17 }
+
+cfabSystemErrorText14Switch1	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch1 18 }
+
+cfabSystemErrorText15Switch1	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch1 19 }
+
+cfabSystemErrorText16Switch1	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch1 20 }
+
+cfabSystemErrorText17Switch1	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch1 21 }
+
+cfabSystemErrorText18Switch1	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch1 22 }
+
+cfabSystemErrorText19Switch1	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch1 23 }
+
+cfabSystemErrorText20Switch1	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch1 24 }
+
+--
+-- cfabSystemErrorSwitch2 Group
+--
+cfabSystemErrorFabricIdSwitch2	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch2 1 }
+
+cfabSystemErrorDomainIdSwitch2	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch2 2 }
+
+cfabSystemErrorSwitchIdSwitch2	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch2 3 }
+
+cfabSystemErrorPointSwitch2	OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE (4))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch2 4 }
+
+cfabSystemErrorText1Switch2	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch2 5 }
+
+cfabSystemErrorText2Switch2	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch2 6 }
+
+cfabSystemErrorText3Switch2	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch2 7 }
+
+cfabSystemErrorText4Switch2	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch2 8 }
+
+cfabSystemErrorText5Switch2	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch2 9 }
+
+cfabSystemErrorText6Switch2	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch2 10 }
+
+cfabSystemErrorText7Switch2	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch2 11 }
+
+cfabSystemErrorText8Switch2	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch2 12 }
+
+cfabSystemErrorText9Switch2	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch2 13 }
+
+cfabSystemErrorText10Switch2	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch2 14 }
+
+cfabSystemErrorText11Switch2	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch2 15 }
+
+cfabSystemErrorText12Switch2	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch2 16 }
+
+cfabSystemErrorText13Switch2	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch2 17 }
+
+cfabSystemErrorText14Switch2	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch2 18 }
+
+cfabSystemErrorText15Switch2	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch2 19 }
+
+cfabSystemErrorText16Switch2	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch2 20 }
+
+cfabSystemErrorText17Switch2	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch2 21 }
+
+cfabSystemErrorText18Switch2	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch2 22 }
+
+cfabSystemErrorText19Switch2	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch2 23 }
+
+cfabSystemErrorText20Switch2	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch2 24 }
+
+--
+-- cfabSystemErrorSwitch3 Group
+--
+cfabSystemErrorFabricIdSwitch3	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch3 1 }
+
+cfabSystemErrorDomainIdSwitch3	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch3 2 }
+
+cfabSystemErrorSwitchIdSwitch3	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch3 3 }
+
+cfabSystemErrorPointSwitch3	OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE (4))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch3 4 }
+
+cfabSystemErrorText1Switch3	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch3 5 }
+
+cfabSystemErrorText2Switch3	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch3 6 }
+
+cfabSystemErrorText3Switch3	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch3 7 }
+
+cfabSystemErrorText4Switch3	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch3 8 }
+
+cfabSystemErrorText5Switch3	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch3 9 }
+
+cfabSystemErrorText6Switch3	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch3 10 }
+
+cfabSystemErrorText7Switch3	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch3 11 }
+
+cfabSystemErrorText8Switch3	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch3 12 }
+
+cfabSystemErrorText9Switch3	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch3 13 }
+
+cfabSystemErrorText10Switch3	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch3 14 }
+
+cfabSystemErrorText11Switch3	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch3 15 }
+
+cfabSystemErrorText12Switch3	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch3 16 }
+
+cfabSystemErrorText13Switch3	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch3 17 }
+
+cfabSystemErrorText14Switch3	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch3 18 }
+
+cfabSystemErrorText15Switch3	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch3 19 }
+
+cfabSystemErrorText16Switch3	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch3 20 }
+
+cfabSystemErrorText17Switch3	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch3 21 }
+
+cfabSystemErrorText18Switch3	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch3 22 }
+
+cfabSystemErrorText19Switch3	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch3 23 }
+
+cfabSystemErrorText20Switch3	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch3 24 }
+
+--
+-- cfabSystemErrorSwitch4 Group
+--
+cfabSystemErrorFabricIdSwitch4	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch4 1 }
+
+cfabSystemErrorDomainIdSwitch4	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch4 2 }
+
+cfabSystemErrorSwitchIdSwitch4	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch4 3 }
+
+cfabSystemErrorPointSwitch4	OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE (4))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch4 4 }
+
+cfabSystemErrorText1Switch4	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch4 5 }
+
+cfabSystemErrorText2Switch4	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch4 6 }
+
+cfabSystemErrorText3Switch4	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch4 7 }
+
+cfabSystemErrorText4Switch4	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch4 8 }
+
+cfabSystemErrorText5Switch4	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch4 9 }
+
+cfabSystemErrorText6Switch4	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch4 10 }
+
+cfabSystemErrorText7Switch4	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch4 11 }
+
+cfabSystemErrorText8Switch4	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch4 12 }
+
+cfabSystemErrorText9Switch4	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch4 13 }
+
+cfabSystemErrorText10Switch4	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch4 14 }
+
+cfabSystemErrorText11Switch4	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch4 15 }
+
+cfabSystemErrorText12Switch4	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch4 16 }
+
+cfabSystemErrorText13Switch4	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch4 17 }
+
+cfabSystemErrorText14Switch4	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch4 18 }
+
+cfabSystemErrorText15Switch4	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch4 19 }
+
+cfabSystemErrorText16Switch4	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch4 20 }
+
+cfabSystemErrorText17Switch4	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch4 21 }
+
+cfabSystemErrorText18Switch4	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch4 22 }
+
+cfabSystemErrorText19Switch4	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch4 23 }
+
+cfabSystemErrorText20Switch4	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch4 24 }
+
+--
+-- cfabSystemErrorSwitch5 Group
+--
+cfabSystemErrorFabricIdSwitch5	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch5 1 }
+
+cfabSystemErrorDomainIdSwitch5	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch5 2 }
+
+cfabSystemErrorSwitchIdSwitch5	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch5 3 }
+
+cfabSystemErrorPointSwitch5	OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE (4))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch5 4 }
+
+cfabSystemErrorText1Switch5	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch5 5 }
+
+cfabSystemErrorText2Switch5	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch5 6 }
+
+cfabSystemErrorText3Switch5	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch5 7 }
+
+cfabSystemErrorText4Switch5	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch5 8 }
+
+cfabSystemErrorText5Switch5	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch5 9 }
+
+cfabSystemErrorText6Switch5	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch5 10 }
+
+cfabSystemErrorText7Switch5	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch5 11 }
+
+cfabSystemErrorText8Switch5	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch5 12 }
+
+cfabSystemErrorText9Switch5	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch5 13 }
+
+cfabSystemErrorText10Switch5	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch5 14 }
+
+cfabSystemErrorText11Switch5	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch5 15 }
+
+cfabSystemErrorText12Switch5	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch5 16 }
+
+cfabSystemErrorText13Switch5	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch5 17 }
+
+cfabSystemErrorText14Switch5	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch5 18 }
+
+cfabSystemErrorText15Switch5	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch5 19 }
+
+cfabSystemErrorText16Switch5	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch5 20 }
+
+cfabSystemErrorText17Switch5	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch5 21 }
+
+cfabSystemErrorText18Switch5	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch5 22 }
+
+cfabSystemErrorText19Switch5	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch5 23 }
+
+cfabSystemErrorText20Switch5	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch5 24 }
+
+--
+-- cfabSystemErrorSwitch6 Group
+--
+cfabSystemErrorFabricIdSwitch6	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch6 1 }
+
+cfabSystemErrorDomainIdSwitch6	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch6 2 }
+
+cfabSystemErrorSwitchIdSwitch6	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch6 3 }
+
+cfabSystemErrorPointSwitch6	OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE (4))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch6 4 }
+
+cfabSystemErrorText1Switch6	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch6 5 }
+
+cfabSystemErrorText2Switch6	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch6 6 }
+
+cfabSystemErrorText3Switch6	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch6 7 }
+
+cfabSystemErrorText4Switch6	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch6 8 }
+
+cfabSystemErrorText5Switch6	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch6 9 }
+
+cfabSystemErrorText6Switch6	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch6 10 }
+
+cfabSystemErrorText7Switch6	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch6 11 }
+
+cfabSystemErrorText8Switch6	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch6 12 }
+
+cfabSystemErrorText9Switch6	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch6 13 }
+
+cfabSystemErrorText10Switch6	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch6 14 }
+
+cfabSystemErrorText11Switch6	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch6 15 }
+
+cfabSystemErrorText12Switch6	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch6 16 }
+
+cfabSystemErrorText13Switch6	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch6 17 }
+
+cfabSystemErrorText14Switch6	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch6 18 }
+
+cfabSystemErrorText15Switch6	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch6 19 }
+
+cfabSystemErrorText16Switch6	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch6 20 }
+
+cfabSystemErrorText17Switch6	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch6 21 }
+
+cfabSystemErrorText18Switch6	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch6 22 }
+
+cfabSystemErrorText19Switch6	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch6 23 }
+
+cfabSystemErrorText20Switch6	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch6 24 }
+
+--
+-- cfabSystemErrorSwitch7 Group
+--
+cfabSystemErrorFabricIdSwitch7	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch7 1 }
+
+cfabSystemErrorDomainIdSwitch7	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch7 2 }
+
+cfabSystemErrorSwitchIdSwitch7	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch7 3 }
+
+cfabSystemErrorPointSwitch7	OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE (4))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch7 4 }
+
+cfabSystemErrorText1Switch7	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch7 5 }
+
+cfabSystemErrorText2Switch7	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch7 6 }
+
+cfabSystemErrorText3Switch7	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch7 7 }
+
+cfabSystemErrorText4Switch7	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch7 8 }
+
+cfabSystemErrorText5Switch7	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch7 9 }
+
+cfabSystemErrorText6Switch7	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch7 10 }
+
+cfabSystemErrorText7Switch7	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch7 11 }
+
+cfabSystemErrorText8Switch7	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch7 12 }
+
+cfabSystemErrorText9Switch7	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch7 13 }
+
+cfabSystemErrorText10Switch7	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch7 14 }
+
+cfabSystemErrorText11Switch7	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch7 15 }
+
+cfabSystemErrorText12Switch7	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch7 16 }
+
+cfabSystemErrorText13Switch7	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch7 17 }
+
+cfabSystemErrorText14Switch7	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch7 18 }
+
+cfabSystemErrorText15Switch7	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch7 19 }
+
+cfabSystemErrorText16Switch7	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch7 20 }
+
+cfabSystemErrorText17Switch7	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch7 21 }
+
+cfabSystemErrorText18Switch7	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch7 22 }
+
+cfabSystemErrorText19Switch7	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch7 23 }
+
+cfabSystemErrorText20Switch7	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch7 24 }
+
+--
+-- cfabSystemErrorSwitch8 Group
+--
+cfabSystemErrorFabricIdSwitch8	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch8 1 }
+
+cfabSystemErrorDomainIdSwitch8	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch8 2 }
+
+cfabSystemErrorSwitchIdSwitch8	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch8 3 }
+
+cfabSystemErrorPointSwitch8	OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE (4))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch8 4 }
+
+cfabSystemErrorText1Switch8	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch8 5 }
+
+cfabSystemErrorText2Switch8	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch8 6 }
+
+cfabSystemErrorText3Switch8	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch8 7 }
+
+cfabSystemErrorText4Switch8	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch8 8 }
+
+cfabSystemErrorText5Switch8	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch8 9 }
+
+cfabSystemErrorText6Switch8	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch8 10 }
+
+cfabSystemErrorText7Switch8	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch8 11 }
+
+cfabSystemErrorText8Switch8	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch8 12 }
+
+cfabSystemErrorText9Switch8	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch8 13 }
+
+cfabSystemErrorText10Switch8	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch8 14 }
+
+cfabSystemErrorText11Switch8	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch8 15 }
+
+cfabSystemErrorText12Switch8	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch8 16 }
+
+cfabSystemErrorText13Switch8	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch8 17 }
+
+cfabSystemErrorText14Switch8	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch8 18 }
+
+cfabSystemErrorText15Switch8	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch8 19 }
+
+cfabSystemErrorText16Switch8	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch8 20 }
+
+cfabSystemErrorText17Switch8	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch8 21 }
+
+cfabSystemErrorText18Switch8	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch8 22 }
+
+cfabSystemErrorText19Switch8	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch8 23 }
+
+cfabSystemErrorText20Switch8	OBJECT-TYPE
+    SYNTAX	DisplayString (SIZE (0..255))
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSystemErrorSwitch8 24 }
+
+--
+-- cfabSwitchStatus Group
+--
+cfabSwitchStatusNumber	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSwitchStatus 1 }
+
+cfabSwitchStatusTable	OBJECT-TYPE
+    SYNTAX	SEQUENCE OF CfabSwitchStatusEntry
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSwitchStatus 2 }
+
+cfabSwitchStatusEntry	OBJECT-TYPE
+    SYNTAX	CfabSwitchStatusEntry
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    INDEX { cfabSwitchStatusIndex }
+    ::= { cfabSwitchStatusTable 1 }
+
+CfabSwitchStatusEntry	::= SEQUENCE {
+	cfabSwitchStatusIndex		INTEGER,
+	cfabSwitchStatusLevel		INTEGER,
+	cfabSwitchStatusFabricId	INTEGER,
+	cfabSwitchStatusDomainId	INTEGER,
+	cfabSwitchStatusSwitchId	INTEGER,
+	cfabSwitchStatusMacAddress	OCTET STRING,
+	cfabSwitchStatusDomainStatus	INTEGER,
+	cfabSwitchStatusSwitchStatus	INTEGER,
+	cfabSwitchStatusFCFmode		INTEGER,
+	cfabSwitchStatusCFABLicense	INTEGER,
+	cfabSwitchStatusFCFLicense	INTEGER,
+	cfabSwitchStatusInfo		INTEGER,
+	cfabSwitchStatusErrorDetail	DisplayString
+}
+
+cfabSwitchStatusIndex	OBJECT-TYPE
+    SYNTAX	INTEGER (1..2147483647)
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSwitchStatusEntry 1 }
+
+cfabSwitchStatusLevel	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSwitchStatusEntry 2 }
+
+cfabSwitchStatusFabricId	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSwitchStatusEntry 3 }
+
+cfabSwitchStatusDomainId	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSwitchStatusEntry 4 }
+
+cfabSwitchStatusSwitchId	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSwitchStatusEntry 5 }
+
+cfabSwitchStatusMacAddress	OBJECT-TYPE
+    SYNTAX	OCTET STRING
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSwitchStatusEntry 6 }
+
+cfabSwitchStatusDomainStatus	OBJECT-TYPE
+    SYNTAX  INTEGER {
+		is-wait(1),
+		is-root(2),
+		is-leaf(3),
+		is-inval(4)
+	    }
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSwitchStatusEntry 7 }
+
+cfabSwitchStatusSwitchStatus	OBJECT-TYPE
+    SYNTAX  INTEGER {
+		is-wait(1),
+		is-master(2),
+		is-slave(3),
+		is-inval(4)
+	    }
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSwitchStatusEntry 8 }
+
+cfabSwitchStatusFCFmode	OBJECT-TYPE
+    SYNTAX  INTEGER {
+                san-a(1),
+                san-b(2),
+                none(-1)
+	    }
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSwitchStatusEntry 9 }
+
+cfabSwitchStatusCFABLicense	OBJECT-TYPE
+    SYNTAX  INTEGER {
+		exist(1),
+		not-exist(2)
+	    }
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSwitchStatusEntry 10 }
+
+cfabSwitchStatusFCFLicense	OBJECT-TYPE
+    SYNTAX  INTEGER {
+		exist(1),
+		not-exist(2)
+	    }
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSwitchStatusEntry 11 }
+
+cfabSwitchStatusInfo	OBJECT-TYPE
+    SYNTAX  INTEGER {
+		normal(1),
+		err-sw-id(2),
+		err-domain-id(3),
+		err-fabric-id(4),
+		err-type-domain(5),
+		err-type-sw(6),
+		err-firm-ver(7),
+		firmware-update(8),
+		err-fcf-license(9),
+		roll-reset-wait(10)
+	    }
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSwitchStatusEntry 12 }
+
+cfabSwitchStatusErrorDetail	OBJECT-TYPE
+    SYNTAX	DisplayString
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabSwitchStatusEntry 13 }
+
+--
+-- cfabTopology Group
+--
+cfabTopologyNumber	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabTopology 1 }
+
+cfabTopologyTable	OBJECT-TYPE
+    SYNTAX	SEQUENCE OF CfabTopologyEntry
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabTopology 2 }
+
+cfabTopologyEntry	OBJECT-TYPE
+    SYNTAX	CfabTopologyEntry
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    INDEX { cfabTopologyIndex }
+    ::= { cfabTopologyTable 1 }
+
+CfabTopologyEntry	::= SEQUENCE {
+	cfabTopologyIndex		INTEGER,
+	cfabTopologyLevel		INTEGER,
+	cfabTopologyFabricId		INTEGER,
+	cfabTopologyDomainId		INTEGER,
+	cfabTopologySwitchId		INTEGER,
+	cfabTopologyChassisNumber	INTEGER,
+	cfabTopologyPortEtherNumber	INTEGER,
+	cfabTopologyPortEtherType	INTEGER,
+	cfabTopologyRemotePortInfo	INTEGER,
+	cfabTopologyRemoteFabricId	INTEGER,
+	cfabTopologyRemoteDomainId	INTEGER,
+	cfabTopologyRemoteSwitchId	INTEGER,
+	cfabTopologyRemoteChassisNumber	INTEGER,
+	cfabTopologyRemotePortEtherNumber	INTEGER,
+	cfabTopologyRemotePortEtherType	INTEGER
+}
+
+cfabTopologyIndex	OBJECT-TYPE
+    SYNTAX	INTEGER (1..2147483647)
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabTopologyEntry 1 }
+
+cfabTopologyLevel	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabTopologyEntry 2 }
+
+cfabTopologyFabricId	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabTopologyEntry 3 }
+
+cfabTopologyDomainId	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabTopologyEntry 4 }
+
+cfabTopologySwitchId	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabTopologyEntry 5 }
+
+cfabTopologyChassisNumber	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabTopologyEntry 6 }
+
+cfabTopologyPortEtherNumber	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabTopologyEntry 7 }
+
+cfabTopologyPortEtherType	OBJECT-TYPE
+    SYNTAX  INTEGER {
+		us-port(1),
+		ds-port(2),
+		isl-port(3),
+		cir-port(4),
+		ep-port(5),
+		blk-port(6)
+	    }
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabTopologyEntry 8 }
+
+cfabTopologyRemotePortInfo	OBJECT-TYPE
+    SYNTAX  INTEGER {
+		same-fabric(1),
+		vary-fabric(2)
+	    }
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabTopologyEntry 9 }
+
+cfabTopologyRemoteFabricId	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabTopologyEntry 10 }
+
+cfabTopologyRemoteDomainId	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabTopologyEntry 11 }
+
+cfabTopologyRemoteSwitchId	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabTopologyEntry 12 }
+
+cfabTopologyRemoteChassisNumber	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabTopologyEntry 13 }
+
+cfabTopologyRemotePortEtherNumber	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabTopologyEntry 14 }
+
+cfabTopologyRemotePortEtherType	OBJECT-TYPE
+    SYNTAX  INTEGER {
+		us-port(1),
+		ds-port(2),
+		isl-port(3),
+		cir-port(4),
+		ep-port(5),
+		blk-port(6),
+		other(-1)
+	    }
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabTopologyEntry 15 }
+
+
+--
+-- cfabVfabInfo Group
+--
+cfabVfabInfoTable	OBJECT-TYPE
+    SYNTAX	SEQUENCE OF CfabVfabInfoEntry
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabVfabInfo 1 }
+
+cfabVfabInfoEntry	OBJECT-TYPE
+    SYNTAX	CfabVfabInfoEntry
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    INDEX { cfabVfabInfoIndex, cfabVfabInfoVfabid, cfabVfabInfoVid }
+    ::= { cfabVfabInfoTable 1 }
+
+CfabVfabInfoEntry	::= SEQUENCE {
+	cfabVfabInfoIndex		INTEGER,
+	cfabVfabInfoVfabid		INTEGER,
+	cfabVfabInfoVid			INTEGER,
+	cfabVfabInfoMode		INTEGER,
+	cfabVfabInfoTrans		INTEGER,
+	cfabVfabInfoTag			INTEGER,
+	cfabVfabInfoIftype		INTEGER,
+	cfabVfabInfoDynamic		INTEGER
+}
+
+cfabVfabInfoIndex	OBJECT-TYPE
+    SYNTAX	INTEGER (1..2147483647)
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabVfabInfoEntry 1 }
+
+cfabVfabInfoVfabid	OBJECT-TYPE
+    SYNTAX  INTEGER (0..3002)
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabVfabInfoEntry 2 }
+
+cfabVfabInfoVid		OBJECT-TYPE
+    SYNTAX	INTEGER  (1..4094)
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabVfabInfoEntry 3 }
+
+cfabVfabInfoMode	OBJECT-TYPE
+    SYNTAX  INTEGER {
+		host-mode(1),
+		network-mode(2),
+		san-mode(3)
+	    }
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabVfabInfoEntry 4 }
+
+cfabVfabInfoTrans	OBJECT-TYPE
+    SYNTAX	INTEGER (0..4094)
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabVfabInfoEntry 5 }
+
+cfabVfabInfoTag		OBJECT-TYPE
+    SYNTAX  INTEGER {
+		untag-vlan(0),
+		tag-vlan(1)
+	    }
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabVfabInfoEntry 6 }
+
+cfabVfabInfoIftype	OBJECT-TYPE
+    SYNTAX  INTEGER {
+		cir(4),
+		ep(5)
+	    }
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabVfabInfoEntry 7 }
+
+cfabVfabInfoDynamic	OBJECT-TYPE
+    SYNTAX  INTEGER {
+		static(0),
+		dynamic(1)
+	    }
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabVfabInfoEntry 8 }
+
+cfabVfabDot1adInfoTable		OBJECT-TYPE
+    SYNTAX	SEQUENCE OF CfabVfabDot1adInfoEntry
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabVfabInfo 2 }
+
+cfabVfabDot1adInfoEntry		OBJECT-TYPE
+    SYNTAX	CfabVfabDot1adInfoEntry
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    INDEX { cfabVfabDot1adInfoIndex, cfabVfabDot1adInfoVfabid }
+    ::= { cfabVfabDot1adInfoTable 1 }
+
+CfabVfabDot1adInfoEntry	::= SEQUENCE {
+	cfabVfabDot1adInfoIndex		INTEGER,
+	cfabVfabDot1adInfoVfabid	INTEGER,
+	cfabVfabDot1adInfoStatus	INTEGER
+}
+
+cfabVfabDot1adInfoIndex		OBJECT-TYPE
+    SYNTAX	INTEGER (1..2147483647)
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabVfabDot1adInfoEntry 1 }
+
+cfabVfabDot1adInfoVfabid	OBJECT-TYPE
+    SYNTAX  INTEGER (0..3002)
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabVfabDot1adInfoEntry 2 }
+
+cfabVfabDot1adInfoStatus	OBJECT-TYPE
+    SYNTAX  INTEGER {
+		disable(0),
+		enable(1)
+	    }
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabVfabDot1adInfoEntry 3 }
+
+cfabCfabDot1adTpid	OBJECT-TYPE
+    SYNTAX	INTEGER (1536..65535)
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabVfabInfo 3 }
+
+cfabVfabThroughInfoTable	OBJECT-TYPE
+    SYNTAX	SEQUENCE OF CfabVfabThroughInfoEntry
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabVfabInfo 4 }
+
+cfabVfabThroughInfoEntry	OBJECT-TYPE
+    SYNTAX	CfabVfabThroughInfoEntry
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    INDEX { cfabVfabThroughInfoIndex }
+    ::= { cfabVfabThroughInfoTable 1 }
+
+CfabVfabThroughInfoEntry	::= SEQUENCE {
+	cfabVfabThroughInfoIndex	INTEGER,
+	cfabVfabThroughInfoVfabid	INTEGER,
+	cfabVfabThroughInfoVid		INTEGER
+}
+
+cfabVfabThroughInfoIndex	OBJECT-TYPE
+    SYNTAX	INTEGER (1..2147483647)
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabVfabThroughInfoEntry 1 }
+
+cfabVfabThroughInfoVfabid	OBJECT-TYPE
+    SYNTAX  INTEGER (0..3000)
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabVfabThroughInfoEntry 2 }
+
+cfabVfabThroughInfoVid		OBJECT-TYPE
+    SYNTAX	INTEGER  (1..4094)
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('CFAB_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { cfabVfabThroughInfoEntry 3 }
+
+--
+-- Trap
+--
+cfabFirmUpdateComplete	TRAP-TYPE
+    ENTERPRISE	sbMibObjects
+    VARIABLES	{ cfabFirmUpdateInfoFabricId, cfabFirmUpdateInfoDomainId, cfabFirmUpdateInfoSwitchId }
+    DESCRIPTION
+	"The firmware of the indicated switch was updated."
+    --#TYPE		"Firmware was updated."
+    --#SUMMARY		"The firmware of switch %d/%d/%d was updated."
+    --#ARGUMENTS	{ 0, 1, 2 }
+    --#SEVERITY		INFORMATIONAL
+    --#TIMEINDEX	3
+    --#HELP		"Corrective actions are unnecessary because of the notification of firmware update."
+    --#HELPTAG		0
+    --#STATE		OPERATIONAL
+    ::= 1
+
+cfabConfigUpdateComplete	TRAP-TYPE
+    ENTERPRISE	sbMibObjects
+    VARIABLES	{ cfabConfigUpdateInfoFabricId, cfabConfigUpdateInfoDomainId, cfabConfigUpdateInfoSwitchId }
+    DESCRIPTION
+	"Config was saved in the flash memory of indicated switch."
+    --#TYPE		"Config was saved."
+    --#SUMMARY		"Config was saved in the flash memory of switch %d/%d/%d."
+    --#ARGUMENTS	{ 0, 1, 2 }
+    --#SEVERITY		INFORMATIONAL
+    --#TIMEINDEX	3
+    --#HELP		"Corrective actions are unnecessary because of the notification of config save."
+    --#HELPTAG		0
+    --#STATE		OPERATIONAL
+    ::= 2
+
+cfabConstructComplete	TRAP-TYPE
+    ENTERPRISE	sbMibObjects
+    VARIABLES	{ cfabConstructInfoFabricId, cfabConstructInfoRootDomainId }
+    DESCRIPTION
+	"The construction of C-Fabric was completed."
+    --#TYPE		"C-Fabric was constructed."
+    --#SUMMARY		"The construction of C-Fabric (fabric_id=%d) was completed."
+    --#ARGUMENTS	{ 0 }
+    --#SEVERITY		INFORMATIONAL
+    --#TIMEINDEX	2
+    --#HELP		"Corrective actions are unnecessary because of the notification of fabric construction."
+    --#STATE		OPERATIONAL
+    ::= 3
+
+cfabMasterSwitchChange	TRAP-TYPE
+    ENTERPRISE	sbMibObjects
+    VARIABLES	{ cfabMasterSwitchChangeInfoFabricId, cfabMasterSwitchChangeInfoDomainId, cfabMasterSwitchChangeInfoMasterSwitchId }
+    DESCRIPTION
+	"Master switch of the indicated domain was changed."
+    --#TYPE		"Master switch was changed."
+    --#SUMMARY		"Master switch of fabric_id=%d/domain_id=%d was changed to the switch %d."
+    --#ARGUMENTS	{ 0, 1, 2 }
+    --#SEVERITY		INFORMATIONAL
+    --#TIMEINDEX	3
+    --#HELP		"Corrective actions are unnecessary because of the notification of master switch change."
+    --#STATE		OPERATIONAL
+    ::= 4
+
+cfabRollingResetFinish	TRAP-TYPE
+    ENTERPRISE	sbMibObjects
+    VARIABLES	{ cfabRollingResetInfoFabricId, cfabRollingResetInfoDomainId, cfabRollingResetInfoSwitchId }
+    DESCRIPTION
+	"The execution of rolling-reset was finished."
+    --#TYPE		"Rolling-reset finished."
+    --#SUMMARY		"The execution of rolling-reset of fabric_id=%d was finished."
+    --#ARGUMENTS	{ 0 }
+    --#SEVERITY		INFORMATIONAL
+    --#TIMEINDEX	3
+    --#HELP		"Corrective actions are unnecessary because of the completion notification of rolling-reset."
+    --#STATE		OPERATIONAL
+    ::= 5
+
+cfabConfigCommitNotify	TRAP-TYPE
+    ENTERPRISE	sbMibObjects
+    VARIABLES	{ cfabConfigCommitFabricId, cfabConfigCommitDomainId, cfabConfigCommitSwitchId }
+    DESCRIPTION
+	"Config setting was reflected in the indicated switch."
+    --#TYPE		"Config was committed."
+    --#SUMMARY		"Config setting was reflected in the switch %d/%d/%d."
+    --#ARGUMENTS	{ 0, 1, 2 }
+    --#SEVERITY		INFORMATIONAL
+    --#TIMEINDEX	3
+    --#HELP		"Corrective actions are unnecessary because of the notification of config commitment."
+    --#STATE		OPERATIONAL
+    ::= 6
+
+cfabDomainAddNotify	TRAP-TYPE
+    ENTERPRISE	sbMibObjects
+    VARIABLES	{ cfabDomainAddFabricId, cfabDomainAddDomainId, cfabDomainAddSwitchId, cfabDomainAddStatus }
+    DESCRIPTION
+	"The indicated domain is added or removed."
+    --#TYPE		"The domain is added/removed."
+    --#SUMMARY		"The domain (fabric_id=%d/domain_id=%d) is added or removed depending on the cfabDomainAddStatus (remove=0, add=1). The status is %d."
+    --#ARGUMENTS	{ 0, 1, 3 }
+    --#SEVERITY		CRITICAL
+    --#TIMEINDEX	4
+    --#HELP		"Action: If cfabDomainAddStatus is 0 (remove), check devices which is belonging to the indicated domain. If all devices are down, replace them. If all devices work normally, check links which are connected to the switch belonging to the indicated domain. If there are any downed links, replace them. If cfabDomainAddStatus is 1 (add), corrective actions are unnecessary."
+    --#STATE		DEGRADED
+    ::= 7
+
+cfabSwitchAddNotify	TRAP-TYPE
+    ENTERPRISE	sbMibObjects
+    VARIABLES	{ cfabSwitchAddFabricId, cfabSwitchAddDomainId, cfabSwitchAddSwitchId, cfabSwitchAddStatus }
+    DESCRIPTION
+	"The indicated switch device is added or removed."
+    --#TYPE		"The switch device is added/removed."
+    --#SUMMARY		"The switch device (fabric_id=%d/domain_id=%d/switch_id=%d) is added or removed depending on the cfabSwitchAddStatus (remove=0, add=1). The status is %d."
+    --#ARGUMENTS	{ 0, 1, 2, 3 }
+    --#SEVERITY		CRITICAL
+    --#TIMEINDEX	4
+    --#HELP		"Action: If cfabSwitchAddStatus is 0 (remove), check the indicated device. If the device is down, replace it. If the device works normally, check links which are connected to the indicated device. If there are any downed links, replace them. If cfabSwitchAddStatus is 1 (add), corrective actions are unnecessary."
+    --#STATE		DEGRADED
+    ::= 8
+
+END

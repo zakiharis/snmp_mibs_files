@@ -1,0 +1,178 @@
+-- D-Link SYSLOG mib 
+-- Draft Ver 0.1 2003/7/29 04:01
+
+DLINK-SYSLOG-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY,OBJECT-TYPE,IpAddress 
+                                        FROM SNMPv2-SMI
+        RowStatus           			FROM SNMPv2-TC
+    	dlink-common-mgmt  	            FROM DLINK-ID-REC-MIB;
+    	
+    swDLinkSysLogMIB MODULE-IDENTITY
+	    LAST-UPDATED "0007150000Z"
+	    ORGANIZATION "enterprise, Inc."
+	    CONTACT-INFO
+	        "   Customer Service
+
+		    Postal: 
+
+		       Tel: 
+
+		    E-mail: "
+	    DESCRIPTION
+		    "The Structure of System Log Information for the
+		     proprietary enterprise."
+        ::= { dlink-common-mgmt 12 }
+
+        
+
+    swSysLogCtrlState OBJECT-TYPE
+        SYNTAX  INTEGER {
+               other(1),
+               disabled(2),
+               enabled(3)
+               }
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "This object can be enabled or disabled functionality of System Log 
+            during runtime of the system."
+        ::= { swDLinkSysLogMIB 1 }
+
+--***************************************************************************
+--swSysLogServerTable
+--***************************************************************************	
+    swSysLogServerTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SwSysLogServerEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "This table contain System Log Server information."
+        ::= { swDLinkSysLogMIB 2 }
+        
+    swSysLogServerEntry OBJECT-TYPE
+        SYNTAX  SwSysLogServerEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A list of information about System Log Server."
+        INDEX  { swSysLogServerIndex }
+        ::= { swSysLogServerTable 1 }
+      
+    SwSysLogServerEntry ::= 
+        SEQUENCE {
+            swSysLogServerIndex
+                INTEGER,
+            swSysLogServerFacility
+                INTEGER,
+             swSysLogServerSeverity
+                INTEGER,
+            swSysLogServerUDPPort
+                INTEGER,
+            swSysLogServerIPAddress
+                IpAddress,
+            swSysLogServerState
+                INTEGER,
+            swSysLogServerRowStatus
+                RowStatus                                                         
+        }
+        
+    swSysLogServerIndex OBJECT-TYPE
+        SYNTAX  INTEGER {
+                swSysLogServerIndex-first(1),
+                swSysLogServerIndex-second(2),
+                swSysLogServerIndex-third(3),
+                swSysLogServerIndex-fourth(4)
+                  }
+        MAX-ACCESS  read-only	
+        STATUS  current
+        DESCRIPTION
+            "The index of System Log Server entry ,and is unique."
+        ::= { swSysLogServerEntry 1 }
+    
+    --
+    -- The Facilities and Serverities of the messages are numerically coded with decimal 
+    -- values.  Some of the operating system daemons and processed have been assigned 
+    -- Facility values.  Process and daemons that have not been explicity assigned a 
+    -- Facility may use any of the "local use" facilities or they may use the "use-level"
+    -- Facility.  Those Facilities that have been designated are shown in the Table 1 and
+    -- Severity level indicators are described in the Table 2 of RFC3614 along with  their 
+    -- numerical code values. 
+    --    However, in this mib, only Numerical Code 16 ~ 23; Facilities(local0 ~ local7) 
+    -- are implememted in Facilities. And Severity inclued Warning(4), Informational(6) 
+    -- and for all severity.
+
+    swSysLogServerFacility OBJECT-TYPE
+		SYNTAX  INTEGER {
+               local0(0),
+               local1(1),
+               local2(2),
+               local3(3),
+               local4(4),
+               local5(5),
+               local6(6),
+               local7(7)
+               }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "syslog Message Facilities"
+        ::= { swSysLogServerEntry 2 }    
+
+    swSysLogServerSeverity OBJECT-TYPE
+        SYNTAX  INTEGER {
+        	   all(1),
+        	   warning(2),
+               informational(3)
+               }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "syslog Message Severities"
+        ::= { swSysLogServerEntry 3 }         
+        
+    swSysLogServerUDPPort OBJECT-TYPE
+        SYNTAX  INTEGER
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "syslog uses the user datagram protocol (UDP) as its underlying tranaposrt 
+             layer mechanism. The UDP port that has been assigned to syslog is 514. It
+             is RECOMMENDED that the source port also be 514 to indicate that the message 
+             is form the syslog process of the sender, but there have been cases seen 
+             where valid syslog messages have come from a sender with a source port other 
+             than 514. If the sender uses a source port other than 514 then it is 
+             RECOMMENDED and has been considered to be good from that subsequent messages 
+             are from a single consistent port."
+        DEFVAL  { 514 }     
+        ::= { swSysLogServerEntry 4 }     
+        
+    swSysLogServerIPAddress OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "specifies the IP address of the System Log Server."
+        ::= { swSysLogServerEntry 5 }   
+        
+    swSysLogServerState OBJECT-TYPE
+        SYNTAX  INTEGER {
+               other(1),
+               disabled(2),
+               enabled(3)
+               }
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "enabled or disabled the specific System Log Server during runtime."
+        ::= { swSysLogServerEntry 6 }     
+        
+    swSysLogServerRowStatus OBJECT-TYPE 
+        SYNTAX  RowStatus
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "indicates the status of this entry."
+        ::= { swSysLogServerEntry 7 }         
+END

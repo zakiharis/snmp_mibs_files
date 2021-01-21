@@ -1,0 +1,767 @@
+PRIMEPOWER-XSCF-MIB DEFINITIONS ::= BEGIN
+
+-- All Rights Reserved, Copyright FUJITSU LIMITED 1996-2003.
+-- This file is a ASN.1 file. This file name is "primepower_xscf_0002.my".
+-- This file offered by FUJITSU LIMITED.
+--
+-- update history: V01  add aplNetFddi,aplNetHub,aplNetLr
+--                 V02  add aplNetAtmSw,aplNetLha,aplNetLhb,aplNetLlu
+--                 V03  add aplNWCM,aplNetClad,aplNetCOMSC,aplNWext,
+--                          aplNetLrx
+--                 V04  add aplNetMpCN,aplNetMpSMM
+--                 V05  add aplNetCL
+--                 V06  add aplNetFrad and modify IMPORTS statement
+--                 V07  change aplNetCL to aplNetLCB
+--                 V08  add aplDrms
+--                 V09  add aplAosf,aplSafegate
+--                 V10  add aplMmServer
+--                 V11  add aplWinLMA
+--                 V12  add aplNetAsb
+--                 V13  add aplNetMpNs
+--                 V14  add aplNetMpTrf
+--                 V15  add aplNetMpNP
+--                 V16  add aplNetEW6000
+--                 V17  add aplNetMpNsAgt
+--                 V18  add aplNetPcSvrMgr
+--                 V19  add aplNetAOLan
+--                 V20  add aplNetEA
+--                 V21  add aplNetPrinter
+--                 V22  add aplNC
+--                 V23  add aplNetMpCW2000
+--                 V24  add aplInterstage
+--                 V25  add aplLSC
+--                 V26  add aplIPPolicyMGR,aplNetShelter
+--                 V27  add aplNetStorage
+--                 V28  add aplNetESH
+--                 V29  add aplNetIpn
+--                 V30  add aplNAD
+--                 V31  add aplSANMgr
+--                 V32  add aplNetxDSL
+--                 V33  add aplUser1,hokugin
+--                 V34  add aplIPNetMGR
+--                 V35  add aplDirServMon
+--                 V36  add aplSNeteLAN,aplSNeteSH,aplSNeteLCB
+--                 V37  add aplNAS
+--                 V38  add aplNetgeostream
+--                 V39  add aplNeopsNMIC
+--                 V40  add aplNetFWmetro
+--                 V41  add aplWebSysAdmin
+--                 V42  add aplNetEPICenter
+--                 V43  add aplIWNWatcher,aplIWTDirector
+--                 V44  add aplNetftth
+--                 V45  add aplFNAServer
+--                 V46  add aplNetbdsu,aplNetmwdm
+--                 V47  add aplTelecomCS
+--                 V48  add aplIPServerS
+--                 V49  add aplNetAssist
+--                 V50  add aplSWProcMon
+--                 V51  add aplNetMpCNTrapTrc
+--                 V52  add aplFSMAgt
+--                 V53  add aplIWVWall
+--                 V54  add aplNetSCF,aplInterwayNW
+--
+-- Release History : 0001 Initial version.
+--                   0002 Add Mib of scfMonitor.
+--                   0003 Change EnterpriseOID for trap.
+--
+
+IMPORTS
+        OBJECT-TYPE     FROM RFC-1212
+        TRAP-TYPE       FROM RFC1215-MIB
+        DisplayString   FROM RFC1213-MIB
+        enterprises, TimeTicks     FROM RFC1155-SMI;
+
+          -- OID: 1.3.6.1.4.1
+
+-- FUJITSU product MIB nodes
+fujitsu          OBJECT IDENTIFIER ::= { enterprises     211 }
+
+product          OBJECT IDENTIFIER ::= { fujitsu           1 }
+solaris          OBJECT IDENTIFIER ::= { product          15 }
+primepower       OBJECT IDENTIFIER ::= { solaris           2 }
+scfObjects       OBJECT IDENTIFIER ::= { primepower        1 }
+scfInfo          OBJECT IDENTIFIER ::= { scfObjects        1 }
+scfState         OBJECT IDENTIFIER ::= { scfObjects        2 }
+scfTrapParams    OBJECT IDENTIFIER ::= { scfObjects        3 }
+scfMonitor       OBJECT IDENTIFIER ::= { scfObjects        4 }
+
+application      OBJECT IDENTIFIER ::= { fujitsu           4 }
+aplNetwork       OBJECT IDENTIFIER ::= { application       1 }
+aplNetDevice     OBJECT IDENTIFIER ::= { aplNetwork        1 }
+aplNetMedia      OBJECT IDENTIFIER ::= { aplNetwork        2 }
+aplNetFunction   OBJECT IDENTIFIER ::= { aplNetwork        3 }
+aplNetWinNT      OBJECT IDENTIFIER ::= { aplNetwork        4 }
+
+-- groups in device
+aplNetAtmSw      OBJECT IDENTIFIER ::= { aplNetDevice 1 }
+-- An application of fujitsu atm switch management uses this OID.
+
+aplNetLha        OBJECT IDENTIFIER ::= { aplNetDevice 2 }
+-- An application of fujitsu smart hub management (repeater function) uses
+-- this OID.
+
+aplNetLhb        OBJECT IDENTIFIER ::= { aplNetDevice 3 }
+-- An application of fujitsu smart hub management (repeater function and
+-- bridge function) uses this OID.
+
+aplNetClad       OBJECT IDENTIFIER ::= { aplNetDevice 4 }
+-- An application of ATM Clad management uses this OID.
+
+aplNetAsb        OBJECT IDENTIFIER ::= { aplNetDevice 5 }
+-- An application of ATM SYSTEM-B management uses this OID.
+
+aplNetEA         OBJECT IDENTIFIER ::= { aplNetDevice 6 }
+-- An application of ATM SYSTEM-B management New Version uses this OID.
+
+aplNetmwdm       OBJECT IDENTIFIER ::= { aplNetDevice 120 }
+-- A M-WDM product uses this OID.
+
+aplNetbdsu       OBJECT IDENTIFIER ::= { aplNetDevice 121 }
+-- A B-DSU product uses this OID.
+
+aplNetftth       OBJECT IDENTIFIER ::= { aplNetDevice 122 }
+-- A FTTH product uses this OID.
+
+aplNetFWmetro    OBJECT IDENTIFIER ::= { aplNetDevice 123 }
+-- A Transport product uses this OID.
+
+aplNetxDSL       OBJECT IDENTIFIER ::= { aplNetDevice 124 }
+-- A xDSL product uses this OID.
+
+aplNetIpn        OBJECT IDENTIFIER ::= { aplNetDevice 125 }
+-- A IPN product uses this OID.
+
+aplNetStorage    OBJECT IDENTIFIER ::= { aplNetDevice 126 }
+-- A Storage product uses this OID.
+
+aplNetPrinter    OBJECT IDENTIFIER ::= { aplNetDevice 127 }
+-- A Network Printer uses this OID.
+
+-- groups in media
+aplNetFddi       OBJECT IDENTIFIER ::= { aplNetMedia 1 }
+-- An application of FDDI management uses this OID.
+
+aplNetCOMSC      OBJECT IDENTIFIER ::= { aplNetMedia 2 }
+-- An application of COMS-C management uses this OID.
+
+aplNetEW6000     OBJECT IDENTIFIER ::= { aplNetMedia 3 }
+-- An application of EW6000 management uses this OID.
+
+-- groups in function
+aplNetHub        OBJECT IDENTIFIER ::= { aplNetFunction 1 }
+-- An application of HUB management uses this OID.
+
+aplNetLr         OBJECT IDENTIFIER ::= { aplNetFunction 2 }
+-- An application of LINKRELAY management uses this OID.
+
+aplNetLlu        OBJECT IDENTIFIER ::= { aplNetFunction 3 }
+-- An applicaiton of LAMP Agent's management user this OID.
+
+aplNWCM          OBJECT IDENTIFIER ::= { aplNetFunction 4 }
+-- An application of NetWalker/CM uses this OID.
+
+aplNWext         OBJECT IDENTIFIER ::= { aplNetFunction 5 }
+-- An application of SNMP agent extension kit uses this OID.
+
+aplNetLrx        OBJECT IDENTIFIER ::= { aplNetFunction 6 }
+-- An application of LR/X uses this OID.
+
+aplNetLCB        OBJECT IDENTIFIER ::= { aplNetFunction 7 }
+-- An application of LCB uses this OID.
+
+aplNetFrad       OBJECT IDENTIFIER ::= { aplNetFunction 8 }
+-- An application of FRAD uses this OID.
+
+aplDrms          OBJECT IDENTIFIER ::= { aplNetFunction 9 }
+-- An application of DRMS uses this OID.
+
+aplAosf          OBJECT IDENTIFIER ::= { aplNetFunction 10 }
+-- An application of AOSF uses this OID.
+
+aplSafegate      OBJECT IDENTIFIER ::= { aplNetFunction 11 }
+-- An application of Safegate uses this OID.
+
+aplMmServer      OBJECT IDENTIFIER ::= { aplNetFunction 12 }
+-- An application of Media Server uses this OID.
+
+aplWinLMA        OBJECT IDENTIFIER ::= { aplNetFunction 13 }
+-- An application of Windows LMA uses this OID.
+
+aplNC            OBJECT IDENTIFIER ::= { aplNetFunction 14 }
+-- An application of Network Computer uses this OID.
+
+aplInterstage    OBJECT IDENTIFIER ::= { aplNetFunction 15 }
+-- An application of Interstage uses this OID.
+
+aplLSC           OBJECT IDENTIFIER ::= { aplNetFunction 16 }
+-- An application of Local Server Console uses this OID.
+
+aplIPPolicyMGR   OBJECT IDENTIFIER ::= { aplNetFunction 17 }
+-- An application of IP Policy Manager uses this OID.
+
+aplNetShelter    OBJECT IDENTIFIER ::= { aplNetFunction 18 }
+-- An application of NetShelter uses this OID.
+
+aplNetESH        OBJECT IDENTIFIER ::= { aplNetFunction 19 }
+-- An application of NetEyemanager/SH uses this OID.
+
+aplNAD           OBJECT IDENTIFIER ::= { aplNetFunction 20 }
+-- An application of Network AccessDirector uses this OID.
+
+aplSANMgr        OBJECT IDENTIFIER ::= { aplNetFunction 21 }
+-- An application of SAN Manager uses this OID.
+
+aplIPNetMGR      OBJECT IDENTIFIER ::= { aplNetFunction 22 }
+-- An application of IP NetMGR uses this OID.
+
+aplDirServMon    OBJECT IDENTIFIER ::= { aplNetFunction 23 }
+-- An application of Directory Service Monitor uses this OID.
+
+aplSNeteLAN      OBJECT IDENTIFIER ::= { aplNetFunction 24 }
+-- An application of NetEyemanager/LAN for Solaris uses this OID.
+
+aplSNeteSH       OBJECT IDENTIFIER ::= { aplNetFunction 25 }
+-- An application of NetEyemanager/SH for Solaris uses this OID.
+
+aplSNeteLCB      OBJECT IDENTIFIER ::= { aplNetFunction 26 }
+-- An application of NetEyemanager/LCB for Solaris uses this OID.
+
+aplNAS           OBJECT IDENTIFIER ::= { aplNetFunction 27 }
+-- An application of INTERSTAGE Network Access Server uses this OID.
+
+aplNetgeostream  OBJECT IDENTIFIER ::= { aplNetFunction 28 }
+-- An application of GeoStream uses this OID.
+
+aplNeopsNMIC     OBJECT IDENTIFIER ::= { aplNetFunction 29 }
+-- An application of NE-OPS NM Interface Converter uses this OID.
+
+aplWebSysAdmin   OBJECT IDENTIFIER ::= { aplNetFunction 30 }
+-- An application of Web-based System Admin uses this OID.
+
+aplIWNWatcher    OBJECT IDENTIFIER ::= { aplNetFunction 31 }
+-- An application of InterWay/Network Watcher uses this OID.
+
+aplIWTDirector   OBJECT IDENTIFIER ::= { aplNetFunction 32 }
+-- An application of InterWay/Traffic Director uses this OID.
+
+aplFNAServer     OBJECT IDENTIFIER ::= { aplNetFunction 33 }
+-- An application of FNA Server uses this OID.
+
+aplTelecomCS     OBJECT IDENTIFIER ::= { aplNetFunction 34 }
+-- An application of Telecom Server uses this OID.
+
+aplIPServerS     OBJECT IDENTIFIER ::= { aplNetFunction 35 }
+-- An application of IP Server uses this OID.
+
+aplNetAssist     OBJECT IDENTIFIER ::= { aplNetFunction 36 }
+-- An application of SystemWalker/NetAssist uses this OID.
+
+aplSWProcMon     OBJECT IDENTIFIER ::= { aplNetFunction 37 }
+-- An application of SystemWalker Process Monitor uses this OID.
+
+aplFSMAgt        OBJECT IDENTIFIER ::= { aplNetFunction 38 }
+-- An application of Fsas Server Management Agent uses this OID.
+
+aplIWVWall       OBJECT IDENTIFIER ::= { aplNetFunction 39 }
+-- An application of InterWay/VW uses this OID.
+
+aplNetSCF        OBJECT IDENTIFIER ::= { aplNetFunction 40 }
+-- An application of System Control Facility uses this OID.
+
+aplInterwayNW    OBJECT IDENTIFIER ::= { aplNetFunction 41 }
+-- An application of InterWay/NW uses this OID.
+
+-- groups in WinNT
+aplNetMpCN       OBJECT IDENTIFIER ::= { aplNetWinNT 1 }
+-- An application of MpCNappl in MpWalker uses this OID.
+
+aplNetMpSMM      OBJECT IDENTIFIER ::= { aplNetWinNT 2 }
+-- An application of MpSMMappl in MpWalker uses this OID.
+
+aplNetMpNs       OBJECT IDENTIFIER ::= { aplNetWinNT 3 }
+-- An application of MpNsMgr,MpNsAgt in MpWalker uses this OID.
+
+aplNetMpTrf      OBJECT IDENTIFIER ::= { aplNetWinNT 4 }
+-- An application of MpTrfMgr in MpWalker uses this OID.
+
+aplNetMpNP       OBJECT IDENTIFIER ::= { aplNetWinNT 5 }
+-- An application of NetPrism uses this OID.
+
+aplNetPcSvrMgr   OBJECT IDENTIFIER ::= { aplNetWinNT 6 }
+-- An application of PC Server Manager uses this OID.
+
+aplNetAOLan      OBJECT IDENTIFIER ::= { aplNetWinNT 7 }
+-- An application of LDCM uses this OID.
+
+aplNetMpCW2000   OBJECT IDENTIFIER ::= { aplNetWinNT 8 }
+-- An application of CiscoWorks2000 uses this OID.
+
+aplNetEPICenter  OBJECT IDENTIFIER ::= { aplNetWinNT 9 }
+-- An application of EPICenter uses this OID.
+
+aplUser1         OBJECT IDENTIFIER ::= { aplNetWinNT 127 }
+-- An user application uses this OID.
+
+-- groups in MpCN
+aplNetMpCNTrapTrc OBJECT IDENTIFIER ::= { aplNetMpCN 1 }
+-- An application of MpCNappl in MpWalker uses this OID.
+
+-- groups in MpNs
+aplNetMpNsAgt    OBJECT IDENTIFIER ::= { aplNetMpNs 1 }
+-- An application of MpNsMgr in MpWalker uses this OID.
+
+-- groups in aplUser1
+hokugin          OBJECT IDENTIFIER ::= { aplUser1 1 }
+-- An user application of hokugin uses this OID.
+
+
+--
+-- System Control Facility INFOMATION GROUP
+--
+
+scfMachineType          OBJECT-TYPE
+     SYNTAX                    DisplayString
+     ACCESS                    read-only
+     STATUS                    mandatory
+     DESCRIPTION               "System model name and model type name."
+     ::= { scfInfo 1 }
+
+scfNumberOfCpu          OBJECT-TYPE
+     SYNTAX                    INTEGER
+     ACCESS                    read-only
+     STATUS                    mandatory
+     DESCRIPTION               "Number of CPUs"
+     ::= { scfInfo 2 }
+
+scfSysSerial            OBJECT-TYPE
+     SYNTAX                    DisplayString
+     ACCESS                    read-only
+     STATUS                    mandatory
+     DESCRIPTION               "System serial number"
+     ::= { scfInfo 3 }
+
+scfFirmVersion          OBJECT-TYPE
+     SYNTAX                    DisplayString
+     ACCESS                    read-only
+     STATUS                    mandatory
+     DESCRIPTION               "Firmware version code"
+     ::= { scfInfo 4 }
+
+scfHCPVersion           OBJECT-TYPE
+     SYNTAX                    DisplayString
+     ACCESS                    read-only
+     STATUS                    mandatory
+     DESCRIPTION               "HCP version code"
+     ::= { scfInfo 5 }
+
+scfServerUptime         OBJECT-TYPE
+     SYNTAX                    TimeTicks
+     ACCESS                    read-only
+     STATUS                    mandatory
+     DESCRIPTION               "Uptime of agent"
+     ::= { scfInfo 6 }
+
+scfHostID               OBJECT-TYPE
+     SYNTAX                    DisplayString
+     ACCESS                    read-only
+     STATUS                    mandatory
+     DESCRIPTION               "Host ID"
+     ::= { scfInfo 7 }
+
+scfServerID             OBJECT-TYPE
+     SYNTAX                    DisplayString
+     ACCESS                    read-only
+     STATUS                    mandatory
+     DESCRIPTION               "Server ID"
+     ::= { scfInfo 8 }
+
+--
+-- System Control Facility STATUS GROUP
+--
+
+scfHWErrLevel          OBJECT-TYPE
+     SYNTAX                    DisplayString
+     ACCESS                    read-only
+     STATUS                    mandatory
+     DESCRIPTION               "System damage level"
+     ::= { scfState 1 }
+
+scfOSStatus             OBJECT-TYPE
+     SYNTAX                    DisplayString
+     ACCESS                    read-only
+     STATUS                    mandatory
+     DESCRIPTION               "Status of OS events"
+     ::= { scfState 2 }
+
+scfDisplay              OBJECT-TYPE
+     SYNTAX                    DisplayString
+     ACCESS                    read-only
+     STATUS                    mandatory
+     DESCRIPTION               "Status of display indication"
+     ::= { scfState 3 }
+
+scfModeSwitch           OBJECT-TYPE
+     SYNTAX                    DisplayString
+     ACCESS                    read-only
+     STATUS                    mandatory
+     DESCRIPTION               "Status of mode switch"
+     ::= { scfState 4 }
+
+--
+-- System Control Facility TRAP parameter GROUP
+--
+
+scfServerName           OBJECT-TYPE
+     SYNTAX                    DisplayString
+     ACCESS                    read-only
+     STATUS                    mandatory
+     DESCRIPTION               "Host name"
+     ::= { scfTrapParams 1 }
+
+scfTrapTime             OBJECT-TYPE
+     SYNTAX                    TimeTicks
+     ACCESS                    read-only
+     STATUS                    mandatory
+     DESCRIPTION               "The time that trap occured"
+     ::= { scfTrapParams 2 }
+
+scfHWErrComment         OBJECT-TYPE
+     SYNTAX                    DisplayString
+     ACCESS                    read-only
+     STATUS                    mandatory
+     DESCRIPTION               "Error-log comment"
+     ::= { scfTrapParams 3 }
+
+scfHWConfAddr           OBJECT-TYPE
+     SYNTAX                    DisplayString
+     ACCESS                    read-only
+     STATUS                    mandatory
+     DESCRIPTION               "Error-Parts name"
+     ::= { scfTrapParams 4 }
+
+--
+-- System Control Facility TRAP type GROUP
+--
+
+scfHardwareDefectSet	TRAP-TYPE
+	ENTERPRISE	scfObjects
+	VARIABLES	{ scfServerName, scfTrapTime, scfHWErrComment, scfHWConfAddr }
+	DESCRIPTION	"Sent if Hardware Defect Flag is set"
+     --#TYPE		"Hardware Defect Flag"
+     --#SUMMARY		"%s: Hardware Defect on %s: %s"
+     --#ARGUMENTS	{2, 0, 1}
+     --#SEVERITY	CRITICAL
+     --#TIMEINDEX	1
+     --#STATE		NONOPERATIONAL
+::= 1
+
+scfHardwareDefectUnset	TRAP-TYPE
+	ENTERPRISE	scfObjects
+	VARIABLES	{ scfServerName, scfTrapTime, scfHWErrComment, scfHWConfAddr }
+	DESCRIPTION	"Sent if Hardware Defect Flag is deleted"
+     --#TYPE		"Hardware Defect Flag Deleted"
+     --#SUMMARY		"%s: Hardware Defect deleted on %s: %s"
+     --#ARGUMENTS	{2, 0, 1}
+     --#SEVERITY	INFORMATIONAL
+     --#TIMEINDEX	1
+     --#STATE		NONOPERATIONAL
+::= 2
+
+scfHardwareErrorSet	TRAP-TYPE
+	ENTERPRISE	scfObjects
+	VARIABLES	{ scfServerName, scfTrapTime, scfHWErrComment, scfHWConfAddr }
+	DESCRIPTION	"Sent if Hardware Error Flag is set"
+     --#TYPE		"Hardware Error Flag Set"
+     --#SUMMARY		"%s: Hardware Error on %s: %s"
+     --#ARGUMENTS	{2, 0, 1}
+     --#SEVERITY	CRITICAL
+     --#TIMEINDEX	1
+     --#STATE		NONOPERATIONAL
+::= 3
+
+scfHardwareErrorUnset	TRAP-TYPE
+	ENTERPRISE	scfObjects
+	VARIABLES	{ scfServerName, scfTrapTime, scfHWErrComment, scfHWConfAddr }
+	DESCRIPTION	"Sent if Hardware Error Flag is delete"
+     --#TYPE		"Hardware Error Flag Deleted"
+     --#SUMMARY		"%s: Hardware Error deleted on %s: %s"
+     --#ARGUMENTS	{2, 0, 1}
+     --#SEVERITY	INFORMATIONAL
+     --#TIMEINDEX	1
+     --#STATE		NONOPERATIONAL
+::= 4
+
+scfAgentStart		TRAP-TYPE
+	ENTERPRISE	scfObjects
+	VARIABLES	{ scfServerName }
+	DESCRIPTION	"Sent when agent starts"
+     --#TYPE		"Agent Start"
+     --#SUMMARY		"XSCF Agent started on %s"
+     --#ARGUMENTS	{0}
+     --#SEVERITY	INFORMATIONAL
+     --#TIMEINDEX	1
+     --#STATE		NONOPERATIONAL
+::= 5
+
+scfHardwareErrorRepair	TRAP-TYPE
+	ENTERPRISE	scfObjects
+	VARIABLES	{ scfServerName, scfTrapTime, scfHWErrComment, scfHWConfAddr }
+	DESCRIPTION	"Sent when some error condition is repaired"
+     --#TYPE		"Error Condition Repaired"
+     --#SUMMARY		"%s: Error repaired on %s: %s"
+     --#ARGUMENTS	{2, 0, 1}
+     --#SEVERITY	MINOR
+     --#TIMEINDEX	1
+     --#STATE		NONOPERATIONAL
+::= 6
+
+scfHardwareDefectRepair	TRAP-TYPE
+	ENTERPRISE	scfObjects
+	VARIABLES	{ scfServerName, scfTrapTime, scfHWErrComment, scfHWConfAddr }
+	DESCRIPTION	"Sent when some defect condition is repaired"
+     --#TYPE		"Defect Condition Repaired"
+     --#SUMMARY		"%s: Defect repaired on %s: %s"
+     --#ARGUMENTS	{2, 0, 1}
+     --#SEVERITY	MINOR
+     --#TIMEINDEX	1
+     --#STATE		NONOPERATIONAL
+::= 7
+
+--
+-- System Control Facility scfMonitor GROUP
+--
+
+--
+-- Temperature (unit: 0.1 degrees, Celsius)
+--
+scfTemperatureTable            OBJECT-TYPE
+     SYNTAX                    SEQUENCE OF ScfTemperatureEntry
+     ACCESS                    not-accessible
+     STATUS                    mandatory
+     DESCRIPTION               ""
+     ::= { scfMonitor 1 }
+scfTemperatureEntry            OBJECT-TYPE
+     SYNTAX                    ScfTemperatureEntry
+     ACCESS                    not-accessible
+     STATUS                    mandatory
+     DESCRIPTION               "This is a temperature value which can be referred by XSCF."
+     INDEX                     {
+          scfTemperaturePartsName,
+          scfTemperaturePartsNumber,
+          scfTemperatureSubIndex
+     }
+     ::= { scfTemperatureTable 1 }
+ScfTemperatureEntry ::= SEQUENCE {
+     scfTemperaturePartsName   INTEGER ,
+     scfTemperaturePartsNumber INTEGER ,
+     scfTemperatureSubIndex    INTEGER ,
+     scfTemperatureStatus      INTEGER ,
+     scfTemperatureValue       INTEGER
+}
+scfTemperaturePartsName        OBJECT-TYPE
+     SYNTAX                    INTEGER {
+                               sb(1)     ,
+                               panel(2)  ,
+                               pci-bd(3) ,
+                               scsi-bp(4),
+                               cpu(17)   ,
+                               slot(33)  ,
+                               fan(49)   ,
+                               fanjt(50) ,
+                               psu(65)   ,
+                               cpuddc(66),
+                               ddc-a(67) ,
+                               ddc-b(68) ,
+                               ups(129)  ,
+                               disk(145 ),
+                               pci(146)  ,
+                               rci(160)  ,
+                               unknown(255) }
+     ACCESS                    read-only
+     STATUS                    mandatory
+     DESCRIPTION               ""
+     ::= { scfTemperatureEntry 1 }
+scfTemperaturePartsNumber      OBJECT-TYPE
+     SYNTAX                    INTEGER
+     ACCESS                    read-only
+     STATUS                    mandatory
+     DESCRIPTION               ""
+     ::= { scfTemperatureEntry 2 }
+scfTemperatureSubIndex         OBJECT-TYPE
+     SYNTAX                    INTEGER
+     ACCESS                    read-only
+     STATUS                    mandatory
+     DESCRIPTION               ""
+     ::= { scfTemperatureEntry 3 }
+scfTemperatureStatus           OBJECT-TYPE
+     SYNTAX                    INTEGER {
+                               invalid(1),
+                               valid(2)     }
+     ACCESS                    read-only
+     STATUS                    mandatory
+     DESCRIPTION               ""
+     ::= { scfTemperatureEntry 4 }
+scfTemperatureValue            OBJECT-TYPE
+     SYNTAX                    INTEGER
+     ACCESS                    read-only
+     STATUS                    mandatory
+     DESCRIPTION               ""
+     ::= { scfTemperatureEntry 5 }
+
+
+--
+-- Voltage (unit: 0.01 volt)
+--
+scfVoltageTable                OBJECT-TYPE
+     SYNTAX                    SEQUENCE OF ScfVoltageEntry
+     ACCESS                    not-accessible
+     STATUS                    mandatory
+     DESCRIPTION               ""
+     ::= { scfMonitor 2 }
+scfVoltageEntry                OBJECT-TYPE
+     SYNTAX                    ScfVoltageEntry
+     ACCESS                    not-accessible
+     STATUS                    mandatory
+     DESCRIPTION               "This is a voltage value which can be referred by XSCF."
+     INDEX                     {
+          scfVoltagePartsName,
+          scfVoltagePartsNumber,
+          scfVoltageSubIndex
+     }
+     ::= { scfVoltageTable 1 }
+ScfVoltageEntry ::= SEQUENCE {
+     scfVoltagePartsName       INTEGER ,
+     scfVoltagePartsNumber     INTEGER ,
+     scfVoltageSubIndex        INTEGER ,
+     scfVoltageStatus          INTEGER ,
+     scfVoltageValue           INTEGER
+}
+scfVoltagePartsName            OBJECT-TYPE
+     SYNTAX                    INTEGER {
+                               sb(1)     ,
+                               panel(2)  ,
+                               pci-bd(3) ,
+                               scsi-bp(4),
+                               cpu(17)   ,
+                               slot(33)  ,
+                               fan(49)   ,
+                               fanjt(50) ,
+                               psu(65)   ,
+                               cpuddc(66),
+                               ddc-a(67) ,
+                               ddc-b(68) ,
+                               ups(129)  ,
+                               disk(145 ),
+                               pci(146)  ,
+                               rci(160)  ,
+                               unknown(255) }
+     ACCESS                    read-only
+     STATUS                    mandatory
+     DESCRIPTION               ""
+     ::= { scfVoltageEntry 1 }
+scfVoltagePartsNumber          OBJECT-TYPE
+     SYNTAX                    INTEGER
+     ACCESS                    read-only
+     STATUS                    mandatory
+     DESCRIPTION               ""
+     ::= { scfVoltageEntry 2 }
+scfVoltageSubIndex             OBJECT-TYPE
+     SYNTAX                    INTEGER
+     ACCESS                    read-only
+     STATUS                    mandatory
+     DESCRIPTION               ""
+     ::= { scfVoltageEntry 3 }
+scfVoltageStatus               OBJECT-TYPE
+     SYNTAX                    INTEGER {
+                               invalid(1),
+                               valid(2)     }
+     ACCESS                    read-only
+     STATUS                    mandatory
+     DESCRIPTION               ""
+     ::= { scfVoltageEntry 4 }
+scfVoltageValue                OBJECT-TYPE
+     SYNTAX                    INTEGER
+     ACCESS                    read-only
+     STATUS                    mandatory
+     DESCRIPTION               ""
+     ::= { scfVoltageEntry 5 }
+
+
+--
+-- Rotation (unit: 1 rpm rotation rate)
+--
+scfRotationTable               OBJECT-TYPE
+     SYNTAX                    SEQUENCE OF ScfRotationEntry
+     ACCESS                    not-accessible
+     STATUS                    mandatory
+     DESCRIPTION               ""
+     ::= { scfMonitor 3 }
+scfRotationEntry               OBJECT-TYPE
+     SYNTAX                    ScfRotationEntry
+     ACCESS                    not-accessible
+     STATUS                    mandatory
+     DESCRIPTION               "This is a rotation value which can be referred by XSCF."
+     INDEX                     {
+          scfRotationPartsName,
+          scfRotationPartsNumber,
+          scfRotationSubIndex
+     }
+     ::= { scfRotationTable 1 }
+ScfRotationEntry ::= SEQUENCE {
+     scfRotationPartsName       INTEGER ,
+     scfRotationPartsNumber     INTEGER ,
+     scfRotationSubIndex        INTEGER ,
+     scfRotationStatus          INTEGER ,
+     scfRotationValue           INTEGER
+}
+scfRotationPartsName           OBJECT-TYPE
+     SYNTAX                    INTEGER {
+                               sb(1)     ,
+                               panel(2)  ,
+                               pci-bd(3) ,
+                               scsi-bp(4),
+                               cpu(17)   ,
+                               slot(33)  ,
+                               fan(49)   ,
+                               fanjt(50) ,
+                               psu(65)   ,
+                               cpuddc(66),
+                               ddc-a(67) ,
+                               ddc-b(68) ,
+                               ups(129)  ,
+                               disk(145 ),
+                               pci(146)  ,
+                               rci(160)  ,
+                               unknown(255) }
+     ACCESS                    read-only
+     STATUS                    mandatory
+     DESCRIPTION               ""
+     ::= { scfRotationEntry 1 }
+scfRotationPartsNumber         OBJECT-TYPE
+     SYNTAX                    INTEGER
+     ACCESS                    read-only
+     STATUS                    mandatory
+     DESCRIPTION               ""
+     ::= { scfRotationEntry 2 }
+scfRotationSubIndex            OBJECT-TYPE
+     SYNTAX                    INTEGER
+     ACCESS                    read-only
+     STATUS                    mandatory
+     DESCRIPTION               ""
+     ::= { scfRotationEntry 3 }
+scfRotationStatus              OBJECT-TYPE
+     SYNTAX                    INTEGER {
+                               invalid(1),
+                               valid(2)     }
+     ACCESS                    read-only
+     STATUS                    mandatory
+     DESCRIPTION               ""
+     ::= { scfRotationEntry 4 }
+scfRotationValue               OBJECT-TYPE
+     SYNTAX                    INTEGER
+     ACCESS                    read-only
+     STATUS                    mandatory
+     DESCRIPTION               ""
+     ::= { scfRotationEntry 5 }
+
+END

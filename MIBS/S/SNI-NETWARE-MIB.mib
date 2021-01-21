@@ -1,0 +1,505 @@
+SNI-NETWARE-MIB DEFINITIONS ::= BEGIN
+
+--
+-- $Copyright$
+-- Copyright (C) Siemens Nixdorf Informationssysteme AG 1995
+-- Copyright (C) Fujitsu Siemens Computers GmbH 2001
+-- All rights reserved
+--
+--
+
+
+IMPORTS
+	OBJECT-TYPE								FROM RFC-1212
+	mib-2, DisplayString					FROM RFC1213-MIB
+	TimeTicks, Counter, Gauge, enterprises	FROM RFC1155-SMI;
+
+--
+-- The Windows NT MIB compiler doesn't do IMPORTS.
+-- So, include these definitions here. NT defines "DisplayString" as
+-- OCTET STRING (SIZE(0..255)), in RFC1213 it has no explicit size.
+--
+-- DisplayString ::= OCTET  STRING
+-- enterprises     OBJECT IDENTIFIER ::= { iso org(3) dod(6) internet(1) private(4) 1 }
+--
+
+-- SNI Server Management MIB nodes
+
+	sni					OBJECT IDENTIFIER       ::= { enterprises    231 }
+
+	sniProductMibs		OBJECT IDENTIFIER       ::= { sni              2 }
+	sniExtensions		OBJECT IDENTIFIER       ::= { sniProductMibs  10 }
+	sniServerMgmt		OBJECT IDENTIFIER		::= { sniExtensions    2 }
+	sniInventory		OBJECT IDENTIFIER       ::= { sniServerMgmt    1 }
+	sniCommon			OBJECT IDENTIFIER		::= { sniServerMgmt    2 }
+	  sniBios			OBJECT IDENTIFIER		::= { sniCommon        1 }
+	  sniEisa			OBJECT IDENTIFIER		::= { sniCommon        2 }
+	  sniHd				OBJECT IDENTIFIER		::= { sniCommon        3 }
+	  sniBus			OBJECT IDENTIFIER		::= { sniCommon        4 }
+	  sniServerControl	OBJECT IDENTIFIER		::= { sniCommon        5 }
+	sniPcSpecific		OBJECT IDENTIFIER		::= { sniServerMgmt    3 }
+	sniScb				OBJECT IDENTIFIER		::= { sniServerMgmt    4 }
+	sniOsSpecific		OBJECT IDENTIFIER		::= { sniServerMgmt    5 }
+	  sniNetware		OBJECT IDENTIFIER		::= { sniOsSpecific    1 }
+	  sniWinNt			OBJECT IDENTIFIER		::= { sniOsSpecific    2 }
+	  sniOs2			OBJECT IDENTIFIER		::= { sniOsSpecific    3 }
+	  sniUnix			OBJECT IDENTIFIER		::= { sniOsSpecific    4 }
+	sniOemComponents	OBJECT IDENTIFIER		::= { sniServerMgmt    6 }
+	  sniOemDpt			OBJECT IDENTIFIER		::= { sniOemComponents 1 }
+	  sniOemMylex		OBJECT IDENTIFIER		::= { sniOemComponents 2 }
+	    sniMlxDiskArray	OBJECT IDENTIFIER		::= { sniOemMylex      1 }
+	sniSecurity			OBJECT IDENTIFIER		::= { sniServerMgmt    7 }
+	  sniSmSecurity		OBJECT IDENTIFIER		::= { sniSecurity      1 }
+	sniServerView		OBJECT IDENTIFIER       ::= { sniServerMgmt    8 }
+	sniTrapMib			OBJECT IDENTIFIER       ::= { sniExtensions    5 }
+
+
+-- The MIB objects
+ 
+sniNWServerName OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+"The name of the server"
+	::= { sniNetware 1 }
+
+sniNWVersion OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+"Netware Version"
+	::= { sniNetware 2 }
+
+sniNWSubVersion OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+"Netware Sub-Version"
+	::= { sniNetware 3 }
+
+sniNWMaxConnectionsSupported OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+"Maximum number of supported connections"
+	::= { sniNetware 4 }
+
+sniNWConnectionsInUse OBJECT-TYPE
+	SYNTAX	Gauge
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+"Number of connections currently used"
+	::= { sniNetware 5 }
+
+sniNWMaxVolumesSupported OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+"Maximum number of volumes supported"
+	::= { sniNetware 6 }
+
+sniNWRevisionLevel OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+"Netware Revision Level"
+	::= { sniNetware 7 }
+
+sniNWSFTLevel OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+"SFT Level"
+	::= { sniNetware 8 }
+
+sniNWTTSLevel OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+"TTS Level"
+	::= { sniNetware 9 }
+
+sniNWPeakUsedConnections OBJECT-TYPE
+	SYNTAX	Counter
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+"Peak connections used"
+	::= { sniNetware 10 }
+
+sniNWAccountingVersion OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+"Accounting Version"
+	::= { sniNetware 11 }
+
+sniNWVAPversion OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+"VAP Version"
+	::= { sniNetware 12 }
+
+sniNWQueingVersion OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+"Queuing version"
+	::= { sniNetware 13 }
+
+sniNWPrintServerVersion OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+"Print Server version"
+	::= { sniNetware 14 }
+
+sniNWVirtualConsoleVersion OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+"Virtual Console Version"
+	::= { sniNetware 15 }
+
+sniNWSecurityRestrictionLevel OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+"Security Restriction Level"
+	::= { sniNetware 16 }
+
+sniNWInternetBridgeSupport OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+""
+	::= { sniNetware 17 }
+
+sniNWCLibMajorVersion OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+"CLib Major Version"
+	::= { sniNetware 18 }
+
+sniNWCLibMinorVersion OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+"CLib Minor Version"
+	::= { sniNetware 19 }
+
+sniNWCLibRevision OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+"CLib Revision"
+	::= { sniNetware 20 }
+
+sniNWSerialNumber OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+"Serial number of the NetWare(r) server"
+	::= { sniNetware 21 }
+
+sniNWApplicationNumber OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+"Vendor Application Number"
+	::= { sniNetware 22 }
+
+sniNWIPXSendPacketCount OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+"Number of sent IPX packets
+Only valid under NW 4.x"
+	::= { sniNetware 23 }
+
+sniNWIPXMalformPacketCount OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+"Number of IPX packets discarded, because they were malformed
+Only valid under NW 4.x"
+	::= { sniNetware 24 }
+
+sniNWIPXGetECBRequestCount OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+"Number of ECB requests
+Only valid under NW 4.x"
+	::= { sniNetware 25 }
+
+sniNWIPXGetECBFailCount OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+"Number of ECB requests that failed
+Only valid under NW 4.x"
+	::= { sniNetware 26 }
+
+sniNWIPXAESEventCount OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+"Number of AES events scheduled
+Only valid under NW 4.x"
+	::= { sniNetware 27 }
+
+sniNWIPXPostponedAESCount OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+"
+Only valid under NW 4.x"
+	::= { sniNetware 28 }
+
+sniNWIPXMaxConfiguredSocketCount OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+"
+Only valid under NW 4.x"
+	::= { sniNetware 29 }
+
+sniNWIPXMaxOpenSocketCount OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+"
+Only valid under NW 4.x"
+	::= { sniNetware 30 }
+
+sniNWIPXOpenSocketFailCount OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+"
+Only valid under NW 4.x"
+	::= { sniNetware 31 }
+
+sniNWIPXListenECBCount OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+"
+Only valid under NW 4.x"
+	::= { sniNetware 32 }
+
+sniNWIPXECBCancelFailCount OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+"
+Only valid under NW 4.x"
+	::= { sniNetware 33 }
+
+sniNWIPXGetLocalTargetFailCount OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+"
+Only valid under NW 4.x"
+	::= { sniNetware 34 }
+
+sniNWSPXMaxConnectionsCount OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+"
+Only valid under NW 4.x"
+	::= { sniNetware 35 }
+
+sniNWSPXMaxUsedConnections OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+"
+Only valid under NW 4.x"
+	::= { sniNetware 36 }
+
+sniNWSPXEstConnectionReq OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+"
+Only valid under NW 4.x"
+	::= { sniNetware 37 }
+
+sniNWSPXEstConnectionFail OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+"
+Only valid under NW 4.x"
+	::= { sniNetware 38 }
+
+sniNWSPXListenConnectReq OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+"
+Only valid under NW 4.x"
+	::= { sniNetware 39 }
+
+sniNWSPXListenConnectFail OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+"
+Only valid under NW 4.x"
+	::= { sniNetware 40 }
+
+sniNWSPXSendCount OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+"
+Only valid under NW 4.x"
+	::= { sniNetware 41 }
+
+sniNWSPXWindowChokeCount OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+"
+Only valid under NW 4.x"
+	::= { sniNetware 42 }
+
+sniNWSPXBadSendCount OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+"
+Only valid under NW 4.x"
+	::= { sniNetware 43 }
+
+sniNWSPXSendFailCount OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+"
+Only valid under NW 4.x"
+	::= { sniNetware 44 }
+
+sniNWSPXAbortedConnection OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+"
+Only valid under NW 4.x"
+	::= { sniNetware 45 }
+
+sniNWSPXListenPacketCount OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+"
+Only valid under NW 4.x"
+	::= { sniNetware 46 }
+
+sniNWSPXBadListenCount OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+"
+Only valid under NW 4.x"
+	::= { sniNetware 47 }
+
+sniNWSPXIncomingPacketCount OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+"
+Only valid under NW 4.x"
+	::= { sniNetware 48 }
+
+sniNWSPXBadInPacketCnt OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+"
+Only valid under NW 4.x"
+	::= { sniNetware 49 }
+
+sniNWSPXSuppressedPackCnt OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+"
+Only valid under NW 4.x"
+	::= { sniNetware 50 }
+
+sniNWSPXNoSesListenECBCnt OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+"
+Only valid under NW 4.x"
+	::= { sniNetware 51 }
+
+sniNWSPXWatchDogDestSesCnt OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+"
+Only valid under NW 4.x"
+	::= { sniNetware 52 }
+
+END

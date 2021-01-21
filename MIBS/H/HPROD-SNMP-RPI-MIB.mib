@@ -1,0 +1,43 @@
+HPROD-SNMP-RPI-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        OBJECT-TYPE, MODULE-IDENTITY, Gauge32
+                     FROM SNMPv2-SMI
+		OBJECT-GROUP, MODULE-COMPLIANCE
+			FROM SNMPv2-CONF
+		hPsnmpMIBS, hPsnmpModuleIdentity, hPsnmpModuleCompliances, hPsnmpMIBgroups
+			FROM HPROD-SNMP-MIB
+;
+
+hPsnmpRpiMIB MODULE-IDENTITY
+	LAST-UPDATED "201503080000Z"
+	ORGANIZATION "Hedberg Productions"
+	CONTACT-INFO "johan@hedbergproductions.com"
+	DESCRIPTION "MIB for Raspberry PI monitoring."
+	REVISION "201503080000Z"
+	DESCRIPTION "MIB for Raspberry PI monitoring."
+	::= { hPsnmpModuleIdentity 1 }
+
+hPsnmpRpiMIBcompliance MODULE-COMPLIANCE
+	STATUS current
+	DESCRIPTION "Why do I need this shit?"
+	MODULE
+		MANDATORY-GROUPS { hPsnmpGroupRpi }
+	::= { hPsnmpModuleCompliances 2 }
+
+hPsnmpRpiRoot OBJECT IDENTIFIER ::= {hPsnmpMIBS 1}
+
+hPsnmpGroupRpi OBJECT-GROUP
+	OBJECTS { hPsnmpRpiCpuTemp }
+	STATUS current
+	DESCRIPTION "Fuck you"
+	::= { hPsnmpMIBgroups 1 }
+
+hPsnmpRpiCpuTemp OBJECT-TYPE
+	SYNTAX Gauge32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Hedberg productions SNMP RPI Cpu Temperature."
+	::= {hPsnmpRpiRoot 1}
+
+END

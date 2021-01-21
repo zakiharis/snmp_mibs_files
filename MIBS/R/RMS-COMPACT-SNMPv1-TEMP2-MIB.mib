@@ -1,0 +1,209 @@
+-- ----------------------------------------------------------------------
+--
+--					Copyright (c) 2006 by Sinetica Corporation Ltd.
+--
+-- Filename:        RMS-C_SNMPv1_temp2.mib
+--
+-- Author:          Adrian Moruz
+--
+-- Description:     SNMPv1 MIB definition for the RMS Compact Temperature 2 notifications
+--
+-- $Id: RMS-C_SNMPv1_temp2.mib,v 1.1 2006/10/11 11:23:30 adrian.moruz Exp $
+--
+-- $Name:  $
+--
+-- $Log: RMS-C_SNMPv1_temp2.mib,v $
+-- Revision 1.1  2006/10/11 11:23:30  adrian.moruz
+-- Created from RMS-C_SNMPv1.mib v1.2 to separate the different trap enterprise groups into separate MIBs
+--
+--
+-- ----------------------------------------------------------------------
+
+RMS-COMPACT-SNMPv1-TEMP2-MIB DEFINITIONS ::= BEGIN
+
+-- {{{ Imports
+--	OBJECT-TYPE, Counter32, Unsigned32,
+
+IMPORTS
+        TRAP-TYPE
+                FROM RFC-1215
+        sysDescr, sysName, DisplayString
+                FROM RFC1213-MIB
+        OBJECT-TYPE
+                FROM RFC-1212
+        enterprises 
+                FROM RFC1155-SMI
+	;
+
+-- }}}
+
+
+
+sinetica   OBJECT IDENTIFIER ::= { enterprises 3711 }
+
+
+
+rms-compact          OBJECT IDENTIFIER ::= { sinetica 15 }
+rms-compact1         OBJECT IDENTIFIER ::= { rms-compact 1 }
+rms-cObjects   OBJECT IDENTIFIER ::= { rms-compact1 1 }
+
+
+-- {{{ rms-cObjects  
+
+rms-cEnviroment   OBJECT IDENTIFIER ::= { rms-cObjects 1  }
+
+-- }}}
+-- {{{ rms-cTemp group    
+
+rms-cHumid2          OBJECT IDENTIFIER ::= { rms-cEnviroment 4 }
+
+-- }}}
+-- {{{
+
+rms-cTemp2LowControlLimitAlarm            TRAP-TYPE
+    ENTERPRISE rms-cTemp2
+    VARIABLES { 
+    			sysDescr,
+    			sysName,
+    			rms-cTemp2Name,
+    			rms-cTemp2LowerControlLevel
+    			}
+    DESCRIPTION
+        "Temperature is below the low control limit."
+	--#TYPE		"Temperature 2 below lower control limit"
+	--#SUMMARY	"Temperature %s below %d in %s at %s"
+	--#ARGUMENTS	{2,3,0,1}
+	--#SEVERITY 	MAJOR
+	--#TIMEINDEX	4
+	--#STATE		NONOPERATIONAL
+    ::= 121
+
+rms-cTemp2LowWarningLimitAlarm           TRAP-TYPE
+    ENTERPRISE rms-cTemp2
+    VARIABLES { 
+    			sysDescr,
+    			sysName,
+    			rms-cTemp2Name,
+    			rms-cTemp2LowerWarningLevel
+    			}
+    DESCRIPTION
+        "Temperature is below the low warning limit."
+	--#TYPE		"Temperature 2 below lower warning limit"
+	--#SUMMARY	"Temperature %s below %d in %s at %s"
+	--#ARGUMENTS	{2,3,0,1}
+	--#SEVERITY 	MINOR
+	--#TIMEINDEX	4
+	--#STATE		NONOPERATIONAL
+    ::= 122
+
+rms-cTemp2HighWarningLimitAlarm            TRAP-TYPE
+    ENTERPRISE rms-cTemp2
+    VARIABLES { 
+    			sysDescr,
+    			sysName,
+    			rms-cTemp2Name,
+    			rms-cTemp2UpperWarningLevel
+    			}
+    DESCRIPTION
+        "Temperature is over the high warning limit."
+	--#TYPE		"Temperature 2 above high warning limit"
+	--#SUMMARY	"Temperature %s above %d in %s at %s"
+	--#ARGUMENTS	{2,3,0,1}
+	--#SEVERITY 	MINOR
+	--#TIMEINDEX	4
+	--#STATE		NONOPERATIONAL
+    ::= 123
+
+rms-cTemp2HighControlLimitAlarm           TRAP-TYPE
+    ENTERPRISE rms-cTemp2
+    VARIABLES { 
+    			sysDescr,
+    			sysName,
+    			rms-cTemp2Name,
+    			rms-cTemp2UpperControlLevel
+    			}
+    DESCRIPTION
+        "Temperature is over the high control limit."
+	--#TYPE		"Temperature 2 above high control limit"
+	--#SUMMARY	"Temperature %s above %d in %s at %s"
+	--#ARGUMENTS	{2,3,0,1}
+	--#SEVERITY 	MAJOR
+	--#TIMEINDEX	4
+	--#STATE		NONOPERATIONAL
+    ::= 124
+
+rms-cTemp2LowControlLimitNormal            TRAP-TYPE
+    ENTERPRISE rms-cTemp2
+    VARIABLES { 
+    			sysDescr,
+    			sysName,
+    			rms-cTemp2Name,
+    			rms-cTemp2LowerControlLevel
+    			}
+    DESCRIPTION
+        "Temperature is inside the low control limit."
+	--#TYPE		"Temperature 2 above lower control limit"
+	--#SUMMARY	"Temperature %s above %d in %s at %s"
+	--#ARGUMENTS	{2,3,0,1}
+	--#SEVERITY 	INFORMATIONAL
+	--#TIMEINDEX	4
+	--#STATE		NONOPERATIONAL
+    ::= 125
+
+rms-cTemp2LowWarningLimitNormal           TRAP-TYPE
+    ENTERPRISE rms-cTemp2
+    VARIABLES { 
+    			sysDescr,
+    			sysName,
+    			rms-cTemp2Name,
+    			rms-cTemp2LowerWarningLevel
+    			}
+    DESCRIPTION
+        "Temperature is inside the low warning limit."
+	--#TYPE		"Temperature 2 above lower warning limit"
+	--#SUMMARY	"Temperature %s above %d in %s at %s"
+	--#ARGUMENTS	{2,3,0,1}
+	--#SEVERITY 	INFORMATIONAL
+	--#TIMEINDEX	4
+	--#STATE		NONOPERATIONAL
+    ::= 126
+
+rms-cTemp2HighWarningLimitNormal            TRAP-TYPE
+    ENTERPRISE rms-cTemp2
+    VARIABLES { 
+    			sysDescr,
+    			sysName,
+    			rms-cTemp2Name,
+    			rms-cTemp2UpperWarningLevel
+    			}
+    DESCRIPTION
+        "Temperature is inside the high warning limit."
+	--#TYPE		"Temperature 2 below high warning limit"
+	--#SUMMARY	"Temperature %s below %d in %s at %s"
+	--#ARGUMENTS	{2,3,0,1}
+	--#SEVERITY 	INFORMATIONAL
+	--#TIMEINDEX	4
+	--#STATE		NONOPERATIONAL
+    ::= 127
+
+rms-cTemp2HighControlLimitNormal           TRAP-TYPE
+    ENTERPRISE rms-cTemp2
+    VARIABLES { 
+    			sysDescr,
+    			sysName,
+    			rms-cTemp2Name,
+    			rms-cTemp2UpperControlLevel
+    			}
+    DESCRIPTION
+        "Temperature is inside the high control limit."
+	--#TYPE		"Temperature 2 below high control limit"
+	--#SUMMARY	"Temperature %s below %d in %s at %s"
+	--#ARGUMENTS	{2,3,0,1}
+	--#SEVERITY 	INFORMATIONAL
+	--#TIMEINDEX	4
+	--#STATE		NONOPERATIONAL
+    ::= 128
+
+-- }}}
+
+END

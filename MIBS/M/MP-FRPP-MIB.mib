@@ -1,0 +1,2723 @@
+-- ************************************************************************************************
+-- FileName    :mpFrppMIB.my
+-- Description :MultiMedia Platform private MIB
+-- Revision History     :
+--   Ver.     mark   date      
+--   01.06    @007   07/31/2001
+-- ************************************************************************************************
+--
+
+
+MP-FRPP-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+      mgmt, NetworkAddress, IpAddress, Counter, Gauge, TimeTicks
+      FROM RFC1155-SMI
+
+      ifIndex
+      FROM RFC1213-MIB
+
+      OBJECT-TYPE
+      FROM RFC-1212
+
+--      DisplayString
+--      FROM RFC1155-SMI
+
+      TRAP-TYPE
+      FROM RFC-1215
+
+      RowStatus
+        FROM SNMPv2-TC;
+
+   NetPrefix ::= OCTET STRING (SIZE (13))
+
+   DisplayString ::= OCTET STRING
+
+-- The following definition was gotten from rfc1514
+   DateAndTime ::= OCTET STRING (SIZE (8 | 11))
+-- in OpenView , DateAndTime must be comment   98/12/15 YI
+   --        A date-time specification for the local time of day.
+   --        This data type is intended to provide a consistent
+   --        method of reporting date information.
+   --
+   --            field  octets  contents                  range
+   --            _____  ______  ________                  _____
+   --              1      1-2   year                      0..65536
+   --                           (in network byte order)
+   --              2       3    month                     1..12
+   --              3       4    day                       1..31
+   --              4       5    hour                      0..23
+   --              5       6    minutes                   0..59
+   --              6       7    seconds                   0..60
+   --                           (use 60 for leap-second)
+   --              7       8    deci-seconds              0..9
+   --              8       9    direction from UTC        "+" / "-"
+   --                           (in ascii notation)
+   --              9      10    hours from UTC            0..11
+   --             10      11    minutes from UTC          0..59
+   --
+   --            Note that if only local time is known, then
+   --            timezone information (fields 8-10) is not present.
+
+-- The following definition was cadged from the Bridge MIB
+      MacAddress ::= OCTET STRING (SIZE (6))
+                                                -- a 6 octet address
+                                                -- in the
+                                                -- "canonical"
+                                                -- order
+      -- defined by IEEE 802.1a, i.e., as if it were transmitted
+      -- least significant bit first, even though 802.5 (in
+      -- contrast to other n802.x protocols) requires MAC
+      -- addresses to be transmitted most significant bit first.
+      --
+      -- 16-bit addresses, if needed, are represented by setting
+      -- their upper 4 octets to all 0's, i.e., AAFF would be
+      -- represented as 00000000AAFF.
+
+-- The following definition is privately defined for Sanfran Private MIB
+      PhysAddress ::= OCTET STRING (SIZE (6))
+
+
+--   nec               OBJECT IDENTIFIER ::= { enterprises 119}
+
+--   necProduct        OBJECT IDENTIFIER ::= { nec 1 }
+--   nec-mib           OBJECT IDENTIFIER ::= { nec 2 }
+--   necExperimental   OBJECT IDENTIFIER ::= { nec 3 }
+
+--   datax             OBJECT IDENTIFIER ::= { necProduct 3 }
+--   ether-sw          OBJECT IDENTIFIER ::= { datax 10 }
+--   sf                OBJECT IDENTIFIER ::= { ether-sw 3 }
+
+--   necCommon         OBJECT IDENTIFIER ::= { nec-mib 1 }
+--   necFunction       OBJECT IDENTIFIER ::= { nec-mib 2 }
+--   necProductDepend  OBJECT IDENTIFIER ::= { nec-mib 3 }
+
+--   datax-mib         OBJECT IDENTIFIER ::= { necProductDepend 3 }
+--   ether-sw-mib      OBJECT IDENTIFIER ::= { datax-mib 10 }
+--   ether-sw          OBJECT IDENTIFIER ::= { datax 10 }
+
+
+
+
+  org         OBJECT IDENTIFIER     ::= { iso 3 }
+  dod         OBJECT IDENTIFIER     ::= { org 6 }
+  internet    OBJECT IDENTIFIER     ::= { dod 1 }
+  private     OBJECT IDENTIFIER     ::= { internet 4 }
+  enterprises OBJECT IDENTIFIER     ::= { private 1 }
+  nec               OBJECT IDENTIFIER ::= { enterprises 119}
+
+
+-- 98/12/15 YI mmpf => mmpf-mib CHG start
+-- sysObjectID
+   necProduct        OBJECT IDENTIFIER ::= { nec 1 }
+   datax             OBJECT IDENTIFIER ::= { necProduct 3 }
+   mmpf              OBJECT IDENTIFIER ::= { datax 13 }
+   mmn9110           OBJECT IDENTIFIER ::= { mmpf 1 }
+   mmn9120           OBJECT IDENTIFIER ::= { mmpf 2 }
+-- [sysObjectID]  MM-Node9110/MM-Node9120
+--  mmn9110           OBJECT IDENTIFIER ::= { nec necProduct(1) datax(3) mmpf(13) mmn9110(1) }
+--  mmn9120           OBJECT IDENTIFIER ::= { nec necProduct(1) datax(3) mmpf(13) mmn9110(2) }
+
+
+   nec-mib           OBJECT IDENTIFIER ::= { nec 2 }
+   necProductDepend  OBJECT IDENTIFIER ::= { nec-mib 3 }
+   datax-mib         OBJECT IDENTIFIER ::= { necProductDepend 3 }
+   mmpf-mib          OBJECT IDENTIFIER ::= { datax-mib 13 }
+
+   mpSystem                 OBJECT IDENTIFIER ::= { mmpf-mib 1 }
+   mpIfCard                 OBJECT IDENTIFIER ::= { mmpf-mib 2 }
+   mpEtherPort              OBJECT IDENTIFIER ::= { mmpf-mib 3 }
+   mpVlan                   OBJECT IDENTIFIER ::= { mmpf-mib 4 }
+   mpBridge                 OBJECT IDENTIFIER ::= { mmpf-mib 5 }
+   mpDbAccess               OBJECT IDENTIFIER ::= { mmpf-mib 6 }
+   mpEventLog               OBJECT IDENTIFIER ::= { mmpf-mib 7 }
+   mpUiSession              OBJECT IDENTIFIER ::= { mmpf-mib 8 }
+   mpFtp                    OBJECT IDENTIFIER ::= { mmpf-mib 9 }
+   mpDhcp                   OBJECT IDENTIFIER ::= { mmpf-mib 10 }
+   mpIp                     OBJECT IDENTIFIER ::= { mmpf-mib 11 }
+   mpRip                    OBJECT IDENTIFIER ::= { mmpf-mib 12 }
+   mpSnmp                   OBJECT IDENTIFIER ::= { mmpf-mib 13 }
+   mpStats                  OBJECT IDENTIFIER ::= { mmpf-mib 14 }
+   mpCli                    OBJECT IDENTIFIER ::= { mmpf-mib 15 }
+   mpAtm                    OBJECT IDENTIFIER ::= { mmpf-mib 16 }
+   mpLis                    OBJECT IDENTIFIER ::= { mmpf-mib 17 }
+   mpDns                    OBJECT IDENTIFIER ::= { mmpf-mib 18 }
+   mpLec                    OBJECT IDENTIFIER ::= { mmpf-mib 19 }
+   mpMpc                    OBJECT IDENTIFIER ::= { mmpf-mib 20 }
+   mpStp                    OBJECT IDENTIFIER ::= { mmpf-mib 21 }
+   mpLlc                    OBJECT IDENTIFIER ::= { mmpf-mib 22 }
+   mpOspf                   OBJECT IDENTIFIER ::= { mmpf-mib 23 }
+
+   mpObsCtl                 OBJECT IDENTIFIER ::= { mmpf-mib 101 }
+   mpCardInfo               OBJECT IDENTIFIER ::= { mmpf-mib 102 }
+   mpInterface              OBJECT IDENTIFIER ::= { mmpf-mib 103 }
+   mpPvoice                 OBJECT IDENTIFIER ::= { mmpf-mib 104 }
+-- 98/12/15 YI mmpf => mmpf-mib CHG end
+
+   mpAtmCallCtl             OBJECT IDENTIFIER ::= { mmpf-mib 110 }
+   mpCes                    OBJECT IDENTIFIER ::= { mmpf-mib 111 }
+   mpIpsw                   OBJECT IDENTIFIER ::= { mmpf-mib 112 }
+   mpInsCtl                 OBJECT IDENTIFIER ::= { mmpf-mib 113 }
+   mpFfr                    OBJECT IDENTIFIER ::= { mmpf-mib 114 }
+   mpIpswAtm                OBJECT IDENTIFIER ::= { mmpf-mib 115 }
+
+   mpPpp                    OBJECT IDENTIFIER ::= { mmpf-mib 120 }
+   mpPos                    OBJECT IDENTIFIER ::= { mmpf-mib 121 }
+   mpFrpp                   OBJECT IDENTIFIER ::= { mmpf-mib 123 }
+
+--
+--
+--
+
+        mpFrppTrapInfo        OBJECT IDENTIFIER ::= { mpFrpp 1 }
+
+        mpFrppTrapInfoMccid  OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                     "A unique value to identify a multi channel(MCC-ID)."--
+                ::= { mpFrppTrapInfo 1 }
+
+        mpFrppTrapInfoDlci  OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                     "A unique value to identify a data link(DLCI)."
+--
+                ::= { mpFrppTrapInfo 2 }
+
+
+--
+
+--
+
+        mpFrppMccCfgTable OBJECT-TYPE
+                SYNTAX SEQUENCE OF MpFrppMccCfgEntry
+                ACCESS  not-accessible
+                STATUS  mandatory
+                DESCRIPTION "This is the table type object of the Mcc FrameRelay Chanel configuration."
+                ::= { mpFrpp 2 }
+
+        mpFrppMccCfgEntry OBJECT-TYPE
+                SYNTAX  MpFrppMccCfgEntry
+                ACCESS  not-accessible
+                STATUS  mandatory
+                DESCRIPTION "This is the table entry of mpFrppMccCfgTable."
+                INDEX { mpFrppMccCfgIfIndex }
+                ::= { mpFrppMccCfgTable 1 }
+
+        MpFrppMccCfgEntry ::=
+                 SEQUENCE {
+                   mpFrppMccCfgIfIndex          INTEGER,
+                   mpFrppMccCfgL2Status         INTEGER,
+                   mpFrppMccCfgLmiProtocol      INTEGER,
+                   mpFrppMccCfgUniType          INTEGER,
+                   mpFrppMccCfgMonitoredEvents  INTEGER,
+                   mpFrppMccCfgErrorThreshold   INTEGER,
+                   mpFrppMccCfgFullEnqInterval  INTEGER,
+                   mpFrppMccCfgLmiProcedure     INTEGER,
+                   mpFrppMccCfgNetPollInterval  INTEGER,
+                   mpFrppMccCfgUsrPollInterval  INTEGER,
+--                 mpFrppMccCfgMtuSize          INTEGER,                @006
+                   mpFrppMccCfgAsync            INTEGER,
+--                 mpFrppMccCfgCllm             INTEGER,                @006
+--                 mpFrppMccCfgCllmTim          INTEGER,                @006
+                   mpFrppMccCfgRowStatus        RowStatus,
+                   mpFrppMccCfgErrInfo          INTEGER
+               }
+
+        mpFrppMccCfgIfIndex  OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION "The value of this object identifies 
+                             the MCC-ID (Mcc Channel number) ."
+                         --
+                ::= { mpFrppMccCfgEntry 1 }
+
+        mpFrppMccCfgL2Status OBJECT-TYPE
+                SYNTAX   INTEGER {
+                                up(1),
+                                down(2),
+                                testing(3)
+                                }
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION "The value of this object identifies the 
+                             layer 2 status."
+                          --
+                DEFVAL { down }
+                ::= { mpFrppMccCfgEntry 2 }
+
+        mpFrppMccCfgLmiProtocol OBJECT-TYPE
+                SYNTAX  INTEGER {
+                                ansi(1),   -- ANSI 91
+                                itu(2),    -- ITU or FRF
+                                noLmi(3)   --
+                               }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION "The value of this object identifies the 
+                             link management interface protocol."
+                          --
+                          --
+                DEFVAL { ansi }
+                ::= { mpFrppMccCfgEntry 3 }
+
+        mpFrppMccCfgUniType OBJECT-TYPE
+                SYNTAX  INTEGER {
+                                dte(1),       -- DTE
+                                dce(2)        -- DCE
+                               }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION "The value of this object identifies 
+                             the frame relay user Network Interface type."
+                          --
+                          --
+                DEFVAL { dte }
+                ::= { mpFrppMccCfgEntry 4 }
+
+        mpFrppMccCfgMonitoredEvents OBJECT-TYPE
+                SYNTAX  INTEGER (1..10)
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION "The value of this object identifies 
+                             the monitored events count(N393)."
+                          --
+                DEFVAL { 4 }
+                ::= { mpFrppMccCfgEntry 5 }
+
+        mpFrppMccCfgErrorThreshold OBJECT-TYPE
+                SYNTAX  INTEGER (1..10)
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION "The value of this object identifies 
+                             the error threshold(N392)."
+                          --
+                DEFVAL { 3 }
+                ::= { mpFrppMccCfgEntry 6 }
+
+        mpFrppMccCfgFullEnqInterval OBJECT-TYPE
+                SYNTAX  INTEGER (1..255)
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION "The value of this object identifies the i
+                             full status (status of all PVCs) polling counter(N391)."
+                          --
+                          --
+                          --
+                DEFVAL { 6 }
+                ::= { mpFrppMccCfgEntry 7 }
+
+        mpFrppMccCfgLmiProcedure OBJECT-TYPE
+               SYNTAX  INTEGER {
+                                uniDirectional(1),   --
+                                biDirectional(2)     --
+                               }
+               ACCESS  read-write
+               STATUS  mandatory
+               DESCRIPTION "The value of this object identifies the
+                            link management interface (LMI) procedure."
+                         --
+               DEFVAL { uniDirectional }
+               ::= { mpFrppMccCfgEntry 8 }
+
+        mpFrppMccCfgNetPollInterval OBJECT-TYPE
+               SYNTAX  INTEGER (5..30)
+               ACCESS  read-write
+               STATUS  mandatory
+               DESCRIPTION "The value of this object identifies the
+                            polling verification timer(T392)."
+                         --
+                         --
+                         --
+               DEFVAL { 15 }
+               ::= { mpFrppMccCfgEntry 9 }
+
+        mpFrppMccCfgUsrPollInterval OBJECT-TYPE
+               SYNTAX  INTEGER (5..30)
+               ACCESS  read-write
+               STATUS  mandatory
+               DESCRIPTION "The value of this object identifies the
+                           link integrity verification polling timer(T391)."
+                         --
+                         --
+                         --
+               DEFVAL { 10 }
+               ::= { mpFrppMccCfgEntry 10 }
+
+        mpFrppMccCfgAsync OBJECT-TYPE
+               SYNTAX  INTEGER {
+                                enable(1),
+                                disable(2)
+                               }
+               ACCESS  read-write
+               STATUS  mandatory
+               DESCRIPTION "The value of this object identifies the Async Flag."
+                         --
+               DEFVAL { disable }
+               ::= { mpFrppMccCfgEntry 11 }
+
+        mpFrppMccCfgRowStatus OBJECT-TYPE
+               SYNTAX  RowStatus
+               ACCESS  read-write
+               STATUS  mandatory
+               DESCRIPTION "An entry in MCC Channel management table."
+                         --
+                         --
+                         --
+                         --
+                         --
+                         --
+                         --
+                         --
+               ::= { mpFrppMccCfgEntry 12 }
+
+        mpFrppMccCfgErrInfo OBJECT-TYPE
+               SYNTAX  INTEGER {
+                                normal(1),                      --
+                                parameterNotEnough(2),          --
+                                badValue(3),                    --
+                                badIndexValue(4),               --
+                                correlationError(5),            --
+                                memoryAllocateFailure(6),       --
+                                mbufHuntFailure(7),             --
+                                relationalConfigExist(8),       --
+                                lowLayerConfigNotRegistered(9), --
+                                mappingDataAlreadyExist(10),    --
+                                ipAddressNotDeleted(11),        --
+                                mccIdHuntFailure(12)            --
+                               }
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates error
+                            information that became an error set to MIB
+                            in this table."
+                         --
+                         --
+               ::= { mpFrppMccCfgEntry 13 }
+
+--
+
+        mpFrppFrppCfgTable OBJECT-TYPE
+               SYNTAX SEQUENCE OF MpFrppFrppCfgEntry
+               ACCESS  not-accessible
+               STATUS  mandatory
+               DESCRIPTION "This is the table type object of the
+                            Mcc FrameRelay FRPP configuration."
+               ::= { mpFrpp 3 }
+
+        mpFrppFrppCfgEntry OBJECT-TYPE
+               SYNTAX  MpFrppFrppCfgEntry
+               ACCESS  not-accessible
+               STATUS  mandatory
+               DESCRIPTION "This is the table entry of mpFrppFrppCfgTable."
+               INDEX { mpFrppFrppCfgIfIndex, mpFrppFrppCfgMccidIndex,
+                       mpFrppFrppCfgDlciIndex }                         --
+               ::= { mpFrppFrppCfgTable 1 }
+
+        MpFrppFrppCfgEntry ::=
+                 SEQUENCE {
+                   mpFrppFrppCfgIfIndex            INTEGER,
+                   mpFrppFrppCfgMccidIndex         INTEGER,             --
+                   mpFrppFrppCfgDlciIndex          INTEGER,             --
+                   mpFrppFrppCfgFrppName           DisplayString,
+                   mpFrppFrppCfgIpadd              IpAddress,
+                   mpFrppFrppCfgSubnet             IpAddress,
+                   mpFrppFrppCfgMtuSize            INTEGER,
+                   mpFrppFrppCfgInterWorkType      INTEGER,
+                   mpFrppFrppCfgCrtpSupport        INTEGER,             --
+                   mpFrppFrppCfgCrtpLimit          INTEGER,             --
+                   mpFrppFrppCfgCrtpMode           INTEGER,             --
+                   mpFrppFrppCfgCrtpAging          INTEGER,             --
+                   mpFrppFrppCfgCtcpSupport        INTEGER,             --
+                   mpFrppFrppCfgCtcpLimit          INTEGER,             --
+                   mpFrppFrppCfgCtcpMode           INTEGER,             --
+                   mpFrppFrppCfgCtcpAging          INTEGER,             --
+                   mpFrppFrppCfgHwSticFlag         INTEGER,             --
+                   mpFrppDlciCfgMtuSize            INTEGER,
+                   mpFrppDlciCfgBecn               INTEGER,
+                   mpFrppDlciCfgEncap              INTEGER,
+                   mpFrppDlciCfgDe                 INTEGER,
+                   mpFrppDlciCfgPln                INTEGER,
+                   mpFrppDlciCfgFragSize           INTEGER,
+                   mpFrppDlciCfgMir                INTEGER,
+                   mpFrppDlciCfgPerInc             INTEGER,
+                   mpFrppDlciCfgPerDec             INTEGER,
+                   mpFrppDlciCfgMincir             INTEGER,
+                   mpFrppDlciCfgCir                INTEGER,
+                   mpFrppDlciCfgSnapFlg            INTEGER,
+                   mpFrppDlciQueueLenH             INTEGER,
+                   mpFrppDlciQueueLenU             INTEGER,
+                   mpFrppDlciQueueLenL             INTEGER,
+                   mpFrppDlciQueueLenN             INTEGER,
+                   mpFrppDlciQueueByteH            INTEGER,
+                   mpFrppDlciQueueByteU            INTEGER,
+                   mpFrppDlciQueueByteL            INTEGER,
+                   mpFrppDlciQueueByteN            INTEGER,
+                   mpFrppDlciIpQosClassAf3         INTEGER,
+                   mpFrppDlciIpQosClassAf2         INTEGER,
+                   mpFrppDlciIpQosClassAf1         INTEGER,
+                   mpFrppDlciIpQosClassBe          INTEGER,
+                   mpFrppDlciIpQosClassEf3         INTEGER,
+                   mpFrppDlciIpQosClassEf2         INTEGER,
+                   mpFrppDlciIpQosClassEf1         INTEGER,
+                   mpFrppDlciIpQosClassAf4         INTEGER,
+                   mpFrppDlciCfgInarpMode          INTEGER,
+                   mpFrppDlciCfgTrapFilter         INTEGER,       --
+                   mpFrppFrppCfgRowStatus          RowStatus,
+                   mpFrppFrppCfgErrInfo            INTEGER
+               }
+
+        mpFrppFrppCfgIfIndex  OBJECT-TYPE
+               SYNTAX  INTEGER
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object identifies the
+                            FRPP_NO (FRPP number) ."
+                         --
+               ::= { mpFrppFrppCfgEntry 1 }
+
+        mpFrppFrppCfgMccidIndex OBJECT-TYPE             --
+               SYNTAX  INTEGER (0..2147483647)                  --
+               ACCESS  read-only                        --
+               STATUS  mandatory
+               DESCRIPTION "The value of this object is the mccid for
+                            this entry."
+                         --
+                         --
+               ::= { mpFrppFrppCfgEntry 2 }
+
+       mpFrppFrppCfgDlciIndex OBJECT-TYPE               --
+               SYNTAX  INTEGER (16..991)                --
+               ACCESS  read-only                        --
+               STATUS  mandatory
+               DESCRIPTION "The value of this object is the Dlci for
+                            this entry."
+                         --
+                         --
+               ::= { mpFrppFrppCfgEntry 3 }      
+
+        mpFrppFrppCfgFrppName    OBJECT-TYPE
+               SYNTAX  DisplayString
+               ACCESS  read-write
+               STATUS  mandatory
+               DESCRIPTION
+                     "The textual name of the interface on the Frpp."
+                        --
+               ::= { mpFrppFrppCfgEntry 4 }
+
+        mpFrppFrppCfgIpadd OBJECT-TYPE
+               SYNTAX   IpAddress
+               ACCESS   read-only
+               STATUS   mandatory
+               DESCRIPTION
+                     "The value of this object is the FRPP IP address
+                      for this entry."
+                      --
+               ::= { mpFrppFrppCfgEntry 5 }
+
+        mpFrppFrppCfgSubnet OBJECT-TYPE
+               SYNTAX   IpAddress
+               ACCESS   read-only
+               STATUS   mandatory
+               DESCRIPTION
+                     "The value of this object is the FRPP IP address
+                      for this entry."
+                      --
+               ::= { mpFrppFrppCfgEntry 6 }
+
+        mpFrppFrppCfgMtuSize OBJECT-TYPE
+               SYNTAX  INTEGER (1280..9180)                     --
+               ACCESS  read-write
+               STATUS  mandatory
+               DESCRIPTION "The value of this object identifies the max frame
+                            length on this port."
+                         --
+                         --
+               DEFVAL { 9180 }
+               ::= { mpFrppFrppCfgEntry 7 }
+
+        mpFrppFrppCfgInterWorkType OBJECT-TYPE
+               SYNTAX  INTEGER {
+                                ipoverfr(1),  -- IPoverFR
+                                macoverfr(2)  -- MACoverFR
+                               }
+               ACCESS  read-write
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the
+                            FRPP InterWorkType."
+                         --
+               DEFVAL { ipoverfr }
+               ::= { mpFrppFrppCfgEntry 8 }
+
+        mpFrppFrppCfgCrtpSupport OBJECT-TYPE                    --
+               SYNTAX  INTEGER {
+                                no(1), 
+                                support(2)
+                               }
+               ACCESS  read-write
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the
+                            CRTP Support Flag."
+                         --
+               DEFVAL { no }
+               ::= { mpFrppFrppCfgEntry 9 }
+
+        mpFrppFrppCfgCrtpLimit OBJECT-TYPE
+               SYNTAX  INTEGER (1..128)
+               ACCESS  read-write
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the
+                            CRTP Limit."
+                         --
+               DEFVAL { 128 }
+               ::= { mpFrppFrppCfgEntry 10 }
+
+        mpFrppFrppCfgCrtpMode OBJECT-TYPE
+               SYNTAX  INTEGER {
+                                through(1),
+                                discard(2)
+                               }
+               ACCESS  read-write
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the
+                            CRTP Mode."
+                         --
+               DEFVAL { through }
+               ::= { mpFrppFrppCfgEntry 11}
+
+        mpFrppFrppCfgCrtpAging OBJECT-TYPE
+               SYNTAX  INTEGER (1..120)
+               ACCESS  read-write
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the
+                            CRTP Aging Time."
+                         --
+               DEFVAL { 5 }
+               ::= { mpFrppFrppCfgEntry 12 }
+
+        mpFrppFrppCfgCtcpSupport OBJECT-TYPE
+               SYNTAX  INTEGER {
+                                no(1),
+                                support(2)
+                               }
+               ACCESS  read-write
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the
+                            CTCP Support Flag."
+                         --
+               DEFVAL { no }
+               ::= { mpFrppFrppCfgEntry 13 }
+
+        mpFrppFrppCfgCtcpLimit OBJECT-TYPE
+               SYNTAX  INTEGER (1..128)
+               ACCESS  read-write
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the
+                            CTCP Limit."
+                         --
+               DEFVAL { 128 }
+               ::= { mpFrppFrppCfgEntry 14 }
+
+        mpFrppFrppCfgCtcpMode OBJECT-TYPE
+               SYNTAX  INTEGER {
+                                through(1),
+                                discard(2)
+                               }
+               ACCESS  read-write
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the
+                            CTCP Mode."
+                         --
+               DEFVAL { through }
+               ::= { mpFrppFrppCfgEntry 15}
+
+        mpFrppFrppCfgCtcpAging OBJECT-TYPE
+               SYNTAX  INTEGER (1..120)
+               ACCESS  read-write
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the
+                            CTCP Aging Time."
+                         --
+               DEFVAL { 30 }
+               ::= { mpFrppFrppCfgEntry 16 }
+
+        mpFrppFrppCfgHwSticFlag OBJECT-TYPE
+               SYNTAX  INTEGER {
+                                enable(1),
+                                disable(2)
+                               }
+               ACCESS  read-write
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the
+                            Statistics Request Flag."
+                         --
+               DEFVAL { enable }
+               ::= { mpFrppFrppCfgEntry 17}
+
+        mpFrppDlciCfgMtuSize OBJECT-TYPE
+               SYNTAX  INTEGER
+               ACCESS  read-only                                --
+               STATUS  mandatory
+               DESCRIPTION "The value of this object identifies the
+                            inside maximum frame size(Mtu) in octets for
+                            this frame relay logical port(DLCI).
+                            This value shall not exceed the value of
+                            mpFrCktMtuSize."
+                         --
+                         --
+                         --
+               ::= { mpFrppFrppCfgEntry 18 }
+
+        mpFrppDlciCfgBecn OBJECT-TYPE
+               SYNTAX  INTEGER {
+                                enable(1),
+                                disable(2)
+                               }
+               ACCESS  read-write
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates mode of BECN."
+                         --
+               DEFVAL { disable }
+               ::= { mpFrppFrppCfgEntry 19 }
+
+        mpFrppDlciCfgEncap OBJECT-TYPE                          --
+               SYNTAX  INTEGER {
+                                nec(1),                         --
+                                cisco(2)
+                               }
+               ACCESS  read-write
+               STATUS  mandatory
+               DESCRIPTION "The value of this object identifies the
+                            Mode of VoIp."
+                         --
+               DEFVAL { nec }                                   --
+               ::= { mpFrppFrppCfgEntry 20 }
+
+        mpFrppDlciCfgDe OBJECT-TYPE
+               SYNTAX  INTEGER {
+                                enable(1),
+                                disable(2)
+                               }
+               ACCESS  read-write
+               STATUS  mandatory
+               DESCRIPTION "The value of this object identifies the DE bit
+                            marking."
+                         --
+               DEFVAL { disable }
+               ::= { mpFrppFrppCfgEntry 21 }
+
+        mpFrppDlciCfgPln OBJECT-TYPE
+               SYNTAX  INTEGER {
+                                ipv4(1),
+                                ipv6(2)
+                               }
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object identifies the protocol
+                            addressing."
+                         --
+               ::= { mpFrppFrppCfgEntry 22 }
+
+        mpFrppDlciCfgFragSize OBJECT-TYPE
+               SYNTAX  INTEGER (0..1600)
+               ACCESS  read-write
+               STATUS  mandatory
+               DESCRIPTION "The value of this object identifies the
+                           FRF.12 flagment size. within the range of
+                           0,16 - 1600."
+                         --
+               DEFVAL { 0 }
+               ::= { mpFrppFrppCfgEntry 23 }
+
+        mpFrppDlciCfgMir OBJECT-TYPE
+               SYNTAX  INTEGER (0..2048)
+               ACCESS  read-write
+               STATUS  mandatory
+               DESCRIPTION "The value of this object identifies the
+                            Mir ."
+                         --
+               DEFVAL { 0 }                                     --
+               ::= { mpFrppFrppCfgEntry 24 }
+
+        mpFrppDlciCfgPerInc OBJECT-TYPE
+               SYNTAX  INTEGER (1..100)
+               ACCESS  read-write
+               STATUS  mandatory
+               DESCRIPTION "The value of this object identifies the
+                            percent increment."
+                         --
+               DEFVAL { 12 }
+               ::= { mpFrppFrppCfgEntry 25 }
+
+        mpFrppDlciCfgPerDec OBJECT-TYPE
+               SYNTAX  INTEGER (1..100)
+               ACCESS  read-write
+               STATUS  mandatory
+               DESCRIPTION "The value of this object identifies the
+                            percent decrement."
+                         --
+               DEFVAL { 25 }
+               ::= { mpFrppFrppCfgEntry 26 }
+
+        mpFrppDlciCfgMincir OBJECT-TYPE
+               SYNTAX  INTEGER (1..2048)                        --
+               ACCESS  read-write
+               STATUS  mandatory
+               DESCRIPTION "The value of this object identifies the
+                            MinCir."
+                         --
+               DEFVAL { 64 }
+              ::= { mpFrppFrppCfgEntry 27 }
+
+        mpFrppDlciCfgCir  OBJECT-TYPE
+               SYNTAX  INTEGER (1..2048)                        --
+               ACCESS  read-write
+               STATUS  mandatory
+               DESCRIPTION "The value of this object identifies the
+                            Committed Information Rate (CIR) is rate
+                            (expressed in bits/second) that the network
+                            commits to deliver under normal network conditions.
+                           "
+                         --
+                         --
+                         --
+               DEFVAL { 64 }
+               ::= { mpFrppFrppCfgEntry 28 }
+
+        mpFrppDlciCfgSnapFlg OBJECT-TYPE
+               SYNTAX  INTEGER {
+                                off(1),
+                                on(2)
+                               }
+               ACCESS  read-write
+               STATUS  mandatory
+               DESCRIPTION "The value of this object identifies configration
+                            status for this table."
+                         --
+               DEFVAL { off }
+               ::= { mpFrppFrppCfgEntry 29 }
+
+        mpFrppDlciQueueLenH OBJECT-TYPE
+               SYNTAX  INTEGER (0..255)
+               ACCESS  read-write
+               STATUS  mandatory
+               DESCRIPTION "The value of this object identifies configration
+                            High queue length.
+                           "
+                         --
+               DEFVAL { 40 }
+               ::= { mpFrppFrppCfgEntry 30 }
+
+        mpFrppDlciQueueLenU OBJECT-TYPE
+               SYNTAX  INTEGER (0..255)
+               ACCESS  read-write
+               STATUS  mandatory
+               DESCRIPTION "The value of this object identifies configration
+                            Urgent queue length.
+                           "
+                         --
+               DEFVAL { 20 }
+               ::= { mpFrppFrppCfgEntry 31 }
+
+        mpFrppDlciQueueLenL OBJECT-TYPE
+               SYNTAX  INTEGER (0..255)
+               ACCESS  read-write
+               STATUS  mandatory
+               DESCRIPTION "The value of this object identifies configration
+                            Low queue length.
+                           "
+                         --
+               DEFVAL { 80 }
+               ::= { mpFrppFrppCfgEntry 32 }
+
+        mpFrppDlciQueueLenN OBJECT-TYPE
+               SYNTAX  INTEGER (0..255)
+               ACCESS  read-write
+               STATUS  mandatory
+               DESCRIPTION "The value of this object identifies configration
+                            Normal queue length.
+                           "
+                         --
+               DEFVAL { 60 }
+               ::= { mpFrppFrppCfgEntry 33 }
+
+        mpFrppDlciQueueByteH OBJECT-TYPE
+               SYNTAX  INTEGER (0..65535)
+               ACCESS  read-write
+               STATUS  mandatory
+               DESCRIPTION "The value of this object identifies configration
+                            High queue length. within the range of 0,16 - 1600."
+                         --
+               DEFVAL { 0 }                             --
+               ::= { mpFrppFrppCfgEntry 34 }
+
+        mpFrppDlciQueueByteU OBJECT-TYPE
+               SYNTAX  INTEGER (0..65535)
+               ACCESS  read-write
+               STATUS  mandatory
+               DESCRIPTION "The value of this object identifies configration
+                            Urgent queue length. within the range of 0,16 - 1600
+."
+                         --
+               DEFVAL { 0 }                             --
+               ::= { mpFrppFrppCfgEntry 35 }
+
+        mpFrppDlciQueueByteL OBJECT-TYPE
+               SYNTAX  INTEGER (0..65535)
+               ACCESS  read-write
+               STATUS  mandatory
+               DESCRIPTION "The value of this object identifies configration
+                            Low queue length. within the range of 0,16 - 1600."
+                         --
+               DEFVAL { 0 }                             --
+               ::= { mpFrppFrppCfgEntry 36 }
+
+        mpFrppDlciQueueByteN OBJECT-TYPE
+               SYNTAX  INTEGER (0..65535)
+               ACCESS  read-write
+               STATUS  mandatory
+               DESCRIPTION "The value of this object identifies configration
+                            Normal queue length. within the range of 0,16 - 1600
+."
+                         --
+               DEFVAL { 0 }                             --
+               ::= { mpFrppFrppCfgEntry 37 }
+
+
+        mpFrppDlciIpQosClassAf3 OBJECT-TYPE
+               SYNTAX  INTEGER {
+                                urgent(1),
+                                high(2),
+                                normal(3),
+                                low(4)
+                               }
+               ACCESS  read-write
+               STATUS  mandatory
+               DESCRIPTION "The value of this object identifies configration
+                            IP-Qos/AF3 mapping Class .
+                           "
+                         --
+               DEFVAL { high }
+               ::= { mpFrppFrppCfgEntry 38 }
+
+        mpFrppDlciIpQosClassAf2 OBJECT-TYPE
+               SYNTAX  INTEGER {
+                                urgent(1),
+                                high(2),
+                                normal(3),
+                                low(4)
+                               }
+               ACCESS  read-write
+               STATUS  mandatory
+               DESCRIPTION "The value of this object identifies configration
+                            IP-Qos/AF2 mapping Class .
+                           "
+                         --
+               DEFVAL { normal }
+               ::= { mpFrppFrppCfgEntry 39 }
+
+        mpFrppDlciIpQosClassAf1 OBJECT-TYPE
+               SYNTAX  INTEGER {
+                                urgent(1),
+                                high(2),
+                                normal(3),
+                                low(4)
+                               }
+               ACCESS  read-write
+               STATUS  mandatory
+               DESCRIPTION "The value of this object identifies configration
+                            IP-Qos/AF1 mapping Class .
+                           "
+                         --
+               DEFVAL { normal }
+               ::= { mpFrppFrppCfgEntry 40 }
+
+        mpFrppDlciIpQosClassBe OBJECT-TYPE
+               SYNTAX  INTEGER {
+                                urgent(1),
+                                high(2),
+                                normal(3),
+                                low(4)
+                               }
+               ACCESS  read-write
+               STATUS  mandatory
+               DESCRIPTION "The value of this object identifies configration
+                            IP-Qos/Be mapping Class .
+                           "
+                         --
+               DEFVAL { low }
+               ::= { mpFrppFrppCfgEntry 41 }
+
+        mpFrppDlciIpQosClassEf3 OBJECT-TYPE
+               SYNTAX  INTEGER {
+                                urgent(1),
+                                high(2),
+                                normal(3),
+                                low(4)
+                               }
+               ACCESS  read-write
+               STATUS  mandatory
+               DESCRIPTION "The value of this object identifies configration
+                            IP-Qos/Ef3 mapping Class .
+                           "
+                         --
+               DEFVAL { urgent }
+               ::= { mpFrppFrppCfgEntry 42 }
+
+        mpFrppDlciIpQosClassEf2 OBJECT-TYPE
+               SYNTAX  INTEGER {
+                                urgent(1),
+                                high(2),
+                                normal(3),
+                                low(4)
+                               }
+               ACCESS  read-write
+              STATUS  mandatory
+               DESCRIPTION "The value of this object identifies configration
+                            IP-Qos/EF2 mapping Class .
+                           "
+                         --
+               DEFVAL { urgent }
+               ::= { mpFrppFrppCfgEntry 43 }
+
+        mpFrppDlciIpQosClassEf1 OBJECT-TYPE
+               SYNTAX  INTEGER {
+                                urgent(1),
+                                high(2),
+                                normal(3),
+                                low(4)
+                               }
+               ACCESS  read-write
+               STATUS  mandatory
+               DESCRIPTION "The value of this object identifies configration
+                            IP-Qos/Ef1 mapping Class .
+                           "
+                         --
+               DEFVAL { urgent }
+               ::= { mpFrppFrppCfgEntry 44 }
+
+        mpFrppDlciIpQosClassAf4 OBJECT-TYPE
+               SYNTAX  INTEGER {
+                                urgent(1),
+                                high(2),
+                                normal(3),
+                                low(4)
+                               }
+               ACCESS  read-write
+               STATUS  mandatory
+               DESCRIPTION "The value of this object identifies configration
+                            IP-Qos/AF4 mapping Class .
+                           "
+                         --
+               DEFVAL { high }
+               ::= { mpFrppFrppCfgEntry 45 }
+
+        mpFrppDlciCfgInarpMode OBJECT-TYPE
+               SYNTAX  INTEGER {
+                                no(1),
+                                passive(2)
+                               }
+               ACCESS  read-write
+               STATUS  mandatory
+               DESCRIPTION "The value of this object identifies configration
+                            Inverse Arp mode ."
+                         --
+               DEFVAL { passive }
+               ::= { mpFrppFrppCfgEntry 46 }
+
+        mpFrppDlciCfgTrapFilter OBJECT-TYPE
+               SYNTAX  INTEGER {
+                                no(1),     -- No
+                                up(2),     -- UP
+                                down(3),   -- Down
+                                up-down(4) -- Up-Down
+                               }
+               ACCESS  read-write
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the
+                            DLCi Trap Filter status."
+                         --
+               DEFVAL { no }
+               ::= { mpFrppFrppCfgEntry 47 }
+
+        mpFrppFrppCfgRowStatus OBJECT-TYPE
+               SYNTAX  RowStatus
+               ACCESS  read-write
+               STATUS  mandatory
+               DESCRIPTION "An entry in MCC Channel management table."
+                         --
+                         --
+                         --
+                         --
+                         --
+                         --
+                         --
+                         --
+               ::= { mpFrppFrppCfgEntry 48 }
+
+        mpFrppFrppCfgErrInfo OBJECT-TYPE
+               SYNTAX  INTEGER {
+                                normal(1),                      --
+                                parameterNotEnough(2),          --
+                                badValue(3),                    --
+                                badIndexValue(4),               --
+                                correlationError(5),            --
+                                memoryAllocateFailure(6),       --
+                                mbufHuntFailure(7),             --
+                                relationalConfigExist(8),       --
+                                lowLayerConfigNotRegistered(9), --
+                                mappingDataAlreadyExist(10),    --
+                                ipAddressNotDeleted(11),        --
+                                mccIdHuntFailure(12)            --
+                               }
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates error
+                            information that became an error set to MIB
+                            in this table."
+                         --
+                         --
+               ::= { mpFrppFrppCfgEntry 49 }
+
+
+--- FRPP Admin Information MIB
+        mpFrppInfoTable OBJECT-TYPE
+               SYNTAX  SEQUENCE OF MpFrppInfoEntry
+               ACCESS  not-accessible
+               STATUS  mandatory
+               DESCRIPTION "This is the table type object of the
+                            FRPP information."
+                         --
+               ::= { mpFrpp 4 }
+
+        mpFrppInfoEntry OBJECT-TYPE
+               SYNTAX  MpFrppInfoEntry
+               ACCESS  not-accessible
+               STATUS  mandatory
+               DESCRIPTION "This is the table entry of mpFrppInfoTable."
+                         --
+               INDEX { mpFrppInfoIndex }
+               ::= { mpFrppInfoTable 1 }
+
+        MpFrppInfoEntry ::=
+                 SEQUENCE {
+                   mpFrppInfoIndex                 INTEGER,
+                   mpFrppInfoFrppAdminStatus       INTEGER,
+                   mpFrppInfoFrppOperStatus        INTEGER,
+                   mpFrppInfoFrppLastChange        TimeTicks,
+                   mpFrppInfoDlci                  INTEGER,     --
+                   mpFrppInfoDlciAdminStatus       INTEGER,     --
+                   mpFrppInfoDlciOperStatus        INTEGER,     --
+                   mpFrppInfoDlciLastChange        TimeTicks,   --
+                   mpFrppInfoDlciOperDownEvent     INTEGER      --
+                 }
+
+        mpFrppInfoIndex  OBJECT-TYPE
+               SYNTAX  INTEGER
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object identifies the
+                            Frpp No (Frpp number) ."
+                         --
+               ::= { mpFrppInfoEntry 1 }
+
+        mpFrppInfoFrppAdminStatus OBJECT-TYPE
+               SYNTAX  INTEGER {
+                                active(1),   -- Active
+                                inactive(2)  -- Inactive
+                               }
+               ACCESS  read-write
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the
+                            Frpp administration status."
+                         --
+               DEFVAL { active }
+               ::= { mpFrppInfoEntry 2 }
+
+        mpFrppInfoFrppOperStatus OBJECT-TYPE
+               SYNTAX  INTEGER {
+                                active(1),
+                                inactive(2)
+                               }
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the
+                            Frpp operational status."
+                         --
+               ::= { mpFrppInfoEntry 3 }
+
+        mpFrppInfoFrppLastChange OBJECT-TYPE
+               SYNTAX  TimeTicks
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of sysUpTime at the time the Frpp
+                            entered its current operational state."
+                         --
+                         --
+               ::= { mpFrppInfoEntry 4 }
+
+        mpFrppInfoDlci OBJECT-TYPE                      --
+               SYNTAX  INTEGER (16..991)
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object is equal to the
+                            Data Link Connection Identifer(DLCi) value
+                            for index to this mpFrDlcStatisticsTable table."
+                         --
+               ::= { mpFrppInfoEntry 5 }
+
+        mpFrppInfoDlciAdminStatus OBJECT-TYPE                   --
+               SYNTAX  INTEGER {
+                                active(1),   -- Active
+                                inactive(2)  -- Inactive
+                               }
+               ACCESS  read-only                        --
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the      
+                            Dlci administration status."
+                         --
+               ::= { mpFrppInfoEntry 6 }
+
+        mpFrppInfoDlciOperStatus OBJECT-TYPE                    --
+               SYNTAX  INTEGER {
+                                active(1),
+                                inactive(2)
+                               }
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the
+                            DLCi operational status."
+                         --
+               ::= { mpFrppInfoEntry 7 }
+
+        mpFrppInfoDlciLastChange OBJECT-TYPE                    --
+               SYNTAX  TimeTicks
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of sysUpTime at the time the DLCI
+                            entered its current operational state."
+                         --
+                         --
+               ::= { mpFrppInfoEntry 8 }
+
+        mpFrppInfoDlciOperDownEvent OBJECT-TYPE                 --
+               SYNTAX  INTEGER {
+                                normal(1),
+                                dlcidown(2),
+                                lmierror(3),
+                                lmiStatusInactiveReceived(4),
+                                unknown(5)
+                               }
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates error
+                            information that became an error set to MIB
+                            in this table."
+                         --
+                         --
+               ::= { mpFrppInfoEntry 9 }
+
+
+-- Frpp Mccid Statistics Information MIB
+
+        mpFrppMccIdStatTable OBJECT-TYPE
+               SYNTAX SEQUENCE OF MpFrppMccIdStatEntry
+               ACCESS  not-accessible
+               STATUS  mandatory
+               DESCRIPTION "This is the table type object of the
+                            Frpp Mccid statistics information."
+               ::= { mpFrpp 5 }
+
+        mpFrppMccIdStatEntry OBJECT-TYPE
+               SYNTAX  MpFrppMccIdStatEntry
+               ACCESS  not-accessible
+               STATUS  mandatory
+               DESCRIPTION "This is the table entry of mpFrppMccIdStatTable."
+               INDEX { mpFrppMccIdStatIfIndex }
+               ::= { mpFrppMccIdStatTable 1 }
+
+        MpFrppMccIdStatEntry ::=
+                 SEQUENCE {
+                   mpFrppMccIdStatIfIndex       INTEGER,
+                   mpFrppMccIdRcvOctets         Counter,
+                   mpFrppMccIdRcvFrames         Counter,
+                   mpFrppMccIdRcvFrameMinSize   INTEGER,
+                   mpFrppMccIdRcvFrameMaxSize   INTEGER,
+                   mpFrppMccIdRcvDiscardFrames  Counter,
+                   mpFrppMccIdRcvFecnFrames     Counter,
+                   mpFrppMccIdRcvBecnFrames     Counter,
+                   mpFrppMccIdRcvDeFrames       Counter,
+                   mpFrppMccIdRcvInvalidFrames  Counter,
+                   mpFrppMccIdRcvLongFrames     Counter,
+                   mpFrppMccIdRcvShortFrames    Counter,
+                   mpFrppMccIdXmtOctets         Counter,
+                   mpFrppMccIdXmtFrames         Counter,
+                   mpFrppMccIdXmtFrameMinSize   INTEGER,
+                   mpFrppMccIdXmtFrameMaxSize   INTEGER,
+                   mpFrppMccIdXmtDiscardFrames  Counter,
+                   mpFrppMccIdXmtFecnFrames     Counter,
+                   mpFrppMccIdXmtBecnFrames     Counter,
+                   mpFrppMccIdXmtDeFrames       Counter,
+                   mpFrppMccIdRcvCllmFrames     Counter
+               }
+
+        mpFrppMccIdStatIfIndex OBJECT-TYPE
+               SYNTAX  INTEGER
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object identifies the mccid
+                            number."
+                         --
+               ::= { mpFrppMccIdStatEntry 1 }
+
+        mpFrppMccIdRcvOctets OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of octets received on this port."
+                         --
+               ::= { mpFrppMccIdStatEntry 2 }
+
+        mpFrppMccIdRcvFrames OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of frames received on this port."
+                         --
+               ::= { mpFrppMccIdStatEntry 3 }
+
+        mpFrppMccIdRcvFrameMinSize OBJECT-TYPE
+               SYNTAX  INTEGER
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the minimum
+                            size of frames received on this port."
+                         --
+               ::= { mpFrppMccIdStatEntry 4 }
+
+        mpFrppMccIdRcvFrameMaxSize OBJECT-TYPE
+               SYNTAX  INTEGER
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the maximum
+                            size of frames received on this port."
+                         --
+               ::= { mpFrppMccIdStatEntry 5 }
+
+        mpFrppMccIdRcvDiscardFrames OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of discard frames received on this port."
+                         --
+               ::= { mpFrppMccIdStatEntry 6 }
+
+        mpFrppMccIdRcvFecnFrames OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the number
+                            of frames received with the FECN bit set."
+                         --
+               ::= { mpFrppMccIdStatEntry 7 }
+
+        mpFrppMccIdRcvBecnFrames OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the number
+                            of frames received with the BECN bit set."
+                         --
+               ::= { mpFrppMccIdStatEntry 8 }
+
+        mpFrppMccIdRcvDeFrames OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the number
+                            of frames received with the DE bit set."
+                         --
+               ::= { mpFrppMccIdStatEntry 9 }
+
+        mpFrppMccIdRcvInvalidFrames OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of invalid frames received on this port."
+                         --
+               ::= { mpFrppMccIdStatEntry 10 }
+
+        mpFrppMccIdRcvLongFrames OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of long frames received on this port."
+                         --
+               ::= { mpFrppMccIdStatEntry 11 }
+
+        mpFrppMccIdRcvShortFrames OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of short frames received on this port."
+                         --
+               ::= { mpFrppMccIdStatEntry 12 }
+
+        mpFrppMccIdXmtOctets OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of octets sent on this port."
+                         --
+               ::= { mpFrppMccIdStatEntry 13 }
+
+        mpFrppMccIdXmtFrames OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of frames sent on this port."
+                         --
+               ::= { mpFrppMccIdStatEntry 14 }
+
+        mpFrppMccIdXmtFrameMinSize OBJECT-TYPE
+               SYNTAX  INTEGER
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the minimum
+                            size of frames sent on this port."
+                         --
+               ::= { mpFrppMccIdStatEntry 15 }
+
+        mpFrppMccIdXmtFrameMaxSize OBJECT-TYPE
+               SYNTAX  INTEGER
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the maximum
+                            size of frames sent on this port."
+                         --
+               ::= { mpFrppMccIdStatEntry 16 }
+
+        mpFrppMccIdXmtDiscardFrames OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of discard frames sent on this port."
+                         --
+               ::= { mpFrppMccIdStatEntry 17 }
+
+        mpFrppMccIdXmtFecnFrames OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the number
+                            of frames sent with the FECN bit set."
+                         --
+               ::= { mpFrppMccIdStatEntry 18 }
+
+        mpFrppMccIdXmtBecnFrames OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the number
+                            of frames sent with the BECN bit set."
+                         --
+               ::= { mpFrppMccIdStatEntry 19 }
+
+        mpFrppMccIdXmtDeFrames OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the number
+                            of frames sent with the DE bit set."
+                         --
+               ::= { mpFrppMccIdStatEntry 20 }
+
+        mpFrppMccIdRcvCllmFrames OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of CLLM frames received on this port."
+                         --
+               ::= { mpFrppMccIdStatEntry 21 }
+
+
+-- Frpp Port LMI Statistics Information MIB
+
+        mpFrppMccIdLmiStatTable OBJECT-TYPE
+               SYNTAX SEQUENCE OF MpFrppMccIdLmiStatEntry
+               ACCESS  not-accessible
+               STATUS  mandatory
+               DESCRIPTION "This is the table type object of the
+                            Frpp Port LMI statitics information."
+               ::= { mpFrpp 6 }
+
+        mpFrppMccIdLmiStatEntry OBJECT-TYPE
+               SYNTAX  MpFrppMccIdLmiStatEntry
+               ACCESS  not-accessible
+               STATUS  mandatory
+               DESCRIPTION "This is the table entry
+                            of mpFrppMccIdLmiStatTable."
+               INDEX { mpFrppMccIdLmiStatIfIndex }
+               ::= { mpFrppMccIdLmiStatTable 1 }
+
+        MpFrppMccIdLmiStatEntry ::=
+                 SEQUENCE {
+                   mpFrppMccIdLmiStatIfIndex      INTEGER,
+                   mpFrppMccIdRcvLmiStatEnqs      Counter,
+                   mpFrppMccIdXmtLmiStatEnqs      Counter,
+                   mpFrppMccIdRcvLmiStats         Counter,
+                   mpFrppMccIdXmtLmiStats         Counter,
+                   mpFrppMccIdUsrLmiLinkRelErrs   Counter,
+                   mpFrppMccIdUsrLmiT391Tos       Counter,
+                   mpFrppMccIdUsrLmiSeqErrs       Counter,
+                   mpFrppMccIdUsrLmiProtErrs      Counter,
+                   mpFrppMccIdUsrLmiChInacts      Counter,
+                   mpFrppMccIdNetLmiLinkRelErrs   Counter,
+                   mpFrppMccIdNetLmiT392Tos       Counter,
+                   mpFrppMccIdNetLmiSeqErrs       Counter,
+                   mpFrppMccIdNetLmiErrs          Counter,
+                   mpFrppMccIdNetChInacts         Counter,
+                   mpFrppMccIdRcvAsyncFrms        Counter
+               }
+
+        mpFrppMccIdLmiStatIfIndex OBJECT-TYPE
+               SYNTAX  INTEGER
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object identifies the mccid
+                            number."
+                         --
+               ::= { mpFrppMccIdLmiStatEntry 1 }
+
+        mpFrppMccIdRcvLmiStatEnqs OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of status enquiry frames received on
+                            this port."
+                         --
+               ::= { mpFrppMccIdLmiStatEntry 2 }
+
+        mpFrppMccIdXmtLmiStatEnqs OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of status enquiry frames sent on this port."
+                         --
+               ::= { mpFrppMccIdLmiStatEntry 3 }
+
+        mpFrppMccIdRcvLmiStats OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of status frames received on this port."
+                         --
+               ::= { mpFrppMccIdLmiStatEntry 4 }
+
+        mpFrppMccIdXmtLmiStats OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of status frames sent on this port."
+                         --
+               ::= { mpFrppMccIdLmiStatEntry 5 }
+
+        mpFrppMccIdUsrLmiLinkRelErrs OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the number
+                            of user-side local in-channel signaling link
+                            reliability errors for this port."
+                         --
+               ::= { mpFrppMccIdLmiStatEntry 6 }
+
+        mpFrppMccIdUsrLmiT391Tos OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the number
+                            of user-side not receive status for this port."
+                         --
+               ::= { mpFrppMccIdLmiStatEntry 7 }
+
+        mpFrppMccIdUsrLmiSeqErrs OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the number
+                            of Sequens Errors."
+                         --
+               ::= { mpFrppMccIdLmiStatEntry 8 }
+
+        mpFrppMccIdUsrLmiProtErrs OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the number
+                            of network-side local in-channel signaling protocol
+                            errors for this port."
+                         --
+               ::= { mpFrppMccIdLmiStatEntry 9 }
+
+        mpFrppMccIdUsrLmiChInacts OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the number
+                            of times the network-side channel was declared
+                            inactive (i.e., N392 errors in N393 events)
+                            for this port."
+                         --
+               ::= { mpFrppMccIdLmiStatEntry 10 }
+
+        mpFrppMccIdNetLmiLinkRelErrs OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the number
+                            of user-side local in-channel signaling link
+                            reliability errors for this port."
+                         --
+               ::= { mpFrppMccIdLmiStatEntry 11 }
+
+        mpFrppMccIdNetLmiT392Tos OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the number
+                            of user-side not receive status for this port."
+                         --
+               ::= { mpFrppMccIdLmiStatEntry 12 }
+
+        mpFrppMccIdNetLmiSeqErrs OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the number
+                            of Sequens Errors."
+                         --
+               ::= { mpFrppMccIdLmiStatEntry 13 }
+
+        mpFrppMccIdNetLmiErrs OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the number
+                            of network-side local in-channel signaling protocol
+                            errors for this port."
+                         --
+               ::= { mpFrppMccIdLmiStatEntry 14 }
+
+        mpFrppMccIdNetChInacts OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the number
+                            of times the network-side channel was declared
+                            inactive (i.e., N392 errors in N393 events)
+                            for this port."
+                         --
+               ::= { mpFrppMccIdLmiStatEntry 15 }
+
+        mpFrppMccIdRcvAsyncFrms OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the number
+                            of Async Frames for this port."
+                         --
+               ::= { mpFrppMccIdLmiStatEntry 16 }
+
+
+--
+
+        mpFrppFrppStatTable OBJECT-TYPE
+               SYNTAX SEQUENCE OF MpFrppFrppStatEntry
+               ACCESS  not-accessible
+               STATUS  mandatory
+               DESCRIPTION "This is the table type object of the
+                            Frpp Frpp statistics information."
+               ::= { mpFrpp 7 }
+
+        mpFrppFrppStatEntry OBJECT-TYPE
+               SYNTAX  MpFrppFrppStatEntry
+               ACCESS  not-accessible
+               STATUS  mandatory
+               DESCRIPTION "This is the table entry of mpFrppFrppStatTable."
+               INDEX { mpFrppFrppStatIndex }
+               ::= { mpFrppFrppStatTable 1 }
+
+        MpFrppFrppStatEntry ::=
+                 SEQUENCE {
+                   mpFrppFrppStatIndex              INTEGER,
+                   mpFrppFrppStatRcvFrames          Counter,
+                   mpFrppFrppStatXmtFrames          Counter,
+                   mpFrppFrppStatRcvDiscardFrames   Counter,
+                   mpFrppFrppStatXmtDiscardFrames   Counter,
+                   mpFrppFrppStatRcvEncapErrors     Counter,
+                   mpFrppFrppStatXmtEncapErrors     Counter,
+                   mpFrppFrppStatRcvArpTransErrors  Counter,
+                   mpFrppFrppStatXmtArpTransErrors  Counter,
+                   mpFrppFrppStatReassembleErrors   Counter,
+                   mpFrppFrppStatPriorityQueues     Counter,
+                   mpFrppFrppStatPriorityBytes      Counter
+               }
+
+        mpFrppFrppStatIndex OBJECT-TYPE
+               SYNTAX  INTEGER
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object identifies the Frpp
+                            number."
+                         --
+               ::= { mpFrppFrppStatEntry 1 }
+
+        mpFrppFrppStatRcvFrames OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of frames received on this port."
+                         --
+               ::= { mpFrppFrppStatEntry 2 }
+
+        mpFrppFrppStatXmtFrames OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of frames sent on this port."
+                         --
+               ::= { mpFrppFrppStatEntry 3 }
+
+        mpFrppFrppStatRcvDiscardFrames OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of discarded frames received
+                            on this port."
+                         --
+               ::= { mpFrppFrppStatEntry 4 }
+     
+        mpFrppFrppStatXmtDiscardFrames OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of discarded frames sent on this port."
+                         --
+               ::= { mpFrppFrppStatEntry 5 }
+
+        mpFrppFrppStatRcvEncapErrors OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of Payload header conversion errors
+                            received on this port."
+                         --
+                         --
+               ::= { mpFrppFrppStatEntry 6 }
+
+        mpFrppFrppStatXmtEncapErrors OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of Payload header conversion errors
+                            sent on this port."
+                         --
+                         --
+               ::= { mpFrppFrppStatEntry 7 }
+
+        mpFrppFrppStatRcvArpTransErrors OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the number
+                            of APR packet conversion error sends received
+                            on this port."
+                         --
+               ::= { mpFrppFrppStatEntry 8 }
+
+        mpFrppFrppStatXmtArpTransErrors OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the number
+                            of ARP packet conversion error sends sent on
+                            this port."
+                         --
+               ::= { mpFrppFrppStatEntry 9 }
+
+        mpFrppFrppStatReassembleErrors OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of Reassemble conversion errors."
+                         --
+               ::= { mpFrppFrppStatEntry 10 }
+
+        mpFrppFrppStatPriorityQueues OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of priority queue length excess frames."
+                         --
+               ::= { mpFrppFrppStatEntry 11 }
+
+        mpFrppFrppStatPriorityBytes OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of priority byte length excess frames."
+                         --
+               ::= { mpFrppFrppStatEntry 12 }
+
+
+-- Frpp DLCI Statistics Information MIB
+
+        mpFrppDlcStatTable OBJECT-TYPE
+               SYNTAX SEQUENCE OF MpFrppDlcStatEntry
+               ACCESS  not-accessible
+               STATUS  mandatory
+               DESCRIPTION "This is the table type object of the
+                            Frpp DLCI statistics information."
+               ::= { mpFrpp 8 }
+
+        mpFrppDlcStatEntry OBJECT-TYPE
+               SYNTAX  MpFrppDlcStatEntry
+               ACCESS  not-accessible
+               STATUS  mandatory
+               DESCRIPTION "This is the table entry of mpFrppDlcStatTable."
+               INDEX { mpFrppDlciStatIfIndex }
+               ::= { mpFrppDlcStatTable 1 }
+
+        MpFrppDlcStatEntry ::=
+                 SEQUENCE {
+                   mpFrppDlciStatIfIndex                    INTEGER,
+--                 mpFrppDlciStatDlciIndex                  INTEGER,    @006
+                   mpFrppDlciStatRcvOctets                  Counter,
+                   mpFrppDlciStatRcvFrames                  Counter,
+                   mpFrppDlciStatRcvFrameMinSize            INTEGER,
+                   mpFrppDlciStatRcvFrameMaxSize            INTEGER,
+                   mpFrppDlciStatRcvFECNFrames              Counter,
+                   mpFrppDlciStatRcvBECNFrames              Counter,
+                   mpFrppDlciStatRcvDEFrames                Counter,
+                   mpFrppDlciStatRcvTaggedDEFrames          Counter,
+                   mpFrppDlciStatXmtOctets                  Counter,
+                   mpFrppDlciStatXmtFrames                  Counter,
+                   mpFrppDlciStatXmtFrameMinSize            INTEGER,
+                   mpFrppDlciStatXmtFrameMaxSize            INTEGER,
+                   mpFrppDlciStatXmtDEDiscardFrames         Counter,
+                   mpFrppDlciStatXmtFECNFrames              Counter,
+                   mpFrppDlciStatXmtBECNFrames              Counter,
+                   mpFrppDlciStatXmtDEFrames                Counter,
+                   mpFrppDlciStatXmtTaggedDEFrames          Counter,
+                   mpFrppDlciStatRcvInArpReqFrms            Counter,
+                   mpFrppDlciStatXmtInArpReqFrms            Counter,
+                   mpFrppDlciStatRcvInArpRlyFrms            Counter,
+                   mpFrppDlciStatXmtInArpRlyFrms            Counter,
+                   mpFrppDlciStatFNUnrecognizHeaders        Counter,
+                   mpFrppDlciStatNFUnrecognizHeaders        Counter,
+                   mpFrppDlciStatFNArpTranslationErrs       Counter,
+                   mpFrppDlciStatNFArpTranslationErrs       Counter,
+                   mpFrppDlciStatXmtVQFrms                  Counter,
+                   mpFrppDlciStatXmtUQFrms                  Counter,
+                   mpFrppDlciStatXmtXceedUQLenFrms          Counter,
+                   mpFrppDlciStatXmtXceedUQByteFrms         Counter,
+                   mpFrppDlciStatXmtHQFrms                  Counter,
+                   mpFrppDlciStatXmtXceedHQLenFrms          Counter,
+                   mpFrppDlciStatXmtXceedHQByteFrms         Counter,
+                   mpFrppDlciStatXmtNQFrms                  Counter,
+                   mpFrppDlciStatXmtXceedNQLenFrms          Counter,
+                   mpFrppDlciStatXmtXceedNQByteFrms         Counter,
+                   mpFrppDlciStatXmtLQFrms                  Counter,
+                   mpFrppDlciStatXmtXceedLQLenFrms          Counter,
+                   mpFrppDlciStatXmtXceedLQByteFrms         Counter,
+                   mpFrppDlciStatRcvNPBDe0Frms              Counter,
+                   mpFrppDlciStatRcvNPBDe1Frms              Counter,
+                   mpFrppDlciStatRcvNPBDiscardFrms          Counter,
+                   mpFrppDlciStatXmtNPBFrms                 Counter,
+                   mpFrppDlciStatXmtNPBDiscardFrms          Counter
+               }
+
+        mpFrppDlciStatIfIndex OBJECT-TYPE
+               SYNTAX  INTEGER
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object identifies the frpp
+                            number."
+                         --
+               ::= { mpFrppDlcStatEntry 1 }
+
+        mpFrppDlciStatRcvOctets OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of octets received for this Dlci."
+                         --
+               ::= { mpFrppDlcStatEntry 2 }
+
+        mpFrppDlciStatRcvFrames OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of frames received for this Dlci."
+                         --
+               ::= { mpFrppDlcStatEntry 3 }
+
+        mpFrppDlciStatRcvFrameMinSize OBJECT-TYPE
+               SYNTAX  INTEGER
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the minimum
+                            size of frames received for this Dlci."
+                         --
+               ::= { mpFrppDlcStatEntry 4 }
+
+        mpFrppDlciStatRcvFrameMaxSize OBJECT-TYPE
+               SYNTAX  INTEGER
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the maximum
+                            size of frames received for this Dlci."
+                         --
+               ::= { mpFrppDlcStatEntry 5 }
+
+        mpFrppDlciStatRcvFECNFrames OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the number
+                            of frames received with the FECN bit set."
+                         --
+               ::= { mpFrppDlcStatEntry 6 }
+
+        mpFrppDlciStatRcvBECNFrames OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the number
+                            of frames received with the BECN bit set."
+                         --
+               ::= { mpFrppDlcStatEntry 7 }
+
+        mpFrppDlciStatRcvDEFrames OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the number
+                            of frames received with the DE bit set."
+                         --
+               ::= { mpFrppDlcStatEntry 8 }
+
+
+        mpFrppDlciStatRcvTaggedDEFrames OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the number
+                            of DE tagged frames received from this port."
+                         --
+               ::= { mpFrppDlcStatEntry 9 }
+
+        mpFrppDlciStatXmtOctets OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of octets sent for this DLci."
+                         --
+               ::= { mpFrppDlcStatEntry 10 }
+
+        mpFrppDlciStatXmtFrames OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of frames sent for this dlci."
+                         --
+               ::= { mpFrppDlcStatEntry 11 }
+
+        mpFrppDlciStatXmtFrameMinSize OBJECT-TYPE
+               SYNTAX  INTEGER
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the minimum
+                            size of frames sent for this dlci."
+                         --
+               ::= { mpFrppDlcStatEntry 12 }
+
+        mpFrppDlciStatXmtFrameMaxSize OBJECT-TYPE
+               SYNTAX  INTEGER
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the maximum
+                            size of frames sent for this dlci."
+                         --
+               ::= { mpFrppDlcStatEntry 13 }
+
+        mpFrppDlciStatXmtDEDiscardFrames OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of discard DE frames sent for this dlci."
+                         --
+               ::= { mpFrppDlcStatEntry 14 }
+
+        mpFrppDlciStatXmtFECNFrames OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the number
+                            of frames sent with the FECN bit set."
+                         --
+               ::= { mpFrppDlcStatEntry 15 }
+
+        mpFrppDlciStatXmtBECNFrames OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the number
+                            of frames sent with the BECN bit set."
+                         --
+               ::= { mpFrppDlcStatEntry 16 }
+
+        mpFrppDlciStatXmtDEFrames OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the number
+                            of frames sent with the DE bit set."
+                         --
+               ::= { mpFrppDlcStatEntry 17 }
+
+        mpFrppDlciStatXmtTaggedDEFrames OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the number
+                            of DE tagged frames sent to this port."
+                         --
+               ::= { mpFrppDlcStatEntry 18 }
+
+       mpFrppDlciStatRcvInArpReqFrms OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the number
+                            of frames sent with the InArp."
+                         --
+               ::= { mpFrppDlcStatEntry 19 }
+
+       mpFrppDlciStatXmtInArpReqFrms OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the number
+                            of frames sent with the InArp."
+                         --
+               ::= { mpFrppDlcStatEntry 20 }
+
+       mpFrppDlciStatRcvInArpRlyFrms OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the number
+                            of frames sent with the InArp."
+                         --
+               ::= { mpFrppDlcStatEntry 21 }
+
+       mpFrppDlciStatXmtInArpRlyFrms OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the number
+                            of frames sent with the InArp."
+                         --
+               ::= { mpFrppDlcStatEntry 22 }
+
+       mpFrppDlciStatFNUnrecognizHeaders OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the number
+                            of frames sent with the InArp."
+                         --
+               ::= { mpFrppDlcStatEntry 23 }
+
+       mpFrppDlciStatNFUnrecognizHeaders OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the number
+                            of frames sent with the InArp."
+                         --
+               ::= { mpFrppDlcStatEntry 24 }
+
+       mpFrppDlciStatFNArpTranslationErrs OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the number
+                            of frames sent with the InArp."
+                         --
+               ::= { mpFrppDlcStatEntry 25 }
+
+       mpFrppDlciStatNFArpTranslationErrs OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the number
+                            of frames sent with the InArp."
+                         --
+               ::= { mpFrppDlcStatEntry 26 }
+
+       mpFrppDlciStatXmtVQFrms OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the number
+                            of frames sent with the InArp."
+                         --
+               ::= { mpFrppDlcStatEntry 27 }
+
+       mpFrppDlciStatXmtUQFrms OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the number
+                            of frames sent with the InArp."
+                         --
+               ::= { mpFrppDlcStatEntry 28 }
+
+       mpFrppDlciStatXmtXceedUQLenFrms OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the number
+                            of frames sent with the InArp."
+                         --
+               ::= { mpFrppDlcStatEntry 29 }
+
+       mpFrppDlciStatXmtXceedUQByteFrms OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the number
+                            of frames sent with the InArp."
+                         --
+               ::= { mpFrppDlcStatEntry 30 }
+
+        mpFrppDlciStatXmtHQFrms OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the number
+                            of frames sent with the InArp."
+                         --
+               ::= { mpFrppDlcStatEntry 31 }
+
+        mpFrppDlciStatXmtXceedHQLenFrms OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the number
+                            of frames sent with the InArp."
+                         --
+               ::= { mpFrppDlcStatEntry 32 }
+
+        mpFrppDlciStatXmtXceedHQByteFrms OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the number
+                            of frames sent with the InArp."
+                         --
+               ::= { mpFrppDlcStatEntry 33 }
+
+        mpFrppDlciStatXmtNQFrms OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the number
+                            of frames sent with the InArp."
+                         --
+               ::= { mpFrppDlcStatEntry 34 }
+
+        mpFrppDlciStatXmtXceedNQLenFrms OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the number
+                            of frames sent with the InArp."
+                         --
+               ::= { mpFrppDlcStatEntry 35 }
+
+        mpFrppDlciStatXmtXceedNQByteFrms OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the number
+                            of frames sent with the InArp."
+                         --
+               ::= { mpFrppDlcStatEntry 36 }
+
+        mpFrppDlciStatXmtLQFrms OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the number
+                            of frames sent with the InArp."
+                         --
+               ::= { mpFrppDlcStatEntry 37 }
+
+        mpFrppDlciStatXmtXceedLQLenFrms OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the number
+                            of frames sent with the InArp."
+                         --
+               ::= { mpFrppDlcStatEntry 38 }
+
+        mpFrppDlciStatXmtXceedLQByteFrms OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the number
+                            of frames sent with the InArp."
+                         --
+               ::= { mpFrppDlcStatEntry 39 }
+
+        mpFrppDlciStatRcvNPBDe0Frms OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the number
+                            of frames received from SAR with the CLP bit set
+                            to 0."
+                         --
+               ::= { mpFrppDlcStatEntry 40 }
+
+        mpFrppDlciStatRcvNPBDe1Frms OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the number
+                            of frames received from SAR with the CLP bit set
+                            to 1."
+                         --
+               ::= { mpFrppDlcStatEntry 41 }
+
+        mpFrppDlciStatRcvNPBDiscardFrms OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of discard frames sent on this port."
+                         --
+               ::= { mpFrppDlcStatEntry 42 }
+
+        mpFrppDlciStatXmtNPBFrms OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of discard frames sent on this port."
+                         --
+               ::= { mpFrppDlcStatEntry 43 }
+
+        mpFrppDlciStatXmtNPBDiscardFrms OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of discard frames sent on this port."
+                         --
+               ::= { mpFrppDlcStatEntry 44 }
+
+--
+
+        mpFrppDlciWkStatTable OBJECT-TYPE
+               SYNTAX SEQUENCE OF MpFrppDlciWkStatEntry
+               ACCESS  not-accessible
+               STATUS  mandatory
+               DESCRIPTION "This is the table type object of the
+                            Frpp DLCI Work statistics information."
+               ::= { mpFrpp 9 }
+
+        mpFrppDlciWkStatEntry OBJECT-TYPE
+               SYNTAX  MpFrppDlciWkStatEntry
+               ACCESS  not-accessible
+               STATUS  mandatory
+               DESCRIPTION "This is the table entry of mpFrppDlciWkStatTable."
+               INDEX { mpFrppDlciWkStatIfIndex }
+               ::= { mpFrppDlciWkStatTable 1 }
+
+        MpFrppDlciWkStatEntry ::=
+                 SEQUENCE {
+                   mpFrppDlciWkStatIfIndex                  INTEGER,
+--                 mpFrppDlciWkStatDlciIndex                INTEGER,    @006
+                   mpFrppDlciWkStatFNEncapNones             Counter,
+                   mpFrppDlciWkStatFNEncapBridgeds          Counter,
+                   mpFrppDlciWkStatFNEncapBridgedFCSs       Counter,
+                   mpFrppDlciWkStatFNEncapBPDUs             Counter,
+                   mpFrppDlciWkStatFNEncapRoutedIPs         Counter,
+                   mpFrppDlciWkStatFNEncapRoutedIPSNAPs     Counter,
+                   mpFrppDlciWkStatFNEncapVOIP0s            Counter,
+                   mpFrppDlciWkStatFNEncapVOIP1s            Counter,
+                   mpFrppDlciWkStatFNEncapVOIP2s            Counter,
+                   mpFrppDlciWkStatFNEncapVOIP3s            Counter,
+                   mpFrppDlciWkStatFNEncapVOIP4s            Counter,
+                   mpFrppDlciWkStatFNEncapVOIP5s            Counter,
+                   mpFrppDlciWkStatFNEncapVOIP6s            Counter,
+                   mpFrppDlciWkStatFNEncapVOIP7s            Counter,
+                   mpFrppDlciWkStatFNEncapVOIP8s            Counter,
+                   mpFrppDlciWkStatFNEncapVOIP9s            Counter,
+                   mpFrppDlciWkStatNFEncapNones             Counter,
+                   mpFrppDlciWkStatNFEncapBridgeds          Counter,
+                   mpFrppDlciWkStatNFEncapBridgedFCSs       Counter,
+                   mpFrppDlciWkStatNFEncapBPDUs             Counter,
+                   mpFrppDlciWkStatNFEncapRoutedIPs         Counter,
+                   mpFrppDlciWkStatNFEncapRoutedIPSNAPs     Counter,
+                   mpFrppDlciWkStatNFEncapVOIP0s            Counter,
+                   mpFrppDlciWkStatNFEncapVOIP1s            Counter,
+                   mpFrppDlciWkStatNFEncapVOIP2s            Counter,
+                   mpFrppDlciWkStatNFEncapVOIP3s            Counter,
+                   mpFrppDlciWkStatNFEncapVOIP4s            Counter,
+                   mpFrppDlciWkStatNFEncapVOIP5s            Counter,
+                   mpFrppDlciWkStatNFEncapVOIP6s            Counter,
+                   mpFrppDlciWkStatNFEncapVOIP7s            Counter,
+                   mpFrppDlciWkStatNFEncapVOIP8s            Counter,
+                   mpFrppDlciWkStatNFEncapVOIP9s            Counter,
+                   mpFrppDlciWkStatRcvFragFrms              Counter,
+                   mpFrppDlciWkStatRasmCompleteds           Counter,
+                   mpFrppDlciWkStatFragSequenceErrs         Counter,
+                   mpFrppDlciWkStatFragBitErrs              Counter,
+                   mpFrppDlciWkStatRasmFrmSizeErrs          Counter,
+                   mpFrppDlciWkStatInvalidFragFrms          Counter,
+                   mpFrppDlciWkStatFragBufhuntNgs           Counter,
+                   mpFrppDlciWkStatFragSndNgs               Counter,
+                   mpFrppDlciWkStatXmtFrames                Counter,
+                   mpFrppDlciWkStatXmtDiscardFrms           Counter
+               }
+
+        mpFrppDlciWkStatIfIndex OBJECT-TYPE
+               SYNTAX  INTEGER
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object identifies the frpp
+                            number."
+                         --
+               ::= { mpFrppDlciWkStatEntry 1 }
+
+        mpFrppDlciWkStatFNEncapNones OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of non capsule for this Dlci."
+                         --
+               ::= { mpFrppDlciWkStatEntry 2 }
+
+        mpFrppDlciWkStatFNEncapBridgeds  OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of MACoFR(802.3/ETHER) non FCS for this Dlci."
+                         --
+                ::= { mpFrppDlciWkStatEntry 3 }
+
+        mpFrppDlciWkStatFNEncapBridgedFCSs    OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of MACoFR(802.3/ETHER) for this Dlci."
+                         --
+                ::= { mpFrppDlciWkStatEntry 4 }
+
+        mpFrppDlciWkStatFNEncapBPDUs  OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of MACoFR(802.3d/802.3g) for this dlci."
+                         --
+                ::= { mpFrppDlciWkStatEntry 5 }
+
+        mpFrppDlciWkStatFNEncapRoutedIPs  OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of IPoFR(NLPID) for this dlci."
+                         --
+                ::= { mpFrppDlciWkStatEntry 6 }
+
+        mpFrppDlciWkStatFNEncapRoutedIPSNAPs  OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of IPoFR with SNAP for this dlci."
+                         --
+                ::= { mpFrppDlciWkStatEntry 7 }
+
+        mpFrppDlciWkStatFNEncapVOIP0s     OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of VoIP (cmp udp) for this dlci."
+                         --
+                ::= { mpFrppDlciWkStatEntry 8 }
+
+        mpFrppDlciWkStatFNEncapVOIP1s   OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of VoIP (cmp rtp) for this dlci."
+                         --
+                ::= { mpFrppDlciWkStatEntry 9 }
+
+        mpFrppDlciWkStatFNEncapVOIP2s  OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of VoIP (ful hdr)for this dlci."
+                         --
+                ::= { mpFrppDlciWkStatEntry 10 }
+
+        mpFrppDlciWkStatFNEncapVOIP3s  OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of VoIP (ful ctx) for this dlci." 
+                         --
+                ::= { mpFrppDlciWkStatEntry 11 }
+
+        mpFrppDlciWkStatFNEncapVOIP4s   OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of VoIP (cmp rtp) for this dlci."
+                         --
+                ::= { mpFrppDlciWkStatEntry 12 }
+
+        mpFrppDlciWkStatFNEncapVOIP5s    OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of VoIP (ful hdr) for this dlci."
+                         --
+                ::= { mpFrppDlciWkStatEntry 13 }
+
+        mpFrppDlciWkStatFNEncapVOIP6s   OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of VoIP(ful ctx) for this dlci."
+                         --
+                ::= { mpFrppDlciWkStatEntry 14 }
+
+        mpFrppDlciWkStatFNEncapVOIP7s  OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of VoIP for this dlci.(reserve)"
+                         --
+                ::= { mpFrppDlciWkStatEntry 15 }
+
+        mpFrppDlciWkStatFNEncapVOIP8s  OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of VoIP for this dlci.(reserve)"
+                         --
+                ::= { mpFrppDlciWkStatEntry 16 }
+
+        mpFrppDlciWkStatFNEncapVOIP9s  OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of VoIP for this dlci.(reserve)"
+                         --
+                ::= { mpFrppDlciWkStatEntry 17 }
+
+        mpFrppDlciWkStatNFEncapNones   OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of None capsulation for this dlci."
+                         --
+                ::= { mpFrppDlciWkStatEntry 18 }
+                
+        mpFrppDlciWkStatNFEncapBridgeds  OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of MACoFR(802.3/ETHER) non FSC for this dlci."
+                         --
+                ::= { mpFrppDlciWkStatEntry 19 }
+
+        mpFrppDlciWkStatNFEncapBridgedFCSs  OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of MACoFR(802.3/ETHER) for this dlci."
+                         --
+                ::= { mpFrppDlciWkStatEntry 20 }
+
+        mpFrppDlciWkStatNFEncapBPDUs   OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of MACoFR(802.3d/802.3g) for this dlci."
+                         --
+                ::= { mpFrppDlciWkStatEntry 21 }
+
+        mpFrppDlciWkStatNFEncapRoutedIPs  OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of IPoFR(NLPID) for this dlci."
+                         --
+                ::= { mpFrppDlciWkStatEntry 22 }
+
+        mpFrppDlciWkStatNFEncapRoutedIPSNAPs  OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of IPoFR with SNAP for this dlci."
+                         --
+                ::= { mpFrppDlciWkStatEntry 23 }
+
+        mpFrppDlciWkStatNFEncapVOIP0s  OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of VoIP (cmp udp) for this dlci."
+                         --
+                ::= { mpFrppDlciWkStatEntry 24 }
+
+        mpFrppDlciWkStatNFEncapVOIP1s OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of VoIP (cmp rtp) for this dlci."
+                         --
+                ::= { mpFrppDlciWkStatEntry 25 }
+
+        mpFrppDlciWkStatNFEncapVOIP2s   OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of VoIP (ful hdr) for this dlci."
+                         --
+                ::= { mpFrppDlciWkStatEntry 26 }
+
+        mpFrppDlciWkStatNFEncapVOIP3s  OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of VoIP (ful ctx) for this dlci."
+                         --
+                ::= { mpFrppDlciWkStatEntry 27 }
+
+        mpFrppDlciWkStatNFEncapVOIP4s  OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of VoIP (cmp rtp) for this dlci."
+                         --
+                ::= { mpFrppDlciWkStatEntry 28  }
+        
+        mpFrppDlciWkStatNFEncapVOIP5s  OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of VoIP (ful hdr) for this dlci."
+                         --
+                ::= { mpFrppDlciWkStatEntry 29 }
+
+        mpFrppDlciWkStatNFEncapVOIP6s  OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of VoIP (ful ctx) for this dlci."
+                         --
+                ::= { mpFrppDlciWkStatEntry 30 }
+
+        mpFrppDlciWkStatNFEncapVOIP7s   OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of VoIP for this dlci."
+                         --
+                ::= { mpFrppDlciWkStatEntry 31 }
+
+        mpFrppDlciWkStatNFEncapVOIP8s   OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of VoIP for this dlci."
+                         --
+                ::= { mpFrppDlciWkStatEntry 32 }
+
+        mpFrppDlciWkStatNFEncapVOIP9s  OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of VoIP for this dlci."
+                         --
+                ::= { mpFrppDlciWkStatEntry 33 }
+
+        mpFrppDlciWkStatRcvFragFrms   OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of FRF.12 Fragment for this dlci."
+                         --
+                ::= { mpFrppDlciWkStatEntry 34 }
+
+        mpFrppDlciWkStatRasmCompleteds   OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of FRF.12 RasmCompleted for this dlci."
+                         --
+                ::= { mpFrppDlciWkStatEntry 35 }
+
+        mpFrppDlciWkStatFragSequenceErrs  OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of FRF.12 FragSequenceErr for this dlci."
+                         --
+                ::= { mpFrppDlciWkStatEntry 36 }
+
+        mpFrppDlciWkStatFragBitErrs  OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of FRF.12 BitErr for this dlci."
+                         --
+                ::= { mpFrppDlciWkStatEntry 37 }
+
+        mpFrppDlciWkStatRasmFrmSizeErrs  OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of FRF.12 SizeErr for this dlci."
+                         --
+                ::= { mpFrppDlciWkStatEntry 38 }
+
+        mpFrppDlciWkStatInvalidFragFrms   OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of FRF.12 InvalidFragFrms  for this dlci."
+                         --
+                ::= { mpFrppDlciWkStatEntry 39 }
+
+        mpFrppDlciWkStatFragBufhuntNgs   OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of FRF.12 Buffer Hunt NG for this dlci."
+                         --
+                ::= { mpFrppDlciWkStatEntry 40 }
+        
+        mpFrppDlciWkStatFragSndNgs  OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of FRF.12 send flg err for this dlci."
+                         --
+                ::= { mpFrppDlciWkStatEntry 41 }
+
+        mpFrppDlciWkStatXmtFrames  OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of FRF.12 rev flg ng for this dlci."
+                         --
+                ::= { mpFrppDlciWkStatEntry 42 }
+
+        mpFrppDlciWkStatXmtDiscardFrms  OBJECT-TYPE
+               SYNTAX  Counter
+               ACCESS  read-only
+               STATUS  mandatory
+               DESCRIPTION "The value of this object indicates the total
+                            number of FRF.12 DiscardFrms for this dlci."
+                         --
+                ::= { mpFrppDlciWkStatEntry 43 }
+
+END
+
+

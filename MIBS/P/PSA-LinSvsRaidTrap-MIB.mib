@@ -1,0 +1,2615 @@
+PSA-LinSvsRaidTrap-MIB DEFINITIONS ::= BEGIN
+
+--PRIMEQUEST system management MIB for Partition
+--
+--
+--$Copyright$
+--Copyright Fujitsu Limited 2010
+--All rights reserved
+--
+--
+--MIB Revision: 02000009
+--
+
+IMPORTS
+	OBJECT-TYPE								FROM RFC-1212
+	TRAP-TYPE								FROM RFC-1215
+	mib-2, DisplayString					FROM RFC1213-MIB
+	TimeTicks, Counter, Gauge, IpAddress	FROM RFC1155-SMI
+	mgmt, enterprises						FROM RFC1155-SMI;
+
+--enterprises	OBJECT IDENTIFIER ::={ iso org(3) dod(6) internet(1) private(4) 1 }
+--
+--PRIMEQUEST system management MIB nodes
+--fujitsu:                    1.3.6.1.4.1.211
+-- products:                  1.3.6.1.4.1.211.1
+--  iaServer:                 1.3.6.1.4.1.211.1.31
+--   primequest:              1.3.6.1.4.1.211.1.31.1
+--    partition:	           1.3.6.1.4.1.211.1.31.1.2
+--
+--Trap enterprise is "psaLinSvsRaidTrap"
+
+--FUJITSU PRIMEQUEST system management MIB nodes for Partition
+  fujitsu        OBJECT IDENTIFIER  ::={ enterprises 211 }
+  products       OBJECT IDENTIFIER  ::={ fujitsu 1 }
+  iaServer       OBJECT IDENTIFIER  ::={ products 31 }
+  primequest     OBJECT IDENTIFIER  ::={ iaServer 1 }
+   partition     OBJECT IDENTIFIER  ::={ primequest 2 }
+    parititonVariables	OBJECT IDENTIFIER	::={ partition	200 }
+    partitionEnterprise        OBJECT IDENTIFIER  ::={ partition 201 }
+     psaComTrap                OBJECT IDENTIFIER  ::={ partitionEnterprise 1 }
+     psaSVAgentsTrap           OBJECT IDENTIFIER  ::={ partitionEnterprise 102 }
+     psaLinLanComTrap          OBJECT IDENTIFIER  ::={ partitionEnterprise 2 }
+     psaLinIntelE100Trap       OBJECT IDENTIFIER  ::={ partitionEnterprise 3 }
+     psaLinIntelE1000Trap      OBJECT IDENTIFIER  ::={ partitionEnterprise 4 }
+     psaLinBcm5700Trap         OBJECT IDENTIFIER  ::={ partitionEnterprise 5 }
+     psaLinEmulexTrap          OBJECT IDENTIFIER  ::={ partitionEnterprise 6 }
+     psaLinLsiLogicTrap        OBJECT IDENTIFIER  ::={ partitionEnterprise 7 }
+     psaLinScsiComTrap         OBJECT IDENTIFIER  ::={ partitionEnterprise 8 }
+     psaLinGrmpdTrap           OBJECT IDENTIFIER  ::={ partitionEnterprise 9 }
+     psaLinGdsTrap             OBJECT IDENTIFIER  ::={ partitionEnterprise 10 }
+     psaLinGlsTrap             OBJECT IDENTIFIER  ::={ partitionEnterprise 11 }
+     psaLinTg3Trap             OBJECT IDENTIFIER  ::={ partitionEnterprise 12 }
+     psaLinIbTrap              OBJECT IDENTIFIER  ::={ partitionEnterprise 13 }
+     psaLinXframe2Trap         OBJECT IDENTIFIER  ::={ partitionEnterprise 14 }
+     psaGschTrap               OBJECT IDENTIFIER  ::={ partitionEnterprise 15 }
+     psaLinIntelE1000ETrap     OBJECT IDENTIFIER  ::={ partitionEnterprise 16 }
+     psaLinIntelIgbTrap        OBJECT IDENTIFIER  ::={ partitionEnterprise 17 }
+     psaLinSvsRaidTrap         OBJECT IDENTIFIER  ::={ partitionEnterprise 18 }
+     psaLinIntelixgbeTrap      OBJECT IDENTIFIER  ::={ partitionEnterprise 19 }
+     psaExternalFileUnitTrap   OBJECT IDENTIFIER  ::={ partitionEnterprise 101 }
+
+--***************************************************************************************
+--
+--FUJITSU PRIMEQUEST system management trap parameter variables for Partition
+--	They aren't directly accessibles(can't use snmp get/set command), but sent with trap
+--
+--***************************************************************************************
+
+     trapVarComInfo	OBJECT IDENTIFIER	::={ parititonVariables 1 }
+
+trapPartitionName OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Partition name which trap is generated."
+   ::= { trapVarComInfo 1 }
+
+trapPartitionId OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Paritition identifier which trap is generated."
+   ::= { trapVarComInfo 2 }
+
+trapEventLevel OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Event level"
+   ::= { trapVarComInfo 3 }
+
+trapEventId OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Event Identifier"
+   ::= { trapVarComInfo 4 }
+
+trapUnitName OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Unit name which trap is generated."
+   ::= { trapVarComInfo 5 }
+
+trapMmbVip OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Management board vertual IP address."
+   ::= { trapVarComInfo 6 }
+
+     trapVarDivInfo	OBJECT IDENTIFIER	::={ parititonVariables 2 }
+
+trapPartNo OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Parts number of trap source."
+   ::= { trapVarDivInfo 1 }
+
+trapStepping OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 2 }
+
+trapSerialNo OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Serial number of trap source. "
+   ::= { trapVarDivInfo 3 }
+
+trapModelNo OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Model number of trap source."
+   ::= { trapVarDivInfo 4 }
+
+trapSuspect OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Logical name or pci bus number of trap source."
+   ::= { trapVarDivInfo 5 }
+
+trapVendorId OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Vendor identifier of trap source."
+   ::= { trapVarDivInfo 6 }
+
+trapDeviceId OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Device identifier of trap source."
+   ::= { trapVarDivInfo 7 }
+
+trapRevision OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Revision of trap source."
+   ::= { trapVarDivInfo 8 }
+
+trapCardName OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Device name of trap source."
+   ::= { trapVarDivInfo 9 }
+
+trapErrDetail OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 10 }
+
+trapErrCode OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 11 }
+
+trapIrpCode OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 12 }
+
+trapHbaNo OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 13 }
+
+trapErrCause OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 14 }
+
+trapPathNo OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 15 }
+
+trapDiskId OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 16 }
+
+trapFmrDiskId OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 17 }
+
+trapCurDiskId OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 18 }
+
+trapPathId OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 19 }
+
+trapPhysIf OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 20 }
+
+trapVirtualIf OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 21 }
+
+trapLogicalIp OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 22 }
+
+trapWatchIp OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 23 }
+
+trapInterface OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 24 }
+
+trapSourceIp OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 25 }
+
+trapDestIp OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 26 }
+
+trapModelName OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Model name of trap source."
+   ::= { trapVarDivInfo 27 }
+
+trapFlagcode OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 28 }
+
+--***************************************************************************************
+--
+--FUJITSU PRIMEQUEST system management TRAP definition for Partition
+--	Trap enterprise:	psaLinSvsRaidTrap (.1.3.6.1.4.1.211.1.31.1.2.201.18)
+--
+--***************************************************************************************
+
+svraidLinEvent0 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (BBU temperature out of range)"
+   --#TYPE			"Svraid Lin Event 0"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (BBU temperature out of range) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 18500
+
+svraidLinEvent1 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (BBU temperature unstable)"
+   --#TYPE			"Svraid Lin Event 1"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (BBU temperature unstable) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 18501
+
+svraidLinEvent2 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (BBU temperature above threshold)"
+   --#TYPE			"Svraid Lin Event 2"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (BBU temperature above threshold) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 18502
+
+svraidLinEvent3 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (BBU voltage out of range)"
+   --#TYPE			"Svraid Lin Event 3"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (BBU voltage out of range) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 18503
+
+svraidLinEvent4 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (BBU voltage unstable)"
+   --#TYPE			"Svraid Lin Event 4"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (BBU voltage unstable) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 18504
+
+svraidLinEvent5 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (BBU communication error) "
+   --#TYPE			"Svraid Lin Event 5"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (BBU communication error) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 18505
+
+svraidLinEvent6 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (BBU failed)"
+   --#TYPE			"Svraid Lin Event 6"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (BBU failed) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 18506
+
+svraidLinEvent7 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (BBU fast charging failed)"
+   --#TYPE			"Svraid Lin Event 7"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (BBU fast charging failed) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 18507
+
+svraidLinEvent8 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (BBU charge count exceeded)"
+   --#TYPE			"Svraid Lin Event 8"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (BBU charge count exceeded) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18508
+
+svraidLinEvent9 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (Rebuild on disk failed)"
+   --#TYPE			"Svraid Lin Event 9"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (Rebuild on disk failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 18509
+
+svraidLinEvent10 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (Rebuild failed on logical drive)"
+   --#TYPE			"Svraid Lin Event 10"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (Rebuild failed on logical drive)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 18510
+
+svraidLinEvent11 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (Migration failed on logical drive)"
+   --#TYPE			"Svraid Lin Event 11"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (Migration failed on logical drive)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 18511
+
+svraidLinEvent12 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (Migration aborted on logical drive)"
+   --#TYPE			"Svraid Lin Event 12"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (Migration aborted on logical drive)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 18512
+
+svraidLinEvent13 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (Logical drive degraded)"
+   --#TYPE			"Svraid Lin Event 13"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (Logical drive degraded)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 18513
+
+svraidLinEvent14 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (Logical drive failed)"
+   --#TYPE			"Svraid Lin Event 14"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (Logical drive failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 18514
+
+svraidLinEvent15 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (BBU voltage problem detected)"
+   --#TYPE			"Svraid Lin Event 15"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (BBU voltage problem detected) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 18515
+
+svraidLinEvent16 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (BBU temperature problem detected)"
+   --#TYPE			"Svraid Lin Event 16"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (BBU temperature problem detected) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 18516
+
+svraidLinEvent17 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (BBU failed)"
+   --#TYPE			"Svraid Lin Event 17"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (BBU failed) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 18517
+
+svraidLinEvent18 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (Fatal firmware error)"
+   --#TYPE			"Svraid Lin Event 18"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (Fatal firmware error) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 18518
+
+svraidLinEvent19 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (Multi-bit ECC error)"
+   --#TYPE			"Svraid Lin Event 19"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (Multi-bit ECC error) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 18519
+
+svraidLinEvent20 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (Single-bit ECC error)"
+   --#TYPE			"Svraid Lin Event 20"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (Single-bit ECC error) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 18520
+
+svraidLinEvent21 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (Not enough adapter memory)"
+   --#TYPE			"Svraid Lin Event 21"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (Not enough adapter memory) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 18521
+
+svraidLinEvent22 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (Resume migration of logical drive failed due to Configuration Mismatch)"
+   --#TYPE			"Svraid Lin Event 22"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (Resume migration of logical drive failed due to Configuration Mismatch)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 18522
+
+svraidLinEvent23 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (Hot spare S.M.A.R.T. polling failed on disk)"
+   --#TYPE			"Svraid Lin Event 23"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (Hot spare S.M.A.R.T. polling failed on disk)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 18523
+
+svraidLinEvent24 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (Predictive failure)"
+   --#TYPE			"Svraid Lin Event 24"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (Predictive failure)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 18524
+
+svraidLinEvent25 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (BBU needs to be replaced - SOH bad)"
+   --#TYPE			"Svraid Lin Event 25"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (BBU needs to be replaced - SOH bad) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 18525
+
+svraidLinEvent26 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (BBU removed)"
+   --#TYPE			"Svraid Lin Event 26"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (BBU removed) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18526
+
+svraidLinEvent27 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (Enclosure communication lost)"
+   --#TYPE			"Svraid Lin Event 27"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (Enclosure communication lost) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18527
+
+svraidLinEvent28 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (Enclosure not responding)"
+   --#TYPE			"Svraid Lin Event 28"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (Enclosure not responding) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18528
+
+svraidLinEvent29 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (SAS/SATA mixing not supported in enclosure)"
+   --#TYPE			"Svraid Lin Event 29"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (SAS/SATA mixing not supported in enclosure) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18529
+
+svraidLinEvent30 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (Bad block table on disk is 80 percent full)"
+   --#TYPE			"Svraid Lin Event 30"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (Bad block table on disk is 80 percent full)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 18530
+
+svraidLinEvent31 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (Bad block table on disk is full; unable to log Block)"
+   --#TYPE			"Svraid Lin Event 31"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (Bad block table on disk is full; unable to log Block)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 18531
+
+svraidLinEvent32 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (BBU/charger problems detected; SOH bad)"
+   --#TYPE			"Svraid Lin Event 32"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (BBU/charger problems detected; SOH bad) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18532
+
+svraidLinEvent33 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (Single-bit ECC error; warning threshold exceeded)"
+   --#TYPE			"Svraid Lin Event 33"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (Single-bit ECC error; warning threshold exceeded) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18533
+
+svraidLinEvent34 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (Single-bit ECC error; critical threshold exceeded)"
+   --#TYPE			"Svraid Lin Event 34"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (Single-bit ECC error; critical threshold exceeded) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18534
+
+svraidLinEvent35 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (Single-bit ECC error; further reporting disabled)"
+   --#TYPE			"Svraid Lin Event 35"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (Single-bit ECC error; further reporting disabled) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 18535
+
+svraidLinEvent36 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (Previous configuration completely missing at boot)"
+   --#TYPE			"Svraid Lin Event 36"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (Previous configuration completely missing at boot) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18536
+
+svraidLinEvent37 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (Logical drive partially degraded)"
+   --#TYPE			"Svraid Lin Event 37"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (Logical drive partially degraded)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 18537
+
+svraidLinEvent38 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (Disks missing)"
+   --#TYPE			"Svraid Lin Event 38"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (Disks missing)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 18538
+
+svraidLinEvent39 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (State change on logical drive from operational to degraded)"
+   --#TYPE			"Svraid Lin Event 39"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (State change on logical drive from operational to degraded)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 18539
+
+svraidLinEvent40 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (State change on logical drive from operational to partially degraded)"
+   --#TYPE			"Svraid Lin Event 40"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (State change on logical drive from operational to partially degraded)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 18540
+
+svraidLinEvent41 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (State change on logical drive from operational to failed)"
+   --#TYPE			"Svraid Lin Event 41"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (State change on logical drive from operational to failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 18541
+
+svraidLinEvent42 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (State change on logical drive from degraded to degraded)"
+   --#TYPE			"Svraid Lin Event 42"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (State change on logical drive from degraded to degraded)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 18542
+
+svraidLinEvent43 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (State change on logical drive from degraded to partially degraded)"
+   --#TYPE			"Svraid Lin Event 43"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (State change on logical drive from degraded to partially degraded)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 18543
+
+svraidLinEvent44 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (State change on logical drive from degraded to failed)"
+   --#TYPE			"Svraid Lin Event 44"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (State change on logical drive from degraded to failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 18544
+
+svraidLinEvent45 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (State change on logical drive from partially degraded to degraded)"
+   --#TYPE			"Svraid Lin Event 45"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (State change on logical drive from partially degraded to degraded)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 18545
+
+svraidLinEvent46 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (State change on logical drive from partially degraded to partially degraded)"
+   --#TYPE			"Svraid Lin Event 46"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (State change on logical drive from partially degraded to partially degraded)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 18546
+
+svraidLinEvent47 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (State change on logical drive from partially degraded to failed)"
+   --#TYPE			"Svraid Lin Event 47"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (State change on logical drive from partially degraded to failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 18547
+
+svraidLinEvent48 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (State change on logical drive from failed to failed)"
+   --#TYPE			"Svraid Lin Event 48"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (State change on logical drive from failed to failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 18548
+
+svraidLinEvent49 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (State change by user on disk from failed to failed)"
+   --#TYPE			"Svraid Lin Event 49"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (State change by user on disk from failed to failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 18549
+
+svraidLinEvent50 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (State change by user on disk from hotspare to failed)"
+   --#TYPE			"Svraid Lin Event 50"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (State change by user on disk from hotspare to failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 18550
+
+svraidLinEvent51 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (State change by user on disk from rebuilding to failed)"
+   --#TYPE			"Svraid Lin Event 51"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (State change by user on disk from rebuilding to failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 18551
+
+svraidLinEvent52 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (State change by user on disk from operational to failed)"
+   --#TYPE			"Svraid Lin Event 52"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (State change by user on disk from operational to failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 18552
+
+svraidLinEvent53 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (State change on disk from failed to failed)"
+   --#TYPE			"Svraid Lin Event 53"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (State change on disk from failed to failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 18553
+
+svraidLinEvent54 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (State change on disk from hot spare to failed)"
+   --#TYPE			"Svraid Lin Event 54"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (State change on disk from hot spare to failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 18554
+
+svraidLinEvent55 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID:%s Device error (State change on disk from rebuilding to failed)"
+   --#TYPE			"Svraid Lin Event 55"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (State change on disk from rebuilding to failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 18555
+
+svraidLinEvent56 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID:%s Device error (State change on disk from operational to failed)"
+   --#TYPE			"Svraid Lin Event 56"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (State change on disk from operational to failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 18556
+
+svraidLinEvent57 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (Disk missing after reboot)"
+   --#TYPE			"Svraid Lin Event 57"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (Disk missing after reboot)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 18557
+
+svraidLinEvent58 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (Logical drive missing after reboot)"
+   --#TYPE			"Svraid Lin Event 58"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (Logical drive missing after reboot) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 18558
+
+svraidLinEvent59 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (State change by user on disk from hot spare to offline)"
+   --#TYPE			"Svraid Lin Event 59"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (State change by user on disk from hot spare to offline)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 18559
+
+svraidLinEvent60 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (State change by user on disk from offline to failed)"
+   --#TYPE			"Svraid Lin Event 60"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (State change by user on disk from offline to failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 18560
+
+svraidLinEvent61 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (State change by user on disk from operational to offline)"
+   --#TYPE			"Svraid Lin Event 61"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (State change by user on disk from operational to offline)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 18561
+
+svraidLinEvent62 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (State change by user on disk from rebuilding to offline)"
+   --#TYPE			"Svraid Lin Event 62"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (State change by user on disk from rebuilding to offline)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 18562
+
+svraidLinEvent63 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (State change on disk from hot spare to offline)"
+   --#TYPE			"Svraid Lin Event 63"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (State change on disk from hot spare to offline)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 18563
+
+svraidLinEvent64 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (State change on disk from offline to failed)"
+   --#TYPE			"Svraid Lin Event 64"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (State change on disk from offline to failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 18564
+
+svraidLinEvent65 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (State change on disk from operational to offline)"
+   --#TYPE			"Svraid Lin Event 65"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (State change on disk from operational to offline)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 18565
+
+svraidLinEvent66 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (State change on disk from rebuilding to offline)"
+   --#TYPE			"Svraid Lin Event 66"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (State change on disk from rebuilding to offline)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 18566
+
+svraidLinEvent67 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (SAS port lost link)"
+   --#TYPE			"Svraid Lin Event 67"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (SAS port lost link) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 18567
+
+svraidLinEvent68 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (Adapter missing after reboot)"
+   --#TYPE			"Svraid Lin Event 68"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (Adapter missing after reboot) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 18568
+
+svraidLinEvent69 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (Adapter needs replacement; faulty IOP detected)"
+   --#TYPE			"Svraid Lin Event 69"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (Adapter needs replacement; faulty IOP detected) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 18569
+
+svraidLinEvent70 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (Microcode update timeout on disk)"
+   --#TYPE			"Svraid Lin Event 70"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (Microcode update timeout on disk)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 18570
+
+svraidLinEvent71 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (Microcode update failed on disk)"
+   --#TYPE			"Svraid Lin Event 71"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (Microcode update failed on disk)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 18571
+
+svraidLinEvent72 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (Adapter cache pinned for missing or offline logical drive)"
+   --#TYPE			"Svraid Lin Event 72"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (Adapter cache pinned for missing or offline logical drive)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 18572
+
+svraidLinEvent73 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (Adapter cache pinned for missing or offline logical drives)"
+   --#TYPE			"Svraid Lin Event 73"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (Adapter cache pinned for missing or offline logical drives)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 18573
+
+svraidLinEvent74 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (Adapter cache discarded by user for missing logical drives)"
+   --#TYPE			"Svraid Lin Event 74"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (Adapter cache discarded by user for missing logical drives)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 18574
+
+svraidLinEvent75 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (Adapter cache destaged for logical drive)"
+   --#TYPE			"Svraid Lin Event 75"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (Adapter cache destaged for logical drive)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 18575
+
+svraidLinEvent76 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (Internal hardware error)"
+   --#TYPE			"Svraid Lin Event 76"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (Internal hardware error) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 18576
+
+svraidLinEvent77 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (Internal hardware error during POST)"
+   --#TYPE			"Svraid Lin Event 77"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (Internal hardware error during POST) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 18577
+
+svraidLinEvent78 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (Bad block table of disk threshold exceeded; table is about to overflow)"
+   --#TYPE			"Svraid Lin Event 78"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (Bad block table of disk threshold exceeded; table is about to overflow)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 18578
+
+svraidLinEvent79 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (Disk failed due to bad block table overflow)"
+   --#TYPE			"Svraid Lin Event 79"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (Disk failed due to bad block table overflow)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 18579
+
+svraidLinEvent80 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (Disk failure detected during POST)"
+   --#TYPE			"Svraid Lin Event 80"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (Disk failure detected during POST)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 18580
+
+svraidLinEvent81 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (Failure detected during POST)"
+   --#TYPE			"Svraid Lin Event 81"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (Failure detected during POST) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 18581
+
+svraidLinEvent82 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (Multiple failure on disk detected)"
+   --#TYPE			"Svraid Lin Event 82"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (Multiple failure on disk detected)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 18582
+
+svraidLinEvent83 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (Disk failed since it never entered ready state)"
+   --#TYPE			"Svraid Lin Event 83"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (Disk failed since it never entered ready state)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 18583
+
+svraidLinEvent84 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (Internal software interface error)"
+   --#TYPE			"Svraid Lin Event 84"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (Internal software interface error) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18584
+
+svraidLinEvent85 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (Device open error)"
+   --#TYPE			"Svraid Lin Event 85"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (Device open error) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18585
+
+svraidLinEvent86 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (Ioctl send error)"
+   --#TYPE			"Svraid Lin Event 86"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (Ioctl send error) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18586
+
+svraidLinEvent87 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (Insufficient application memory)"
+   --#TYPE			"Svraid Lin Event 87"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (Insufficient application memory) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18587
+
+svraidLinEvent88 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (System API error)"
+   --#TYPE			"Svraid Lin Event 88"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (System API error) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18588
+
+svraidLinEvent89 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (Firmware initialization failed)"
+   --#TYPE			"Svraid Lin Event 89"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (Firmware initialization failed) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 18589
+
+svraidLinEvent90 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (Firmware recovery failed)"
+   --#TYPE			"Svraid Lin Event 90"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (Firmware recovery failed) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 18590
+
+svraidLinEvent91 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (BBU requires reconditioning; please initiate recalibration)"
+   --#TYPE			"Svraid Lin Event 91"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (BBU requires reconditioning; please initiate recalibration) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18591
+
+svraidLinEvent92 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Software error (Task for object cannot be started. The scheduler has disabled the task)"
+   --#TYPE			"Svraid Lin Event 92"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID: Software error (Task for object cannot be started. The scheduler has disabled the task)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MAJOR
+   ::= 18592
+
+svraidLinEvent93 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (SAS topology error)"
+   --#TYPE			"Svraid Lin Event 92"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (SAS topology error) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 18593
+
+svraidLinEvent94 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (State change on disk from copyback to failed)"
+   --#TYPE			"Svraid Lin Event 94"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (State change on disk from copyback to failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 18594
+
+svraidLinEvent95 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (State change on disk from copyback to offline)"
+   --#TYPE			"Svraid Lin Event 95"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (State change on disk from copyback to offline)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 18595
+
+svraidLinEvent96 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (State change on disk from JBOD to failed)"
+   --#TYPE			"Svraid Lin Event 96"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (State change on disk from JBOD to failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 18596
+
+svraidLinEvent97 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (State change on disk from JBOD to offline)"
+   --#TYPE			"Svraid Lin Event 97"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (State change on disk from JBOD to offline)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 18597
+
+svraidLinEvent98 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (State change by user on disk from copyback to failed)"
+   --#TYPE			"Svraid Lin Event 98"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (State change by user on disk from copyback to failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 18598
+
+svraidLinEvent99 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (State change by user on disk from copyback to offline)"
+   --#TYPE			"Svraid Lin Event 99"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (State change by user on disk from copyback to offline)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 18599
+
+svraidLinEvent100 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (State change by user on disk from JBOD to failed)"
+   --#TYPE			"Svraid Lin Event 100"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (State change by user on disk from JBOD to failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 18600
+
+svraidLinEvent101 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (Disk security failed to communicate with EKMS)"
+   --#TYPE			"Svraid Lin Event 101"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (Disk security failed to communicate with EKMS) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18601
+
+svraidLinEvent102 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (Logical drive secure failed)"
+   --#TYPE			"Svraid Lin Event 102"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (Logical drive secure failed) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18602
+
+svraidLinEvent103 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (Controller encountered a fatal error and was reset)"
+   --#TYPE			"Svraid Lin Event 103"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (Controller encountered a fatal error and was reset) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 18603
+
+svraidLinEvent104 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (Configuration command could not be committed to disk)"
+   --#TYPE			"Svraid Lin Event 104"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (Configuration command could not be committed to disk)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MAJOR
+   ::= 18604
+
+svraidLinEvent105 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (Power state change failed on disk)"
+   --#TYPE			"Svraid Lin Event 105"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (Power state change failed on disk)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 18605
+
+svraidLinEvent106 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (Power state change failed on disk (from stopped to active))"
+   --#TYPE			"Svraid Lin Event 106"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (Power state change failed on disk (from stopped to active))"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 18606
+
+svraidLinEvent107 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (Logical drive is not ready)"
+   --#TYPE			"Svraid Lin Event 107"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (Logical drive is not ready)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 18607
+
+svraidLinEvent108 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (Adapter has been replaced during reboot)"
+   --#TYPE			"Svraid Lin Event 108"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (Adapter has been replaced during reboot) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18608
+
+svraidLinEvent109 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (Enclosure power supply removed)"
+   --#TYPE			"Svraid Lin Event 109"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (Enclosure power supply removed) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18609
+
+svraidLinEvent110 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (Enclosure power supply turned off)"
+   --#TYPE			"Svraid Lin Event 110"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (Enclosure power supply turned off) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18610
+
+svraidLinEvent111 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (Enclosure temperature sensor below warning threshold)"
+   --#TYPE			"Svraid Lin Event 111"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (Enclosure temperature sensor below warning threshold) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18611
+
+svraidLinEvent112 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (Enclosure temperature sensor below error threshold)"
+   --#TYPE			"Svraid Lin Event 112"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (Enclosure temperature sensor below error threshold) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 18612
+
+svraidLinEvent113 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (Enclosure temperature sensor above warning threshold)"
+   --#TYPE			"Svraid Lin Event 113"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (Enclosure temperature sensor above warning threshold) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 18613
+
+svraidLinEvent114 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Adapter error (Enclosure temperature sensor above error threshold)"
+   --#TYPE			"Svraid Lin Event 114"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Adapter error (Enclosure temperature sensor above error threshold) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MAJOR
+   ::= 18614
+
+svraidLinEvent115 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (Power state change failed on disk (from active to transition))"
+   --#TYPE			"Svraid Lin Event 115"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (Power state change failed on disk (from active to transition))"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 18615
+
+svraidLinEvent116 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (Power state change failed on disk (from stopped to transition))"
+   --#TYPE			"Svraid Lin Event 116"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (Power state change failed on disk (from stopped to transition))"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 18616
+
+svraidLinEvent117 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (Power state change failed on disk (from transition to active))"
+   --#TYPE			"Svraid Lin Event 117"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (Power state change failed on disk (from transition to active))"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 18617
+
+svraidLinEvent118 TRAP-TYPE
+   ENTERPRISE   psaLinSvsRaidTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "SV RAID: Device error (Power state change failed on disk (from transition to stopped))"
+   --#TYPE			"Svraid Lin Event 118"
+   --#SUMMARY		"%s(PID=%d) %s %d %s SV RAID:%s Device error (Power state change failed on disk (from transition to stopped))"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 18618
+
+END

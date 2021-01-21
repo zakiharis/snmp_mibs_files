@@ -1,0 +1,1452 @@
+USR-CONFIG-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+          OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE, OBJECT-IDENTITY,
+          Integer32
+                  FROM SNMPv2-SMI
+          TruthValue, DisplayString
+                  FROM SNMPv2-TC
+          common, UsrConfigStatus, UsrNetLogicalId,
+    	  UsrUserName, UsrDisplayString, UsrNetAddress
+       FROM USR-DEFINITIONS-MIB
+       ifIndex, ifAdminStatus, ifOperStatus FROM IF-MIB;
+usrConfig        MODULE-IDENTITY
+                 LAST-UPDATED "200305190930Z"
+                 ORGANIZATION "CommWorks Corporation, a 3Com Company"
+                 CONTACT-INFO "Customer Support"
+                 DESCRIPTION
+                         "The commWorks enterprise defined MIB objects
+                          for Configuration Management"
+--      REVISION     "200305190930Z"
+--      DESCRIPTION  "Added Ethernet Operating Mode that allows one to Change Ethernet port's Mode."
+--      REVISION     "200209060930Z"
+--      DESCRIPTION  "Added two new enterprise traps for LinkDown and LinkUp events. The traps contain the slot information of the card."
+--      REVISION "200208231340Z"
+--      DESCRIPTION "Clarified usage and leabels for usrCfgIfPromiscuousMode,
+--          usrCfgResetEEpromStatus."
+--               REVISION        "200208021650Z"
+--               DESCRIPTION     "Obsoleted usrCfgModemGroupFilterTable and everything
+--                                under it. These were moved to usr_vha.mib"
+--      REVISION "200208231340Z"
+--      DESCRIPTION "Clarified usage and leabels for usrCfgIfPromiscuousMode,
+--                   usrCfgResetEEpromStatus."
+--      REVISION     "200208151645Z"
+--      DESCRIPTION  "Added two new MIB objects for new CLI Save Settings"
+--      REVISION     "200208021650Z"
+--      DESCRIPTION  "Obsoleted usrCfgModemGroupFilterTable and everything
+--                    under it. These were moved to usr_vha.mib"
+--      REVISION     "200203131300Z"
+--      DESCRIPTION  "Converted to SNMPv2"
+         ::= { common 1 }
+   -- textual conventions
+   -- 
+   -- textual conventions are like pre-processor macro in 'C'
+   --        (i.e. #define statements)
+   -- Use them to define your own 'datatypes'
+   -- Network Encapsulation Types. This enumeration should match the one 
+   -- in pilgrim/config/include/config_public.h
+	UsrCfgEncapsulations ::= INTEGER {
+						 none(0),
+	                          ethernetII(1),
+		  	    	           snap(2),
+				           dsap(3),
+				           ethernet8023Novell(4),
+			     	      ppp(5),
+			          	 frameRelay(6),
+				           slip(7),
+     	                     arap(8),	
+          	                loop(9),
+                               frameRelayMgmt(10),
+                               bridge(11),
+                               atm1483(12),
+                               atm1577(13),
+                               atmLane(14),
+                               mcns(15)
+			}
+   -- Begin managed object definitions here...
+-- The Config Group
+usrCfgVersion OBJECT-TYPE
+	SYNTAX      DisplayString
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The current software version of the Config Process."
+::= { usrConfig 1}
+usrCfgConfigFileName OBJECT-TYPE
+	SYNTAX      DisplayString
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION		
+		"The name of a ConfigFile to read/write  permanent database records."
+::= { usrConfig 2 }
+usrCfgCFMStatusFlag  OBJECT-TYPE
+	SYNTAX	  UsrConfigStatus
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"Setting the value of this object to `save' causes the values
+		 of the Config Group to be written out to the current config
+		 file, which is stored in the cfgConfigFile object. While
+		 the new ConfigFile is being written, the config process
+		 will set the value of this flag set to `saving''. Any
+		 attempts to set the value while it is  not `normal'
+		 (i.e. the file is currently being written to the
+		 ConfigFile) while result in a badValue error being
+		 returned. Setting the value to `normal' will result in no
+		 action."
+::= { usrConfig 3 }
+usrCfgCFMStatusNetFlag  OBJECT-TYPE
+	SYNTAX	UsrConfigStatus
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"Setting the value of this object to `save' causes the values
+		 of all the Network Table entries to be written out to the
+		 current config file, which is stored in the cfgConfigFile
+		 object. While the new ConfigFile is being written, the config
+		 process will set the value of this flag set to `saving''. Any
+		 attempts to set the value while it is  not `normal'
+		 (i.e. the file is currently being written to the
+		 ConfigFile) while result in a badValue error being
+		 returned. Setting the value to `normal' will result in no
+		 action."
+::= { usrConfig 4 }
+usrCfgCFMStatusIfFlag  OBJECT-TYPE
+	SYNTAX	UsrConfigStatus
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"Setting the value of this object to `save' causes the values
+		 of all the IF Table entries to be written out to the
+		 current config file, which is stored in the cfgConfigFile
+		 object. While the new ConfigFile is being written, the config
+		 process will set the value of this flag set to `saving''. Any
+		 attempts to set the value while it is  not `normal'
+		 (i.e. the file is currently being written to the
+		 ConfigFile) while result in a badValue error being
+		 returned. Setting the value to `normal' will result in no
+		 action."
+::= { usrConfig 5 }
+usrCfgCFMStatusNetSvcFlag OBJECT-TYPE
+	SYNTAX		UsrConfigStatus
+	MAX-ACCESS      	read-write
+	STATUS      	current
+	DESCRIPTION
+		"Setting the value of this object to `save' causes the values
+		 of the Network Service Table to be written out to the
+		 current config file, which is stored in the usrCfgConfigFile
+		 object. While the new ConfigFile is being written, the config
+		 process will set the value of this flag set to `saving''. Any
+		 attempts to set the value while it is  not `normal'
+		 (i.e. the file is currently being written to the
+		 ConfigFile) while result in a badValue error being
+		 returned. Setting the value to `normal' will result in no
+		 action."
+::= { usrConfig 6 }
+usrCfgNetTable OBJECT-TYPE
+	SYNTAX     SEQUENCE OF UsrCfgNetEntry
+	MAX-ACCESS     not-accessible
+	STATUS     current
+	DESCRIPTION
+		"A list of Networks currently configured in the Netserver
+		 system."
+::= { usrConfig 7 }
+usrCfgNetEntry OBJECT-TYPE
+	SYNTAX      UsrCfgNetEntry
+	MAX-ACCESS      not-accessible
+	STATUS      current
+	DESCRIPTION
+		"An entry containing management information applicable to a
+		 particular network."
+	INDEX { usrCfgNetName }
+::= { usrCfgNetTable 1}
+UsrCfgNetEntry ::=
+	SEQUENCE {
+        usrCfgNetName DisplayString,
+		usrCfgNetIfName UsrDisplayString,
+		usrCfgNetProtoType INTEGER,
+		usrCfgNetEncapType UsrCfgEncapsulations,
+		usrCfgNetAddress  UsrNetAddress,
+		usrCfgNetStatus INTEGER,
+        usrCfgNetLogicalId UsrNetLogicalId,
+		usrCfgNetType INTEGER,
+		usrCfgNetUserName UsrUserName,
+		usrCfgNetCFMStatusFlag UsrConfigStatus,
+		usrCfgNewNetIfName UsrDisplayString,
+		usrCfgNewNetAddress UsrNetAddress,
+		usrCfgNewNetEncapType UsrCfgEncapsulations,
+		usrCfgNetRemoteAddress  UsrNetAddress,
+		usrCfgNetWanType INTEGER,
+		usrCfgNetRpPiNormal INTEGER,
+		usrCfgNetVlanTag Integer32
+		}
+usrCfgNetName OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (1..32))
+	MAX-ACCESS  accessible-for-notify
+	STATUS      current
+	DESCRIPTION
+		"The name of this network. Network names can either be assigned
+         by a network administrator when the Network is created. Or it will
+         generated by the Configuration Process when it adds the network to
+		 its internal table. Generated network names will be formed by
+		 concatenating the ascii forms of the protocol name, network address
+		 and port number separated by hyphens."
+::= { usrCfgNetEntry 1}
+usrCfgNetIfName OBJECT-TYPE
+	SYNTAX      UsrDisplayString (SIZE (1..32))
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"The name of the interface this network runs on top of."
+	--CONFIGURABLE
+::= { usrCfgNetEntry 2 }
+usrCfgNetProtoType OBJECT-TYPE
+	SYNTAX     INTEGER {
+                         ip(1),
+		               ipx(2),
+		               at(3),
+				     bridge(5),
+					frameRelayMgmt(6),
+					frameRelayDlci(7),
+					ppp(8),
+					slip(9)
+			          }
+	MAX-ACCESS read-write
+	STATUS     current
+	DESCRIPTION
+		"The Level 3 protocol running over this network."
+	--CONFIGURABLE
+::= { usrCfgNetEntry 3 } 
+usrCfgNetAddress OBJECT-TYPE
+	SYNTAX      UsrNetAddress
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"The address which identifies the network. The format of
+		 this object is dependent on the protocol running on this
+		 network."
+	--CONFIGURABLE
+::= { usrCfgNetEntry 4 }
+usrCfgNetEncapType OBJECT-TYPE
+	SYNTAX      UsrCfgEncapsulations
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"The type of encapsulation employed by this network."
+	--CONFIGURABLE
+::= { usrCfgNetEntry 5 }
+usrCfgNetStatus OBJECT-TYPE
+	SYNTAX      INTEGER {
+			    initializing(1),
+			    configuring(2),
+			    enable(3),  -- Set to this value to enable network 
+			    enabling(4),
+                            disable(5), -- Set to this value to disable network 
+                            disabling(6),
+			    invalid(7), -- Set to this value to remove network
+			    terminating(8),
+			    reconfigure(9) -- Set this value to reconfigure a
+                                           -- static IP Network.
+			          }
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"The current status of the network entry. The value of this
+		 object can be set to one of four values, 'enable', 'disable',
+		 'invalid' or 'reconfigure'.
+		 Setting the value of 'invalid' causes the network to be removed.
+		 The 'enable' value enables a network currently in the 'disable'
+		 state.
+		 Setting the value to 'disable', disables a network in the 
+		 'enable' state. 
+		 'reconfigure' will result in the network temporarily disabled
+		 and re-configured using any non-NULL values in the usrCfgNewNet...
+		 objects. This allows a Network Manager to change an existing
+		 network's address, encapsulation, or interface without having to
+		 remove the router from service. This status can only be used on
+		 static IP networks. Any attempt to 'reconfigure' any other type of
+		 network will result in a 'badValue' error.
+		 Attempts to set the value of this object to any other values
+		 is illegal and will cause a 'badValue' error to be generated."
+	--CONFIGURABLE
+::= { usrCfgNetEntry 6 }
+usrCfgNetLogicalId OBJECT-TYPE
+	SYNTAX      UsrNetLogicalId
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The logical identifier for this network assigned by the Pilgrim
+                 forwarder process which owns this network. The value of the
+		 LogicalId is returned to the Config Process in the
+		 FWD_ENABLE_NETWORK_RSP IPC message."
+::= { usrCfgNetEntry 7 }
+usrCfgNetType OBJECT-TYPE
+	SYNTAX      INTEGER {
+                            static(1),
+		            dynamic(2),
+                            automatic(3)
+                            }
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"Networks configured via network management interaction are
+           static networks.
+           Networks created to service incoming calls are dynamic networks.
+           Networks created automatically every time the system reboots (i.e.
+           the IP Loopback Network are automatic networks. Automatic networks
+           are essentially read-only network entries, the cannot be enabled,
+           disabled or deleted."
+::= { usrCfgNetEntry 8 }
+usrCfgNetUserName OBJECT-TYPE
+	SYNTAX       UsrUserName
+	MAX-ACCESS   read-write
+	STATUS       current
+	DESCRIPTION
+		"The name of a user (location) associated with a dedicated circuit
+		 type network. This object's value is only meaningful for Data Link
+		 Control networks (PPP, SLIP, Frame Relay, etc...) over 
+		 dedicated/permanent circuits. This name is passed to the Data
+		 Link Control Process when the network is created
+		 (ADD NETWORK command). The DLCP will use the name to lookup a
+		 location profile in User Manager database. For non-dedicated
+		 circuit networks, this object's value will always be a 
+		 NULL string. Attempts to SET or change the value of this object
+		 for non-dedicated circuit networks will fail."
+	--CONFIGURABLE
+::= { usrCfgNetEntry 9 }
+usrCfgNetCFMStatusFlag OBJECT-TYPE
+	SYNTAX	UsrConfigStatus
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"Setting the value of this object to `save' causes the values
+		 of this Network Table entry to be written out to the
+		 current config file, which is stored in the usrCfgConfigFile
+		 object. While the new ConfigFile is being written, the config
+		 process will set the value of this flag set to `saving''. Any
+		 attempts to set the value while it is  not `normal'
+		 (i.e. the file is currently being written to the
+		 ConfigFile) while result in a badValue error being
+		 returned. Setting the value to `normal' will result in no
+		 action."
+::= { usrCfgNetEntry 10 }
+--
+-- The following three objects are used in conjunction with the 'reconfigure'
+-- network status. Any object with a non-NULL/zero value, will be used
+-- to configure the network setting when a 'reconfigure' request is made
+-- through the usrCfgNetStatus object.
+--
+-- NOTE: These objects and the associated 'reconfigure' command only
+--       apply to static IP Networks. Attempts to set values for these
+--       objects for any other type of network will fail.
+--
+usrCfgNewNetIfName OBJECT-TYPE
+	SYNTAX      UsrDisplayString (SIZE (0..32))
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"The name of the interface this network runs on top of."
+::= { usrCfgNetEntry 11 }
+usrCfgNewNetAddress OBJECT-TYPE
+	SYNTAX      UsrNetAddress
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"The address which identifies the network. The format of
+		 this object is dependent on the protocol running on this
+		 network."
+::= { usrCfgNetEntry 12 }
+usrCfgNewNetEncapType OBJECT-TYPE
+	SYNTAX      UsrCfgEncapsulations
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"The type of encapsulation employed by this network."
+::= { usrCfgNetEntry 13 }
+usrCfgNetRemoteAddress OBJECT-TYPE
+        SYNTAX      UsrNetAddress
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+                "The IP address of the remote router for the network
+                 configured as an IP Numbered-Point-To-Point network."
+        --CONFIGURABLE
+::= { usrCfgNetEntry 14 }
+usrCfgNetWanType OBJECT-TYPE
+        SYNTAX     INTEGER {
+                         none(0),
+                         unptp(1),
+                         nptp(2),
+                         network(3)
+                        }
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "The Wan Type determines the type of the IP network
+                 created on top of the WAN (eg., Frame Relay)."
+        --CONFIGURABLE
+::= { usrCfgNetEntry 15 }
+usrCfgNetRpPiNormal OBJECT-TYPE
+        SYNTAX     INTEGER {
+                         rp(1),
+                         pi(2),
+                         normal(3)
+                        }
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "This flag determines whether the interface being defined
+                 is a generic one, or one which supports redundancy of
+                 RP and PI interface."
+        DEFVAL { normal }
+        --CONFIGURABLE
+::= { usrCfgNetEntry 17 }
+usrCfgNetVlanTag OBJECT-TYPE
+        SYNTAX     Integer32 (0..4094) 
+        MAX-ACCESS     read-write
+        STATUS     current
+        DESCRIPTION
+                "This determines the VLAN tag that needs to be added to all
+                the packets going through this network. By default this value is 0.
+		If zero is set then it means that no VLAN tag will be added."
+        --CONFIGURABLE
+::= { usrCfgNetEntry 18 }
+usrCfgIfTable OBJECT-TYPE
+	SYNTAX     SEQUENCE OF UsrCfgIfEntry
+	MAX-ACCESS not-accessible
+	STATUS     current
+	DESCRIPTION
+		"A list of Interface Names currently configured in the Netserver
+		 system."
+::= { usrConfig 8 }
+usrCfgIfEntry OBJECT-TYPE
+	SYNTAX      UsrCfgIfEntry
+	MAX-ACCESS  not-accessible
+	STATUS      current
+	DESCRIPTION
+		"An entry containing management information applicable to a
+		 particular Interface."
+	INDEX { usrCfgIfName }
+::= { usrCfgIfTable 1}
+UsrCfgIfEntry ::=
+	SEQUENCE {
+        usrCfgIfName            UsrDisplayString,
+		usrCfgIfIndex           Integer32,
+		usrCfgIfAdminStatus     INTEGER,
+		usrCfgIfLinkUpDownTrapEnable INTEGER,
+		usrCfgIfPromiscuousMode INTEGER,
+		usrCfgIfInFilter DisplayString,
+		usrCfgIfOutFilter DisplayString,
+		usrCfgIfFilterAccess INTEGER,
+		usrCfgIfSdlCmds INTEGER,
+		usrCfgIfSdlCmdResults INTEGER,
+		usrCfgIfSysIndex Integer32,
+        usrCfgIfManualSwitch Integer32,
+		usrCfgIfPolicy UsrDisplayString,
+		usrCfgIfPolicyAccess INTEGER,
+		usrCfgIfType  Integer32,
+		usrCfgIfEthernetOperMode INTEGER
+		}
+usrCfgIfName OBJECT-TYPE
+	SYNTAX      UsrDisplayString (SIZE (1..32))
+	MAX-ACCESS      not-accessible
+	STATUS      current
+	DESCRIPTION
+		"The name of this interface.  The value of this
+           object is the same as the ifName object of the standard Interface
+           table (RFC-1573). This table allows the Pilgrim CLI process to
+           translate Interface names into ifIndex values. All the other tables
+           in the Pilgrim system relating to interfaces are indexed by the
+           ifIndex value of the related interface."
+::= { usrCfgIfEntry 1}
+usrCfgIfIndex OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The interface index of this interface taken from the standard 
+           (RFC-1573) Interface MIB."
+::= { usrCfgIfEntry 2 }
+usrCfgIfAdminStatus OBJECT-TYPE
+       SYNTAX  INTEGER {
+                   up(1),       -- ready to pass packets
+                   down(2)
+               }
+       MAX-ACCESS  read-write
+       STATUS  current
+       DESCRIPTION
+               "The permanently configured state of the interface."
+	--CONFIGURABLE
+::= { usrCfgIfEntry 3 }
+usrCfgIfLinkUpDownTrapEnable  OBJECT-TYPE
+       SYNTAX      INTEGER { enabled(1), disabled(2) }
+       MAX-ACCESS  read-write
+       STATUS  current
+       DESCRIPTION
+               "The permanently configured value, which indicates whether 
+	        linkUp/linkDown traps should be generated for this
+		interface."
+	--CONFIGURABLE
+::= { usrCfgIfEntry 4 }
+usrCfgIfPromiscuousMode  OBJECT-TYPE
+       SYNTAX      INTEGER {
+                        enabled(1),
+                        disabled(2)
+                        }
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "This object has a value of DISABLED if this interface
+               only accepts packets/frames that are addressed to this
+               station.  This object has a value of ENABLED when the
+               station accepts all packets/frames transmitted on the
+               media.  The value ENABLED is only legal on certain
+               types of media.  If legal, setting this object to a
+               value of ENABLED may require the interface to be reset
+               before becoming effective.
+               The value of ifPromiscuousMode does not affect the
+               reception of broadcast and multicast packets/frames by
+               the interface.
+                This functionality is not supported for wireless
+                components."
+	--CONFIGURABLE
+::= { usrCfgIfEntry 5 }
+usrCfgIfInFilter OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE(0..20))
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION "The name of the input filter for a specific interface."
+      --CONFIGURABLE
+::= { usrCfgIfEntry 6 }
+usrCfgIfOutFilter OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE(0..20))
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION "The name of the output filter for a specific interface."
+       --CONFIGURABLE
+::= { usrCfgIfEntry 7 }
+usrCfgIfFilterAccess OBJECT-TYPE
+       SYNTAX      INTEGER {
+	                     off (0),
+                             on (1)
+                           }
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION "This switch will allow user filters to override the
+                    interface filters. If set to 'off', user filters do not
+		    override the interface filters. If set to 'on' user
+		    filters can override the interface filters."
+       --CONFIGURABLE
+::= {usrCfgIfEntry 8 }
+usrCfgIfSdlCmds OBJECT-TYPE
+       	SYNTAX INTEGER{
+                normal(1),
+		download(2),
+		forceLinkDown(3)
+ 	    }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The Software Download Commands are as follows:
+		normal: 
+		This mode is for normal operation.
+		download:
+		This command trigger the download for this device.
+		forceLinkDown:
+		Force the Link to go down while a connection is in progress
+ 		and download. "
+        DEFVAL { normal }
+	::= { usrCfgIfEntry 9 }
+usrCfgIfSdlCmdResults OBJECT-TYPE
+       	SYNTAX INTEGER{
+		notSelected(1),
+		pending(2),
+		active(3),
+		failed(4),
+		complete(5),
+		portBusy(6)
+ 	    }
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The Software Download status are as follows:
+ 		notSelected: 
+		The particular Device is not selected for software download.
+		This mode is for normal operation.
+ 		pending:
+		This Device was selected for download, but it has not started.
+ 		active:
+		This Device is currently being downloaded to.
+ 		failed:
+		The download process failed for some reason in this device.
+ 		complete:
+		This Device was successfully downloaded.
+		portBusy:
+		This Device is busy."
+        DEFVAL { notSelected }
+	::= { usrCfgIfEntry 10 }
+	usrCfgIfSysIndex OBJECT-TYPE
+       	SYNTAX Integer32
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The index of the Positron System Table that this interface
+		 belongs to. The value of this object will always be zero on
+		 non-Positron systems."
+	::= { usrCfgIfEntry 11 }
+usrCfgIfManualSwitch OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"This switch controls the Interface status, when a SAVE ALL
+		 is issued and it was not disabled by the user. It should not
+		 be modified, it is only used by CFM."
+	--CONFIGURABLE
+::= { usrCfgIfEntry 12  }
+usrCfgIfPolicy OBJECT-TYPE
+	SYNTAX      UsrDisplayString (SIZE(0..20))
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION "The name of the  policy for a specific interface."
+      --CONFIGURABLE
+::= { usrCfgIfEntry 13 }
+usrCfgIfPolicyAccess OBJECT-TYPE
+       SYNTAX      INTEGER {
+	                        off (0),
+                             on (1)
+                           }
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION "This switch will allow user policy to override the
+                    interface policy. If set to 'off', user policies do not
+				override the interface policy. If set to 'on' user
+				policy can override the interface policy."
+       --CONFIGURABLE
+::= {usrCfgIfEntry 14 }
+usrCfgIfType OBJECT-TYPE  
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current    
+    DESCRIPTION 
+        "The type of interface, distinguished according to
+        the physical/link protocol(s) immediately below
+        the network layer in the protocol stack."
+::= { usrCfgIfEntry 15  } 
+usrCfgIfEthernetOperMode OBJECT-TYPE
+	SYNTAX INTEGER {
+				tenhalfduplex (0),
+				tenfullduplex (1),
+				hunhalfduplex (2),
+				hunfullduplex (3),
+				autonegotiate  (4),
+				notapplicable (5)
+				}
+	MAX-ACCESS	read-write
+	STATUS		current
+	DESCRIPTION "This Variable allows one to change the ethernet device operating
+				mode. Modes could be 10Half/10Full/100Half/100Full or Auto Negoti
+				ate. This is applicable only for ETHERNET Interfaces supported on
+				the HARC-I and HARC-II boards with DP83840A or Level-1 Phys."
+	--CONFIGURABLE
+::= { usrCfgIfEntry 25 }
+usrCfgModuleTable OBJECT-TYPE
+	SYNTAX     SEQUENCE OF UsrCfgModuleEntry
+	MAX-ACCESS     not-accessible
+	STATUS     current
+	DESCRIPTION
+		"A list of RoboExec Software modules currently configured in the
+		 Netserver system."
+::= { usrConfig 9 }
+usrCfgModuleEntry OBJECT-TYPE
+	SYNTAX      UsrCfgModuleEntry
+	MAX-ACCESS      not-accessible
+	STATUS      current
+	DESCRIPTION
+		"An entry containing management information applicable to a
+		 particular Module."
+	INDEX { usrCfgModName }
+::= { usrCfgModuleTable 1}
+UsrCfgModuleEntry ::=
+	SEQUENCE {
+          usrCfgModName
+			DisplayString,
+		usrCfgModType
+			INTEGER,
+		usrCfgModFileName
+			DisplayString,
+		usrCfgModCfgFileName
+			DisplayString,
+		usrCfgModDescr
+			DisplayString,
+		usrCfgModMasterProcess
+			DisplayString,
+		usrCfgModStatus
+			INTEGER
+		}
+usrCfgModName OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (1..32))
+	MAX-ACCESS      not-accessible
+	STATUS      current
+	DESCRIPTION
+		"The name of this module."
+::= { usrCfgModuleEntry 1}
+usrCfgModType OBJECT-TYPE
+	SYNTAX      INTEGER { linked(1), loadable(2) }
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The module type."
+::= { usrCfgModuleEntry 2}
+usrCfgModFileName OBJECT-TYPE
+	SYNTAX      DisplayString
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The module's down-loadable file name. For 'linked' modules
+		 the value will always be a zero length string, and no
+		 SET operations will be allowed. If no file name is specified
+		 when a new entry is added to the table, the Config Process will
+		 attempt to load the file '@file//<usrCfgModName.mod"
+	--CONFIGURABLE
+::= { usrCfgModuleEntry 3}
+usrCfgModCfgFileName OBJECT-TYPE
+	SYNTAX      DisplayString
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The module's Configuration file name. This file contains the
+		 module's permanent configuration records. The value of this
+		 object is passed to the module's master process's initialization
+		 routine via the 'init_arg' parameter."
+	--CONFIGURABLE
+::= { usrCfgModuleEntry 4}
+usrCfgModDescr OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE(0..128))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"A longer string describing the module."
+::= { usrCfgModuleEntry 5}
+usrCfgModMasterProcess OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE(1..32))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The name of the master process of this module."
+::= { usrCfgModuleEntry 6}
+usrCfgModStatus OBJECT-TYPE
+	SYNTAX      INTEGER {	initializing(1),
+						configuring(2),
+						loading(3),
+						loaded(4),
+						terminate(5),
+						terminating(6),
+						unload(7),
+						unloading(8),
+						broken(9) }
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"Status flags to control and display the module's current state.
+		 Only the values 'terminate' and 'unload' may be set by a
+		 Network Manager process. Adding a new entry to the table will
+		 trigger the Config Process to load the module."
+::= { usrCfgModuleEntry 7}
+usrCfgAvailServiceTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF USRCfgAvailServiceEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"This table defines the available services from the router."
+::= { usrConfig 10 }
+usrCfgAvailServiceEntry OBJECT-TYPE
+	SYNTAX USRCfgAvailServiceEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"An entry containing management information for a 
+		particular available service."
+	INDEX { usrCfgAvailServiceIndex }
+::= { usrCfgAvailServiceTable 1 }
+USRCfgAvailServiceEntry ::=
+	SEQUENCE {
+		usrCfgAvailServiceIndex
+			Integer32,
+		usrCfgAvailServiceName
+			DisplayString,
+		usrCfgAvailServiceDescription
+			DisplayString,
+		usrCfgAvailServiceType
+			INTEGER,
+		usrCfgAvailServiceProtocol
+			INTEGER,
+		usrCfgAvailServiceModuleName
+			DisplayString
+	 }
+usrCfgAvailServiceIndex OBJECT-TYPE
+	SYNTAX Integer32
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"An index into this table."
+::= { usrCfgAvailServiceEntry 1 }
+usrCfgAvailServiceName OBJECT-TYPE
+	SYNTAX DisplayString (SIZE(1..32))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The handle by which this service is known."
+::= { usrCfgAvailServiceEntry 2 }
+usrCfgAvailServiceDescription OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"A textual description of the service."
+::= { usrCfgAvailServiceEntry 3 }
+usrCfgAvailServiceType OBJECT-TYPE
+	SYNTAX INTEGER {
+			cfgSrvNetwork(1),
+			cfgSrvTerminal(2),
+			cfgSrvBoth(3),
+			cfgSrvNeither(4)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"What type of service does this entry describe?."
+::= { usrCfgAvailServiceEntry 4 }
+usrCfgAvailServiceProtocol OBJECT-TYPE
+	SYNTAX INTEGER {
+			cfgSrvTCP(1),
+			cfgSrvUDP(2),
+			cfgSrcIPX(3),
+			cfgSrvSPX(4),
+			cfgSrvDDP(5),
+			cfgSrvADSP(6),
+			cfgSrvNCSI(7)
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"This describes the Transport protocol on which the service resides."
+::= { usrCfgAvailServiceEntry 5 }
+usrCfgAvailServiceModuleName OBJECT-TYPE
+	SYNTAX DisplayString (SIZE(1..32))
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The Pilgrim module which implements this service.."
+::= { usrCfgAvailServiceEntry 6 }
+usrCfgNetworkServiceTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF UsrCfgNetworkServiceEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"This table defines the Network services provided by Pilgrim"
+::= { usrConfig 11 }
+usrCfgNetworkServiceEntry OBJECT-TYPE
+	SYNTAX UsrCfgNetworkServiceEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"An entry containing management information for a 
+		particular network service."
+	INDEX { usrCfgNetworkServiceAdminName }
+::= { usrCfgNetworkServiceTable 1 }
+UsrCfgNetworkServiceEntry ::=
+	SEQUENCE {
+		usrCfgNetworkServiceAdminName
+			DisplayString,
+		usrCfgNetworkServiceName
+			DisplayString,
+		usrCfgNetworkServiceSocketNumber
+			INTEGER,
+		usrCfgNetworkServiceAncillaryData
+			OCTET STRING,
+		usrCfgNetworkServiceCloseActiveServices
+			TruthValue,
+		usrCfgNetworkServiceStatus
+			INTEGER,
+		usrCfgNetworkServiceCFMStatusFlag
+			UsrConfigStatus
+	 }
+usrCfgNetworkServiceAdminName OBJECT-TYPE
+	SYNTAX DisplayString (SIZE(1..32))
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION
+		"The name by which the administrator identifies this service."
+::= { usrCfgNetworkServiceEntry 1 }
+usrCfgNetworkServiceName OBJECT-TYPE
+	SYNTAX DisplayString (SIZE(1..32))
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The available service providing this network service.
+		Must be the an entry from the Available Services Table."
+	--CONFIGURABLE
+::= { usrCfgNetworkServiceEntry 2 }
+usrCfgNetworkServiceSocketNumber OBJECT-TYPE
+	SYNTAX INTEGER (0..65535)
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The number of the socket for this service."
+	--CONFIGURABLE
+::= { usrCfgNetworkServiceEntry 3 }
+usrCfgNetworkServiceAncillaryData OBJECT-TYPE
+	SYNTAX OCTET STRING
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"This specifies any other data that the service needs
+		for its definition. To reset this SET to 'none'."
+	--CONFIGURABLE
+::= { usrCfgNetworkServiceEntry 4 }
+usrCfgNetworkServiceCloseActiveServices OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"This variable determines if active sessions using this service
+		are closed when the service is set to inactive or invalid"
+	--CONFIGURABLE
+::= { usrCfgNetworkServiceEntry 5 }
+usrCfgNetworkServiceStatus OBJECT-TYPE
+	SYNTAX INTEGER {
+			enable(1),
+			disable(2),
+			delete(3)
+		}
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Setting this variable to delete removes the service."
+	--CONFIGURABLE
+::= { usrCfgNetworkServiceEntry 6 }
+usrCfgNetworkServiceCFMStatusFlag OBJECT-TYPE
+	SYNTAX	UsrConfigStatus
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"Setting the value of this object to `save' causes the values
+		 of this Network Service Table entry to be written out to the
+		 current config file, which is stored in the usrCfgConfigFile
+		 object. While the new ConfigFile is being written, the config
+		 process will set the value of this flag set to `saving''. Any
+		 attempts to set the value while it is  not `normal'
+		 (i.e. the file is currently being written to the
+		 ConfigFile) while result in a badValue error being
+		 returned. Setting the value to `normal' will result in no
+		 action."
+::= { usrCfgNetworkServiceEntry 7 }
+usrCfgRebootFlag OBJECT-TYPE
+	SYNTAX	INTEGER {
+				normal(1),
+				reboot(2),
+				shutdown(3),
+				resetConfiguration(4)
+			}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"Setting the value of this object to `reboot' causes the
+		 the system to gracefully shutdown and then reboot. Setting
+		 the value to `shutdown' causes the system to shutdown and not
+		 reboot automatically. The value `resetConfiguration' will
+		 reset the system configuration to the 'factory default'
+		 configuration and then reboot the system. Setting
+		 the value to `normal' will result in no action."
+::= { usrConfig 12 }
+usrCfgTransmitAuthenName OBJECT-TYPE
+	SYNTAX UsrUserName
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"The System wide transmit authentication user name."
+	--CONFIGURABLE
+::= { usrConfig 13 }
+usrCfgSystemVersion OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The software release version of this system."
+::= { usrConfig 14 }
+usrCfgImageFileName OBJECT-TYPE
+	SYNTAX DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"The file name of the software image which this product loads
+           when the system reboots. The value of this object is used by the
+           USR Access Router Manager when it downloads a new version of the
+           router software."
+::= { usrConfig 15 }
+usrCfgDownLoadStatus OBJECT-TYPE
+	SYNTAX	INTEGER {
+				normal(1),
+				triggerDownLoad(2),
+				deletingImageFile(3),
+				readyForDownLoad(4)
+			}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"This value is used to  prepare the system to receive a
+		 new system image via TFTP. A Network Management
+		 station initiates a system image download by setting the
+		 value of this object to 'triggerDownLoad'. The system then sets
+		 the state to 'deletingImageFile', while it removes the current
+		 image file from the flash file system. This frees up space in the
+		 flash file system for the new image. 
+		 When the old image file is deleted, the value of this will be
+		 changed to 'readyForDownLoad'. The NMS is expected to poll
+		 this MIB object until this state is reached. Then it can 
+		 begin a TFTP download of the new image file.
+		 (NOTE: if the system crashes or reboots during the 
+		 'deleteingImageFile' or 'readyForDownLoad' states, the system
+		 will NOT reboot, and the image must be update via a console
+		 port Software Down Load.)
+		 After the new system image TFTP download has been completed,
+		 the NMS **MUST** set this object back to the 'normal' state.
+		 A system shutdown or reboot via the usrCfgRebootFlag object 
+		 will not be allowed unless the this object has been reset to
+		 'normal'."
+::= { usrConfig 16 }
+usrCfgLossOfServiceChecking OBJECT-TYPE
+	SYNTAX TruthValue
+	MAX-ACCESS read-write
+	STATUS current
+	DESCRIPTION
+		"Specifies whether the configurator will allow the modems to
+		 be busied out if a loss of service is detected.
+		 This feature may not be available on all systems."
+	DEFVAL	{ 1 }
+	--CONFIGURABLE
+::= { usrConfig 17 }
+usrCfgBulkFileGroup OBJECT IDENTIFIER ::= { usrConfig 18 }
+usrCfgBulkFileStatus OBJECT-TYPE
+	SYNTAX	INTEGER {
+				normal(1),
+				createBulkFile(2),
+				creatingBulkFile(3),
+				restoreBulkFile(4),
+				restoringBulkFile(5),
+				bulkFileError(6)
+			}
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"This object is used to allow the system to prepare a
+		 Bulk configuration file that is retrievable via TFTP.
+		 A bulk configuration file is created by setting the
+		 value of this object to 'createBulkFile'. The system
+		 then sets this object to 'creatingBulkFile' and
+		 concatenates the individual .cfg files into a single
+		 file indicated by the object usrCfgBulkFileName.
+		 The individual .cfg files can be restored by setting
+		 the value of this object to 'restoreBulkFile'. The
+		 system then sets this object to 'restoringBulkFile'
+		 and splits the file indicated by the object
+		 usrCfgBulkFileName into the individual .cfg files.
+		 Note: the file indicated by the object usrCfgBulkFileName
+		 must be present in the file system for this to succeed.
+		 The operation is completed when the value of this object
+		 is set back to 'normal' or 'bulkFileError' which indicates
+		 that an error occurred."
+::= { usrCfgBulkFileGroup 1 }
+usrCfgBulkFileName OBJECT-TYPE
+	SYNTAX	DisplayString (SIZE(0..32))
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"This is the name of the Bulk File that will be acted upon
+		 when usrCfgBulkFileStatus is set to 'createBulkFile' or
+		 'restoreBulkFile'."
+	DEFVAL { "ConfigBulkFile" }
+	--CONFIGURABLE
+::= { usrCfgBulkFileGroup 2 }
+usrCfgBulkFileErrorMessage OBJECT-TYPE
+	SYNTAX	OCTET STRING (SIZE(0..256))
+	MAX-ACCESS	read-only
+	STATUS	current
+	DESCRIPTION
+		"When the value of usrCfgBulkFileStatus is 'bulkFileError',
+		 this object will indicate the error that occurred."
+::= { usrCfgBulkFileGroup 3 }
+usrConfigTraps OBJECT IDENTIFIER ::= { usrConfig 19 }
+usrConfigTrapsv2 OBJECT-IDENTITY
+        STATUS  current
+        DESCRIPTION
+                "The events for Configuration Management traps"
+::= { usrConfigTraps 0 }
+usrCfgDynNetCreated NOTIFICATION-TYPE
+	OBJECTS { usrCfgNetName }
+    STATUS  current
+	DESCRIPTION
+		"A usrCfgDynNetCreated message signifies that the sending 
+		 CommWorks Remote Access Router has just established a
+		 Dynamic Network to service a dialup network user."
+::= { usrConfigTrapsv2 1 }
+usrCfgDynNetRemoved NOTIFICATION-TYPE
+	OBJECTS { usrCfgNetName }
+        STATUS  current
+	DESCRIPTION
+		"A usrCfgDynNetRemoved trap signifies that the sending 
+		 CommWorks Remote Access Router has just removed a
+		 Dynamic Network associated with a recently disconnected
+		 dialup network user"
+::= { usrConfigTrapsv2 2 }
+-- Enterprise traps being added to include slot number information also
+usrCfgSlot OBJECT-TYPE
+         SYNTAX INTEGER (0..16)
+         MAX-ACCESS  read-only
+         STATUS  current
+         DESCRIPTION
+            "The non-zero slot number holding this blade.
+             If the slot number is not determinable, such as for the testbed,
+             then the value is 0."
+        ::= { usrConfig 40 }
+usrCfgLinkUpDownTrapType  OBJECT-TYPE
+       SYNTAX   INTEGER {
+                rfcTrap(1),
+                cfgTrap(2),
+                rfcCfgTrap(3) }
+       MAX-ACCESS  read-write
+       STATUS  current
+       DESCRIPTION
+               "The type of linkUp/linkDown trap generated.
+                rfcTrap(1) - IF-MIB linkUp / LinkDown trap upon link up/dn
+                cfgTrap(2) - USR-CONFIG-MIB usrCfgLinkUp / usrCfgLinkDown upon link up/dn
+                rfcCfgTrap(3) - both linkUp and usrCfgLinkUp trap upon link up both 
+                linkDown and usrCfgLinkDown trap upon link dn "
+       DEFVAL { rfcTrap }
+--CONFIGURABLE
+      ::= { usrConfig 41 }
+usrCfgLinkDown NOTIFICATION-TYPE
+    OBJECTS { ifIndex, ifAdminStatus, ifOperStatus, usrCfgSlot }
+    STATUS  current
+    DESCRIPTION
+            "A usrCfgLinkDown trap signifies that the SNMP entity, acting in
+            an agent role, has detected that the ifOperStatus object for
+            one of its communication links is about to enter the down
+            state from some other state (but not from the notPresent
+            state).  This other state is indicated by the included value
+            of ifOperStatus.  usrCfgSlot is the slot number holding the blade."
+	          --#TYPE	"Network Interface Down Event"
+	          --#SUMMARY	"Network Interface: %d failure on slot number %d"
+	          --#ARGUMENTS { 0 3 }
+	          --#SEVERITY MAJOR
+	          --#STATE	NONOPERATIONAL
+	          --#PROBABLECAUSE "Adaptor Error" 
+    ::= { usrConfigTrapsv2 3 }
+usrCfgLinkUp NOTIFICATION-TYPE
+    OBJECTS { ifIndex, ifAdminStatus, ifOperStatus, usrCfgSlot }
+    STATUS  current
+    DESCRIPTION
+            "A usrCfgLinkUp trap signifies that the SNMP entity, acting in an
+            agent role, has detected that the ifOperStatus object for
+            one of its communication links left the down state and
+            transitioned into some other state (but not into the
+            notPresent state).  This other state is indicated by the
+            included value of ifOperStatus.
+            usrCfgSlot is the slot number holding the blade."
+	          --#TYPE	"Network Interface Up Event"
+	          --#SUMMARY	"Network Interface: %d restored on slot number %d"
+	          --#ARGUMENTS { 0 3 }
+	          --#SEVERITY CLEARED
+	          --#STATE	OPERATIONAL
+	          --#PROBABLECAUSE "Disconnected cable has been connected." 
+    ::= { usrConfigTrapsv2 4 }
+usrCfgTunnelConnTable OBJECT-TYPE
+	SYNTAX     SEQUENCE OF UsrCfgTunnelConnEntry
+	MAX-ACCESS     not-accessible
+	STATUS     current
+	DESCRIPTION
+		"A list of dynamic tunneling connections currently
+           active in the Netserver system."
+::= { usrConfig 20 }
+usrCfgTunnelConnEntry OBJECT-TYPE
+	SYNTAX      UsrCfgTunnelConnEntry
+	MAX-ACCESS      not-accessible
+	STATUS      current
+	DESCRIPTION
+		"An entry containing management information applicable to a
+		 particular Connection."
+	INDEX { usrCfgTunnelConnIfName }
+::= { usrCfgTunnelConnTable 1}
+UsrCfgTunnelConnEntry ::=
+	SEQUENCE {
+          usrCfgTunnelConnIfName DisplayString,
+		usrCfgTunnelConnUserName OCTET STRING,
+		usrCfgTunnelConnTunnelType INTEGER,
+		usrCfgTunnelConnStartTime Integer32
+		}
+usrCfgTunnelConnIfName OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (1..32))
+	MAX-ACCESS      not-accessible
+	STATUS      current
+	DESCRIPTION
+		"The name of this dynamic tunneling interface."
+::= { usrCfgTunnelConnEntry 1}
+usrCfgTunnelConnUserName OBJECT-TYPE
+	SYNTAX      OCTET STRING (SIZE (1..32))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The name of the user for this connection."
+::= { usrCfgTunnelConnEntry 2}
+usrCfgTunnelConnTunnelType OBJECT-TYPE
+	SYNTAX      INTEGER {
+                    pptp(1),
+                    l2f(2),
+                   l2tp(3),
+                    atmp(4),
+                    vtp(5),
+                    ah(6),
+                    ip-ip(7),
+                    min-ip-ip(8),
+                    esp(9),
+                    gre(10),
+                    drs(11)
+                    }
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+		"The tunneling protocol used for this connection."
+::= { usrCfgTunnelConnEntry 3}
+usrCfgTunnelConnStartTime OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+          "The start time of the connection."
+::= { usrCfgTunnelConnEntry 4}
+usrCfgSecurityService OBJECT-TYPE                                          
+        SYNTAX  INTEGER {
+                    radius(1),
+                    tacacsplus(2)                                          
+                }                                                          
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+                "Specifies the security service client process that gets started
+                at boot time."
+        DEFVAL  { 1 } 
+    --CONFIGURABLE
+::= { usrConfig 21 }
+usrCfgLogicalIfTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF UsrCfgLogicalIfEntry
+    MAX-ACCESS     not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A list of Logical Interface Names currently configured in the Netserver
+         system."
+::= { usrConfig 22 }
+usrCfgLogicalIfEntry OBJECT-TYPE
+    SYNTAX      UsrCfgLogicalIfEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing management information applicable to a
+         particular Interface."
+    INDEX { usrCfgLogicalIfName }
+::= { usrCfgLogicalIfTable 1}
+UsrCfgLogicalIfEntry ::=
+    SEQUENCE {
+             usrCfgLogicalIfName DisplayString,
+             usrCfgLogicalIfNonObject Integer32
+             }
+usrCfgLogicalIfName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The name of this interface. "
+	--CONFIGURABLE
+::= { usrCfgLogicalIfEntry 1}
+usrCfgLogicalIfNonObject OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "Fix for compiler which doesn't accept table without
+         any auxiliary objects! Code will return NO_SUCH_OBJECT."
+::= { usrCfgLogicalIfEntry 2}
+usrCfgLogicalIfRefTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF UsrCfgLogicalIfRefEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A list of Logical Interface Names and Index. This table is used as a reference for 
+         retrieving the stored index of LogicalIf"
+::= { usrConfig 23 }
+usrCfgLogicalIfRefEntry OBJECT-TYPE
+    SYNTAX      UsrCfgLogicalIfRefEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing management information applicable to a
+         particular Interface."
+    INDEX { usrCfgLogicalIfRefName }
+::= { usrCfgLogicalIfRefTable 1}
+UsrCfgLogicalIfRefEntry ::=
+    SEQUENCE {
+             usrCfgLogicalIfRefName     DisplayString,
+             usrCfgLogicalIfRefIndex    Integer32
+             }
+usrCfgLogicalIfRefName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The name of this interface. "
+	--CONFIGURABLE
+::= { usrCfgLogicalIfRefEntry 1}
+usrCfgLogicalIfRefIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The index of this logical interface. "
+	--CONFIGURABLE
+::= { usrCfgLogicalIfRefEntry 2}
+usrCfgResetEEpromStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                        enabled(1),
+                        disabled(2)
+                        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+                " Specifies whether boot prom needs to be initialised."
+    --CONFIGURABLE
+::= { usrConfig 24 }
+usrCfgModemGroupFilterTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF UsrCfgModemGroupFilterEntry
+    MAX-ACCESS     not-accessible
+    STATUS     obsolete
+    DESCRIPTION
+         "list of filter operations in a particular modem group.
+          Obsolete : This is no longer used."
+::= { usrConfig 28 }
+usrCfgModemGroupFilterEntry OBJECT-TYPE
+    SYNTAX      UsrCfgModemGroupFilterEntry
+    MAX-ACCESS      not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "An entry containing management information applicable to a
+         particular modem group.
+         Obsolete : This is no longer used."
+    INDEX { usrCfgModemGroupName }
+::= { usrCfgModemGroupFilterTable 1}
+UsrCfgModemGroupFilterEntry ::=
+    SEQUENCE {
+             usrCfgModemGroupName DisplayString,
+             usrCfgModemGroupFilterAccess  INTEGER,
+             usrCfgModemGroupInFilter DisplayString,
+             usrCfgModemGroupOutFilter DisplayString
+             }
+usrCfgModemGroupName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..32))
+    MAX-ACCESS      not-accessible
+    STATUS      obsolete
+    DESCRIPTION
+        "The name of this modem group
+         Obsolete : This is no longer used."
+    --CONFIGURABLE
+::= { usrCfgModemGroupFilterEntry 1}
+usrCfgModemGroupFilterAccess OBJECT-TYPE
+        SYNTAX      INTEGER {
+                            off (0),
+                             on (1)
+                           }
+        MAX-ACCESS  read-write
+        STATUS      obsolete
+     DESCRIPTION
+                "This is for setting a filter access for all the
+                interfaces in a particular modem group.
+                Obsolete : This is no longer used."
+    --CONFIGURABLE
+::= { usrCfgModemGroupFilterEntry 2 }
+usrCfgModemGroupInFilter OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..20))
+    MAX-ACCESS  read-write
+    STATUS      obsolete
+    DESCRIPTION "The name of the input filter for a specific modem group.
+                 Obsolete : This is no longer used."
+      --CONFIGURABLE
+::= { usrCfgModemGroupFilterEntry 3 }
+usrCfgModemGroupOutFilter OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..20))
+    MAX-ACCESS  read-write
+    STATUS      obsolete
+    DESCRIPTION "The name of the output filter for a specific group.
+                 Obsolete : This is no longer used."
+       --CONFIGURABLE
+::= { usrCfgModemGroupFilterEntry 4 }
+usrCfgTransmitPassword OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (1..32))
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "System password transmitted with auth name, when password is not 
+	 available from other sources; reading this object returns NULL"
+    --CONFIGURABLE
+    ::= { usrConfig 33 }
+usrCfgCFMStatusSettingsFlag  OBJECT-TYPE
+	SYNTAX	  UsrConfigStatus
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"Setting the value of this object to `save' causes the values
+		 of the Config Group to be written out to the current config
+		 file, which is stored in the cfgConfigFile object. While
+		 the new ConfigFile is being written, the config process
+		 will set the value of this flag set to `saving''. Any
+		 attempts to set the value while it is  not `normal'
+		 (i.e. the file is currently being written to the
+		 ConfigFile) while result in a badValue error being
+		 returned. Setting the value to `normal' will result in no
+		 action."
+::= { usrConfig 38 }
+usrCfgNetworksConfigFileName OBJECT-TYPE
+	SYNTAX      DisplayString
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION		
+		"The name of a ConfigFile to read/write Configurator IP Networks."
+::= { usrConfig 39 }
+usrCfgIpRedundancy OBJECT-TYPE
+	SYNTAX      INTEGER {
+		enable(1),
+		disable(2)
+        }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+                " Specifies whether the redundancy interconnect feature is enabled or not."
+    DEFVAL	{ disable }
+    --CONFIGURABLE
+::= { usrConfig 35 }
+usrCfgRpIfName OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (1..32))
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"The name of the RP interface
+         Returns NULL string if not configured."
+	--CONFIGURABLE
+::= { usrConfig 36 }
+usrCfgPiIfName OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (1..32))
+	MAX-ACCESS  read-write
+	STATUS      current
+	DESCRIPTION
+		"The name of the PI interface
+         Returns NULL string if not configured."
+	--CONFIGURABLE
+::= { usrConfig 37 }
+END  -- End of USR-CONFIG-MIB DEFINITIONS

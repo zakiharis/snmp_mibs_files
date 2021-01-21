@@ -1,0 +1,193 @@
+-- =============================================================================
+-- Copyright (c) 2004-2014 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: Multiprotocol Label Switching MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+--   V1.0 2013-06-13 Initial version Created by Neng Yan
+-- =============================================================================
+H3C-MPLSEXT-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    RowStatus, TruthValue
+        FROM SNMPv2-TC
+    h3cCommon
+        FROM HUAWEI-3COM-OID-MIB
+    ;
+
+-- =============================================================================
+-- module identity part
+-- =============================================================================
+h3cMplsExt MODULE-IDENTITY
+    LAST-UPDATED
+        "201306131800Z"        -- Jan 13, 2013 at 18:00 GMT
+    ORGANIZATION
+        "Hangzhou H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team Hangzhou H3C Technologies Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip:100085"
+    DESCRIPTION
+        "Multiprotocol Label Switching MIB"
+    REVISION
+        "201306131800Z"   -- Jan 13, 2013 at 18:00 GMT
+    DESCRIPTION
+        "Initial version of this MIB."
+    ::= { h3cCommon 142 }
+
+-- =============================================================================
+-- object definition begin
+-- =============================================================================
+h3cMplsExtObjects      OBJECT IDENTIFIER ::= { h3cMplsExt 1 }
+
+h3cMplsExtScalarGroup  OBJECT IDENTIFIER ::= { h3cMplsExtObjects 1 }
+
+h3cMplsExtLsrID    OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The Label Switching Router's Identifier."
+    ::= { h3cMplsExtScalarGroup 1 }
+
+h3cMplsExtLdpStatus    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The global configuration of LDP(Label Distribution Protocol)."
+    ::= { h3cMplsExtScalarGroup 2 }
+
+-- =============================================================================
+-- h3cMplsExtTable Definition
+-- =============================================================================
+h3cMplsExtTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF H3cMplsExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table for configuring
+        MPLS(Multiprotocol Label Switching) parameters."
+    ::= { h3cMplsExtObjects 2 }
+
+h3cMplsExtEntry   OBJECT-TYPE
+    SYNTAX      H3cMplsExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry for configuring MPLS parameters."
+    INDEX
+    {
+        h3cMplsExtIndex
+    }
+    ::= { h3cMplsExtTable 1 }
+
+H3cMplsExtEntry ::=
+    SEQUENCE
+    {
+        h3cMplsExtIndex               Unsigned32,
+        h3cMplsExtCapability          TruthValue,
+        h3cMplsExtMtu                 Unsigned32,
+        h3cMplsExtRowStatus           RowStatus
+    }
+
+h3cMplsExtIndex   OBJECT-TYPE
+    SYNTAX      Unsigned32(1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Index of MPLS interface."
+    ::= { h3cMplsExtEntry 1 }
+
+h3cMplsExtCapability    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The MPLS capability of an interface."
+    DEFVAL { false }
+    ::= { h3cMplsExtEntry 2 }
+
+h3cMplsExtMtu     OBJECT-TYPE
+    SYNTAX      Unsigned32(46..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The MPLS MTU(Maximum Transmission Unit) of an interface."
+    ::= { h3cMplsExtEntry 3 }
+
+h3cMplsExtRowStatus     OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Operation status of this table entry."
+    ::= { h3cMplsExtEntry 4 }
+-- =============================================================================
+-- End of h3cMplsExtTable Definition
+-- =============================================================================
+
+-- =============================================================================
+-- h3cMplsExtLdpTable Definition
+-- =============================================================================
+h3cMplsExtLdpTable     OBJECT-TYPE
+    SYNTAX      SEQUENCE OF H3cMplsExtLdpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table for configuring LDP parameters."
+    ::= { h3cMplsExtObjects 3 }
+
+h3cMplsExtLdpEntry     OBJECT-TYPE
+    SYNTAX      H3cMplsExtLdpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry for configuring LDP parameters."
+    INDEX
+    {
+        h3cMplsExtLdpIndex
+    }
+    ::= { h3cMplsExtLdpTable 1 }
+
+H3cMplsExtLdpEntry ::=
+    SEQUENCE
+    {
+        h3cMplsExtLdpIndex                 Unsigned32,
+        h3cMplsExtLdpCapability            TruthValue,
+        h3cMplsExtLdpRowStatus             RowStatus
+    }
+
+h3cMplsExtLdpIndex     OBJECT-TYPE
+    SYNTAX      Unsigned32(1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Index of LDP interface."
+    ::= { h3cMplsExtLdpEntry 1 }
+
+h3cMplsExtLdpCapability    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The LDP capability of an interface."
+    DEFVAL { false }
+    ::= { h3cMplsExtLdpEntry 2 }
+
+h3cMplsExtLdpRowStatus     OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Operation status of this table entry.  A row entry cannot
+        be modified when the value of this object is 'active'."
+    ::= { h3cMplsExtLdpEntry 3 }
+-- =============================================================================
+-- End of h3cMplsExtLdpTable Definition
+-- =============================================================================
+
+END

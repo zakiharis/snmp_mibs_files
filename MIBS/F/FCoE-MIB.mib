@@ -1,0 +1,240 @@
+--
+--  SBAX Series MIB
+--	Copyright FUJITSU LIMITED 2012
+--
+-- $Revision: 1.1 $
+
+FCoE-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+	OBJECT-TYPE    FROM RFC-1212
+	enterprises    FROM RFC1155-SMI
+	DisplayString  FROM RFC1213-MIB;
+
+    fujitsu    OBJECT IDENTIFIER ::= { enterprises 211 }
+    product    OBJECT IDENTIFIER ::= { fujitsu 1 }
+    nonos      OBJECT IDENTIFIER ::= { product 127 }
+    pineapple  OBJECT IDENTIFIER ::= { nonos 118 }
+
+-- SBAX-MIB
+    sbMibObjects    OBJECT IDENTIFIER ::= { pineapple 2 }
+    fcoeMibObjects  OBJECT IDENTIFIER ::= { sbMibObjects 2 }
+
+-- FCoE-MIB
+    fcoeFipSnoopingInfo  OBJECT IDENTIFIER ::= { fcoeMibObjects 1 }
+    fcoeFipSnoopingFcf	 OBJECT IDENTIFIER ::= { fcoeMibObjects 2 }
+    fcoeFipSnoopingVl	 OBJECT IDENTIFIER ::= { fcoeMibObjects 3 }
+
+--
+-- fcoeFipSnoopingInfo Group
+--
+fcoeFipSnoopingInfoNumber  OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('FCoE_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { fcoeFipSnoopingInfo 1 }
+
+fcoeFipSnoopingInfoTable  OBJECT-TYPE
+    SYNTAX	SEQUENCE OF FcoeFipSnoopingInfoEntry
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('FCoE_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { fcoeFipSnoopingInfo 2 }
+
+fcoeFipSnoopingInfoEntry  OBJECT-TYPE
+    SYNTAX	FcoeFipSnoopingInfoEntry
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('FCoE_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    INDEX { fcoeFipSnoopingInfoifIndex }
+    ::= { fcoeFipSnoopingInfoTable 1 }
+
+FcoeFipSnoopingInfoEntry  ::= SEQUENCE {
+    fcoeFipSnoopingInfoifIndex     INTEGER,
+    fcoeFipSnoopingInfoPortType    DisplayString,
+    fcoeFipSnoopingInfoFsType      DisplayString
+}
+
+fcoeFipSnoopingInfoifIndex  OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"Refer to attached file ('FCoE_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { fcoeFipSnoopingInfoEntry 1 }
+
+fcoeFipSnoopingInfoPortType  OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"Refer to attached file ('FCoE_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { fcoeFipSnoopingInfoEntry 2 }
+
+fcoeFipSnoopingInfoFsType  OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"Refer to attached file ('FCoE_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { fcoeFipSnoopingInfoEntry 3 }
+
+--
+-- fcoeFipSnoopingFcf Group
+--
+fcoeFipSnoopingFcfNumber  OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('FCoE_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { fcoeFipSnoopingFcf 1 }
+
+fcoeFipSnoopingFcfTable  OBJECT-TYPE
+    SYNTAX	SEQUENCE OF FcoeFipSnoopingFcfEntry
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('FCoE_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { fcoeFipSnoopingFcf 2 }
+
+fcoeFipSnoopingFcfEntry  OBJECT-TYPE
+    SYNTAX	FcoeFipSnoopingFcfEntry
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('FCoE_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    INDEX { fcoeFipSnoopingFcfifIndex }
+    ::= { fcoeFipSnoopingFcfTable 1 }
+
+FcoeFipSnoopingFcfEntry  ::= SEQUENCE {
+    fcoeFipSnoopingFcfifIndex       INTEGER,
+    fcoeFipSnoopingFcfAddress       OCTET STRING,
+    fcoeFipSnoopingFcfSwitchName    OCTET STRING,
+    fcoeFipSnoopingFcfAgeTime       INTEGER
+}
+
+fcoeFipSnoopingFcfifIndex  OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"Refer to attached file ('FCoE_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { fcoeFipSnoopingFcfEntry 1 }
+
+fcoeFipSnoopingFcfAddress  OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (6))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"Refer to attached file ('FCoE_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { fcoeFipSnoopingFcfEntry 2 }
+
+fcoeFipSnoopingFcfSwitchName  OBJECT-TYPE
+    SYNTAX	OCTET STRING (SIZE (16))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"Refer to attached file ('FCoE_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { fcoeFipSnoopingFcfEntry 3 }
+
+fcoeFipSnoopingFcfAgeTime  OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"Refer to attached file ('FCoE_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { fcoeFipSnoopingFcfEntry 4 }
+
+--
+-- fcoeFipSnoopingVl Group
+--
+fcoeFipSnoopingVlNumber  OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('FCoE_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { fcoeFipSnoopingVl 1 }
+
+fcoeFipSnoopingVlTable  OBJECT-TYPE
+    SYNTAX	SEQUENCE OF FcoeFipSnoopingVlEntry
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('FCoE_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { fcoeFipSnoopingVl 2 }
+
+fcoeFipSnoopingVlEntry  OBJECT-TYPE
+    SYNTAX	FcoeFipSnoopingVlEntry
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION
+	"Refer to attached file ('FCoE_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    INDEX { fcoeFipSnoopingVlifIndex }
+    ::= { fcoeFipSnoopingVlTable 1 }
+
+FcoeFipSnoopingVlEntry  ::= SEQUENCE {
+    fcoeFipSnoopingVlifIndex       INTEGER,
+    fcoeFipSnoopingVlFcid          OCTET STRING,
+    fcoeFipSnoopingVlSwitchName    OCTET STRING,
+    fcoeFipSnoopingVlAgeTime       INTEGER
+}
+
+fcoeFipSnoopingVlifIndex  OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"Refer to attached file ('FCoE_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { fcoeFipSnoopingVlEntry 1 }
+
+fcoeFipSnoopingVlFcid  OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (3))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"Refer to attached file ('FCoE_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { fcoeFipSnoopingVlEntry 2 }
+
+fcoeFipSnoopingVlSwitchName  OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (16))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"Refer to attached file ('FCoE_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { fcoeFipSnoopingVlEntry 3 }
+
+fcoeFipSnoopingVlAgeTime  OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"Refer to attached file ('FCoE_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { fcoeFipSnoopingVlEntry 4 }
+
+END

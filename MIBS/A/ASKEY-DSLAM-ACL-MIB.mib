@@ -1,0 +1,109 @@
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+--
+--  File         : askeyAcl.mib
+--  Description  : Askey defined to record all managed objects for ACL
+--  Version      : 1.0
+--  Date         : Dec. 15, 2004 by Dennis Tseng   
+--
+--  Copyright (c) 1999-2004 Askey International, Corp.  All Rights Reserved.
+--
+--  ipDslam                 FROM ASKEY-DSLAM-MIB
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+
+ASKEY-DSLAM-ACL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    ifIndex   		    FROM IF-MIB
+    OBJECT-TYPE,
+    MODULE-IDENTITY,
+    Integer32			FROM SNMPv2-SMI
+    RowStatus           FROM SNMPv2-TC
+    ipDslam             FROM ASKEY-DSLAM-MIB
+    MacAddress			FROM ASKEY-SYSTEM-MIB
+    ;
+
+askeyAclMib MODULE-IDENTITY
+    LAST-UPDATED    "200411150000Z"  -- Nov 15, 2004
+    ORGANIZATION    "ASKEY Inc."
+    CONTACT-INFO    "ASKEY Inc.
+                    E-mail: jht@askey.com.tw"
+
+    DESCRIPTION     "ASKEY ACCESS-CONTROL-LIST MIB OID defines and documentation."
+
+    ::= { ipDslam 8 }
+
+askeyAclTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF    AskeyAclEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    ""
+    ::= { askeyAclMib 1 }
+
+askeyAclEntry OBJECT-TYPE
+    SYNTAX      AskeyAclEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    ""
+    INDEX { ifIndex, aclVpi, aclVci, aclMac}
+    ::= { askeyAclTable 1 }
+    
+AskeyAclEntry ::=
+    SEQUENCE {
+        aclVpi                    
+            INTEGER,
+        aclVci                    
+            INTEGER,
+        aclMac
+            MacAddress,    
+        aclAct
+            INTEGER
+    }
+
+aclVpi OBJECT-TYPE
+    SYNTAX      INTEGER (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+                "The VPI value of the VCL.
+                 The maximum VPI value cannot
+                 exceed the value allowable by the
+                 atmInterfaceMaxVpiBits."
+                 ::= {askeyAclEntry 1}
+
+aclVci OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+                "The VCI value of the VCL.
+                 The maximum VCI value cannot
+                 exceed the value allowable by the
+                 atmInterfaceMaxVciBits."
+                 ::= {askeyAclEntry 2}
+                            
+aclMac OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    ""
+    ::= { askeyAclEntry 3 }        
+
+aclAct OBJECT-TYPE
+    SYNTAX      INTEGER { permit(1), deny(2), delete(3) }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    ""
+    ::= { askeyAclEntry 4 }        
+  
+--
+-- END of ASKEY-ACL-MIB                
+--
+
+END
+    

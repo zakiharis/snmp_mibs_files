@@ -1,0 +1,1587 @@
+--------------------------------------------------------------------------------
+--                    Fujitsu Siemens RCA4Plus - Trap MIB
+--         Management Information Base for SNMP Network Management
+--
+--                                 Revision: 1.0.2
+--
+--                         Last Modified:  Sep 7, 2005
+--
+--   Copyright 2005 Fujitsu-Siemens Corporation. All Rights Reserved.
+--
+--   The information in this document is subject to change without notice.
+--
+--------------------------------------------------------------------------------
+--
+-- The RCA4Plus Enterprise number is 544.
+-- The ASN.1 prefix to, and including the Fijitsu-Siemens Enterprise is: 1.3.6.1.4.1.544
+--
+
+FSCSERIAL-TRAP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+
+   Gauge                    FROM RFC1155-SMI
+   enterprises              FROM RFC1155-SMI
+   TimeTicks                FROM RFC1155-SMI
+   IpAddress                FROM RFC1155-SMI
+   Counter                  FROM RFC1155-SMI
+   NetworkAddress           FROM RFC1155-SMI
+   OBJECT-TYPE              FROM RFC-1212
+   DisplayString            FROM RFC1213-MIB
+   PhysAddress              FROM RFC1213-MIB
+   TRAP-TYPE                FROM RFC-1215;
+
+equinox         OBJECT IDENTIFIER ::= { enterprises 544 }
+
+--------------------------------------------------------------------------------
+-- Object Groupings
+--------------------------------------------------------------------------------
+
+-- Note: every product type should be uniquely identified underneath the
+-- fscSerialProducts object group. Each product should report its unique
+-- fscSerialProducts OBJECT IDENTIFIER in mib-2.system.sysObjectID. The following
+-- products are currently defined:
+--
+--    fscSerialProducts.8 = RCA4Plus
+--
+
+fscSerial              OBJECT IDENTIFIER ::= { equinox 8 }                -- 1.3.6.1.4.1.544.8
+fscSerialProducts      OBJECT IDENTIFIER ::= { fscSerial 1 }              -- 1.3.6.1.4.1.544.8.1
+fscSerialManagement    OBJECT IDENTIFIER ::= { fscSerial 2 }              -- 1.3.6.1.4.1.544.8.2
+
+fscSerialTrapObject    OBJECT IDENTIFIER ::= { fscSerialManagement 6 }    -- 1.3.6.1.4.1.544.8.2.6
+
+
+--
+-- A UTF8String represents a series of UTF-8 encoded characters. UTF-8 encoding
+-- provides the ability to encode all characters defined in the Universal
+-- Multiple-Octet Coded Character Set (UCS) and all characters defined in the
+-- Unicode Standard. UCS is defined in international standard ISO 10646. Unicode
+-- encompasses a subset of UCS. See http://www.unicode.org for more information
+-- on Unicode. See RFC2279 for more information on UTF-8 encoding.
+--
+
+UTF8String ::= OCTET STRING
+
+--
+-- An enumeration of image file upgrade results.
+--
+
+ImageFileUpgradeResultsEnum ::= INTEGER
+{
+   imageUpgradeSuccess(1),              -- Successful
+   imageUpgradeTftpNoSocket(2),         -- TFTP No Socket
+   imageUpgradeTftpConnectFailure(3),   -- TFTP server TFTP connect failed
+   imageUpgradeTftpRequestDenied(4),    -- TFTP server request denied
+   imageUpgradeTftpBadPacket(5),        -- TFTP err - non-data packet received
+   imageUpgradeTftpOOS(6),              -- TFTP err - too many packets out
+                                        --  of sequence
+   imageUpgradeTftpTooBig(7),           -- TFTP err - transferred data exceeds
+                                        --  file size
+   imageUpgradeTftpTimeout(8),          -- TFTP err - timeout during transfer,
+                                        --  retries exceeded
+   imageUpgradeAlreadyInProgress(9),    -- Update already in progress
+   imageUpgradeCannotStart(10),	        -- Update thread did not start
+   imageUpgradeMemoryError(11),         -- Update memory allocation error
+   imageUpgradeTftpProtocolError(12),   -- TFTP protocol error occurred could
+                                        --  not complete transfer
+   imageUpgradeBadType(13),             -- The Image type does not match the
+                                        --  region (BOOT or APP) to update
+   imageUpgradeInvalidAppDowngrade(14), -- Invalid downgrade version
+   imageUpgradeChecksumError(15),       -- Checksum Error
+   imageUpgradeFlashError(16),          -- Flash Error
+   imageUpgradeInternalError(17),       -- Internal error
+   imageUpgradeFileNotFound(18),        -- File not found
+   imageUpgradeBadHeader(19),           -- The image file does not contain a valid
+                                        --  image header
+   imageUpgradeIncompatibleHeader(20)   -- Header is not compatible
+}
+
+--
+-- An enumeration of error reasons used to manage NFS traps.
+--
+NFSErrorReasonEnum ::= INTEGER
+{
+   nfsNoError(9999),            --  No error
+   nfsNhGeneralErr(1),          --  Unidentifed error encountered
+   nfsNhIntMountErr(2),         --  Internal mount or umount error
+   nfsNhFTypeCompatErr(3),      --  FTYPE incompatible w/ port setting
+   nfsNhFileNameErr(4),         --  Port history file name error
+   nfsNhFileWriteErr(5),        --  Port history file write error
+   nfsNhFileOvRnErr(6),         --  Port history file overrun error
+   nfsRpcCantEncodeArgs(7),     --  RPC Can't encode arguments
+   nfsRpcCantDecodeRes(8),      --  RPC Can't decode results
+   nfsRpcCantSend(9),           --  RPC Failure in sending call
+   nfsRpcCantRecv(10),          --  RPC Failure in receiving result
+   nfsRpcTimedOut(11),          --  RPC Call timed out
+   nfsRpcVersMismatch(12),      --  RPC RPC versions not compatible
+   nfsRpcAuthErr(13),           --  RPC Authentication error
+   nfsRpcProgUnavail(14),       --  RPC Program not available
+   nfsRpcProgVersMismatch(15),  --  RPC Program version mismatched
+   nfsRpcProcUnavail(16),       --  RPC Procedure unavailable
+   nfsRpcCantDecodeArgs(17),    --  RPC Decode arguments error
+   nfsRpcSystemErr(18),         --  RPC Generic 'other problem'
+   nfsRpcUnknownHost(19),       --  RPC Unknown host name
+   nfsRpcPortmapFailure(20),    --  RPC Portmapper failed in its call
+   nfsRpcProgNotRegistered(21), --  RPC Remote program not registered
+   nfsRpcFailed(22),            --  RPC Failed
+   nfsRpcUnknownProto(23),      --  RPC Unknown protocol
+   nfsRpcIntr(24),              --  RPC Intr
+   nfsRpcUnknownAddr(25),       --  RPC Remote address unknown
+   nfsRpcTliErr(26),            --  RPC TLI Error
+   nfsRpcNoBroadcast(27),       --  RPC Broadcasting not supported
+   nfsRpcN2AXLateFailure(28),   --  RPC Name to addr translate failed
+   nfsRpcUDErr(29),             --  RPC UD Error
+   nfsRpcInProgress(30),        --  RPC In Progress
+   nfsRpcStaleRACHandle(31),    --  RPC Stale RAC Handle
+   nfsSysEOpNotPerm(32),        --  Operation not permitted
+   nfsSysENoEntry(33),          --  No such file or directory
+   nfsSysEIOErr(34),            --  I/O error
+   nfsSysENXIO(35),             --  No such device or address
+   nfsSysEBadFile(36),          --  Bad file number
+   nfsSysENoMem(37),            --  Out of memory
+   nfsSysENoAccess(38),         --  Permission denied
+   nfsSysEFileExist(39),        --  File exists
+   nfsSysEXDev(40),             --  Cross-device link
+   nfsSysENoDev(41),            --  No such device
+   nfsSysENoDir(42),            --  Not a directory
+   nfsSysEIsDit(43),            --  Is a directory
+   nfsSysEInval(44),            --  Invalid argument
+   nfsSysEFileBig(45),          --  File too large
+   nfsSysENoSpace(46),          --  No space left on device
+   nfsSysEROFileSystem(47),     --  Read-only file system
+   nfsSysEToManyLinks(48),      --  Too many links
+   nfsSysENetDown(49),          --  Network is down
+   nfsSysENetUnreach(50),       --  Network is unreachable
+   nfsSysENetReset(51),         --  Network dropped connection because of reset
+   nfsSysEConnAborted(52),      --  Software caused connection abort
+   nfsSysEConnReset(53),        --  Connection reset by peer
+   nfsSysENoBufs(54),           --  No buffer space available
+   nfsSysEIsConnected(55),      --  Transport endpoint is already connected
+   nfsSysENotCon(56),           --  Transport endpoint is not connected
+   nfsSysEShutDown(57),         --  Cannot send after transport endpoint shutdown
+   nfsSysETimedOut(58),         --  Connection timed out
+   nfsSysEConnRefused(59),      --  Connection refused
+   nfsSysEHostDown(60),         --  Host is down
+   nfsSysEHostUnreach(61),      --  No route to host
+   nfsSysEStale(62),            --  Stale NFS file handle
+   nfsNfsErrPerm(63),           --  Not owner
+   nfsNfsErrNoEnt(64),          --  No such file or directory
+   nfsNfsErrIO(65),             --  I/O error
+   nfsNfsErrNXIO(66),           --  No such device or address
+   nfsNfsErrAccess(67),         --  Permission Denied
+   nfsNfsErrFileExist(68),      --  File exists
+   nfsNfsErrXDev(69),           --  Cross-device link
+   nfsNfsErrNoDev(70),          --  No such device
+   nfsNfsErrNoDir(71),          --  Not a directory
+   nfsNfsErrIsDir(72),          --  Is a directory
+   nfsNfsErrInval(73),          --  Invalid argument
+   nfsNfsErrFileBig(74),        --  File too large
+   nfsNfsErrNoSpace(75),        --  No space left on device
+   nfsNfsErrROFileSystem(76),   --  Read-only file system
+   nfsNfsErrTooManyLinks(77),   --  Too many hard links
+   nfsNfsErrNameTooLong(78),    --  File name too long
+   nfsNfsErrDirNotEmpty(79),    --  Directory not empty
+   nfsNfsErrDiskQuot(80),       --  Disk quota exceeded
+   nfsNfsErrStale(81),          --  Invalid file namdle
+   nfsNfsErrRemote(82),         --  Too many levels of remote in path
+   nfsNfsErrWFlush(83),         --  Servers write cache flushed to disk
+   nfsNfsErrBadHandle(84),      --  Illegal NFS handle
+   nfsNfsErrNotSync(85),        --  Update synchronization mismatch detected
+   nfsNfsErrBadCookie(86),      --  READDIR or READDIRPLUS cookie is stale
+   nfsNfsErrNotSupp(87),        --  Operation not supported
+   nfsNfsErrTooSmall(88),       --  Buffer or request too small
+   nfsNfsErrServerFault(89),    --  An error occurred on the server
+   nfsNfsErrBadType(90),        --  Attempt to create unsupported object type
+   nfsNfsErrReqNotInTime(91),   --  Request not completed in timely fashion
+   nfsNfsErrSameAsReq(92),      --  NVERIFY attributes same as in request
+   nfsNfsErrDenied(93),         --  An attempt to lock a file is denied
+   nfsNfsErrExpired(94),        --  Lease being used has expired
+   nfsNfsErrLocked(95),         --  Read or write attempted on locked file
+   nfsNfsErrGrace(96),          --  Server is in recovery or grace period
+   nfsNfsErrFHandleExpired(97), --  Volatile file handle expired at server
+   nfsNfsErrShareDenied(98),    --  Share conflict on OPEN attempt
+   nfsNfsErrWrongSec(99),       --  Wrong security mechanism being used
+   nfsNfsErrClientIDInUSe(100), --  SETCLIENTID client id already in use
+   nfsNfsErrResource(101),      --  Resources exhausted in COMPOUND proc
+   nfsNfsErrMoved(102),         --  Filesystem containing file has moved
+   nfsNfsErrNoFileHandle(103),  --  Current filehandle not set properly
+   nfsNfsErrMinVersMMatch(104), --  Unsupported version requested
+   nfsNfsErrStaleClientID(105), --  Client id not recognized by server
+   nfsNfsErrStaleStateID(106),  --  Stateid is from earlier server instance
+   nfsNfsErrOldStateID(107),    --  Stateid from earlier time was used
+   nfsNfsErrBadStateID(108),    --  Bad stateid was used
+   nfsNfsErrBadSeqID(109),      --  Bad sequence number in locking request
+   nfsNfsErrNotSame(110),       --  VERIFY attributes not same as request
+   nfsNfsErrLockRange(111),     --  Sub-range lock request not supported
+   nfsNfsErrSymLink(112),       --  Symbolic link rather than directory
+   nfsNfsErrRestoreFH(113),     --  No saved file handle for RESTOREFH
+   nfsNfsErrLeaseMoved(114),    --  Associated file system has moved
+   nfsNfsErrAttrNotSupp(115),   --  Server does not support attribute
+   nfsNfsErrNoGrace(116),       --  Client state reclaim out of grace period
+   nfsNfsErrBAdReclaim(117),    --  Bad reclaim provided by client
+   nfsNfsErrReclaimConfl(118),  --  Client reclaim conflict
+   nfsNfsErrBadXDR(119),        --  XDR decoding error encountered
+   nfsNfsErrLocksHeld(120),     --  Close attempt while locks held
+   nfsNfsErrOpenMode(121),      --  Unsanctioned operation requested
+   nfsNfsErrBadOwner(122),      --  Owner  group or acl cannot be translated
+   nfsNfsErrBadChar(123),       --  Unsupported UTF-8 string character
+   nfsNfsErrBadName(124),       --  Invalid name for current operation
+   nfsNfsErrBadRange(125),      --  Inappropriate LOCK  LOCKT or LOCKU range
+   nfsNfsErrLockNotSupp(126),   --  Atomic lock upgrade/downgrade not supported
+   nfsNfsErrOpIllegal(127),     --  Illegal operation specified in arg op field
+   nfsNfsErrDeadLock(128),      --  Locking deadlock condition detected
+   nfsNfsErrFileOpen(129),      --  File involved is currently open
+   nfsNfsErrAdminRevoked(130),  --  Revoked by server administrator
+   nfsNfsErrCbPathDown(131),    --  NFS callback path is down
+   nfsNHTcpNfsNotAvailErr(132)  --  Server does not support TCP protocol for NFS service
+}
+
+--
+-- An enumeration of port error status used to manage NFS traps.
+--
+NFSPortErrStatusEnum ::= INTEGER
+{
+   nfsNoRecentErrors(9999),              -- No recent errors
+   nfsMountNeeded(1),                    -- Mount needed
+   nfsErrOpeningHistoryFileRetry(2),     -- Error opening history file - retrying
+   nfsErrOpeningHistoryFileFinal(3),     -- Error opening history file - gave up
+   nfsErrWriteCurrent(4),                -- Current write error encountered
+                                         --        (on most recent write to file)
+   nfsErrWriteRecent(5),                 -- Current write error encountered,
+                                         --       but most recent write succeeded
+   nfsOverrunCurrent(6),                 -- Current overrun encountered
+                                         -- (unable to write to the file fast enough)
+   nfsOverrunRecent(7)                   -- Recent overrun encountered
+                                        -- (unable to write to the file fast enough)
+}
+
+--------------------------------------------------------------------------------
+-- Trap Object Group (fscSerialTrapObject)
+--
+-- The following objects are implemented only for the generation of
+-- TRAPs. The objects are sent in traps and are not accessible in
+-- any other way.
+--------------------------------------------------------------------------------
+
+fscSerialTrapObjectUserName OBJECT-TYPE
+      SYNTAX UTF8String ( SIZE (0..64) )
+      ACCESS not-accessible
+      STATUS mandatory
+  --% AVAILABILITY public
+      DESCRIPTION
+         "This object is sent in a trap to identify the name of the user
+         for which the trap condition occurred.
+         "
+      ::= { fscSerialTrapObject 1 }
+
+fscSerialTrapObjectTargetUserName OBJECT-TYPE
+      SYNTAX UTF8String ( SIZE (0..64) )
+      ACCESS not-accessible
+      STATUS mandatory
+  --% AVAILABILITY public
+      DESCRIPTION
+         "This object is sent in a trap to identify the name of the target
+         user for which a trap condition occurred.
+         "
+      ::= { fscSerialTrapObject 2 }
+
+fscSerialTrapObjectImageType OBJECT-TYPE
+      SYNTAX INTEGER {
+                        boot(1),
+                        app(2)
+                     }
+      ACCESS not-accessible
+      STATUS mandatory
+  --% AVAILABILITY public
+      DESCRIPTION
+         "This object is sent in a trap to identify the type of software image
+         for which the trap condition occurred.
+         "
+      ::= { fscSerialTrapObject 3 }
+
+fscSerialTrapObjectImageNewVersion OBJECT-TYPE
+      SYNTAX DisplayString ( SIZE (0..32) )
+      ACCESS not-accessible
+      STATUS mandatory
+  --% AVAILABILITY public
+      DESCRIPTION
+         "This object is sent in a trap to identify the version of the new
+         software image the appliance is being upgraded to.
+         "
+      ::= { fscSerialTrapObject 4 }
+
+fscSerialTrapObjectImageCurrentVersion OBJECT-TYPE
+      SYNTAX DisplayString ( SIZE (0..32) )
+      ACCESS not-accessible
+      STATUS mandatory
+  --% AVAILABILITY public
+      DESCRIPTION
+         "This object is sent in a trap to identify the version of the
+         software image that the appliance is currently running.
+         "
+      ::= { fscSerialTrapObject 5 }
+
+fscSerialTrapObjectImageUpgradeResults OBJECT-TYPE
+      SYNTAX ImageFileUpgradeResultsEnum
+      ACCESS not-accessible
+      STATUS mandatory
+  --% AVAILABILITY public
+      DESCRIPTION
+         "This object contains the results of a software image upgrade."
+      ::= { fscSerialTrapObject 6 }
+
+fscSerialTrapObjectPortAlertString OBJECT-TYPE
+      SYNTAX UTF8String (SIZE (0..32) )
+      ACCESS not-accessible
+      STATUS mandatory
+  --% AVAILABILITY public
+      DESCRIPTION
+         "This object is sent in a trap to identify a cry for help string that
+         was detected on a serial port.
+         "
+      ::= { fscSerialTrapObject 7 }
+
+fscSerialTrapObjectSessionIdentifier OBJECT-TYPE
+      SYNTAX INTEGER (1..48)
+      ACCESS not-accessible
+      STATUS mandatory
+  --% AVAILABILITY public
+      DESCRIPTION
+         "This object is sent in a trap to identify the serial port number
+         associated with a serial session for which the trap condition occurred.
+         "
+      ::= { fscSerialTrapObject 8 }
+
+fscSerialTrapObjectPortNumber OBJECT-TYPE
+      SYNTAX INTEGER (1..48)
+      ACCESS not-accessible
+      STATUS mandatory
+  --% AVAILABILITY public
+      DESCRIPTION
+         "This object is sent in a trap to identify the serial port number
+         for which the trap condition occurred.
+         "
+      ::= { fscSerialTrapObject 9 }
+
+fscSerialTrapObjectFileName OBJECT-TYPE
+      SYNTAX DisplayString ( SIZE (0..12) )
+      ACCESS not-accessible
+      STATUS mandatory
+  --% AVAILABILITY public
+      DESCRIPTION
+         "This object is sent in a trap to identify the name of a file
+         for which the trap condition occurred.
+         "
+      ::= { fscSerialTrapObject 10 }
+
+fscSerialTrapObjectSPCDeviceLocation OBJECT-TYPE
+      SYNTAX UTF8String ( SIZE (0..32) )
+      ACCESS not-accessible
+      STATUS mandatory
+  --% AVAILABILITY public
+      DESCRIPTION
+         "This object is sent in a trap to identify the SPC Location Name
+         for which the trap condition occurred.
+         "
+      ::= { fscSerialTrapObject 11 }
+
+fscSerialTrapObjectSPCDeviceSerialPort OBJECT-TYPE
+      SYNTAX INTEGER (1..48)
+      ACCESS not-accessible
+      STATUS mandatory
+  --% AVAILABILITY public
+      DESCRIPTION
+         "This object is sent in a trap to identify the appliance port that the
+         SPC is attached to for which the trap condition occurred.
+         "
+      ::= { fscSerialTrapObject 12 }
+
+fscSerialTrapObjectSPCDeviceLogin OBJECT-TYPE
+      SYNTAX UTF8String ( SIZE (0..32) )
+      ACCESS not-accessible
+      STATUS mandatory
+  --% AVAILABILITY public
+      DESCRIPTION
+         "This object is sent in a trap to identify the Login Name
+         for which the trap condition occurred.
+         "
+      ::= { fscSerialTrapObject 13 }
+
+fscSerialTrapObjectSPCSocket OBJECT-TYPE
+      SYNTAX INTEGER (1..16)
+      ACCESS not-accessible
+      STATUS mandatory
+  --% AVAILABILITY public
+      DESCRIPTION
+         "This object is sent in a trap to identify the SPC socket number
+         for which the trap condition occurred.
+         "
+      ::= { fscSerialTrapObject 14 }
+
+fscSerialTrapObjectLockReason OBJECT-TYPE
+      SYNTAX INTEGER {
+                        consecutiveAuthenticationFailures(1),
+                        administrative(2)
+                     }
+      ACCESS not-accessible
+      STATUS mandatory
+  --% AVAILABILITY public
+      DESCRIPTION
+         "This object is sent in a trap to explain the reason for which a
+         user account has been locked.
+         "
+      ::= { fscSerialTrapObject 15 }
+
+fscSerialTrapObjectUnlockReason OBJECT-TYPE
+      SYNTAX INTEGER {
+                        lockoutExpired(1),
+                        administrative(2),
+                        reboot(3)
+                     }
+      ACCESS not-accessible
+      STATUS mandatory
+  --% AVAILABILITY public
+      DESCRIPTION
+         "This object is sent in a trap to explain the reason for which a
+         user account has been unlocked.
+         "
+      ::= { fscSerialTrapObject 16 }
+
+fscSerialTrapObjectIPAddress OBJECT-TYPE
+      SYNTAX IpAddress
+      ACCESS not-accessible
+      STATUS mandatory
+  --% AVAILABILITY public
+      DESCRIPTION
+         "This object is sent in a trap to indicate the IP address of a user
+          session that has caused the trap.
+         "
+      ::= { fscSerialTrapObject 17 }
+
+fscSerialTrapObjectAggregateServerStatusChanged  OBJECT-TYPE
+      SYNTAX OCTET STRING ( SIZE (4..3072) )
+      ACCESS read-only
+      STATUS mandatory
+  --% AVAILABILITY public
+      DESCRIPTION
+         "This object is sent in a trap to report server session status changes
+         and power status changes. This object will report the status for all
+         connection paths known to the appliance in an aggregated encoding format
+         as indicated below.
+
+         The information for each connection path is packed into four bytes as
+         follows:
+
+         Byte 1      = The serial port number associated with this path.
+
+         Byte 2      = The enumerated socket number of the SPC cascade device
+                       associated with this connection path. The value will be 0
+                       if an SPC socket is not associated with this
+                       connection path.
+
+                       The socket number enumeration will use this convention:
+
+                              A1 = 1    C1 = 9
+                              A2 = 2    C2 = 10
+                              A3 = 3    C3 = 11
+                              A4 = 4    C4 = 12
+                              B1 = 5    D1 = 13
+                              B2 = 6    D2 = 14
+                              B3 = 7    D3 = 15
+                              B4 = 8    D4 = 16
+
+                              No SPC attached = 0
+
+         Byte 3      = The power status of a connected server or the power
+                       status of an SPC socket. One of the following values
+                       can be reported:
+
+                       1 = unknown - unable to determine the power
+                                     status.
+
+                       2 = on      - the server or the SPC socket is powered on.
+
+                       3 = off     - the server or the SPC socket is powered
+                                     off.
+
+         Byte 4      = The serial session status. One of the following values
+                       can be reported:
+
+                       1 = N/A     - not applicable when an SPC is attached.
+
+                       2 = Idle    - there is no active viewer session on this
+                                     path.
+
+                       3 = Active  - there is an active viewer session currently
+                                     on this path.
+
+
+         Each connection path will be packed into this object in four byte
+         increments one after the other. The connection paths do not have to be
+         packed in any specific order.
+
+         Note that the size of this object could conceivably be as large as
+         shown in the following calculation assuming a 16 socket SPC were
+         connected to each serial port of the appliance:
+
+            48 ports X 16 sockets X 4 bytes = 3072 bytes.
+         "
+       ::= { fscSerialTrapObject 18 }
+
+fscSerialTrapObjectServerName OBJECT-TYPE
+      SYNTAX UTF8String ( SIZE (0..64) )
+      ACCESS not-accessible
+      STATUS mandatory
+  --% AVAILABILITY public
+      DESCRIPTION
+         "This object is sent in a trap to identify the name of the server
+         for which the trap condition occurred. The value of this object
+         comes from an instance of the Port Table Name object.
+
+         If this object is reported in a trap that is specific to a serial
+         port on the appliance then the value of this object will be the
+         same as the serial port's Port Table Name.
+         "
+      ::= { fscSerialTrapObject 19 }
+
+fscSerialTrapObjectNFSPriErrorReason OBJECT-TYPE
+      SYNTAX NFSErrorReasonEnum
+      ACCESS not-accessible
+      STATUS mandatory
+  --% AVAILABILITY public
+      DESCRIPTION
+         "This object is sent in a trap to identify the reason for the error
+         encountered.
+
+         In case of no error being reported, this object will have a value of
+         9999 (no error). If an error is being reported (the value is non-zero),
+         then, depending on the error, the fscSerialTrapObjectNFSSecErrorReason
+         may also have a non-zero value (and thereby provide additional
+         information about the error), or the
+         fscSerialTrapObjectNFSPriErrorReason may have a value of 0 (if no more
+         detail is available for the error).
+         "
+      ::= { fscSerialTrapObject 20 }
+
+fscSerialTrapObjectNFSSecErrorReason OBJECT-TYPE
+      SYNTAX NFSErrorReasonEnum
+      ACCESS not-accessible
+      STATUS mandatory
+  --% AVAILABILITY public
+      DESCRIPTION
+         "This object is sent in a trap to identify the reason for the error
+         encountered.
+
+         In case of no error being reported, this object will have a value of
+         9999 (no error). If an error is being reported (i.e the value of
+         fscSerialTrapObjectNFSPriErrorReason is non-zero), then depending on
+         the error the fscSerialTrapObjectNFSSecErrorReason
+         may also have a non-zero value (and thereby provide additional
+         information about the error), or the
+         fscSerialTrapObjectNFSPriErrorReason may have a value of 0 (if no more
+         detail is available for the error).
+         "
+      ::= { fscSerialTrapObject 21 }
+
+fscSerialTrapObjectNFSPortErrStatus OBJECT-TYPE
+      SYNTAX NFSPortErrStatusEnum
+      ACCESS not-accessible
+      STATUS mandatory
+  --% AVAILABILITY public
+      DESCRIPTION
+         "This object is sent in a trap to identify the error status on the
+         specified port.
+         "
+      ::= { fscSerialTrapObject 22 }
+
+--------------------------------------------------------------------------------
+-- Enterprise Traps
+--------------------------------------------------------------------------------
+
+fscSerialRebootStartedTrap TRAP-TYPE
+      ENTERPRISE  fscSerialProducts
+      VARIABLES   { fscSerialTrapObjectUserName }
+      DESCRIPTION
+         "The appliance is in the process of rebooting.
+
+         The name of the user who initiated the reboot
+         is contained in fscSerialTrapObjectUserName.
+         "
+      --#TYPE        "Reboot Started Trap"
+      --#SUMMARY     "The appliance is rebooting. Command issued by user: %s."
+      --#ARGUMENTS   { 0 }
+      --#SEVERITY    INFORMATIONAL
+      --#CATEGORY    "STATUS EVENTS"
+      --#TIMEINDEX   99
+      ::= 1
+
+fscSerialUserLoginTrap TRAP-TYPE
+      ENTERPRISE  fscSerialProducts
+      VARIABLES   { fscSerialTrapObjectUserName }
+      DESCRIPTION
+         "A user logged into the appliance.
+
+         This trap is sent when a user logs into the CLI port or when a user
+         exits a serial session.
+
+         The name of the user who logged in is contained
+         in fscSerialTrapObjectUserName.
+         "
+      --#TYPE        "User login Trap"
+      --#SUMMARY     "A user logged into the the appliance. User: %s."
+      --#ARGUMENTS   { 0 }
+      --#SEVERITY    INFORMATIONAL
+      --#CATEGORY    "REMOTE MONITORING AND MANAGEMENT"
+      --#TIMEINDEX   99
+      ::= 2
+
+fscSerialUserLogoutTrap TRAP-TYPE
+      ENTERPRISE  fscSerialProducts
+      VARIABLES   { fscSerialTrapObjectUserName }
+      DESCRIPTION
+         "A user logged out of the appliance. This trap is sent when a user
+         logs out of the CLI port or when a user exits a serial session.
+
+         The name of the user who logged out is contained
+         in fscSerialTrapObjectUserName.
+         "
+      --#TYPE        "User Logout Trap"
+      --#SUMMARY     "A user logged out of the appliance. User: %s."
+      --#ARGUMENTS   { 0 }
+      --#SEVERITY    INFORMATIONAL
+      --#CATEGORY    "REMOTE MONITORING AND MANAGEMENT"
+      --#TIMEINDEX   99
+      ::= 3
+
+fscSerialSerialSessionStartedTrap TRAP-TYPE
+      ENTERPRISE  fscSerialProducts
+      VARIABLES   {
+                     fscSerialTrapObjectUserName,
+                     fscSerialTrapObjectSessionIdentifier,
+                     fscSerialTrapObjectServerName
+                  }
+      DESCRIPTION
+         "A serial session has started.
+
+         The name of the user who is connected to the session
+         is contained in fscSerialTrapObjectUserName.
+
+         The port number on the appliance that the session is using is
+         contained in fscSerialTrapObjectSessionIdentifier.
+
+         The port name on the appliance that the session is using is 
+         contained in fscSerialTrapObjectServerName.
+         "
+      --#TYPE        "Serial Session Started Trap"
+      --#SUMMARY     "Serial session started. User: %s. Port number: %d."
+      --#ARGUMENTS   { 0, 1 }
+      --#SEVERITY    INFORMATIONAL
+      --#CATEGORY    "STATUS EVENTS"
+      --#TIMEINDEX   99
+      ::= 4
+
+fscSerialSerialSessionStoppedTrap TRAP-TYPE
+      ENTERPRISE  fscSerialProducts
+      VARIABLES   {
+                     fscSerialTrapObjectUserName,
+                     fscSerialTrapObjectSessionIdentifier,
+                     fscSerialTrapObjectServerName
+                  }
+      DESCRIPTION
+         "A serial session has stoppped.
+
+         The name of the user who was connected to the session
+         is contained in fscSerialTrapObjectUserName.
+
+         The port number on the appliance that the session was using is
+         contained in fscSerialTrapObjectSessionIdentifier.
+
+         The name of the server the user was connected to is contained in
+         fscSerialTrapObjectServerName.
+         "
+      --#TYPE        "Serial Session Stopped Trap"
+      --#SUMMARY     "Serial session stopped. User: %s. Port number: %d."
+      --#ARGUMENTS   { 0, 1 }
+      --#SEVERITY    INFORMATIONAL
+      --#CATEGORY    "STATUS EVENTS"
+      --#TIMEINDEX   99
+      ::= 5
+
+fscSerialSerialSessionTerminatedTrap TRAP-TYPE
+      ENTERPRISE  fscSerialProducts
+      VARIABLES   {
+                     fscSerialTrapObjectUserName,
+                     fscSerialTrapObjectTargetUserName,
+                     fscSerialTrapObjectSessionIdentifier,
+                     fscSerialTrapObjectServerName
+                  }
+      DESCRIPTION
+         "A serial session has been terminated or preempted by another
+         user.
+
+         The name of the user who terminated or preempted the session is
+         contained in fscSerialTrapObjectUserName.
+
+         The name of the user who was terminated or preempted from the session
+         is contained in fscSerialTrapObjectTargetUserName.
+
+         The port number on the appliance that the session was using is
+         contained in fscSerialTrapObjectSessionIdentifier.
+
+         The name of the server the user was connected to is contained in
+         fscSerialTrapObjectServerName.
+         "
+      --#TYPE        "Serial Session Terminated Trap"
+      --#SUMMARY     "Serial session terminated. Command issued by user: %s. Terminated user: %s. Port number: %d."
+      --#ARGUMENTS   { 0, 1, 2 }
+      --#SEVERITY    INFORMATIONAL
+      --#CATEGORY    "STATUS EVENTS"
+      --#TIMEINDEX   99
+      ::= 6
+
+fscSerialImageUpgradeStartedTrap TRAP-TYPE
+      ENTERPRISE  fscSerialProducts
+      VARIABLES   {
+                     fscSerialTrapObjectUserName,
+                     fscSerialTrapObjectImageType,
+                     fscSerialTrapObjectImageNewVersion,
+                     fscSerialTrapObjectImageCurrentVersion
+                  }
+      DESCRIPTION
+         "The appliance has started an upgrade of a software image.
+
+         The name of the user who initiated the image upgrade is
+         contained in fscSerialTrapObjectUserName.
+
+         The type of image that is being upgraded is contained
+         in fscSerialTrapObjectImageType.
+
+         The version of the image that the appliance is upgrading to is
+         contained in fscSerialTrapObjectImageNewVersion.
+
+         The version of the image that the appliance is currently running
+         is contained in fscSerialTrapObjectImageCurrentVersion.
+         "
+      --#TYPE        "Image Upgrade Started Trap"
+      --#SUMMARY     "Image upgrade started. Command issued by user: %s. Image type: %d. New version: %s. Current version: %s."
+      --#ARGUMENTS   { 0, 1, 2, 3 }
+      --#SEVERITY    INFORMATIONAL
+      --#CATEGORY    "STATUS EVENTS"
+      --#TIMEINDEX   99
+      ::= 7
+
+fscSerialImageUpgradeResultsTrap TRAP-TYPE
+      ENTERPRISE  fscSerialProducts
+      VARIABLES   {
+                     fscSerialTrapObjectImageUpgradeResults,
+                     fscSerialTrapObjectImageType
+                  }
+      DESCRIPTION
+         "This object contains the results of the upgrade of a software image.
+
+         The result is contained in fscSerialTrapObjectImageUpgradeResults.
+
+         The type of software image the upgrade result is for is contained in
+         fscSerialTrapObjectImageType.
+         "
+      --#TYPE        "Image Upgrade Result Trap"
+      --#SUMMARY     "Image upgrade result. Result: %d. Upgrade image type: %d."
+      --#ARGUMENTS   { 0, 1 }
+      --#SEVERITY    INFORMATIONAL
+      --#CATEGORY    "SYSTEM AND ENVIRONMENTAL"
+      --#TIMEINDEX   99
+      ::= 8
+
+fscSerialUserAddedTrap TRAP-TYPE
+      ENTERPRISE  fscSerialProducts
+      VARIABLES   {
+                     fscSerialTrapObjectUserName,
+                     fscSerialTrapObjectTargetUserName
+                  }
+      DESCRIPTION
+         "A new user has been added to the local user database.
+
+         The name of the user who added the new user is contained
+         in fscSerialTrapObjectUserName.
+
+         The name of the new user is contained in
+         fscSerialTrapObjectTargetUserName.
+         "
+      --#TYPE        "User Added Trap"
+      --#SUMMARY     "A user was added to the local user database. Command issued by user: %s. New user: %s."
+      --#ARGUMENTS   { 0, 1 }
+      --#SEVERITY    INFORMATIONAL
+      --#CATEGORY    "STATUS EVENTS"
+      --#TIMEINDEX   99
+      ::= 9
+
+fscSerialUserDeletedTrap TRAP-TYPE
+      ENTERPRISE  fscSerialProducts
+      VARIABLES   {
+                     fscSerialTrapObjectUserName,
+                     fscSerialTrapObjectTargetUserName
+                  }
+      DESCRIPTION
+         "A user has been deleted from the local user database.
+
+         The name of the user who deleted the user is contained
+         in fscSerialTrapObjectUserName.
+
+         The name of the user who was deleted is contained
+         in fscSerialTrapObjectTargetUserName.
+         "
+      --#TYPE        "User Deleted Trap"
+      --#SUMMARY     "A user was deleted from the local user database. Command issued by user: %s. Deleted user: %s."
+      --#ARGUMENTS   { 0, 1 }
+      --#SEVERITY    INFORMATIONAL
+      --#CATEGORY    "STATUS EVENTS"
+      --#TIMEINDEX   99
+      ::= 10
+
+fscSerialUserModifiedTrap TRAP-TYPE
+      ENTERPRISE  fscSerialProducts
+      VARIABLES   {
+                     fscSerialTrapObjectUserName,
+                     fscSerialTrapObjectTargetUserName
+                  }
+      DESCRIPTION
+         "A user was modified.
+
+         The the name of the user who modified the user is contain
+         in fscSerialTrapObjectUserName.
+
+         The name of the user who was modified is contained
+         in fscSerialTrapObjectTargetUserName.
+         "
+      --#TYPE        "User Modified Trap"
+      --#SUMMARY     "A user was modified in the local user database. Command issued by user: %s. Modified user: %s."
+      --#ARGUMENTS   { 0, 1 }
+      --#SEVERITY    INFORMATIONAL
+      --#CATEGORY    "STATUS EVENTS"
+      --#TIMEINDEX   99
+      ::= 11
+
+fscSerialUserAuthenticationFailureTrap TRAP-TYPE
+      ENTERPRISE  fscSerialProducts
+      VARIABLES   { fscSerialTrapObjectUserName }
+      DESCRIPTION
+         "A user failed to authenticate with the appliance.
+
+         The name of the user who failed to authenticate
+         is contained in fscSerialTrapObjectUserName.
+         "
+      --#TYPE        "User Authentication Failure Trap"
+      --#SUMMARY     "User authentication failed.  User: %s."
+      --#ARGUMENTS   { 0 }
+      --#SEVERITY    INFORMATIONAL
+      --#CATEGORY    "REMOTE MONITORING AND MANAGEMENT"
+      --#TIMEINDEX   99
+      ::= 12
+
+fscSerialFactoryDefaultsSetTrap TRAP-TYPE
+      ENTERPRISE  fscSerialProducts
+      DESCRIPTION
+         "The appliance has been commanded to set itself to factory defaults.
+
+         The appliance sends this trap after being commanded to set itself
+         to factory defaults but prior to actually reverting to factory
+         defaults.
+         "
+      --#TYPE        "Factory Defaults Set Trap"
+      --#SUMMARY     "The appliance was commanded to set itself to factory defaults."
+      --#SEVERITY    INFORMATIONAL
+      --#CATEGORY    "SYSTEM AND ENVIRONMENTAL"
+      --#TIMEINDEX   99
+      ::= 13
+
+fscSerialPortAlertTrap TRAP-TYPE
+      ENTERPRISE  fscSerialProducts
+      VARIABLES   {
+                     fscSerialTrapObjectPortNumber,
+                     fscSerialTrapObjectPortAlertString,
+                     fscSerialTrapObjectServerName
+                  }
+      DESCRIPTION
+         "The appliance detected a cry for help string on a serial port.
+
+         The serial port number the cry for help string was detected
+         on is contained in fscSerialTrapObjectPortNumber.
+
+         The cry for help string that was detected is contained
+         in fscSerialTrapObjectPortAlertString.
+
+         The serial port name the cry for help string was detected
+         on is contained in fscSerialTrapObjectServerName.
+         "
+      --#TYPE        "Port Alert Trap"
+      --#SUMMARY     "A cry for help string was detected on a serial port. Port number: %s. Cry for help string: %s."
+      --#ARGUMENTS   { 0, 1 }
+      --#SEVERITY    CRITICAL
+      --#CATEGORY    "SYSTEM AND ENVIRONMENTAL"
+      --#TIMEINDEX   99
+      ::= 14
+
+fscSerialConfigurationFileLoadedTrap TRAP-TYPE
+      ENTERPRISE  fscSerialProducts
+      VARIABLES   {
+                     fscSerialTrapObjectUserName,
+                     fscSerialTrapObjectFileName
+                  }
+      DESCRIPTION
+         "The appliance has loaded a configuration file.
+
+         The name of the user who commanded the appliance to
+         load the configuration file is contained in
+         fscSerialTrapObjectUserName.
+
+         The name of the file that was loaded is contained in
+         fscSerialTrapObjectFileName.
+         "
+      --#TYPE        "Configuration File Loaded Trap"
+      --#SUMMARY     "Configuration file loaded in the appliance. Command issued by user: %s. Name of file loaded: %s."
+      --#ARGUMENTS   { 0, 1 }
+      --#SEVERITY    INFORMATIONAL
+      --#CATEGORY    "STATUS EVENTS"
+      --#TIMEINDEX   99
+      ::= 15
+
+fscSerialUserDatabaseFileLoadedTrap TRAP-TYPE
+      ENTERPRISE  fscSerialProducts
+      VARIABLES   {
+                     fscSerialTrapObjectUserName,
+                     fscSerialTrapObjectFileName
+                  }
+      DESCRIPTION
+         "The appliance has loaded a user database file.
+
+         The name of the user who commanded the appliance to
+         load the user database file is contained in
+         fscSerialTrapObjectUserName.
+
+         The name of the file that was loaded is contained in
+         fscSerialTrapObjectFileName.
+         "
+      --#TYPE        "User Database File Loaded Trap"
+      --#SUMMARY     "User database file loaded in the appliance. Command issued by user: %s. Name of file loaded: %s."
+      --#ARGUMENTS   { 0, 1 }
+      --#SEVERITY    INFORMATIONAL
+      --#CATEGORY    "STATUS EVENTS"
+      --#TIMEINDEX   99
+      ::= 16
+
+fscSerialPortPowerOnDetectTrap TRAP-TYPE
+      ENTERPRISE  fscSerialProducts
+      VARIABLES   {
+                     fscSerialTrapObjectPortNumber,
+                     fscSerialTrapObjectServerName
+                  }
+      DESCRIPTION
+         "The appliance monitor has detected that the power on/off control
+         signal is high on a serial port indicating that the server attached
+         to the port is powered on.
+
+         This trap is sent on initialization if the condition is detected.
+         Subsequent traps occur only if there is a transition of this signal
+         from low to high.
+
+         The affected port number is contained in
+         fscSerialTrapObjectPortNumber.
+
+         The name of the server connected to the serial port is contained in
+         fscSerialTrapObjectServerName.
+         "
+      --#TYPE        "Port Power On Detected Trap"
+      --#SUMMARY     "Power on detected on a serial port. Port number: %d."
+      --#ARGUMENTS   { 0 }
+      --#SEVERITY    MINOR
+      --#CATEGORY    "REMOTE MONITORING AND MANAGEMENT"
+      --#TIMEINDEX   99
+      ::= 17
+
+fscSerialPortPowerOffDetectTrap TRAP-TYPE
+      ENTERPRISE  fscSerialProducts
+      VARIABLES   {
+                     fscSerialTrapObjectPortNumber,
+                     fscSerialTrapObjectServerName
+                  }
+      DESCRIPTION
+         "The appliance monitor has detected that the power on/off control
+         signal is low on a serial port indicating that server attached to
+         the port is powered off.
+
+         This trap is sent on initialization if the condition is detected.
+         Subsequent traps occur only if there is a transition of this signal
+         from high to low.
+
+         The affected port number is contained in
+         fscSerialTrapObjectPortNumber.
+
+         The name of the server connected to the serial port is contained in
+         fscSerialTrapObjectServerName.
+         "
+      --#TYPE        "Port Power Off Detected Trap"
+      --#SUMMARY     "Power off detected on a serial port. Port number: %d."
+      --#ARGUMENTS   { 0 }
+      --#SEVERITY    CRITICAL
+      --#CATEGORY    "REMOTE MONITORING AND MANAGEMENT"
+      --#TIMEINDEX   99
+      ::= 18
+
+-- trap numbers 39 through 30 are not currently used
+
+
+fscSerialUserLockedTrap TRAP-TYPE
+      ENTERPRISE  fscSerialProducts
+      VARIABLES   {
+                     fscSerialTrapObjectIPAddress,
+                     fscSerialTrapObjectTargetUserName,
+                     fscSerialTrapObjectLockReason
+                  }
+      DESCRIPTION
+         "A user account has been locked.
+
+         The IP address of the client from which the last connection was
+         attempted is contained in fscSerialTrapObjectIPAddress.
+         If 0.0.0.0, then the user was locked attempting to authentication
+         from the local Serial CLI.
+
+         The name of the user who was locked is contained
+         in fscSerialTrapObjectTargetUserName.
+
+         The reason for which the user account has been locked is contained
+         in fscSerialTrapObjectLockReason.
+         "
+      --#TYPE        "User Locked Trap"
+      --#SUMMARY     "User account has been locked. Client IP Address: %s. Locked user: %s. Reason: %s."
+      --#ARGUMENTS   { 0, 1, 2 }
+      --#SEVERITY    MINOR
+      --#CATEGORY    "STATUS EVENTS"
+      --#TIMEINDEX   99
+      ::= 31
+
+fscSerialUserUnlockedTrap TRAP-TYPE
+      ENTERPRISE  fscSerialProducts
+      VARIABLES   {
+                     fscSerialTrapObjectIPAddress,
+                     fscSerialTrapObjectUserName,
+                     fscSerialTrapObjectTargetUserName,
+                     fscSerialTrapObjectUnlockReason
+                  }
+      DESCRIPTION
+         "A user account has been unlocked.
+
+         The IP address of the client that originated the unlock request
+         is contained in fscSerialTrapObjectIPAddress. When the user
+         account is unlocked by an appliance reboot or by the expiration
+         of the lockout period (as specified in the
+         fscSerialTrapObjectUnlockReason object), the IP address
+         will be 0.0.0.0.
+
+         The name of the user who unlocked the user is contained
+         in fscSerialTrapObjectUserName. When the user account is unlocked
+         by an appliance reboot or by the expiration of the lockout period
+         (as specified in the fscSerialTrapObjectUnlockReason object), the
+         name of the user will be blank.
+
+         The name of the user who was unlocked is contained
+         in fscSerialTrapObjectTargetUserName.
+
+         The reason for which the user account has been unlocked is contained
+         in fscSerialTrapObjectUnlockReason.
+         "
+      --#TYPE        "User Unlocked Trap"
+      --#SUMMARY     "User account has been unlocked. Client IP Address: %s. Command issued by user: %s. Unlocked user: %s. Reason: %s."
+      --#ARGUMENTS   { 0, 1, 2, 3 }
+      --#SEVERITY    MINOR
+      --#CATEGORY    "STATUS EVENTS"
+      --#TIMEINDEX   99
+      ::= 32
+
+-- trap number 33 is not currently used
+
+
+fscSerialNFSDisableRqstdTrap TRAP-TYPE
+      ENTERPRISE  fscSerialProducts
+      VARIABLES   {
+                     fscSerialTrapObjectUserName
+                  }
+      DESCRIPTION
+         "The request to disable NFS was sent.
+
+         The user that requested NFS disable is contained in
+         fscSerialTrapObjectUserName.
+         "
+      --#TYPE        "Disable NFS Requested Trap"
+      --#SUMMARY     "Disable NFS requested. Command issued by user: %s."
+      --#ARGUMENTS   { 0 }
+      --#SEVERITY    INFORMATIONAL
+      --#CATEGORY    "REMOTE MONITORING AND MANAGEMENT"
+      --#TIMEINDEX   99
+      ::= 34
+
+fscSerialNFSUnmountedOKTrap TRAP-TYPE
+      ENTERPRISE  fscSerialProducts
+      DESCRIPTION
+         "The appliance has completed the disable/unmount NFS.
+
+          This trap is sent after an NFS Disable request is made and confirms
+          that the unmount operation was successfully completed.
+         "
+      --#TYPE        "NFS Unmount Completed Successfully Trap"
+      --#SUMMARY     "NFS unmount completed successfully."
+      --#SEVERITY    INFORMATIONAL
+      --#CATEGORY    "STATUS EVENTS"
+      --#TIMEINDEX   99
+      ::= 35
+
+fscSerialNFSEnableRqstdTrap TRAP-TYPE
+      ENTERPRISE  fscSerialProducts
+      VARIABLES   {
+                     fscSerialTrapObjectUserName
+                  }
+      DESCRIPTION
+         "The request to enable NFS was sent.
+
+          The user that requested NFS enable is contained in
+          fscSerialTrapObjectUserName.
+         "
+      --#TYPE        "Enable NFS Requested Trap"
+      --#SUMMARY     "Enable NFS requested. Command issued by user: %s."
+      --#ARGUMENTS   { 0 }
+      --#SEVERITY    INFORMATIONAL
+      --#CATEGORY    "REMOTE MONITORING AND MANAGEMENT"
+      --#TIMEINDEX   99
+      ::= 36
+
+fscSerialNFSMountedOKTrap TRAP-TYPE
+      ENTERPRISE  fscSerialProducts
+      DESCRIPTION
+         "The appliance has completed the enable/mount NFS.
+
+          This trap is sent after an NFSEnable request is made and confirms
+          that the mount operation was successfully completed.
+         "
+      --#TYPE        "NFS Mount Completed Successfully Trap"
+      --#SUMMARY     "NFS mount completed successfully."
+      --#SEVERITY    INFORMATIONAL
+      --#CATEGORY    "STATUS EVENTS"
+      --#TIMEINDEX   99
+      ::= 37
+
+fscSerialNFSMountVerifiedOKTrap TRAP-TYPE
+      ENTERPRISE  fscSerialProducts
+      DESCRIPTION
+         "The appliance has verified that the NFS mount operation succedded.
+         "
+      --#TYPE        "NFS Mount Verified Successfully Trap"
+      --#SUMMARY     "NFS mount verified successfully."
+      --#SEVERITY    INFORMATIONAL
+      --#CATEGORY    "STATUS EVENTS"
+      --#TIMEINDEX   99
+      ::= 38
+
+fscSerialNFSMountFailedRetryingTrap TRAP-TYPE
+      ENTERPRISE  fscSerialProducts
+      VARIABLES   {
+                     fscSerialTrapObjectNFSPriErrorReason,
+                     fscSerialTrapObjectNFSSecErrorReason
+                  }
+      DESCRIPTION
+         "The first NFS mount attempt failed.
+
+          The fscSerialTrapObjectNFSPriErrorReason specifies the main reason
+          of failure and can have any value defined in NFSErrorReasonEnum.
+
+          The fscSerialTrapObjectNFSSecErrorReason specifies the secondary
+          reason of failure and can have any value defined in NFSErrorReasonEnum
+          or if there is no detailed reason then the value will be zero.
+         "
+      --#TYPE        "First NFS Mount Attempt Failed Trap"
+      --#SUMMARY     "First NFS mount attempt failed. Primary error code: %d. Secondary error code: %d."
+      --#ARGUMENTS   { 0, 1 }
+      --#SEVERITY    MAJOR
+      --#CATEGORY    "STATUS EVENTS"
+      --#TIMEINDEX   99
+      ::= 39
+
+fscSerialNFSMountFailedGaveUpTrap TRAP-TYPE
+      ENTERPRISE  fscSerialProducts
+      VARIABLES   {
+                     fscSerialTrapObjectNFSPriErrorReason,
+                     fscSerialTrapObjectNFSSecErrorReason
+                  }
+      DESCRIPTION
+         "The final NFS mount attempt failed. No more attempts to mount a NFS
+          will be maid.
+
+          The fscSerialTrapObjectNFSPriErrorReason specifies the main reason
+          of failure and can have any value defined in NFSErrorReasonEnum.
+
+          The fscSerialTrapObjectNFSSecErrorReason specifies the secondary
+          reason of failure and can have any value defined in NFSErrorReasonEnum
+          or if there is no detailed reason then the value will be zero.
+         "
+      --#TYPE        "Final NFS Mount Attempt Failed Trap"
+      --#SUMMARY     "Final NFS mount attempt failed. Primary error code: %d. Secondary error code: %d."
+      --#ARGUMENTS   { 0, 1 }
+      --#SEVERITY    CRITICAL
+      --#CATEGORY    "STATUS EVENTS"
+      --#TIMEINDEX   99
+      ::= 40
+
+fscSerialNFSMountLostRetryingTrap TRAP-TYPE
+      ENTERPRISE  fscSerialProducts
+      VARIABLES   {
+                     fscSerialTrapObjectNFSPriErrorReason,
+                     fscSerialTrapObjectNFSSecErrorReason
+                  }
+      DESCRIPTION
+         "This trap is sent when the NFS mount is lost.
+
+          The fscSerialTrapObjectNFSPriErrorReason specifies the main reason
+          of failure and can have any value defined in NFSErrorReasonEnum.
+
+          The fscSerialTrapObjectNFSSecErrorReason specifies the secondary
+          reason of failure and can have any value defined in NFSErrorReasonEnum
+          or if there is no detailed reason then the value will be zero.
+         "
+      --#TYPE        "NFS Mount Lost Trap"
+      --#SUMMARY     "NFS mount lost. Starting first retry. Primary error code: %d. Secondary error code: %d."
+      --#ARGUMENTS   { 0, 1 }
+      --#SEVERITY    MAJOR
+      --#CATEGORY    "REMOTE MONITORING AND MANAGEMENT"
+      --#TIMEINDEX   99
+      ::= 41
+
+fscSerialNFSMountLost1stRetryFailedTrap TRAP-TYPE
+      ENTERPRISE  fscSerialProducts
+      VARIABLES   {
+                     fscSerialTrapObjectNFSPriErrorReason,
+                     fscSerialTrapObjectNFSSecErrorReason
+                  }
+      DESCRIPTION
+         "The first NFS remount attempt failed.
+
+          The fscSerialTrapObjectNFSPriErrorReason specifies the main reason
+          of failure and can have any value defined in NFSErrorReasonEnum.
+
+          The fscSerialTrapObjectNFSSecErrorReason specifies the secondary
+          reason of failure and can have any value defined in NFSErrorReasonEnum
+          or if there is no detailed reason then the value will be zero.
+         "
+      --#TYPE        "NFS Mount Lost Trap"
+      --#SUMMARY     "NFS mount lost. First retry attempt failed. Primary error code: %d. Secondary error code: %d."
+      --#ARGUMENTS   { 0, 1 }
+      --#SEVERITY    MAJOR
+      --#CATEGORY    "STATUS EVENTS"
+      --#TIMEINDEX   99
+      ::= 42
+
+fscSerialNFSMountLostGaveUpTrap TRAP-TYPE
+      ENTERPRISE  fscSerialProducts
+      VARIABLES   {
+                     fscSerialTrapObjectNFSPriErrorReason,
+                     fscSerialTrapObjectNFSSecErrorReason
+                  }
+      DESCRIPTION
+         "The final NFS remount attempt failed.
+
+          The fscSerialTrapObjectNFSPriErrorReason specifies the main reason
+          of failure and can have any value defined in NFSErrorReasonEnum.
+
+          The fscSerialTrapObjectNFSSecErrorReason specifies the secondary
+          reason of failure and can have any value defined in NFSErrorReasonEnum
+          or if there is no detailed reason then the value will be zero.
+         "
+      --#TYPE        "NFS Mount Lost Trap"
+      --#SUMMARY     "NFS mount lost. Final retry attempt failed. Primary error code: %d. Secondary error code: %d."
+      --#ARGUMENTS   { 0, 1 }
+      --#SEVERITY    CRITICAL
+      --#CATEGORY    "STATUS EVENTS"
+      --#TIMEINDEX   99
+      ::= 43
+
+fscSerialNFSPortEnableRqstdTrap TRAP-TYPE
+      ENTERPRISE  fscSerialProducts
+      VARIABLES   {
+                     fscSerialTrapObjectUserName,
+                     fscSerialTrapObjectPortNumber
+                  }
+      DESCRIPTION
+         "A request to enable a NFS port was sent.
+
+          The fscSerialTrapObjectUserName contains the name of the user that
+          requested this operation.
+
+          The fscSerialTrapObjectPortNumber returns the port number of
+          the NFS port to be enabled.
+         "
+      --#TYPE        "NFS Post Enable Requested Trap"
+      --#SUMMARY     "NFS port enable requested. Port number: %d. Command issued by user: %s."
+      --#ARGUMENTS   { 1, 0 }
+      --#SEVERITY    INFORMATIONAL
+      --#CATEGORY    "REMOTE MONITORING AND MANAGEMENT"
+      --#TIMEINDEX   99
+      ::= 44
+
+fscSerialNFSPortDisableRqstdTrap TRAP-TYPE
+      ENTERPRISE  fscSerialProducts
+      VARIABLES   {
+                     fscSerialTrapObjectUserName,
+                     fscSerialTrapObjectPortNumber
+                  }
+      DESCRIPTION
+         "A request to disable a NFS port was sent.
+
+          The fscSerialTrapObjectUserName contains the name of the user that
+          requested this operation.
+
+          The fscSerialTrapObjectPortNumber returns the port number of
+          the NFS port to be disabled.
+         "
+      --#TYPE        "NFS Port Disable Requested Trap"
+      --#SUMMARY     "NFS port disable requested. Port number: %d. Command issued by user: %s."
+      --#ARGUMENTS   { 1, 0 }
+      --#SEVERITY    INFORMATIONAL
+      --#CATEGORY    "REMOTE MONITORING AND MANAGEMENT"
+      --#TIMEINDEX   99
+      ::= 45
+
+fscSerialNFSPortNeedsMountTrap TRAP-TYPE
+      ENTERPRISE  fscSerialProducts
+      VARIABLES   {
+                     fscSerialTrapObjectPortNumber,
+                     fscSerialTrapObjectNFSPortErrStatus,
+                     fscSerialTrapObjectNFSPriErrorReason,
+                     fscSerialTrapObjectNFSSecErrorReason
+                  }
+      DESCRIPTION
+         "This trap is sent when a port needs mount.
+
+          The fscSerialTrapObjectPortNumber returns the port number of
+          the NFS port that needs remount.
+
+          The fscSerialTrapObjectNFSPortErrStatus returns the status of the
+          port at the time that this trap was generated.
+
+          The fscSerialTrapObjectNFSErrorReason returns the error codes for
+          this operation.
+         "
+      --#TYPE        "NFS Mount Needed Trap"
+      --#SUMMARY     "NFS mount needed. Port number: %d. Port status: %d. Primary error code: %d. Secondary error code: %d."
+      --#ARGUMENTS   { 0, 1, 2, 3}
+      --#SEVERITY    CRITICAL
+      --#CATEGORY    "SYSTEM AND ENVIRONMENTAL"
+      --#TIMEINDEX   99
+      ::= 46
+
+fscSerialNFSPortOpenFailRetryingTrap TRAP-TYPE
+      ENTERPRISE  fscSerialProducts
+      VARIABLES   {
+                     fscSerialTrapObjectPortNumber,
+                     fscSerialTrapObjectNFSPortErrStatus,
+                     fscSerialTrapObjectNFSPriErrorReason,
+                     fscSerialTrapObjectNFSSecErrorReason
+                  }
+      DESCRIPTION
+         "The first attempt to open a file using the NFS failed. Several
+          attempts will be made until the operation will get canceled.
+
+          The fscSerialTrapObjectPortNumber returns the port number of
+          the NFS port that failed.
+
+          The fscSerialTrapObjectNFSPortErrStatus returns the status of the
+          port at the time that this trap was generated.
+
+          The fscSerialTrapObjectNFSPriErrorReason specifies the main reason
+          of failure and can have any value defined in NFSErrorReasonEnum.
+
+          The fscSerialTrapObjectNFSSecErrorReason specifies the secondary
+          reason of failure and can have any value defined in NFSErrorReasonEnum
+          or if there is no detailed reason then the value will be zero.
+         "
+      --#TYPE        "First NFS File Open Attempt Failed Trap"
+      --#SUMMARY     "First NFS file open attempt failed. Port number: %d. Port status: %d. Primary error code: %d. Secondary error code: %d."
+      --#ARGUMENTS   { 0, 1, 2, 3 }
+      --#SEVERITY    MAJOR
+      --#CATEGORY    "STATUS EVENTS"
+      --#TIMEINDEX   99
+      ::= 47
+
+fscSerialNFSPortOpenFailGaveUpTrap TRAP-TYPE
+      ENTERPRISE  fscSerialProducts
+      VARIABLES   {
+                     fscSerialTrapObjectPortNumber,
+                     fscSerialTrapObjectNFSPortErrStatus,
+                     fscSerialTrapObjectNFSPriErrorReason,
+                     fscSerialTrapObjectNFSSecErrorReason
+                  }
+      DESCRIPTION
+         "The final attempt to open a file using the NFS failed. No more attempts
+          will be made and the operation will be canceled.
+
+          The fscSerialTrapObjectPortNumber returns the port number of
+          the NFS port that failed.
+
+          The fscSerialTrapObjectNFSPortErrStatus returns the status of the
+          port at the time that this trap was generated.
+
+          The fscSerialTrapObjectNFSPriErrorReason specifies the main reason
+          of failure and can have any value defined in NFSErrorReasonEnum.
+
+          The fscSerialTrapObjectNFSSecErrorReason specifies the secondary
+          reason of failure and can have any value defined in NFSErrorReasonEnum
+          or if there is no detailed reason then the value will be zero.
+         "
+      --#TYPE        "Final NFS File Open Attempt Failed Trap"
+      --#SUMMARY     "Final NFS file open attempt failed. Port number: %d. Port status: %d. Primary error code: %d. Secondary error code: %d."
+      --#ARGUMENTS   { 0, 1, 2, 3 }
+      --#SEVERITY    CRITICAL
+      --#CATEGORY    "STATUS EVENTS"
+      --#TIMEINDEX   99
+      ::= 48
+
+fscSerialNFSPortFileOpenOKTrap TRAP-TYPE
+      ENTERPRISE  fscSerialProducts
+      VARIABLES   {
+                     fscSerialTrapObjectPortNumber
+                  }
+      DESCRIPTION
+         "This trap is sent when an attempt to open a file through NFS is
+          successful.
+
+          The fscSerialTrapObjectPortNumber returns the port number of
+          the NFS port that was successfully open.
+         "
+      --#TYPE        "NFS File Opened Successfully Trap"
+      --#SUMMARY     "NFS file opened successfully. Port number: %d."
+      --#ARGUMENTS   { 0 }
+      --#SEVERITY    INFORMATIONAL
+      --#CATEGORY    "STATUS EVENTS"
+      --#TIMEINDEX   99
+      ::= 49
+
+fscSerialNFSPortWriteErrorTrap TRAP-TYPE
+      ENTERPRISE  fscSerialProducts
+      VARIABLES   {
+                     fscSerialTrapObjectPortNumber,
+                     fscSerialTrapObjectNFSPortErrStatus,
+                     fscSerialTrapObjectNFSPriErrorReason,
+                     fscSerialTrapObjectNFSSecErrorReason
+                  }
+      DESCRIPTION
+         "This trap is sent when a write file operation fails.
+          If multiple consecutive write operations fail, this trap is
+          only sent once, upon the occurrence of the first failure.
+          Once sent, this trap will not be sent again until a write operation has
+          been successfully performed, and a period of 15 minutes has elapsed
+          without any additional write operation failures and without any overrun
+          errors. (I.e. This trap is sent only when the status of the port is 'No
+          recent errors.)
+
+          The port number of the NFS port on which the failure occurred is
+          contained in fscSerialTrapObjectPortNumber.
+
+          The status of the NFS port on which the failure occurred is contained in
+          fscSerialTrapObjectNFSPortErrStatus. (This is the status of the port
+          at the time that the Trap was generated.)
+
+          The fscSerialTrapObjectNFSPriErrorReason specifies the main reason
+          of failure and can have any value defined in NFSErrorReasonEnum.
+
+          The fscSerialTrapObjectNFSSecErrorReason specifies the secondary
+          reason of failure and can have any value defined in NFSErrorReasonEnum
+          or if there is no detailed reason then the value will be zero.
+        "
+      --#TYPE        "NFS File Write Error Trap"
+      --#SUMMARY     "NFS file write error encountered. Port number: %d. Port status: %d. Primary error code: %d. Secondary error code: %d."
+      --#ARGUMENTS   { 0, 1, 2, 3 }
+      --#SEVERITY    CRITICAL
+      --#CATEGORY    "STATUS EVENTS"
+      --#TIMEINDEX   99
+      ::= 50
+
+fscSerialNFSPortOverrunErrorTrap TRAP-TYPE
+      ENTERPRISE  fscSerialProducts
+      VARIABLES   {
+                     fscSerialTrapObjectPortNumber,
+                     fscSerialTrapObjectNFSPortErrStatus,
+                     fscSerialTrapObjectNFSPriErrorReason,
+                     fscSerialTrapObjectNFSSecErrorReason
+                  }
+      DESCRIPTION
+         "This trap is sent when an overrun occurs when writing to the file.
+          If multiple consecutive overruns occur, this trap is only sent once,
+          upon the occurrence of the first overrun.
+          Once sent, this trap will not be sent again until a write operation has
+          been successfully performed, and a period of 15 minutes has elapsed
+          without any additional overruns or write operation failures.
+          This trap is not sent if the most recent write operation failed or if
+          a write operation failed within the preceding 15 minute period.
+          (I.e. This trap is sent only when the status of the port is 'No recent
+          errors.)
+
+          The port number of the NFS port on which the failure occurred is
+          contained in fscSerialTrapObjectPortNumber.
+
+          The status of the NFS port on which the error occurred is contained in
+          fscSerialTrapObjectNFSPortErrStatus. (This is the status of the port
+          at the time that the Trap was generated.)
+
+          The fscSerialTrapObjectNFSPriErrorReason specifies the main reason
+          of failure and can have any value defined in NFSErrorReasonEnum.
+
+          The fscSerialTrapObjectNFSSecErrorReason specifies the secondary
+          reason of failure and can have any value defined in NFSErrorReasonEnum
+          or if there is no detailed reason then the value will be zero.
+         "
+      --#TYPE        "NFS File Overrun Error Trap"
+      --#SUMMARY     "NFS file overrun error encountered. Port number: %d. Port status: %d. Primary error code: %d. Secondary error code: %d."
+      --#ARGUMENTS   { 0, 1, 2, 3 }
+      --#SEVERITY    MAJOR
+      --#CATEGORY    "REMOTE MONITORING AND MANAGEMENT"
+      --#TIMEINDEX   99
+      ::= 51
+
+fscSerialNFSPortNoRecentErrorsTrap TRAP-TYPE
+      ENTERPRISE  fscSerialProducts
+      VARIABLES   {
+                     fscSerialTrapObjectPortNumber
+                  }
+      DESCRIPTION
+         "This trap is sent if the status of a port changes to a status of
+          'No recent errors' from one of the current or recent write and/or
+          overrun error status conditions.
+
+          The fscSerialTrapObjectPortNumber contains the number of the port
+          that has no errors.
+         "
+      --#TYPE        "No Recent NFS Errors Encountered Trap"
+      --#SUMMARY     "No recent NFS errors encountered. Port number: %d."
+      --#ARGUMENTS   { 0 }
+      --#SEVERITY    INFORMATIONAL
+      --#CATEGORY    "SYSTEM AND ENVIRONMENTAL"
+      --#TIMEINDEX   99
+      ::= 52
+
+fscSerialNFSPortFileClosedTrap TRAP-TYPE
+      ENTERPRISE  fscSerialProducts
+      VARIABLES   {
+                     fscSerialTrapObjectPortNumber
+                  }
+      DESCRIPTION
+         "The file open through a NFS port was successfully closed.
+
+          The fscSerialTrapObjectPortNumber returns the NFS port number
+          where the file was open.
+         "
+      --#TYPE        "NFS File Closed Trap"
+      --#SUMMARY     "NFS file closed. Port number: %d."
+      --#ARGUMENTS   { 0 }
+      --#SEVERITY    INFORMATIONAL
+      --#CATEGORY    "STATUS EVENTS"
+      --#TIMEINDEX   99
+      ::= 53
+
+END

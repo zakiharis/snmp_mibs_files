@@ -1,0 +1,352 @@
+-- ----------------------------------------------------------------------
+--
+--					Copyright (c) 2006 by Sinetica Corporation Ltd.
+--
+-- Filename:        RMS-C_SNMPv1_contact.mib
+--
+-- Author:          Adrian Moruz
+--
+-- Description:     SNMPv1 MIB definition for the RMS Compact Contact notifications
+--
+-- $Id: RMS-C_SNMPv1_contact.mib,v 1.2 2006/10/13 10:31:07 adrian.moruz Exp $
+--
+-- $Name:  $
+--
+-- $Log: RMS-C_SNMPv1_contact.mib,v $
+-- Revision 1.2  2006/10/13 10:31:07  adrian.moruz
+-- all notifications rms-cContact<x>ReturnToNormal updated
+--
+-- Revision 1.1  2006/10/11 11:21:32  adrian.moruz
+-- Created from RMS-C_SNMPv1.mib v1.2 to separate the different trap enterprise groups into separate MIBs
+--
+--
+-- ----------------------------------------------------------------------
+
+RMS-COMPACT-SNMPv1-CONTACT-MIB DEFINITIONS ::= BEGIN
+
+
+-- {{{ Imports
+--	OBJECT-TYPE, Counter32, Unsigned32,
+
+IMPORTS
+        TRAP-TYPE
+                FROM RFC-1215
+        sysDescr, sysName, DisplayString
+                FROM RFC1213-MIB
+        OBJECT-TYPE
+                FROM RFC-1212
+        enterprises 
+                FROM RFC1155-SMI
+	;
+
+-- }}}
+
+
+
+sinetica   OBJECT IDENTIFIER ::= { enterprises 3711 }
+
+
+
+rms-compact          OBJECT IDENTIFIER ::= { sinetica 15 }
+rms-compact1         OBJECT IDENTIFIER ::= { rms-compact 1 }
+rms-cObjects   OBJECT IDENTIFIER ::= { rms-compact1 1 }
+
+
+-- {{{ rms-cObjects  
+
+rms-cContact       OBJECT IDENTIFIER ::= { rms-cObjects 2  }
+
+-- }}}
+-- {{{
+
+rms-cContact1NonNormal              TRAP-TYPE
+    ENTERPRISE rms-cContact
+    VARIABLES { 
+    			sysDescr,
+    			sysName,
+    			rms-cContact1Name,
+    			rms-cContact1NormalState
+    			}
+    DESCRIPTION
+        "The rms-c has detected a non-normal state on contact 1"
+	--#TYPE		"Contact 1 non-normal state"
+	--#SUMMARY	"Contact %s above %d in %s at %s"
+	--#ARGUMENTS	{2,3,0,1}
+	--#SEVERITY 	MINOR
+	--#TIMEINDEX	4
+	--#STATE		NONOPERATIONAL
+    ::= 1
+
+rms-cContact1ReturnToNormal         TRAP-TYPE
+    ENTERPRISE rms-cContact
+    VARIABLES { 
+    			sysDescr,
+    			sysName,
+    			rms-cContact1Name,
+    			rms-cContact1NormalState
+    			}
+    DESCRIPTION
+        "The rms-c has detected a return to normal state on contact 1"
+	--#TYPE		"Contact 1 return to normal state"
+	--#SUMMARY	"Contact %s above %d in %s at %s"
+	--#ARGUMENTS	{2,3,0,1}
+	--#SEVERITY 	INFORMATIONAL
+	--#TIMEINDEX	4
+	--#STATE		NONOPERATIONAL
+    ::= 11
+
+rms-cContact2NonNormal              TRAP-TYPE
+    ENTERPRISE rms-cContact
+    VARIABLES { 
+    			sysDescr,
+    			sysName,
+    			rms-cContact2Name,
+    			rms-cContact2NormalState
+    			}
+    DESCRIPTION
+        "The rms-c has detected a non-normal state on contact 2"
+	--#TYPE		"Contact 2 non-normal state"
+	--#SUMMARY	"Contact %s above %d in %s at %s"
+	--#ARGUMENTS	{2,3,0,1}
+	--#SEVERITY 	MINOR
+	--#TIMEINDEX	4
+	--#STATE		NONOPERATIONAL
+    ::= 2
+
+rms-cContact2ReturnToNormal         TRAP-TYPE
+    ENTERPRISE rms-cContact
+    VARIABLES { 
+    			sysDescr,
+    			sysName,
+    			rms-cContact2Name,
+    			rms-cContact2NormalState
+    			}
+    DESCRIPTION
+        "The rms-c has detected a return to normal state on contact 2"
+	--#TYPE		"Contact 2 return to normal state"
+	--#SUMMARY	"Contact %s above %d in %s at %s"
+	--#ARGUMENTS	{2,3,0,1}
+	--#SEVERITY 	INFORMATIONAL
+	--#TIMEINDEX	4
+	--#STATE		NONOPERATIONAL
+    ::= 12
+
+rms-cContact3NonNormal              TRAP-TYPE
+    ENTERPRISE rms-cContact
+    VARIABLES { 
+    			sysDescr,
+    			sysName,
+    			rms-cContact3Name,
+    			rms-cContact3NormalState
+    			}
+    DESCRIPTION
+        "The rms-c has detected a non-normal state on contact 3"
+	--#TYPE		"Contact 3 non-normal state"
+	--#SUMMARY	"Contact %s above %d in %s at %s"
+	--#ARGUMENTS	{2,3,0,1}
+	--#SEVERITY 	MINOR
+	--#TIMEINDEX	4
+	--#STATE		NONOPERATIONAL
+    ::= 3
+
+rms-cContact3ReturnToNormal         TRAP-TYPE
+    ENTERPRISE rms-cContact
+    VARIABLES { 
+    			sysDescr,
+    			sysName,
+    			rms-cContact3Name,
+    			rms-cContact3NormalState
+    			}
+    DESCRIPTION
+        "The rms-c has detected a return to normal state on contact 3"
+	--#TYPE		"Contact 3 return to normal state"
+	--#SUMMARY	"Contact %s above %d in %s at %s"
+	--#ARGUMENTS	{2,3,0,1}
+	--#SEVERITY 	INFORMATIONAL
+	--#TIMEINDEX	4
+	--#STATE		NONOPERATIONAL
+    ::= 13
+
+rms-cContact4NonNormal              TRAP-TYPE
+    ENTERPRISE rms-cContact
+    VARIABLES { 
+    			sysDescr,
+    			sysName,
+    			rms-cContact4Name,
+    			rms-cContact4NormalState
+    			}
+    DESCRIPTION
+        "The rms-c has detected a non-normal state on contact 4"
+	--#TYPE		"Contact 4 non-normal state"
+	--#SUMMARY	"Contact %s above %d in %s at %s"
+	--#ARGUMENTS	{2,3,0,1}
+	--#SEVERITY 	MINOR
+	--#TIMEINDEX	4
+	--#STATE		NONOPERATIONAL
+    ::= 4
+
+rms-cContact4ReturnToNormal         TRAP-TYPE
+    ENTERPRISE rms-cContact
+    VARIABLES { 
+    			sysDescr,
+    			sysName,
+    			rms-cContact4Name,
+    			rms-cContact4NormalState
+    			}
+    DESCRIPTION
+        "The rms-c has detected a return to normal state on contact 4"
+	--#TYPE		"Contact 4 return to normal state"
+	--#SUMMARY	"Contact %s above %d in %s at %s"
+	--#ARGUMENTS	{2,3,0,1}
+	--#SEVERITY 	INFORMATIONAL
+	--#TIMEINDEX	4
+	--#STATE		NONOPERATIONAL
+    ::= 14
+
+rms-cContact5NonNormal              TRAP-TYPE
+    ENTERPRISE rms-cContact
+    VARIABLES { 
+    			sysDescr,
+    			sysName,
+    			rms-cContact5Name,
+    			rms-cContact5NormalState
+    			}
+    DESCRIPTION
+        "The rms-c has detected a non-normal state on contact 5"
+	--#TYPE		"Contact 5 non-normal state"
+	--#SUMMARY	"Contact %s above %d in %s at %s"
+	--#ARGUMENTS	{2,3,0,1}
+	--#SEVERITY 	MINOR
+	--#TIMEINDEX	4
+	--#STATE		NONOPERATIONAL
+    ::= 5
+
+rms-cContact5ReturnToNormal         TRAP-TYPE
+    ENTERPRISE rms-cContact
+    VARIABLES { 
+    			sysDescr,
+    			sysName,
+    			rms-cContact5Name,
+    			rms-cContact5NormalState
+    			}
+    DESCRIPTION
+        "The rms-c has detected a return to normal state on contact 5"
+	--#TYPE		"Contact 5 return to normal state"
+	--#SUMMARY	"Contact %s above %d in %s at %s"
+	--#ARGUMENTS	{2,3,0,1}
+	--#SEVERITY 	INFORMATIONAL
+	--#TIMEINDEX	4
+	--#STATE		NONOPERATIONAL
+    ::= 15
+
+rms-cContact6NonNormal              TRAP-TYPE
+    ENTERPRISE rms-cContact
+    VARIABLES { 
+    			sysDescr,
+    			sysName,
+    			rms-cContact6Name,
+    			rms-cContact6NormalState
+    			}
+    DESCRIPTION
+        "The rms-c has detected a non-normal state on contact 6"
+	--#TYPE		"Contact 6 non-normal state"
+	--#SUMMARY	"Contact %s above %d in %s at %s"
+	--#ARGUMENTS	{2,3,0,1}
+	--#SEVERITY 	MINOR
+	--#TIMEINDEX	4
+	--#STATE		NONOPERATIONAL
+    ::= 6
+
+rms-cContact6ReturnToNormal         TRAP-TYPE
+    ENTERPRISE rms-cContact
+    VARIABLES { 
+    			sysDescr,
+    			sysName,
+    			rms-cContact6Name,
+    			rms-cContact6NormalState
+    			}
+    DESCRIPTION
+        "The rms-c has detected a return to normal state on contact 6"
+	--#TYPE		"Contact 6 return to normal state"
+	--#SUMMARY	"Contact %s above %d in %s at %s"
+	--#ARGUMENTS	{2,3,0,1}
+	--#SEVERITY 	INFORMATIONAL
+	--#TIMEINDEX	4
+	--#STATE		NONOPERATIONAL
+    ::= 16
+
+rms-cContact7NonNormal              TRAP-TYPE
+    ENTERPRISE rms-cContact
+    VARIABLES { 
+    			sysDescr,
+    			sysName,
+    			rms-cContact7Name,
+    			rms-cContact7NormalState
+    			}
+    DESCRIPTION
+        "The rms-c has detected a non-normal state on contact 7"
+	--#TYPE		"Contact 7 non-normal state"
+	--#SUMMARY	"Contact %s above %d in %s at %s"
+	--#ARGUMENTS	{2,3,0,1}
+	--#SEVERITY 	MINOR
+	--#TIMEINDEX	4
+	--#STATE		NONOPERATIONAL
+    ::= 7
+
+rms-cContact7ReturnToNormal         TRAP-TYPE
+    ENTERPRISE rms-cContact
+    VARIABLES { 
+    			sysDescr,
+    			sysName,
+    			rms-cContact7Name,
+    			rms-cContact7NormalState
+    			}
+    DESCRIPTION
+        "The rms-c has detected a return to normal state on contact 7"
+	--#TYPE		"Contact 7 return to normal state"
+	--#SUMMARY	"Contact %s above %d in %s at %s"
+	--#ARGUMENTS	{2,3,0,1}
+	--#SEVERITY 	INFORMATIONAL
+	--#TIMEINDEX	4
+	--#STATE		NONOPERATIONAL
+    ::= 17
+
+rms-cContact8NonNormal              TRAP-TYPE
+    ENTERPRISE rms-cContact
+    VARIABLES { 
+    			sysDescr,
+    			sysName,
+    			rms-cContact8Name,
+    			rms-cContact8NormalState
+    			}
+    DESCRIPTION
+        "The rms-c has detected a non-normal state on contact 8"
+	--#TYPE		"Contact 8 non-normal state"
+	--#SUMMARY	"Contact %s above %d in %s at %s"
+	--#ARGUMENTS	{2,3,0,1}
+	--#SEVERITY 	MINOR
+	--#TIMEINDEX	4
+	--#STATE		NONOPERATIONAL
+    ::= 8
+
+rms-cContact8ReturnToNormal         TRAP-TYPE
+    ENTERPRISE rms-cContact
+    VARIABLES { 
+    			sysDescr,
+    			sysName,
+    			rms-cContact8Name,
+    			rms-cContact8NormalState
+    			}
+    DESCRIPTION
+        "The rms-c has detected a return to normal state on contact 8"
+	--#TYPE		"Contact 8 return to normal state"
+	--#SUMMARY	"Contact %s above %d in %s at %s"
+	--#ARGUMENTS	{2,3,0,1}
+	--#SEVERITY 	INFORMATIONAL
+	--#TIMEINDEX	4
+	--#STATE		NONOPERATIONAL
+    ::= 18
+-- }}}
+
+
+END

@@ -1,0 +1,172 @@
+-- Header
+    EXABYTE-MIB DEFINITIONS ::= BEGIN
+
+-- Imports
+        IMPORTS
+            mgmt, enterprises, IpAddress
+                FROM RFC1155-SMI
+            DisplayString
+                FROM RFC1213-MIB
+            OBJECT-TYPE
+                FROM RFC1212-MIB;
+--            TruthValue                
+--                FROM SNMPv2-TC;
+
+--        TruthValue ::= TEXTUAL-CONVENTION
+--                STATUS current
+--                DESCRIPTION
+--                    "Represents a boolean value."
+--                SYNTAX INTEGER
+--                {
+--                    true(1),
+--                    false(2)
+--                }
+
+        PhysAddress6 ::= OCTET STRING
+        PhysAddress8 ::= OCTET STRING
+        IPAddress4 ::= OCTET STRING
+        DisplayString4 ::= OCTET STRING (SIZE (0..3))
+        DisplayString8 ::= OCTET STRING (SIZE (0..7))
+        DisplayString10 ::= OCTET STRING (SIZE (0..9))
+        DisplayString11 ::= OCTET STRING (SIZE (0..10))
+        DisplayString16 ::= OCTET STRING (SIZE (0..15))
+        DisplayString20 ::= OCTET STRING (SIZE (0..19))
+        DisplayString36 ::= OCTET STRING (SIZE (0..35))
+
+        exabyte         OBJECT IDENTIFIER ::= { enterprises 3073 }
+
+        mediaChanger    OBJECT IDENTIFIER ::= { exabyte 2 }
+
+        mibVersion OBJECT-TYPE
+                SYNTAX DisplayString
+                ACCESS read-only
+                STATUS mandatory
+                DESCRIPTION
+                  ""
+                ::= { mediaChanger 1 }
+
+        configuration   OBJECT IDENTIFIER ::= { mediaChanger 3 }
+
+        cfgTraps        OBJECT IDENTIFIER ::= { configuration 8 }
+
+        cfgEEPortCloseTrap TRAP-TYPE
+                ENTERPRISE configuration
+--                VARIABLES {}
+                DESCRIPTION
+                  "EEPort Close Trap"
+						
+                  -- Trap annotations are as follows:
+                     --#TYPE "Informational event: EEPort Close"
+                     --#SUMMARY "Informational event: EEPort Close Trap"
+                     --#ARGUMENTS {}
+                     --#SEVERITY INFORMATIONAL
+                     --#TIMEINDEX 1                                          
+                     --#STATE OPERATIONAL
+                ::= 2
+
+        cfgColdStartTrap TRAP-TYPE
+                ENTERPRISE configuration
+                --VARIABLES {}
+                DESCRIPTION
+                  "ColdStart Trap"
+						
+                  -- Trap annotations are as follows:
+                     --#TYPE "Informational event: ColdStart"
+                     --#SUMMARY "Informational event: ColdStart Trap"
+                     --#ARGUMENTS {}
+                     --#SEVERITY INFORMATIONAL
+                     --#TIMEINDEX 1                                          
+                     --#STATE OPERATIONAL
+                ::= 4
+
+        cfgEEPPortOpenTrap TRAP-TYPE
+                ENTERPRISE configuration
+                --VARIABLES {}
+                DESCRIPTION
+                  "EEEPort Open Trap"
+						
+                  -- Trap annotations are as follows:
+                     --#TYPE "Informational event: EEEPort Open"
+                     --#SUMMARY "Informational event: EEEPort Open Trap"
+                     --#ARGUMENTS {}
+                     --#SEVERITY INFORMATIONAL
+                     --#TIMEINDEX 1                                          
+                     --#STATE OPERATIONAL
+                ::= 6
+
+        cfgErrorStateTrap TRAP-TYPE
+                ENTERPRISE configuration
+                --VARIABLES {}
+                DESCRIPTION
+                  "Error State Trap"
+						
+                  -- Trap annotations are as follows:
+                     --#TYPE "Major event: Error State"
+                     --#SUMMARY "Major event: Error State Trap"
+                     --#ARGUMENTS {}
+                     --#SEVERITY MAJOR
+                     --#TIMEINDEX 1                                          
+                     --#STATE OPERATIONAL
+                ::= 8
+
+        cfgMagRemovedTrap TRAP-TYPE
+                ENTERPRISE configuration
+                --VARIABLES {}
+                DESCRIPTION
+                  "Magazine Removed Trap"
+						
+                  -- Trap annotations are as follows:
+                     --#TYPE "Informational event: Magazine Removed"
+                     --#SUMMARY "Informational event: Magazine Removed Trap"
+                     --#ARGUMENTS {}
+                     --#SEVERITY INFORMATIONAL
+                     --#TIMEINDEX 1                                          
+                      --#STATE OPERATIONAL
+                ::= 9
+
+        cfgMagInsertedTrap TRAP-TYPE
+                ENTERPRISE configuration
+                --VARIABLES {}
+                DESCRIPTION
+                  "Magazine Inserted Trap"
+						
+                  -- Trap annotations are as follows:
+                     --#TYPE "Informational event: Magazine Inserted"
+                     --#SUMMARY "Informational event: Magazine Inserted Trap"
+                     --#ARGUMENTS {}
+                     --#SEVERITY INFORMATIONAL
+                     --#TIMEINDEX 1                                          
+                     --#STATE OPERATIONAL
+                ::= 10
+
+        cfgDriveNeedsCleaningTrap TRAP-TYPE
+                ENTERPRISE configuration
+                --VARIABLES {}
+                DESCRIPTION
+                  "Drive Needs Cleaning Trap"
+						
+                  -- Trap annotations are as follows:
+                     --#TYPE "Informational event: Drive Needs Cleaning"
+                     --#SUMMARY "Informational event: Drive Needs Cleaning Trap"
+                     --#ARGUMENTS {}
+                     --#SEVERITY INFORMATIONAL
+                     --#TIMEINDEX 1                                          
+                     --#STATE OPERATIONAL
+                ::= 11
+
+        cfgLibraryOverheatingTrap TRAP-TYPE
+                ENTERPRISE configuration
+                --VARIABLES {}
+                DESCRIPTION
+                  "Library Overheating"
+						
+                  -- Trap annotations are as follows:
+                     --#TYPE "Major event: Library Overheating"
+                     --#SUMMARY "Major event: Library Overheating"
+                     --#ARGUMENTS {}
+                     --#SEVERITY MAJOR
+                     --#TIMEINDEX 1                                          
+                     --#STATE OPERATIONAL
+                ::= 12
+
+    END

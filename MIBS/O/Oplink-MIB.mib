@@ -1,0 +1,22 @@
+-- Copyright OPLINK 2004-2013.
+-- Oplink-MIB { iso org(3) dod(6) internet(1) private(4)
+--              enterprises(1) oplink(19547) }
+-- mngdproducts := { oplink 1 }
+
+Oplink-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY FROM SNMPv2-SMI
+    enterprises  FROM SNMPv2-SMI;
+    oplink MODULE-IDENTITY
+    LAST-UPDATED "201304021500Z"
+    ORGANIZATION "OPLINK"
+    CONTACT-INFO " oplink ems "
+    DESCRIPTION " oplink mib "
+    REVISION    "201304021500Z"
+    DESCRIPTION " reorg oplink mib "
+    ::= { enterprises 19547}
+
+    mngdproducts OBJECT IDENTIFIER ::= { oplink 1 }
+                                          -- snmp managed products
+END
+

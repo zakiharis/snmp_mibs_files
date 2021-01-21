@@ -1,0 +1,4353 @@
+-------------------------------------------------------------------------------
+-- Fjdary-E101 extended-MIB definition                                       --
+-- All Rights Reserved, Copyright FUJITSU LIMITED 2011.                      --
+--                                                                           --
+-- Modification History :                                                    --
+--  v1.0 Initial version.                                                    --
+-------------------------------------------------------------------------------
+FJDARY-E101 DEFINITIONS ::= BEGIN
+
+IMPORTS
+    enterprises,IpAddress, PhysAddress
+        FROM RFC1155-SMI
+    DisplayString
+        FROM RFC1213-MIB
+    OBJECT-TYPE
+        FROM RFC-1212
+    TRAP-TYPE
+        FROM RFC-1215;
+
+-- Textual Conventions
+FjdaryComponentStatus ::= INTEGER{
+    normal(1),      -- Normal state
+    alarm(2),       -- Abnormal state
+    warning(3),     -- Warning state
+    invalid(4),     -- Not installed state
+    maintenance(5), -- Maintenance state
+    undefined(6)    -- Undefined state
+}
+
+-- FUJITSU Specific Object Identifier
+
+fujitsu                      OBJECT IDENTIFIER ::= { enterprises 211 }
+product                      OBJECT IDENTIFIER ::= { fujitsu 1 }
+storage                      OBJECT IDENTIFIER ::= { product 21 }
+
+-- User Specific Object Identifier(1)
+
+nsp                          OBJECT IDENTIFIER ::= { storage 1 }
+fjdarye101                   OBJECT IDENTIFIER ::= { nsp 101 }
+
+--
+fjdarySsp                    OBJECT IDENTIFIER ::= { fjdarye101 1 }
+
+--
+fjdaryPconfig                OBJECT IDENTIFIER ::= { fjdarye101 2 }
+fjdaryCm                     OBJECT IDENTIFIER ::= { fjdaryPconfig 1 }
+fjdaryCa                     OBJECT IDENTIFIER ::= { fjdaryPconfig 2 }
+fjdaryCmmemory               OBJECT IDENTIFIER ::= { fjdaryPconfig 3 }
+fjdaryCmflash                OBJECT IDENTIFIER ::= { fjdaryPconfig 4 }
+fjdaryScu                    OBJECT IDENTIFIER ::= { fjdaryPconfig 5 }
+fjdaryCe                     OBJECT IDENTIFIER ::= { fjdaryPconfig 6 }
+fjdaryDe                     OBJECT IDENTIFIER ::= { fjdaryPconfig 7 }
+fjdaryExpander               OBJECT IDENTIFIER ::= { fjdaryPconfig 8 }
+fjdaryPsu                    OBJECT IDENTIFIER ::= { fjdaryPconfig 9 }
+fjdaryInletthml              OBJECT IDENTIFIER ::= { fjdaryPconfig 10 }
+fjdaryThml                   OBJECT IDENTIFIER ::= { fjdaryPconfig 11 }
+fjdaryDisk                   OBJECT IDENTIFIER ::= { fjdaryPconfig 12 }
+fjdaryLanport                OBJECT IDENTIFIER ::= { fjdaryPconfig 13 }
+
+--
+fjdaryLconfig                OBJECT IDENTIFIER ::= { fjdarye101 3 }
+fjdaryCaPort                 OBJECT IDENTIFIER ::= { fjdaryLconfig 1 }
+fjdaryOlu                    OBJECT IDENTIFIER ::= { fjdaryLconfig 2 }
+fjdarySlu                    OBJECT IDENTIFIER ::= { fjdaryLconfig 3 }
+fjdaryRlu                    OBJECT IDENTIFIER ::= { fjdaryLconfig 4 }
+fjdaryDlu                    OBJECT IDENTIFIER ::= { fjdaryLconfig 5 }
+fjdaryOpenmap                OBJECT IDENTIFIER ::= { fjdaryLconfig 6 }
+fjdaryLunolu                 OBJECT IDENTIFIER ::= { fjdaryLconfig 7 }
+fjdaryHostwwn                OBJECT IDENTIFIER ::= { fjdaryLconfig 8 }
+fjdaryResetpath              OBJECT IDENTIFIER ::= { fjdaryLconfig 9 }
+fjdaryHostiscsi              OBJECT IDENTIFIER ::= { fjdaryLconfig 10 }
+fjdaryHostResponse           OBJECT IDENTIFIER ::= { fjdaryLconfig 11 }
+
+--
+fjdarySensor                 OBJECT IDENTIFIER ::= { fjdarye101 13 }
+fjdaryMachinePower           OBJECT IDENTIFIER ::= { fjdarySensor 1 }
+fjdaryEncPower               OBJECT IDENTIFIER ::= { fjdarySensor 2 }
+fjdaryMachineTemp            OBJECT IDENTIFIER ::= { fjdarySensor 3 }
+fjdaryEncTemp                OBJECT IDENTIFIER ::= { fjdarySensor 4 }
+
+--
+fjdaryFirm                   OBJECT IDENTIFIER ::= { fjdarye101 4 }
+
+--
+fjdaryPerformance            OBJECT IDENTIFIER ::= { fjdarye101 5 }
+fjdaryPfhead                 OBJECT IDENTIFIER ::= { fjdaryPerformance 1 }
+fjdaryPfopca                 OBJECT IDENTIFIER ::= { fjdaryPerformance 2 }
+fjdaryPfdi                   OBJECT IDENTIFIER ::= { fjdaryPerformance 3 }
+fjdaryPfdisk                 OBJECT IDENTIFIER ::= { fjdaryPerformance 4 }
+fjdaryPfdisktime             OBJECT IDENTIFIER ::= { fjdaryPerformance 5 }
+fjdaryPfcm                   OBJECT IDENTIFIER ::= { fjdaryPerformance 6 }
+fjdaryPfcacheolu             OBJECT IDENTIFIER ::= { fjdaryPerformance 7 }
+fjdaryPfrscolu               OBJECT IDENTIFIER ::= { fjdaryPerformance 8 }
+fjdaryPfrscrlu               OBJECT IDENTIFIER ::= { fjdaryPerformance 9 }
+fjdaryPfcopycm               OBJECT IDENTIFIER ::= { fjdaryPerformance 10 }
+fjdaryPfcopyslu              OBJECT IDENTIFIER ::= { fjdaryPerformance 11 }
+fjdaryPfcacheslu             OBJECT IDENTIFIER ::= { fjdaryPerformance 12 }
+fjdaryPfrscslu               OBJECT IDENTIFIER ::= { fjdaryPerformance 13 }
+fjdaryPfcachecopyslu         OBJECT IDENTIFIER ::= { fjdaryPerformance 14 }
+fjdaryPfcachesdvslu          OBJECT IDENTIFIER ::= { fjdaryPerformance 15 }
+fjdaryPfcachecopyolu         OBJECT IDENTIFIER ::= { fjdaryPerformance 16 }
+fjdaryPfcachecommonolu       OBJECT IDENTIFIER ::= { fjdaryPerformance 17 }
+fjdaryPfcachecommonslu       OBJECT IDENTIFIER ::= { fjdaryPerformance 18 }
+
+--
+application                  OBJECT IDENTIFIER ::= { fujitsu 4 }
+aplNetwork                   OBJECT IDENTIFIER ::= { application 1 }
+aplNetDevice                 OBJECT IDENTIFIER ::= { aplNetwork 1 }
+aplNetStorage                OBJECT IDENTIFIER ::= { aplNetDevice 126 }
+aplNetNsp                    OBJECT IDENTIFIER ::= { aplNetStorage 1 }
+aplNetFjdarye101             OBJECT IDENTIFIER ::= { aplNetNsp 101 }
+
+--***************************************************************************--
+--   Unit Status                                                             --
+--***************************************************************************--
+fjdaryUnitStatus OBJECT-TYPE
+    SYNTAX INTEGER {
+        unknown(1),
+        unused(2),
+        ok(3),
+        warning(4),
+        failed(5)
+    }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Overall status of this system."
+    ::= { fjdarye101 6 }
+
+--***************************************************************************--
+--   Trap Specific Object                                                    --
+--***************************************************************************--
+fjdaryTrapItemId OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "This object is used to store the identification number of parts for
+         which maintenance is necessary when trap is transmitted."
+    ::= { fjdarye101 7 }
+
+fjdaryTrapSensorInfo OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "This object is used to store detail information of sensor when trap is
+         transmitted."
+    ::= { fjdarye101 8 }
+
+fjdaryTrapMaintenanceInfo OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "This object is used to store detail information of maintenance when
+         trap is transmitted."
+    ::= { fjdarye101 9 }
+
+fjdaryTrapWarningInfo OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "This object is used to store detail information of warning when trap
+         is transmitted."
+    ::= { fjdarye101 10 }
+
+fjdaryTrapMessage OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "This object is used to store detail messages when all trap is
+         transmitted."
+    ::= { fjdarye101 11 }
+
+fjdaryTrapCode OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "This object is used to store specific code as for parts when trap is
+         transmitted."
+    ::= { fjdarye101 12 }
+
+--***************************************************************************--
+--   Subsystem Parameter                                                     --
+--***************************************************************************--
+fjdarySspMachineId OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "This value indicates the identification number of this system.
+         ttssssssssssssmmmmmmmmmmmmccssssssssssss
+         | |           |           | |
+         | |           |           | +-serial number(12byte)
+         | |           |           +-check code(2byte)
+         | |           +-model name(12byte)
+         | +-series name(12byte)
+         +-type code(2byte)"
+    ::= { fjdarySsp 1 }
+
+fjdarySspConfigDate OBJECT-TYPE
+    SYNTAX DisplayString
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The last date when the configuration was applied.
+         yyyymmddHHMMSS
+         |   | | | | |
+         |   | | | | +-second
+         |   | | | +-minute
+         |   | | +-hour
+         |   | +-day
+         |   +-month
+         +-year"
+    ::= { fjdarySsp 2 }
+
+fjdarySspWwnn OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indecates the World Wide Node Name."
+    ::= { fjdarySsp 3 }
+
+fjdarySspVenderId OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indecates the Vender ID."
+    ::= { fjdarySsp 4 }
+
+fjdarySspProductId OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indecates the Product ID."
+    ::= { fjdarySsp 5 }
+
+fjdarySspBoxId OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "This value of a meaning within a user system. An initial value is the
+         same as fjdarySspMachineId."
+    ::= { fjdarySsp 6 }
+
+fjdarySspMaintenanceServiceLevel OBJECT-TYPE
+    SYNTAX INTEGER {
+        level1(1),
+        level2(2)
+    }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indecates the support level of maintenance
+         service. Level2 supports interface that strengthens the security
+         level from level1."
+    ::= { fjdarySsp 7 }
+
+--***************************************************************************--
+--   Physical Component                                                      --
+--***************************************************************************--
+-------------------------------------------------------------------------------
+--   fjdaryCm                                                                --
+-------------------------------------------------------------------------------
+fjdaryCmCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of CM(controller module)'s informations (regardless of
+         their current state) present on this system."
+    ::= { fjdaryCm 1 }
+
+fjdaryCmTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FjdaryCmEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    ::= { fjdaryCm 2 }
+
+fjdaryCmEntry OBJECT-TYPE
+    SYNTAX FjdaryCmEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    INDEX { fjdaryCmIndex }
+    ::= { fjdaryCmTable 1 }
+
+FjdaryCmEntry ::=
+    SEQUENCE{
+        fjdaryCmIndex    INTEGER,
+        fjdaryCmItemId   INTEGER,
+        fjdaryCmStatus   FjdaryComponentStatus,
+        fjdaryCmModuleId INTEGER,
+        fjdaryCmRole     INTEGER,
+        fjdaryCmPartNo   OCTET STRING,
+        fjdaryCmSerialNo OCTET STRING,
+        fjdaryCmRevision OCTET STRING
+    }
+
+fjdaryCmIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object uniquely identifies this fjdaryCm entry."
+    ::= { fjdaryCmEntry 1 }
+
+fjdaryCmItemId OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the identification number of this
+         CM."
+    ::= { fjdaryCmEntry 2 }
+
+fjdaryCmStatus OBJECT-TYPE
+    SYNTAX FjdaryComponentStatus
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the state of this CM."
+    ::= { fjdaryCmEntry 3 }
+
+fjdaryCmModuleId OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the module indicates of this CM."
+    ::= { fjdaryCmEntry 4 }
+
+fjdaryCmRole OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the role of this CM."
+    ::= { fjdaryCmEntry 5 }
+    
+fjdaryCmPartNo OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the Part No of this CM."
+    ::= { fjdaryCmEntry 6 }
+
+fjdaryCmSerialNo OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the Serial No of this CM."
+    ::= { fjdaryCmEntry 7 }
+
+fjdaryCmRevision OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the Revision of this CM."
+    ::= { fjdaryCmEntry 8 }
+
+-------------------------------------------------------------------------------
+--   fjdaryCa                                                                --
+-------------------------------------------------------------------------------
+fjdaryCaCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of CA(channel adapter)'s informations (regardless of their
+         current state) present on this system."
+    ::= { fjdaryCa 1 }
+
+fjdaryCaTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FjdaryCaEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    ::= { fjdaryCa 2 }
+
+fjdaryCaEntry OBJECT-TYPE
+    SYNTAX FjdaryCaEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    INDEX { fjdaryCaIndex }
+    ::= { fjdaryCaTable 1 }
+
+FjdaryCaEntry ::=
+    SEQUENCE{
+        fjdaryCaIndex    INTEGER,
+        fjdaryCaItemId   INTEGER,
+        fjdaryCaStatus   FjdaryComponentStatus,
+        fjdaryCaModuleId INTEGER,
+        fjdaryCaType     INTEGER
+    }
+
+fjdaryCaIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object uniquely identifies this fjdaryCa entry."
+    ::= { fjdaryCaEntry 1 }
+
+fjdaryCaItemId OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the identification number of this
+         CA."
+    ::= { fjdaryCaEntry 2 }
+
+fjdaryCaStatus OBJECT-TYPE
+    SYNTAX FjdaryComponentStatus
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the state of this CA."
+    ::= { fjdaryCaEntry 3 }
+
+fjdaryCaModuleId OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the module indicates of this CA."
+    ::= { fjdaryCaEntry 4 }
+
+fjdaryCaType OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the type of this CA."
+    ::= { fjdaryCaEntry 5 }
+
+-------------------------------------------------------------------------------
+--   fjdaryCmmemory                                                          --
+-------------------------------------------------------------------------------
+fjdaryCmmemoryCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of CM memory's informations (regardless of their current
+         state) present on this system."
+    ::= { fjdaryCmmemory 1 }
+
+fjdaryCmmemoryTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FjdaryCmmemoryEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    ::= { fjdaryCmmemory 2 }
+
+fjdaryCmmemoryEntry OBJECT-TYPE
+    SYNTAX FjdaryCmmemoryEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    INDEX { fjdaryCmmemoryIndex }
+    ::= { fjdaryCmmemoryTable 1 }
+
+FjdaryCmmemoryEntry ::=
+    SEQUENCE{
+        fjdaryCmmemoryIndex    INTEGER,
+        fjdaryCmmemoryItemId   INTEGER,
+        fjdaryCmmemoryStatus   FjdaryComponentStatus,
+        fjdaryCmmemoryCapacity OCTET STRING,
+        fjdaryCmmemoryPartNo   OCTET STRING,
+        fjdaryCmmemorySerialNo OCTET STRING
+    }
+
+fjdaryCmmemoryIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object uniquely identifies this fjdaryCmmemory
+         entry."
+    ::= { fjdaryCmmemoryEntry 1 }
+
+fjdaryCmmemoryItemId OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the identification number of this
+         CM memory."
+    ::= { fjdaryCmmemoryEntry 2 }
+
+fjdaryCmmemoryStatus OBJECT-TYPE
+    SYNTAX FjdaryComponentStatus
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the state of this CM memory."
+    ::= { fjdaryCmmemoryEntry 3 }
+
+fjdaryCmmemoryCapacity OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the capacity of this CM memory."
+    ::= { fjdaryCmmemoryEntry 4 }
+
+fjdaryCmmemoryPartNo OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the Part No of this CM memory."
+    ::= { fjdaryCmmemoryEntry 5 }
+
+fjdaryCmmemorySerialNo OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the Serial No of this CM memory."
+    ::= { fjdaryCmmemoryEntry 6 }
+
+-------------------------------------------------------------------------------
+--   fjdaryCmflash                                                           --
+-------------------------------------------------------------------------------
+fjdaryCmflashCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of CM flash-rom's informations (regardless of their current
+         state) present on this system."
+    ::= { fjdaryCmflash 1 }
+
+fjdaryCmflashTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FjdaryCmflashEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    ::= { fjdaryCmflash 2 }
+
+fjdaryCmflashEntry OBJECT-TYPE
+    SYNTAX FjdaryCmflashEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    INDEX { fjdaryCmflashIndex }
+    ::= { fjdaryCmflashTable 1 }
+
+FjdaryCmflashEntry ::=
+    SEQUENCE{
+        fjdaryCmflashIndex  INTEGER,
+        fjdaryCmflashItemId INTEGER,
+        fjdaryCmflashStatus FjdaryComponentStatus
+    }
+
+fjdaryCmflashIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object uniquely identifies this fjdaryCmflash
+         entry."
+    ::= { fjdaryCmflashEntry 1 }
+
+fjdaryCmflashItemId OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the identification number of this
+         CM flash-rom."
+    ::= { fjdaryCmflashEntry 2 }
+
+fjdaryCmflashStatus OBJECT-TYPE
+    SYNTAX FjdaryComponentStatus
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the state of this CM flash-rom."
+    ::= { fjdaryCmflashEntry 3 }
+
+-------------------------------------------------------------------------------
+--   fjdaryScu                                                               --
+-------------------------------------------------------------------------------
+fjdaryScuCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of SCU's informations (regardless of their current state)
+         present on this system."
+    ::= { fjdaryScu 1 }
+
+fjdaryScuTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FjdaryScuEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    ::= { fjdaryScu 2 }
+
+fjdaryScuEntry OBJECT-TYPE
+    SYNTAX FjdaryScuEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    INDEX { fjdaryScuIndex }
+    ::= { fjdaryScuTable 1 }
+
+FjdaryScuEntry ::=
+    SEQUENCE{
+        fjdaryScuIndex    INTEGER,
+        fjdaryScuItemId   INTEGER,
+        fjdaryScuStatus   FjdaryComponentStatus,
+        fjdaryScuVoltage  INTEGER,
+        fjdaryScuPartNo   OCTET STRING,
+        fjdaryScuSerialNo OCTET STRING,
+        fjdaryScuRevision OCTET STRING
+    }
+
+fjdaryScuIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object uniquely identifies this fjdaryScu entry."
+    ::= { fjdaryScuEntry 1 }
+
+fjdaryScuItemId OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the identification number of this
+         SCU."
+    ::= { fjdaryScuEntry 2 }
+
+fjdaryScuStatus OBJECT-TYPE
+    SYNTAX FjdaryComponentStatus
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the state of this SCU."
+    ::= { fjdaryScuEntry 3 }
+
+fjdaryScuVoltage OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the voltage of this SCU.
+         The unit is 1/20 volts."
+    ::= { fjdaryScuEntry 4 }
+
+fjdaryScuPartNo OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the Part No of this SCU."
+    ::= { fjdaryScuEntry 5 }
+
+fjdaryScuSerialNo OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the Serial No of this SCU."
+    ::= { fjdaryScuEntry 6 }
+
+fjdaryScuRevision OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the Revision of this SCU."
+    ::= { fjdaryScuEntry 7 }
+
+-------------------------------------------------------------------------------
+--   fjdaryCe                                                                --
+-------------------------------------------------------------------------------
+fjdaryCeCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of CE(controller enclosure)'s informations (regardless of
+         their current state) present on this system."
+    ::= { fjdaryCe 1 }
+
+fjdaryCeTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FjdaryCeEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    ::= { fjdaryCe 2 }
+
+fjdaryCeEntry OBJECT-TYPE
+    SYNTAX FjdaryCeEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    INDEX { fjdaryCeIndex }
+    ::= { fjdaryCeTable 1 }
+
+FjdaryCeEntry ::=
+    SEQUENCE{
+        fjdaryCeIndex  INTEGER,
+        fjdaryCeItemId INTEGER,
+        fjdaryCeStatus FjdaryComponentStatus
+    }
+
+fjdaryCeIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object uniquely identifies this fjdaryCe entry."
+    ::= { fjdaryCeEntry 1 }
+
+fjdaryCeItemId OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the identification number of this
+         CE."
+    ::= { fjdaryCeEntry 2 }
+
+fjdaryCeStatus OBJECT-TYPE
+    SYNTAX FjdaryComponentStatus
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the state of this CE."
+    ::= { fjdaryCeEntry 3 }
+
+-------------------------------------------------------------------------------
+--   fjdaryDe                                                                --
+-------------------------------------------------------------------------------
+fjdaryDeCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of DE(device enclosure)'s informations (regardless of their
+         current state) present on this system."
+    ::= { fjdaryDe 1 }
+
+fjdaryDeTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FjdaryDeEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    ::= { fjdaryDe 2 }
+
+fjdaryDeEntry OBJECT-TYPE
+    SYNTAX FjdaryDeEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    INDEX { fjdaryDeIndex }
+    ::= { fjdaryDeTable 1 }
+
+FjdaryDeEntry ::=
+    SEQUENCE{
+        fjdaryDeIndex  INTEGER,
+        fjdaryDeItemId INTEGER,
+        fjdaryDeStatus FjdaryComponentStatus,
+        fjdaryDeId     INTEGER,
+        fjdaryDeType   INTEGER
+    }
+
+fjdaryDeIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object uniquely identifies this fjdaryDe entry."
+    ::= { fjdaryDeEntry 1 }
+
+fjdaryDeItemId OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the identification number of this
+         DE."
+    ::= { fjdaryDeEntry 2 }
+
+fjdaryDeStatus OBJECT-TYPE
+    SYNTAX FjdaryComponentStatus
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the state of this DE."
+    ::= { fjdaryDeEntry 3 }
+
+fjdaryDeId OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the identification of this DE."
+    ::= { fjdaryDeEntry 4 }
+
+fjdaryDeType OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the type of this DE."
+    ::= { fjdaryDeEntry 5 }
+
+-------------------------------------------------------------------------------
+--   fjdaryExpander                                                          --
+-------------------------------------------------------------------------------
+fjdaryExpanderCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of Expander's informations (regardless of their current
+         state) present on this system."
+    ::= { fjdaryExpander 1 }
+
+fjdaryExpanderTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FjdaryExpanderEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    ::= { fjdaryExpander 2 }
+
+fjdaryExpanderEntry OBJECT-TYPE
+    SYNTAX FjdaryExpanderEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    INDEX { fjdaryExpanderIndex }
+    ::= { fjdaryExpanderTable 1 }
+
+FjdaryExpanderEntry ::=
+    SEQUENCE{
+        fjdaryExpanderIndex    INTEGER,
+        fjdaryExpanderItemId   INTEGER,
+        fjdaryExpanderStatus   FjdaryComponentStatus,
+        fjdaryExpanderFirmInfo OCTET STRING,
+        fjdaryExpanderPartNo   OCTET STRING,
+        fjdaryExpanderSerialNo OCTET STRING,
+        fjdaryExpanderRevision OCTET STRING
+    }
+
+fjdaryExpanderIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object uniquely identifies this fjdaryExpander
+         entry."
+    ::= { fjdaryExpanderEntry 1 }
+
+fjdaryExpanderItemId OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the identification number of this
+         Expander."
+    ::= { fjdaryExpanderEntry 2 }
+
+fjdaryExpanderStatus OBJECT-TYPE
+    SYNTAX FjdaryComponentStatus
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the state of this Expander."
+    ::= { fjdaryExpanderEntry 3 }
+
+fjdaryExpanderFirmInfo OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the firmware information of this
+         Expander."
+    ::= { fjdaryExpanderEntry 4 }
+
+fjdaryExpanderPartNo OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the Part No of this Expander."
+    ::= { fjdaryExpanderEntry 5 }
+
+fjdaryExpanderSerialNo OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the Serial No of this Expander."
+    ::= { fjdaryExpanderEntry 6 }
+
+fjdaryExpanderRevision OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the Revision of this Expander."
+    ::= { fjdaryExpanderEntry 7 }
+
+-------------------------------------------------------------------------------
+--   fjdaryPsu                                                               --
+-------------------------------------------------------------------------------
+fjdaryPsuCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of PSU(power supply unit)'s informations (regardless of
+         their current state) present on this system."
+    ::= { fjdaryPsu 1 }
+
+fjdaryPsuTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FjdaryPsuEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    ::= { fjdaryPsu 2 }
+
+fjdaryPsuEntry OBJECT-TYPE
+    SYNTAX FjdaryPsuEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    INDEX { fjdaryPsuIndex }
+    ::= { fjdaryPsuTable 1 }
+
+FjdaryPsuEntry ::=
+    SEQUENCE{
+        fjdaryPsuIndex    INTEGER,
+        fjdaryPsuItemId   INTEGER,
+        fjdaryPsuStatus   FjdaryComponentStatus,
+        fjdaryPsuPartNo   OCTET STRING,
+        fjdaryPsuSerialNo OCTET STRING,
+        fjdaryPsuRevision OCTET STRING
+    }
+
+fjdaryPsuIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object uniquely identifies this fjdaryPsu entry."
+    ::= { fjdaryPsuEntry 1 }
+
+fjdaryPsuItemId OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the identification number of this
+         PSU."
+    ::= { fjdaryPsuEntry 2 }
+
+fjdaryPsuStatus OBJECT-TYPE
+    SYNTAX FjdaryComponentStatus
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the state of this PSU."
+    ::= { fjdaryPsuEntry 3 }
+
+fjdaryPsuPartNo OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the Part No of this PSU."
+    ::= { fjdaryPsuEntry 4 }
+
+fjdaryPsuSerialNo OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the Serial No of this PSU."
+    ::= { fjdaryPsuEntry 5 }
+
+fjdaryPsuRevision OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the Revision of this PSU."
+    ::= { fjdaryPsuEntry 6 }
+
+-------------------------------------------------------------------------------
+--   fjdaryInletthml                                                         --
+-------------------------------------------------------------------------------
+fjdaryInletthmlCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of inlet thermal sensor's informations (regardless of their
+         current state) present on this system."
+    ::= { fjdaryInletthml 1 }
+
+fjdaryInletthmlTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FjdaryInletthmlEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    ::= { fjdaryInletthml 2 }
+
+fjdaryInletthmlEntry OBJECT-TYPE
+    SYNTAX FjdaryInletthmlEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    INDEX { fjdaryInletthmlIndex }
+    ::= { fjdaryInletthmlTable 1 }
+
+FjdaryInletthmlEntry ::=
+    SEQUENCE{
+        fjdaryInletthmlIndex  INTEGER,
+        fjdaryInletthmlItemId INTEGER,
+        fjdaryInletthmlStatus FjdaryComponentStatus
+    }
+
+fjdaryInletthmlIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object uniquely identifies this fjdaryInletthml
+         entry."
+    ::= { fjdaryInletthmlEntry 1 }
+
+fjdaryInletthmlItemId OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the identification number of this
+         inlet thermal sensor."
+    ::= { fjdaryInletthmlEntry 2 }
+
+fjdaryInletthmlStatus OBJECT-TYPE
+    SYNTAX FjdaryComponentStatus
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the state of this inlet thermal
+         sensor."
+    ::= { fjdaryInletthmlEntry 3 }
+
+-------------------------------------------------------------------------------
+--   fjdaryThml                                                              --
+-------------------------------------------------------------------------------
+fjdaryThmlCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of thermal sensor's informations (regardless of their
+         current state) present on this system."
+    ::= { fjdaryThml 1 }
+
+fjdaryThmlTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FjdaryThmlEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    ::= { fjdaryThml 2 }
+
+fjdaryThmlEntry OBJECT-TYPE
+    SYNTAX FjdaryThmlEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    INDEX { fjdaryThmlIndex }
+    ::= { fjdaryThmlTable 1 }
+
+FjdaryThmlEntry ::=
+    SEQUENCE{
+        fjdaryThmlIndex  INTEGER,
+        fjdaryThmlItemId INTEGER,
+        fjdaryThmlStatus FjdaryComponentStatus
+    }
+
+fjdaryThmlIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object uniquely identifies this fjdaryThml entry."
+    ::= { fjdaryThmlEntry 1 }
+
+fjdaryThmlItemId OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the identification number of this
+         thermal sensor."
+    ::= { fjdaryThmlEntry 2 }
+
+fjdaryThmlStatus OBJECT-TYPE
+    SYNTAX FjdaryComponentStatus
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the state of this thermal sensor."
+    ::= { fjdaryThmlEntry 3 }
+
+-------------------------------------------------------------------------------
+--   fjdaryDisk                                                              --
+-------------------------------------------------------------------------------
+fjdaryDiskCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of DISK's informations (regardless of their current state)
+         present on this system."
+    ::= { fjdaryDisk 1 }
+
+fjdaryDiskTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FjdaryDiskEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    ::= { fjdaryDisk 2 }
+
+fjdaryDiskEntry OBJECT-TYPE
+    SYNTAX FjdaryDiskEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    INDEX { fjdaryDiskIndex }
+    ::= { fjdaryDiskTable 1 }
+
+FjdaryDiskEntry ::=
+    SEQUENCE{
+        fjdaryDiskIndex     INTEGER,
+        fjdaryDiskItemId    INTEGER,
+        fjdaryDiskStatus    INTEGER,
+        fjdaryDiskPlun      INTEGER,
+        fjdaryDiskPurpose   INTEGER,
+        fjdaryDiskType      INTEGER,
+        fjdaryDiskWwn       OCTET STRING,
+        fjdaryDiskVenderId  OCTET STRING,
+        fjdaryDiskProductId OCTET STRING,
+        fjdaryDiskRevision  OCTET STRING
+    }
+
+fjdaryDiskIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object uniquely identifies this fjdaryDisk entry."
+    ::= { fjdaryDiskEntry 1 }
+
+fjdaryDiskItemId OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the identification number of this
+         DISK."
+    ::= { fjdaryDiskEntry 2 }
+
+fjdaryDiskStatus OBJECT-TYPE
+    SYNTAX INTEGER{
+        available(1),
+        broken(2),
+        notavailable(3),
+        notsupported(4),
+        present(5),
+        readying(6),
+        recovering(7),
+        partbroken(64),
+        spare(65),
+        formatting(66),
+        unformatted(67),
+        notexist(68),
+        copying(69)
+    }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the state of this DISK.
+
+         available    : Normal state
+         broken       : Abnormal state
+                        (The data can not be guaranteed)
+         notavailable : Not available state
+                        (Because the RAID group is not set)
+         notsupported : Unsupported error state
+         present      : Undefined volume set state
+         readying     : Data readying state
+         recovering   : Data recovering state
+         partbroken   : Abnormal state
+         spare        : Using spare disk state
+         formatting   : Data formatting state
+         unformatted  : Unformatted state
+         notexist     : Not exist
+         copying      : Data copying state"
+    ::= { fjdaryDiskEntry 3 }
+
+fjdaryDiskPlun OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the PLUN of this DISK."
+    ::= { fjdaryDiskEntry 4 }
+
+fjdaryDiskPurpose OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the purpose of this DISK."
+    ::= { fjdaryDiskEntry 5 }
+
+fjdaryDiskType OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the type of this DISK."
+    ::= { fjdaryDiskEntry 6 }
+
+fjdaryDiskWwn OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the world wide name of this DISK."
+    ::= { fjdaryDiskEntry 7 }
+
+fjdaryDiskVenderId OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the vender of this DISK."
+    ::= { fjdaryDiskEntry 8 }
+
+fjdaryDiskProductId OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the product of this DISK."
+    ::= { fjdaryDiskEntry 9 }
+
+fjdaryDiskRevision OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the revision of this DISK."
+    ::= { fjdaryDiskEntry 10 }
+
+-------------------------------------------------------------------------------
+--   fjdaryLanport                                                           --
+-------------------------------------------------------------------------------
+fjdaryLanportCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of LAN port's informations (regardless of theier current
+         state) present on this system."
+    ::= { fjdaryLanport 1 }
+
+fjdaryLanportTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FjdaryLanportEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    ::= { fjdaryLanport 2 }
+
+fjdaryLanportEntry OBJECT-TYPE
+    SYNTAX FjdaryLanportEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    INDEX { fjdaryLanportIndex }
+    ::= { fjdaryLanportTable 1 }
+
+FjdaryLanportEntry ::=
+    SEQUENCE{
+        fjdaryLanportIndex   INTEGER,
+        fjdaryLanportStatus0 INTEGER,
+        fjdaryLanportStatus1 INTEGER
+    }
+
+fjdaryLanportIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object uniquely identifies this fjdaryLanport
+         entry."
+    ::= { fjdaryLanportEntry 1 }
+
+fjdaryLanportStatus0 OBJECT-TYPE
+    SYNTAX INTEGER{
+        linkup(1),
+        undefined(4),
+        linkdown(6),
+        unknown(7)
+    }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the MNT port state.
+
+         linkup      : Link up state
+         undefined   : Undefined state
+         linkdown    : Link down state
+         unknown     : Unknown state"
+    ::= { fjdaryLanportEntry 2 }
+
+fjdaryLanportStatus1 OBJECT-TYPE
+    SYNTAX INTEGER{
+        linkup(1),
+        undefined(4),
+        linkdown(6),
+        unknown(7)
+    }
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the RMT port state.
+
+         linkup      : Link up state
+         undefined   : Undefined state
+         linkdown    : Link down state
+         unknown     : Unknown state"
+    ::= { fjdaryLanportEntry 3 }
+
+fjdaryLanportHwAdTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FjdaryLanportHwAdEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    ::= { fjdaryLanport 3 }
+
+fjdaryLanportHwAdEntry OBJECT-TYPE
+    SYNTAX FjdaryLanportHwAdEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    INDEX { fjdaryLanportHwAdIndex }
+    ::= { fjdaryLanportHwAdTable 1 }
+
+FjdaryLanportHwAdEntry ::=
+    SEQUENCE{
+        fjdaryLanportHwAdIndex  INTEGER,
+        fjdaryLanportHwAddress0 PhysAddress,
+        fjdaryLanportHwAddress1 PhysAddress
+    }
+
+fjdaryLanportHwAdIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object uniquely identifies this fjdaryLanportHwAd
+         entry."
+    ::= { fjdaryLanportHwAdEntry 1 }
+
+fjdaryLanportHwAddress0 OBJECT-TYPE
+    SYNTAX PhysAddress
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the MNT port's MAC address."
+    ::= { fjdaryLanportHwAdEntry 2 }
+
+fjdaryLanportHwAddress1 OBJECT-TYPE
+    SYNTAX PhysAddress
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the RMT port's MAC address."
+    ::= { fjdaryLanportHwAdEntry 3 }
+
+--***************************************************************************--
+--   Logical Configuration                                                   --
+--***************************************************************************--
+-------------------------------------------------------------------------------
+--   fjdaryCaPort                                                            --
+-------------------------------------------------------------------------------
+fjdaryCaPortCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of CA port's informations (regardless of their current
+         state) present on this system."
+    ::= { fjdaryCaPort 1 }
+
+fjdaryCaPortTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FjdaryCaPortEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    ::= { fjdaryCaPort 2 }
+
+fjdaryCaPortEntry OBJECT-TYPE
+    SYNTAX FjdaryCaPortEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    INDEX { fjdaryCaPortIndex }
+    ::= { fjdaryCaPortTable 1 }
+
+FjdaryCaPortEntry ::=
+    SEQUENCE{
+        fjdaryCaPortIndex           INTEGER,
+        fjdaryCaPortPortInfo        OCTET STRING,
+        fjdaryCaPortiscsiInfo       OCTET STRING,
+        fjdaryCaPortiscsiName       OCTET STRING,
+        fjdaryCaPortiscsiAliasName  OCTET STRING,
+        fjdaryCaPortiscsiIpAddress  IpAddress,
+        fjdaryCaPortiscsiSubnetMask IpAddress,
+        fjdaryCaPortiscsiIsnsServer IpAddress
+    }
+
+fjdaryCaPortIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object uniquely identifies this fjdaryCaPort entry.
+         This information is defined in the following order.
+          CM#0 Port#0
+          CM#0 Port#1
+          CM#1 Port#0
+          CM#1 Port#1
+          CM#0 Port#2
+          CM#0 Port#3
+          CM#1 Port#2
+          CM#1 Port#3"
+    ::= { fjdaryCaPortEntry 1 }
+
+fjdaryCaPortPortInfo OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the port informatiom of this CA
+         port.
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| Reserved                | Factor     | Port Number|
+              +------------+------------+------------+------------+
+          0x04| Map Number | Security   | Host       | Method     |
+              |            |  Mode      |  Connection|            |
+              +------------+------------+------------+------------+
+          0x08| LoopID     | Rate       | Class      | Reserved   |
+              +------------+------------+------------+------------+
+          0x0c| RA Mode    | CM CPU MID | Reserved                |
+              +------------+------------+------------+------------+
+          0x10| FC Frame Size           | MTU Size                |
+              +------------+------------+------------+------------+
+          0x14| Reserved                                          |
+              +------------+------------+------------+------------+
+          0x18| WWN (Port Name)                                   |
+              +                                                   +
+          0x1c|                                                   |
+              +------------+------------+------------+------------+"
+    ::= { fjdaryCaPortEntry 2 }
+
+fjdaryCaPortiscsiInfo OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates an iscsi informatiom table of this
+         CA port.
+                  byte 0      byte 1      byte 2      byte 3
+              +-----------+-----------+-----------+-----------+
+          0x00| Reserved                                      |
+              +-----------+-----------+-----------+-----------+
+          0x04| Reserved              | iSCSI Flag            |
+              +-----------+-----------+-----------+-----------+
+          0x08| Reserved              | Name Valid| Reserved  |
+              +-----------+-----------+-----------+-----------+
+          0x0c| Reserved                                      |
+              +-----------+-----------+-----------+-----------+"
+    ::= { fjdaryCaPortEntry 3 }
+
+fjdaryCaPortiscsiName OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates an iscsi name of this CA port."
+    ::= { fjdaryCaPortEntry 4 }
+
+fjdaryCaPortiscsiAliasName OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates an iscsi alias name of this CA
+         port."
+    ::= { fjdaryCaPortEntry 5 }
+
+fjdaryCaPortiscsiIpAddress OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates an iscsi ip address of this CA
+         port."
+    ::= { fjdaryCaPortEntry 6 }
+
+fjdaryCaPortiscsiSubnetMask OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates an iscsi subnet mask of this CA
+         port."
+    ::= { fjdaryCaPortEntry 7 }
+
+fjdaryCaPortiscsiIsnsServer OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates an isns server ip address of this
+         CA port."
+    ::= { fjdaryCaPortEntry 8 }
+
+-------------------------------------------------------------------------------
+--   fjdaryOlu                                                               --
+-------------------------------------------------------------------------------
+fjdaryOluCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of OLU's informations entry (regardless of their current
+         state) present on this system."
+    ::= { fjdaryOlu 1 }
+
+fjdaryOluTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FjdaryOluEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    ::= { fjdaryOlu 2 }
+
+fjdaryOluEntry OBJECT-TYPE
+    SYNTAX FjdaryOluEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    INDEX { fjdaryOluIndex }
+    ::= { fjdaryOluTable 1 }
+
+FjdaryOluEntry ::=
+    SEQUENCE{
+        fjdaryOluIndex     INTEGER,
+        fjdaryOluInfoTable OCTET STRING
+    }
+
+fjdaryOluIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object uniquely identifies this fjdaryOlu entry."
+    ::= { fjdaryOluEntry 1 }
+
+fjdaryOluInfoTable OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the OLU information of this system.
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| OLU#index*4 information (48 bytes)                |
+              +------------+------------+------------+------------+
+          0x30| OLU#index*4+1 information (48 bytes)              |
+              +------------+------------+------------+------------+
+          0x60| OLU#index*4+2 information (48 bytes)              |
+              +------------+------------+------------+------------+
+          0x90| OLU#index*4+3 information (48 bytes)              |
+              +------------+------------+------------+------------+
+         OLU informateion:
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| OLUN                    | Status                  |
+              +------------+------------+------------+------------+
+          0x04| SLU count  | Reserved                             |
+              +------------+------------+------------+------------+
+          0x08| SLUN 00                 | SLUN 01                 |
+              +------------+------------+------------+------------+
+              ~                                                   ~
+              +------------+------------+------------+------------+
+          0x24| SLUN 0E                 | SLUN 0F                 |
+              +------------+------------+------------+------------+
+          0x28| Reserved                                          |
+              +------------+------------+------------+------------+
+          0x2c| Reserved                                          |
+              +------------+------------+------------+------------+"
+    ::= { fjdaryOluEntry 2 }
+
+-------------------------------------------------------------------------------
+--   fjdarySlu                                                               --
+-------------------------------------------------------------------------------
+fjdarySluCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of SLU's informations entry (regardless of their current
+         state) present on this system."
+    ::= { fjdarySlu 1 }
+
+fjdarySluTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FjdarySluEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    ::= { fjdarySlu 2 }
+
+fjdarySluEntry OBJECT-TYPE
+    SYNTAX FjdarySluEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    INDEX { fjdarySluIndex }
+    ::= { fjdarySluTable 1 }
+
+FjdarySluEntry ::=
+    SEQUENCE{
+        fjdarySluIndex     INTEGER,
+        fjdarySluInfoTable OCTET STRING
+    }
+
+fjdarySluIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object uniquely identifies this fjdarySlu entry."
+    ::= { fjdarySluEntry 1 }
+
+fjdarySluInfoTable OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the SLU information of this system.
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| SLUN                    | Status                  |
+              +------------+------------+------------+------------+
+          0x04| LU Type    | Reserved                             |
+              +------------+------------+------------+------------+
+          0x08| RLUN                    | Temporary RLUN          |
+              +------------+------------+------------+------------+
+          0x0c| MLUN                    | OLUN                    |
+              +------------+------------+------------+------------+
+          0x10| Reserved (16 bytes)                               |
+              ~                                                   ~
+          0x1c|                                                   |
+              +------------+------------+------------+------------+
+          0x20| Start RLBA                                        |
+              +                                                   +
+          0x24|                                                   |
+              +------------+------------+------------+------------+
+          0x28| Temporary Start RLBA                              |
+              +                                                   +
+          0x2c|                                                   |
+              +------------+------------+------------+------------+
+          0x30| Start OLBA                                        |
+              +                                                   +
+          0x34|                                                   |
+              +------------+------------+------------+------------+
+          0x38| OLBA Count                                        |
+              +                                                   +
+          0x3c|                                                   |
+              +------------+------------+------------+------------+
+          0x40| SLBA Count                                        |
+              +                                                   +
+          0x44|                                                   |
+              +------------+------------+------------+------------+
+          0x48| Temporary SLBA Count                              |
+              +                                                   +
+          0x4c|                                                   |
+              +------------+------------+------------+------------+
+          0x50| Start SLBA for OLU                                |
+              +                                                   +
+          0x54|                                                   |
+              +------------+------------+------------+------------+
+          0x58| SLBA Count for OLU                                |
+              +                                                   +
+          0x5c|                                                   |
+              +------------+------------+------------+------------+
+          0x60| Virtual OLBA Count                                |
+              +                                                   +
+          0x64|                                                   |
+              +------------+------------+------------+------------+
+          0x68| Reserved (72 bytes)                               |
+              ~                                                   ~
+          0xac|                                                   |
+              +------------+------------+------------+------------+"
+    ::= { fjdarySluEntry 2 }
+
+-------------------------------------------------------------------------------
+--   fjdaryRlu                                                               --
+-------------------------------------------------------------------------------
+fjdaryRluCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of RLU's informations entry (regardless of their current
+         state) present on this system."
+    ::= { fjdaryRlu 1 }
+
+fjdaryRluTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FjdaryRluEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    ::= { fjdaryRlu 2 }
+
+fjdaryRluEntry OBJECT-TYPE
+    SYNTAX FjdaryRluEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    INDEX { fjdaryRluIndex }
+    ::= { fjdaryRluTable 1 }
+
+FjdaryRluEntry ::=
+    SEQUENCE{
+        fjdaryRluIndex      INTEGER,
+        fjdaryRluInfoTable0 OCTET STRING,
+        fjdaryRluInfoTable1 OCTET STRING,
+        fjdaryRluInfoTable2 OCTET STRING
+    }
+
+fjdaryRluIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object uniquely identifies this fjdaryRlu entry."
+    ::= { fjdaryRluEntry 1 }
+
+fjdaryRluInfoTable0 OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the RLU information #0 of this
+         system.
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| RLUN                    | Status                  |
+              +------------+------------+------------+------------+
+          0x04| Def CM MID | Curr CM MID| Reserved                |
+              +------------+------------+------------+------------+
+          0x08| RAID Level | RLU Mode   | Blockade   | RLU Enable |
+              +------------+------------+------------+------------+
+          0x0c| Reserved                                          |
+              +------------+------------+------------+------------+
+          0x10| RLBA Count                                        |
+              +                                                   +
+          0x14|                                                   |
+              +------------+------------+------------+------------+
+          0x18| Stripe Depth                                      |
+              +------------+------------+------------+------------+
+          0x1c| Stripe Size                                       |
+              +------------+------------+------------+------------+
+          0x20| Expanded RLUN           | Temporary RLUN          |
+              +------------+------------+------------+------------+
+          0x24| Reserved (12 bytes)                               |
+              ~                                                   ~
+          0x2c|                                                   |
+              +------------+------------+------------+------------+
+          0x30| SLU Count  | Reserved                             |
+              +------------+------------+------------+------------+"
+    ::= { fjdaryRluEntry 2 }
+
+fjdaryRluInfoTable1 OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the RLU information #1 of this
+         system.
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| SLUN 00                 | SLUN 01                 |
+              +------------+------------+------------+------------+
+              ~                                                   ~
+              +------------+------------+------------+------------+
+          0xfc| SLUN 7E                 | SLUN 7F                 |
+              +------------+------------+------------+------------+"
+    ::= { fjdaryRluEntry 3 }
+
+fjdaryRluInfoTable2 OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the RLU information #2 of this
+         system.
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| M Disk cnt | Reserved                             |
+              +------------+------------+------------+------------+
+          0x04| DLUN 00                 | DLUN 01                 |
+              +------------+------------+------------+------------+
+              ~                                                   ~
+              +------------+------------+------------+------------+
+          0x20| DLUN 0E                 | DLUN 0F                 |
+              +------------+------------+------------+------------+"
+    ::= { fjdaryRluEntry 4 }
+
+-------------------------------------------------------------------------------
+--   fjdaryDlu                                                               --
+-------------------------------------------------------------------------------
+fjdaryDluCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of DLU's informations entry (regardless of their current
+         state) present on this system."
+    ::= { fjdaryDlu 1 }
+
+fjdaryDluTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FjdaryDluEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    ::= { fjdaryDlu 2 }
+
+fjdaryDluEntry OBJECT-TYPE
+    SYNTAX FjdaryDluEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    INDEX { fjdaryDluIndex }
+    ::= { fjdaryDluTable 1 }
+
+FjdaryDluEntry ::=
+    SEQUENCE{
+        fjdaryDluIndex     INTEGER,
+        fjdaryDluInfoTable OCTET STRING
+    }
+
+fjdaryDluIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object uniquely identifies this fjdaryDlu entry."
+    ::= { fjdaryDluEntry 1 }
+
+fjdaryDluInfoTable OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the DLU information of this system.
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| DLUN                    | Status                  |
+              +------------+------------+------------+------------+
+          0x04| RLUN                    | M Disk No  | Reserved   |
+              +------------+------------+------------+------------+
+          0x08| Start DLBA                                        |
+              +                                                   +
+          0x0c|                                                   |
+              +------------+------------+------------+------------+
+          0x10| Block Count                                       |
+              +                                                   +
+          0x14|                                                   |
+              +------------+------------+------------+------------+
+          0x18| Stripe Depth                                      |
+              +------------+------------+------------+------------+
+          0x1c| Stripe Size                                       |
+              +------------+------------+------------+------------+
+          0x20| M Disk cnt | Reserved                             |
+              +------------+------------+------------+------------+
+          0x24| Reserved                                          |
+              +------------+------------+------------+------------+
+          0x28| PLU in Use 00           | PLU in Use 01           |
+              +------------+------------+------------+------------+
+              ~                                                   ~
+              +------------+------------+------------+------------+
+          0x44| PLU in Use 0E           | PLU in Use 0F           |
+              +------------+------------+------------+------------+
+          0x48| Defined PLU 00          | Defined PLU 01          |
+              +------------+------------+------------+------------+
+              ~                                                   ~
+              +------------+------------+------------+------------+
+          0x64| Defined PLU 0E          | Defined PLU 0F          |
+              +------------+------------+------------+------------+
+          0x68| Reserved                                          |
+              +                                                   +
+          0x6c|                                                   |
+              +------------+------------+------------+------------+"
+    ::= { fjdaryDluEntry 2 }
+
+-------------------------------------------------------------------------------
+--   fjdaryOpenmap                                                           --
+-------------------------------------------------------------------------------
+fjdaryOpenmapCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of open volume mapping table's informations entry
+         (regardless of their current state) present on this system."
+    ::= { fjdaryOpenmap 1 }
+
+fjdaryOpenmapTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FjdaryOpenmapEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    ::= { fjdaryOpenmap 2 }
+
+fjdaryOpenmapEntry OBJECT-TYPE
+    SYNTAX FjdaryOpenmapEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    INDEX { fjdaryOpenmapIndex }
+    ::= { fjdaryOpenmapTable 1 }
+
+FjdaryOpenmapEntry ::=
+    SEQUENCE{
+        fjdaryOpenmapIndex     INTEGER,
+        fjdaryOpenmapInfo      OCTET STRING,
+        fjdaryOpenmapHostTable OCTET STRING
+    }
+
+fjdaryOpenmapIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object uniquely identifies this fjdaryOpenmap
+         entry."
+    ::= { fjdaryOpenmapEntry 1 }
+
+fjdaryOpenmapInfo OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the open volume mapping table
+         information of this system.
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| MAP No     | Valid Cnt  | CA ModuleID| Port No    |
+              +------------+------------+------------+------------+
+          0x04| Default Affinity Group  | Reserved                |
+              +------------+------------+------------+------------+
+          0x08| Reserved                                          |
+              +                                                   +
+          0x0c|                                                   |
+              +------------+------------+------------+------------+"
+    ::= { fjdaryOpenmapEntry 2 }
+
+fjdaryOpenmapHostTable OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the host affinity information of
+         this system.
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| Host #00                | Affinity Group#00       |
+              +------------+------------+------------+------------+
+              ~                                                   ~
+              +------------+------------+------------+------------+
+          0x7c| Host #1F                | Affinity Group#1F       |
+              +------------+------------+------------+------------+"
+    ::= { fjdaryOpenmapEntry 3 }
+
+-------------------------------------------------------------------------------
+--   fjdaryLunolu                                                            --
+-------------------------------------------------------------------------------
+fjdaryLunoluCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of LUN-OLU mapping table's informations entry (regardless
+         of their current state) present on this system."
+    ::= { fjdaryLunolu 1 }
+
+fjdaryLunoluTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FjdaryLunoluEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    ::= { fjdaryLunolu 2 }
+
+fjdaryLunoluEntry OBJECT-TYPE
+    SYNTAX FjdaryLunoluEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    INDEX { fjdaryLunoluIndex }
+    ::= { fjdaryLunoluTable 1 }
+
+FjdaryLunoluEntry ::=
+    SEQUENCE{
+        fjdaryLunoluIndex  INTEGER,
+        fjdaryLunoluInfo   OCTET STRING,
+        fjdaryLunoluTable0 OCTET STRING,
+        fjdaryLunoluTable1 OCTET STRING,
+        fjdaryLunoluTable2 OCTET STRING,
+        fjdaryLunoluTable3 OCTET STRING
+    }
+
+fjdaryLunoluIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object uniquely identifies this fjdaryLunolu entry."
+    ::= { fjdaryLunoluEntry 1 }
+
+fjdaryLunoluInfo OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the LUN-OLU mapping table
+         information of this system.
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| Affinity Group No       | Definition | Reserved   |
+              +------------+------------+------------+------------+
+          0x04| Affinity Group Name (16 bytes)                    |
+              ~                                                   ~
+          0x10|                                                   |
+              +------------+------------+------------+------------+
+          0x14| Prev Affinity Group No  | Next Affinity Group No  |
+              +------------+------------+------------+------------+
+          0x18| Host Response Table No  | Reserved                |
+              +------------+------------+------------+------------+
+          0x1c| Reserved                                          |
+              +------------+------------+------------+------------+"
+    ::= { fjdaryLunoluEntry 2 }
+
+fjdaryLunoluTable0 OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the LUN-OLU mapping table
+         information(LUN#0 to #127) of this system.
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| LUN#0-OLU#              | LUN#1-OLU#              |
+              +------------+------------+------------+------------+
+              ~                                                   ~
+              +------------+------------+------------+------------+
+          0xfc| LUN#126-OLU#            | LUN#127-OLU#            |
+              +------------+------------+------------+------------+"
+    ::= { fjdaryLunoluEntry 3 }
+
+fjdaryLunoluTable1 OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the LUN-OLU mapping table
+         information(LUN#128 to #255) of this system.
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| LUN#128-OLU#            | LUN#129-OLU#            |
+              +------------+------------+------------+------------+
+              ~                                                   ~
+              +------------+------------+------------+------------+
+          0xfc| LUN#254-OLU#            | LUN#255-OLU#            |
+              +------------+------------+------------+------------+"
+    ::= { fjdaryLunoluEntry 4 }
+
+fjdaryLunoluTable2 OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the LUN-OLU mapping table
+         information(LUN#256 to #383) of this system.
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| LUN#256-OLU#            | LUN#257-OLU#            |
+              +------------+------------+------------+------------+
+              ~                                                   ~
+              +------------+------------+------------+------------+
+          0xfc| LUN#382-OLU#            | LUN#383-OLU#            |
+              +------------+------------+------------+------------+"
+    ::= { fjdaryLunoluEntry 5 }
+
+fjdaryLunoluTable3 OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the LUN-OLU mapping table
+         information(LUN#384 to #511) of this system.
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| LUN#384-OLU#            | LUN#385-OLU#            |
+              +------------+------------+------------+------------+
+              ~                                                   ~
+              +------------+------------+------------+------------+
+          0xfc| LUN#510-OLU#            | LUN#511-OLU#            |
+              +------------+------------+------------+------------+"
+    ::= { fjdaryLunoluEntry 6 }
+
+-------------------------------------------------------------------------------
+--   fjdaryHostwwn                                                           --
+-------------------------------------------------------------------------------
+fjdaryHostwwnCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of host wwn table's informations entry (regardless of their
+         current state) present on this system."
+    ::= { fjdaryHostwwn 1 }
+
+fjdaryHostwwnTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FjdaryHostwwnEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    ::= { fjdaryHostwwn 2 }
+
+fjdaryHostwwnEntry OBJECT-TYPE
+    SYNTAX FjdaryHostwwnEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    INDEX { fjdaryHostwwnIndex }
+    ::= { fjdaryHostwwnTable 1 }
+
+FjdaryHostwwnEntry ::=
+    SEQUENCE{
+        fjdaryHostwwnIndex INTEGER,
+        fjdaryHostwwnWWN   OCTET STRING
+    }
+
+fjdaryHostwwnIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object uniquely identifies this fjdaryHostwwn
+         entry."
+    ::= { fjdaryHostwwnEntry 1 }
+
+fjdaryHostwwnWWN OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the host wwn of this system.
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| Host WWN                                          |
+              +                                                   +
+          0x04|                                                   |
+              +------------+------------+------------+------------+
+          0x08| Host Response Table Num | Valid Flag | Reserved   |
+              +------------+------------+------------+------------+
+          0x0c| Reserved (20 bytes)                               |
+              ~                                                   ~
+          0x1c|                                                   |
+              +------------+------------+------------+------------+"
+    ::= { fjdaryHostwwnEntry 2 }
+
+-------------------------------------------------------------------------------
+--   fjdaryResetpath                                                         --
+-------------------------------------------------------------------------------
+fjdaryResetpathCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of reset path group table's informations entry (regardless
+         of their current state) present on this system."
+    ::= { fjdaryResetpath 1 }
+
+fjdaryResetpathTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FjdaryResetpathEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    ::= { fjdaryResetpath 2 }
+
+fjdaryResetpathEntry OBJECT-TYPE
+    SYNTAX FjdaryResetpathEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    INDEX { fjdaryResetpathIndex }
+    ::= { fjdaryResetpathTable 1 }
+
+FjdaryResetpathEntry ::=
+    SEQUENCE{
+        fjdaryResetpathIndex INTEGER,
+        fjdaryResetpathGroup OCTET STRING
+    }
+
+fjdaryResetpathIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object uniquely identifies this fjdaryResetpath
+         entry."
+    ::= { fjdaryResetpathEntry 1 }
+
+fjdaryResetpathGroup OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The value of this object indicates the reset path group table
+         information of this system."
+    ::= { fjdaryResetpathEntry 2 }
+
+-------------------------------------------------------------------------------
+--   fjdaryHostiscsi                                                         --
+-------------------------------------------------------------------------------
+fjdaryHostiscsiCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of host iscsi configuration table entries."
+    ::= { fjdaryHostiscsi 1 }
+
+fjdaryHostiscsiTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FjdaryHostiscsiEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    ::= { fjdaryHostiscsi 2 }
+
+fjdaryHostiscsiEntry OBJECT-TYPE
+    SYNTAX FjdaryHostiscsiEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    INDEX { fjdaryHostiscsiIndex }
+    ::= { fjdaryHostiscsiTable 1 }
+
+FjdaryHostiscsiEntry ::=
+    SEQUENCE{
+        fjdaryHostiscsiIndex     INTEGER,
+        fjdaryHostiscsiDefine    OCTET STRING,
+        fjdaryHostiscsiName      OCTET STRING,
+        fjdaryHostiscsiAliasName OCTET STRING,
+        fjdaryHostiscsiIpAddress IpAddress
+    }
+
+fjdaryHostiscsiIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object uniquely identifies this fjdaryHostiscsi
+         entry. This value ranges are from 0 to the value of
+         fjdaryHostiscsiCount-1."
+    ::= { fjdaryHostiscsiEntry 1 }
+
+fjdaryHostiscsiDefine OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "This object shows hostiscsi.
+                  byte 0      byte 1      byte 2      byte 3
+              +-----------+-----------+-----------+-----------+
+          0x00| Reserved (12 bytes)                           |
+              ~                                               ~
+          0x08|                                               |
+              +-----------+-----------+-----------+-----------+
+          0x0c| Host Response Table No| Valid Flag| Reserved  |
+              +-----------+-----------+-----------+-----------+"
+    ::= { fjdaryHostiscsiEntry 2 }
+
+fjdaryHostiscsiName OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object shows iscsi name of a host."
+    ::= { fjdaryHostiscsiEntry 3 }
+
+fjdaryHostiscsiAliasName OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object shows alias name of a host."
+    ::= { fjdaryHostiscsiEntry 4 }
+
+fjdaryHostiscsiIpAddress OBJECT-TYPE
+    SYNTAX IpAddress
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object shows ip address of a host."
+    ::= { fjdaryHostiscsiEntry 5 }
+
+-------------------------------------------------------------------------------
+--   fjdaryHostResponse                                                      --
+-------------------------------------------------------------------------------
+fjdaryHostResponseCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of host response informations entry (regardless of their
+         current state) present on this system."
+    ::= { fjdaryHostResponse 1 }
+
+fjdaryHostResponseTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FjdaryHostResponseEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    ::= { fjdaryHostResponse 2 }
+
+fjdaryHostResponseEntry OBJECT-TYPE
+    SYNTAX FjdaryHostResponseEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    INDEX { fjdaryHostResponseIndex }
+    ::= { fjdaryHostResponseTable 1 }
+
+FjdaryHostResponseEntry ::=
+    SEQUENCE{
+        fjdaryHostResponseIndex     INTEGER,
+        fjdaryHostResponseInfoTable OCTET STRING
+    }
+
+fjdaryHostResponseIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object uniquely identifies this fjdaryHostResponse
+         entry."
+    ::= { fjdaryHostResponseEntry 1 }
+
+fjdaryHostResponseInfoTable OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the host response information of
+         this system.
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| Table No                | Valid Flag | Reserved   |
+              +------------+------------+------------+------------+
+          0x04| Host Response Name (16 bytes)                     |
+              ~                                                   ~
+          0x10|                                                   |
+              +------------+------------+------------+------------+
+          0x14| Reserved                                          |
+              +------------+------------+------------+------------+
+          0x18| SCC Mode   |Host Cmd T.O| Sense Ctrl              |
+              +------------+------------+------------+------------+
+          0x1c| Ope Mode   | Reserved                             |
+              +------------+------------+------------+------------+
+          0x20| Status Ctrl| Reserved                             |
+              +------------+------------+------------+------------+
+          0x24| Reserved (24 bytes)                               |
+              ~                                                   ~
+          0x3c|                                                   |
+              +------------+------------+------------+------------+
+          0x40|Inquiry Mode|Inquiry Type|Inquiry Ver.| Reserved   |
+              +------------+------------+------------+------------+
+          0x44| Reserved                                          |
+              +------------+------------+------------+------------+
+          0x48| Entry Sense| Entry Sense| Entry Sense| Entry Sense|
+              |  Key#0     |  Code#0    |  SubCode#0 |  ConvBit#0 |
+              +------------+------------+------------+------------+
+          0x4c| ReportSense| ReportSense| ReportSense| ReportSense|
+              |  Key#0     |  Code#0    |  SubCode#0 |  ConvBit#0 |
+              +------------+------------+------------+------------+
+              ~                                                   ~
+              +------------+------------+------------+------------+
+          0x80| Entry Sense| Entry Sense| Entry Sense| Entry Sense|
+              |  Key#7     |  Code#7    |  SubCode#7 |  ConvBit#7 |
+              +------------+------------+------------+------------+
+          0x84| ReportSense| ReportSense| ReportSense| ReportSense|
+              |  Key#7     |  Code#7    |  SubCode#7 |  ConvBit#7 |
+              +------------+------------+------------+------------+
+          0x88| Reserved                                          |
+              +                                                   +
+          0x8c|                                                   |
+              +------------+------------+------------+------------+"
+    ::= { fjdaryHostResponseEntry 2 }
+
+--***************************************************************************--
+--   Sensor Information                                                      --
+--***************************************************************************--
+-------------------------------------------------------------------------------
+--   fjdaryMachinePower                                                      --
+-------------------------------------------------------------------------------
+fjdaryMachinePowerCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of power consumption information table's entry on this
+         machine."
+    ::= { fjdaryMachinePower 1 }
+
+fjdaryMachinePowerTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FjdaryMachinePowerEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    ::= { fjdaryMachinePower 2 }
+
+fjdaryMachinePowerEntry OBJECT-TYPE
+    SYNTAX FjdaryMachinePowerEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    INDEX { fjdaryMachinePowerIndex }
+    ::= { fjdaryMachinePowerTable 1 }
+
+FjdaryMachinePowerEntry ::=
+    SEQUENCE{
+        fjdaryMachinePowerIndex INTEGER,
+        fjdaryMachinePowerInfo  OCTET STRING
+    }
+
+fjdaryMachinePowerIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object uniquely identifies this fjdaryMachinePower
+         entry."
+    ::= { fjdaryMachinePowerEntry 1 }
+
+fjdaryMachinePowerInfo OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the power consumption information
+         on this machine.
+         24 hours of power consumption information on one hour average are
+         stored.
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| Flag       | CM No      | Reserved                |
+              +------------+------------+------------+------------+
+          0x04| Update Time                                       |
+              +------------+------------+------------+------------+
+          0x08| Power Info(current)                               |
+              +------------+------------+------------+------------+
+          0x0c| Power Info(1 hour ago)                            |
+              +------------+------------+------------+------------+
+          0x10| Power Info(2 hour ago)                            |
+              +------------+------------+------------+------------+
+              ~                                                   ~
+              +------------+------------+------------+------------+
+          0x68| Power Info(24 hour ago)                           |
+              +------------+------------+------------+------------+"
+    ::= { fjdaryMachinePowerEntry 2 }
+
+-------------------------------------------------------------------------------
+--   fjdaryEncPower                                                          --
+-------------------------------------------------------------------------------
+fjdaryEncPowerCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of power consumption information table's entry of each
+         enclosure."
+    ::= { fjdaryEncPower 1 }
+
+fjdaryEncPowerTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FjdaryEncPowerEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    ::= { fjdaryEncPower 2 }
+
+fjdaryEncPowerEntry OBJECT-TYPE
+    SYNTAX FjdaryEncPowerEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    INDEX { fjdaryEncPowerIndex }
+    ::= { fjdaryEncPowerTable 1 }
+
+FjdaryEncPowerEntry ::=
+    SEQUENCE{
+        fjdaryEncPowerIndex INTEGER,
+        fjdaryEncPowerInfo  OCTET STRING
+    }
+
+fjdaryEncPowerIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object uniquely identifies this fjdaryEncPower
+         entry."
+    ::= { fjdaryEncPowerEntry 1 }
+
+fjdaryEncPowerInfo OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the power consumption information
+         of each enclosure.
+         24 hours of power consumption information on one hour average are
+         stored.
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| Flag       | CM No      | DE ID      |Reserved    |
+              +------------+------------+------------+------------+
+          0x04| Update Time                                       |
+              +------------+------------+------------+------------+
+          0x08| Power Info(current)                               |
+              +------------+------------+------------+------------+
+          0x0c| Power Info(1 hour ago)                            |
+              +------------+------------+------------+------------+
+          0x10| Power Info(2 hour ago)                            |
+              +------------+------------+------------+------------+
+              ~                                                   ~
+              +------------+------------+------------+------------+
+          0x68| Power Info(24 hour ago)                           |
+              +------------+------------+------------+------------+"
+    ::= { fjdaryEncPowerEntry 2 }
+
+-------------------------------------------------------------------------------
+--   fjdaryMachineTemp                                                       --
+-------------------------------------------------------------------------------
+fjdaryMachineTempCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of temperature information table's entry on this machine."
+    ::= { fjdaryMachineTemp 1 }
+
+fjdaryMachineTempTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FjdaryMachineTempEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    ::= { fjdaryMachineTemp 2 }
+
+fjdaryMachineTempEntry OBJECT-TYPE
+    SYNTAX FjdaryMachineTempEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    INDEX { fjdaryMachineTempIndex }
+    ::= { fjdaryMachineTempTable 1 }
+
+FjdaryMachineTempEntry ::=
+    SEQUENCE{
+        fjdaryMachineTempIndex INTEGER,
+        fjdaryMachineTempInfo  OCTET STRING
+    }
+
+fjdaryMachineTempIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object uniquely identifies this fjdaryMachineTemp
+         entry."
+    ::= { fjdaryMachineTempEntry 1 }
+
+fjdaryMachineTempInfo OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the temperature information on this
+         machine.
+         24 hours of maximum temperature information on one hour are stored.
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| Flag       | CM No      | Reserved                |
+              +------------+------------+------------+------------+
+          0x04| Update Time                                       |
+              +------------+------------+------------+------------+
+          0x08| Temp Info  | Temp Info  | Temp Info  | Temp Info  |
+              | (current)  |(1 hour ago)|(2 hour ago)|(3 hour ago)|
+              +------------+------------+------------+------------+
+              ~                                                   ~
+              +------------+------------+------------+------------+
+          0x20| Temp Info  | Reserved                             |
+              |(24hour ago)|                                      |
+              +------------+------------+------------+------------+"
+    ::= { fjdaryMachineTempEntry 2 }
+
+-------------------------------------------------------------------------------
+--   fjdaryEncTemp                                                           --
+-------------------------------------------------------------------------------
+fjdaryEncTempCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of temperature information table's entry of each enclosure."
+    ::= { fjdaryEncTemp 1 }
+
+fjdaryEncTempTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FjdaryEncTempEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    ::= { fjdaryEncTemp 2 }
+
+fjdaryEncTempEntry OBJECT-TYPE
+    SYNTAX FjdaryEncTempEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    INDEX { fjdaryEncTempIndex }
+    ::= { fjdaryEncTempTable 1 }
+
+FjdaryEncTempEntry ::=
+    SEQUENCE{
+        fjdaryEncTempIndex INTEGER,
+        fjdaryEncTempInfo  OCTET STRING
+    }
+
+fjdaryEncTempIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object uniquely identifies this fjdaryEncTemp entry."
+    ::= { fjdaryEncTempEntry 1 }
+
+fjdaryEncTempInfo OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the temperature information of each
+         enclosure.
+         24 hours of maximum temperature information on one hour are stored.
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| Flag       | CM No      | DE ID      |Reserved    |
+              +------------+------------+------------+------------+
+          0x04| Update Time                                       |
+              +------------+------------+------------+------------+
+          0x08| Temp Info  | Temp Info  | Temp Info  | Temp Info  |
+              | (current)  |(1 hour ago)|(2 hour ago)|(3 hour ago)|
+              +------------+------------+------------+------------+
+              ~                                                   ~
+              +------------+------------+------------+------------+
+          0x20| Temp Info  | Reserved                             |
+              |(24hour ago)|                                      |
+              +------------+------------+------------+------------+"
+    ::= { fjdaryEncTempEntry 2 }
+
+--***************************************************************************--
+--   Firmware                                                                --
+--***************************************************************************--
+fjdaryFirmTotal OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the total firmware information.
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| Firmware Virsion        | Firmware Level          |
+              +------------+------------+------------+------------+
+          0x04| Firmware Suffix                                   |
+              +------------+------------+------------+------------+"
+    ::= { fjdaryFirm 1 }
+
+--***************************************************************************--
+--   Performance Information                                                 --
+--***************************************************************************--
+fjdaryPfheadInf OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "Header that stores performance information.
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| Model Info | Reserved   | Version    | Level      |
+              +------------+------------+------------+------------+
+          0x04| Interval Time                                     |
+              +------------+------------+------------+------------+
+          0x08| Update Time                                       |
+              +------------+------------+------------+------------+
+          0x0c| Status     | Ctrl Module| Reserved                |
+              +------------+------------+------------+------------+
+          0x10| Reserved (16 bytes)                               |
+              ~                                                   ~
+          0x1c|                                                   |
+              +------------+------------+------------+------------+"
+    ::= { fjdaryPfhead 1 }
+
+-------------------------------------------------------------------------------
+--   fjdaryPfopca                                                            --
+-------------------------------------------------------------------------------
+fjdaryPfopcaCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of OPEN-CA performance data table's entry on this system."
+    ::= { fjdaryPfopca 1 }
+
+fjdaryPfopcaTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FjdaryPfopcaEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    ::= { fjdaryPfopca 2 }
+
+fjdaryPfopcaEntry OBJECT-TYPE
+    SYNTAX FjdaryPfopcaEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    INDEX { fjdaryPfopcaIndex }
+    ::= { fjdaryPfopcaTable 1 }
+
+FjdaryPfopcaEntry ::=
+    SEQUENCE{
+        fjdaryPfopcaIndex INTEGER,
+        fjdaryPfopcaInfo  OCTET STRING
+    }
+
+fjdaryPfopcaIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object uniquely identifies this fjdaryPfopca entry."
+    ::= { fjdaryPfopcaEntry 1 }
+
+fjdaryPfopcaInfo OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the OPEN-CA Info#0-#3 performance
+         data.
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| OPEN-CA Info#0 (32 bytes)                         |
+              +------------+------------+------------+------------+
+          0x20| OPEN-CA Info#1 (32 bytes)                         |
+              +------------+------------+------------+------------+
+          0x40| OPEN-CA Info#2 (32 bytes)                         |
+              +------------+------------+------------+------------+
+          0x60| OPEN-CA Info#3 (32 bytes)                         |
+              +------------+------------+------------+------------+
+         OPEN-CA Info:
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| Read Command Count                                |
+              +------------+------------+------------+------------+
+          0x04| Write Command Count                               |
+              +------------+------------+------------+------------+
+          0x08| Read Block Count                                  |
+              +------------+------------+------------+------------+
+          0x0c| Write Block Count                                 |
+              +------------+------------+------------+------------+
+          0x10| Reserved (16 bytes)                               |
+              ~                                                   ~
+          0x1c|                                                   |
+              +------------+------------+------------+------------+"
+    ::= { fjdaryPfopcaEntry 2 }
+
+-------------------------------------------------------------------------------
+--   fjdaryPfdi                                                              --
+-------------------------------------------------------------------------------
+fjdaryPfdiCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of DI(drive interface) performance data table's entry on
+         this system."
+    ::= { fjdaryPfdi 1 }
+
+fjdaryPfdiTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FjdaryPfdiEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    ::= { fjdaryPfdi 2 }
+
+fjdaryPfdiEntry OBJECT-TYPE
+    SYNTAX FjdaryPfdiEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    INDEX { fjdaryPfdiIndex }
+    ::= { fjdaryPfdiTable 1 }
+
+FjdaryPfdiEntry ::=
+    SEQUENCE{
+        fjdaryPfdiIndex INTEGER,
+        fjdaryPfdiInfo  OCTET STRING
+    }
+
+fjdaryPfdiIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object uniquely identifies this fjdaryPfdi entry."
+    ::= { fjdaryPfdiEntry 1 }
+
+fjdaryPfdiInfo OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the DI performance data.
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| DI Port Info#0 (16 bytes)                         |
+              +------------+------------+------------+------------+
+          0x10| DI Port Info#1 (16 bytes)                         |
+              +------------+------------+------------+------------+
+         DI Port Info:
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| Read Command Count                                |
+              +------------+------------+------------+------------+
+          0x04| Write Command Count                               |
+              +------------+------------+------------+------------+
+          0x08| Read Block Count                                  |
+              +------------+------------+------------+------------+
+          0x0c| Write Block Count                                 |
+              +------------+------------+------------+------------+"
+    ::= { fjdaryPfdiEntry 2 }
+
+-------------------------------------------------------------------------------
+--   fjdaryPfdisk                                                            --
+-------------------------------------------------------------------------------
+fjdaryPfdiskCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of DISK performance data table's entry on this system."
+    ::= { fjdaryPfdisk 1 }
+
+fjdaryPfdiskTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FjdaryPfdiskEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    ::= { fjdaryPfdisk 2 }
+
+fjdaryPfdiskEntry OBJECT-TYPE
+    SYNTAX FjdaryPfdiskEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    INDEX { fjdaryPfdiskIndex }
+    ::= { fjdaryPfdiskTable 1 }
+
+FjdaryPfdiskEntry ::=
+    SEQUENCE{
+        fjdaryPfdiskIndex INTEGER,
+        fjdaryPfdiskInfo  OCTET STRING
+    }
+
+fjdaryPfdiskIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object uniquely identifies this fjdaryPfdisk entry."
+    ::= { fjdaryPfdiskEntry 1 }
+
+fjdaryPfdiskInfo OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the DISK performance data.
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| DISK Info#index*8 (32 bytes)                      |
+              +------------+------------+------------+------------+
+          0x20| DISK Info#index*8+1 (32 bytes)                    |
+              +------------+------------+------------+------------+
+              ~                                                   ~
+              +------------+------------+------------+------------+
+          0xe0| DISK Info#index*8+7 (32 bytes)                    |
+              +------------+------------+------------+------------+
+         DISK Info:
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| PLU                     | Reserved   | Busy Rate  |
+              +------------+------------+------------+------------+
+          0x04| Xfer Rate                                         |
+              +------------+------------+------------+------------+
+          0x08| Busy Time                                         |
+              +                                                   +
+          0x0c|                                                   |
+              +------------+------------+------------+------------+
+          0x10| Read Command Count                                |
+              +------------+------------+------------+------------+
+          0x14| Write Command Count                               |
+              +------------+------------+------------+------------+
+          0x18| Read Block Count                                  |
+              +------------+------------+------------+------------+
+          0x1c| Write Block Count                                 |
+              +------------+------------+------------+------------+"
+    ::= { fjdaryPfdiskEntry 2 }
+
+-------------------------------------------------------------------------------
+--   fjdaryPfdisktime                                                        --
+-------------------------------------------------------------------------------
+fjdaryPfdisktimeCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of DISK busy time performance data table's entry on this
+         system."
+    ::= { fjdaryPfdisktime 1 }
+
+fjdaryPfdisktimeTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FjdaryPfdisktimeEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    ::= { fjdaryPfdisktime 2 }
+
+fjdaryPfdisktimeEntry OBJECT-TYPE
+    SYNTAX FjdaryPfdisktimeEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    INDEX { fjdaryPfdisktimeIndex }
+    ::= { fjdaryPfdisktimeTable 1 }
+
+FjdaryPfdisktimeEntry ::=
+    SEQUENCE{
+        fjdaryPfdisktimeIndex INTEGER,
+        fjdaryPfdisktimeInfo  OCTET STRING
+    }
+
+fjdaryPfdisktimeIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object uniquely identifies this fjdaryPfdisktime
+         entry."
+    ::= { fjdaryPfdisktimeEntry 1 }
+
+fjdaryPfdisktimeInfo OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the DISK busy time performance
+         data.
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| DISK Busy Time#index*24 (8 bytes)                 |
+              +------------+------------+------------+------------+
+          0x08| DISK Busy Time#index*24+1 (8 bytes)               |
+              +------------+------------+------------+------------+
+              ~                                                   ~
+              +------------+------------+------------+------------+
+          0xb8| DISK Busy Time#index*24+23 (8 bytes)              |
+              +------------+------------+------------+------------+"
+    ::= { fjdaryPfdisktimeEntry 2 }
+
+-------------------------------------------------------------------------------
+--   fjdaryPfcm                                                              --
+-------------------------------------------------------------------------------
+fjdaryPfcmCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of CM performance data table's entry on this system."
+    ::= { fjdaryPfcm 1 }
+
+fjdaryPfcmTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FjdaryPfcmEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    ::= { fjdaryPfcm 2 }
+
+fjdaryPfcmEntry OBJECT-TYPE
+    SYNTAX FjdaryPfcmEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    INDEX { fjdaryPfcmIndex }
+    ::= { fjdaryPfcmTable 1 }
+
+FjdaryPfcmEntry ::=
+    SEQUENCE{
+        fjdaryPfcmIndex INTEGER,
+        fjdaryPfcmInfo  OCTET STRING
+    }
+
+fjdaryPfcmIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object uniquely identifies this fjdaryPfcm entry."
+    ::= { fjdaryPfcmEntry 1 }
+
+fjdaryPfcmInfo OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the CM performance data.
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| Total CPU Time                                    |
+              +------------+------------+------------+------------+
+          0x04| Idle CPU Time                                     |
+              +------------+------------+------------+------------+
+          0x08| Reserved                                          |
+              +                                                   +
+          0x0c|                                                   |
+              +------------+------------+------------+------------+"
+    ::= { fjdaryPfcmEntry 2 }
+
+-------------------------------------------------------------------------------
+--   fjdaryPfcacheolu                                                        --
+-------------------------------------------------------------------------------
+fjdaryPfcacheoluCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of OLU performance data gathered in cache layer table's
+         entry on this system."
+    ::= { fjdaryPfcacheolu 1 }
+
+fjdaryPfcacheoluTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FjdaryPfcacheoluEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    ::= { fjdaryPfcacheolu 2 }
+
+fjdaryPfcacheoluEntry OBJECT-TYPE
+    SYNTAX FjdaryPfcacheoluEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    INDEX { fjdaryPfcacheoluIndex }
+    ::= { fjdaryPfcacheoluTable 1 }
+
+FjdaryPfcacheoluEntry ::=
+    SEQUENCE{
+        fjdaryPfcacheoluIndex INTEGER,
+        fjdaryPfcacheoluInfo  OCTET STRING
+    }
+
+fjdaryPfcacheoluIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object uniquely identifies this fjdaryPfcacheolu
+         entry."
+    ::= { fjdaryPfcacheoluEntry 1 }
+
+fjdaryPfcacheoluInfo OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the OLU performance data gathered
+         in cache layer.
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| CACHE OLU#index*4 Info (48 bytes)                 |
+              +------------+------------+------------+------------+
+          0x30| CACHE OLU#index*4+1 Info (48 bytes)               |
+              +------------+------------+------------+------------+
+          0x60| CACHE OLU#index*4+2 Info (48 bytes)               |
+              +------------+------------+------------+------------+
+          0x90| CACHE OLU#index*4+3 Info (48 bytes)               |
+              +------------+------------+------------+------------+
+         CACHE OLU information:
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| Read Command Count                                |
+              +------------+------------+------------+------------+
+          0x04| Write Command Count                               |
+              +------------+------------+------------+------------+
+          0x08| Read Hit Count                                    |
+              +------------+------------+------------+------------+
+          0x0c| Write Hit Count                                   |
+              +------------+------------+------------+------------+
+          0x10| Pre-fetch Read Hit Count                          |
+              +------------+------------+------------+------------+
+          0x14| Read Block Count                                  |
+              +------------+------------+------------+------------+
+          0x18| Write Block Count                                 |
+              +------------+------------+------------+------------+
+          0x1c| Staging Count                                     |
+              +------------+------------+------------+------------+
+          0x20| Writeback Count                                   |
+              +------------+------------+------------+------------+
+          0x24| Read Miss Staging Count                           |
+              +------------+------------+------------+------------+
+          0x28| Sequential Read Count                             |
+              +------------+------------+------------+------------+
+          0x2c| Sequential Write Count                            |
+              +------------+------------+------------+------------+"
+    ::= { fjdaryPfcacheoluEntry 2 }
+
+-------------------------------------------------------------------------------
+--   fjdaryPfrscolu                                                          --
+-------------------------------------------------------------------------------
+fjdaryPfrscoluCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of OLU performance data gathered in resource layer table's
+         entry on this system."
+    ::= { fjdaryPfrscolu 1 }
+
+fjdaryPfrscoluTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FjdaryPfrscoluEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    ::= { fjdaryPfrscolu 2 }
+
+fjdaryPfrscoluEntry OBJECT-TYPE
+    SYNTAX FjdaryPfrscoluEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    INDEX { fjdaryPfrscoluIndex }
+    ::= { fjdaryPfrscoluTable 1 }
+
+FjdaryPfrscoluEntry ::=
+    SEQUENCE{
+        fjdaryPfrscoluIndex INTEGER,
+        fjdaryPfrscoluInfo  OCTET STRING
+    }
+
+fjdaryPfrscoluIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object uniquely identifies this fjdaryPfrscolu
+         entry."
+    ::= { fjdaryPfrscoluEntry 1 }
+
+fjdaryPfrscoluInfo OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the OLU performance data gathered
+         in resource layer.
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| RSC OLU#index*16 Info (16 bytes)                  |
+              +------------+------------+------------+------------+
+          0x10| RSC OLU#index*16+1 Info (16 bytes)                |
+              +------------+------------+------------+------------+
+              ~                                                   
+              +------------+------------+------------+------------+
+          0xf0| RSC OLU#index*16+15 Info (16 bytes)               |
+              +------------+------------+------------+------------+
+         RSC OLU information:
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| Read Response Time                                |
+              +------------+------------+------------+------------+
+          0x04| Write Response Time                               |
+              +------------+------------+------------+------------+
+          0x08| Extent Busy Count                                 |
+              +------------+------------+------------+------------+
+          0x0c| Reserved                                          |
+              +------------+------------+------------+------------+"
+    ::= { fjdaryPfrscoluEntry 2 }
+
+-------------------------------------------------------------------------------
+--   fjdaryPfrscrlu                                                          --
+-------------------------------------------------------------------------------
+fjdaryPfrscrluCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of RLU performance data gathered in resource layer table's
+         entry on this system."
+    ::= { fjdaryPfrscrlu 1 }
+
+fjdaryPfrscrluTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FjdaryPfrscrluEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    ::= { fjdaryPfrscrlu 2 }
+
+fjdaryPfrscrluEntry OBJECT-TYPE
+    SYNTAX FjdaryPfrscrluEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    INDEX { fjdaryPfrscrluIndex }
+    ::= { fjdaryPfrscrluTable 1 }
+
+FjdaryPfrscrluEntry ::=
+    SEQUENCE{
+        fjdaryPfrscrluIndex INTEGER,
+        fjdaryPfrscrluInfo  OCTET STRING
+    }
+
+fjdaryPfrscrluIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object uniquely identifies this fjdaryPfrscrlu
+         entry."
+    ::= { fjdaryPfrscrluEntry 1 }
+
+fjdaryPfrscrluInfo OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the RLU performance data gathered
+         in resource layer.
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| RSC RLU#index*16 Info (16 bytes)                  |
+              +------------+------------+------------+------------+
+          0x10| RSC RLU#index*16+1 Info (16 bytes)                |
+              +------------+------------+------------+------------+
+              ~                                                   
+              +------------+------------+------------+------------+
+          0xf0| RSC RLU#index*16+15 Info (16 bytes)               |
+              +------------+------------+------------+------------+
+         RSC RLU information:
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| CPU Cross Access Count                            |
+              +------------+------------+------------+------------+
+          0x04| Straight Access Count                             |
+              +------------+------------+------------+------------+
+          0x08| Cross Access Count                                |
+              +------------+------------+------------+------------+
+          0x0c| Reserved                                          |
+              +------------+------------+------------+------------+"
+    ::= { fjdaryPfrscrluEntry 2 }
+
+-------------------------------------------------------------------------------
+--   fjdaryPfcopycm                                                          --
+-------------------------------------------------------------------------------
+fjdaryPfcopycmCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of CM performance data gathered in copy layer table's entry
+         on this system."
+    ::= { fjdaryPfcopycm 1 }
+
+fjdaryPfcopycmTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FjdaryPfcopycmEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    ::= { fjdaryPfcopycm 2 }
+
+fjdaryPfcopycmEntry OBJECT-TYPE
+    SYNTAX FjdaryPfcopycmEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    INDEX { fjdaryPfcopycmIndex }
+    ::= { fjdaryPfcopycmTable 1 }
+
+FjdaryPfcopycmEntry ::=
+    SEQUENCE{
+        fjdaryPfcopycmIndex INTEGER,
+        fjdaryPfcopycmInfo  OCTET STRING
+    }
+
+fjdaryPfcopycmIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object uniquely identifies this fjdaryPfcopycm
+         entry."
+    ::= { fjdaryPfcopycmEntry 1 }
+
+fjdaryPfcopycmInfo OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the CM performance data gathered in
+         copy layer.
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| Copy Remain Count                                 |
+              +                                                   +
+          0x04|                                                   |
+              +------------+------------+------------+------------+
+          0x08| Reserved                                          |
+              +                                                   +
+          0x0c|                                                   |
+              +------------+------------+------------+------------+"
+    ::= { fjdaryPfcopycmEntry 2 }
+
+-------------------------------------------------------------------------------
+--   fjdaryPfcopyslu                                                         --
+-------------------------------------------------------------------------------
+fjdaryPfcopysluCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of SLU performance data gathered in copy layer table's
+         entry on this system."
+    ::= { fjdaryPfcopyslu 1 }
+
+fjdaryPfcopysluTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FjdaryPfcopysluEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    ::= { fjdaryPfcopyslu 2 }
+
+fjdaryPfcopysluEntry OBJECT-TYPE
+    SYNTAX FjdaryPfcopysluEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    INDEX { fjdaryPfcopysluIndex }
+    ::= { fjdaryPfcopysluTable 1 }
+
+FjdaryPfcopysluEntry ::=
+    SEQUENCE{
+        fjdaryPfcopysluIndex INTEGER,
+        fjdaryPfcopysluInfo  OCTET STRING
+    }
+
+fjdaryPfcopysluIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object uniquely identifies this fjdaryPfcopyslu
+         entry."
+    ::= { fjdaryPfcopysluEntry 1 }
+
+fjdaryPfcopysluInfo OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the SLU performance data gathered
+         in copy layer.
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| COPY SLU#index*4 Info (64 bytes)                  |
+              +------------+------------+------------+------------+
+          0x40| COPY SLU#index*4+1 Info (64 bytes)                |
+              +------------+------------+------------+------------+
+          0x80| COPY SLU#index*4+2 Info (64 bytes)                |
+              +------------+------------+------------+------------+
+          0xc0| COPY SLU#index*4+3 Info (64 bytes)                |
+              +------------+------------+------------+------------+
+         COPY SLU information:
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| EC Source Copy Block Count                        |
+              +------------+------------+------------+------------+
+          0x04| EC Destination Copy Block Count                   |
+              +------------+------------+------------+------------+
+          0x08| OPC Source Copy Block Count                       |
+              +------------+------------+------------+------------+
+          0x0c| OPC Destination Copy Block Count                  |
+              +------------+------------+------------+------------+
+          0x10| Reserved (16 bytes)                               |
+              ~                                                   ~
+          0x1c|                                                   |
+              +------------+------------+------------+------------+
+          0x20| EC Source Copy Area Write Count                   |
+              +------------+------------+------------+------------+
+          0x24| OPC Source Un-copy Area Write Count               |
+              +------------+------------+------------+------------+
+          0x28| Reserved                                          |
+              +                                                   +
+          0x2c|                                                   |
+              +------------+------------+------------+------------+
+          0x30| I/O Limit Busy Count                              |
+              +------------+------------+------------+------------+
+          0x34| Extent Busy Count                                 |
+              +------------+------------+------------+------------+
+          0x38| Cache Busy Count                                  |
+              +------------+------------+------------+------------+
+          0x3c| Other Busy Count                                  |
+              +------------+------------+------------+------------+"
+    ::= { fjdaryPfcopysluEntry 2 }
+
+-------------------------------------------------------------------------------
+--   fjdaryPfcacheslu                                                        --
+-------------------------------------------------------------------------------
+fjdaryPfcachesluCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of SLU performance data gathered in cache layer table's
+         entry on this system."
+    ::= { fjdaryPfcacheslu 1 }
+
+fjdaryPfcachesluTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FjdaryPfcachesluEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    ::= { fjdaryPfcacheslu 2 }
+
+fjdaryPfcachesluEntry OBJECT-TYPE
+    SYNTAX FjdaryPfcachesluEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    INDEX { fjdaryPfcachesluIndex }
+    ::= { fjdaryPfcachesluTable 1 }
+
+FjdaryPfcachesluEntry ::=
+    SEQUENCE{
+        fjdaryPfcachesluIndex INTEGER,
+        fjdaryPfcachesluInfo  OCTET STRING
+    }
+
+fjdaryPfcachesluIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object uniquely identifies this fjdaryPfcacheslu
+         entry."
+    ::= { fjdaryPfcachesluEntry 1 }
+
+fjdaryPfcachesluInfo OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the SLU performance data gathered
+         in cache layer.
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| CACHE SLU#index*4 Info (48 bytes)                 |
+              +------------+------------+------------+------------+
+          0x30| CACHE SLU#index*4+1 Info (48 bytes)               |
+              +------------+------------+------------+------------+
+          0x60| CACHE SLU#index*4+2 Info (48 bytes)               |
+              +------------+------------+------------+------------+
+          0x90| CACHE SLU#index*4+3 Info (48 bytes)               |
+              +------------+------------+------------+------------+
+         CACHE SLU information:
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| Read Command Count                                |
+              +------------+------------+------------+------------+
+          0x04| Write Command Count                               |
+              +------------+------------+------------+------------+
+          0x08| Read Hit Count                                    |
+              +------------+------------+------------+------------+
+          0x0c| Write Hit Count                                   |
+              +------------+------------+------------+------------+
+          0x10| Pre-fetch Read Hit Count                          |
+              +------------+------------+------------+------------+
+          0x14| Read Block Count                                  |
+              +------------+------------+------------+------------+
+          0x18| Write Block Count                                 |
+              +------------+------------+------------+------------+
+          0x1c| Staging Count                                     |
+              +------------+------------+------------+------------+
+          0x20| Writeback Count                                   |
+              +------------+------------+------------+------------+
+          0x24| Read Miss Staging Count                           |
+              +------------+------------+------------+------------+
+          0x28| Sequential Read Count                             |
+              +------------+------------+------------+------------+
+          0x2c| Sequential Write Count                            |
+              +------------+------------+------------+------------+"
+    ::= { fjdaryPfcachesluEntry 2 }
+
+-------------------------------------------------------------------------------
+--   fjdaryPfrscslu                                                          --
+-------------------------------------------------------------------------------
+fjdaryPfrscsluCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of SLU performance data gathered in resource layer table's
+         entry on this system."
+    ::= { fjdaryPfrscslu 1 }
+
+fjdaryPfrscsluTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FjdaryPfrscsluEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    ::= { fjdaryPfrscslu 2 }
+
+fjdaryPfrscsluEntry OBJECT-TYPE
+    SYNTAX FjdaryPfrscsluEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    INDEX { fjdaryPfrscsluIndex }
+    ::= { fjdaryPfrscsluTable 1 }
+
+FjdaryPfrscsluEntry ::=
+    SEQUENCE{
+        fjdaryPfrscsluIndex INTEGER,
+        fjdaryPfrscsluInfo  OCTET STRING
+    }
+
+fjdaryPfrscsluIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object uniquely identifies this fjdaryPfrscslu
+         entry."
+    ::= { fjdaryPfrscsluEntry 1 }
+
+fjdaryPfrscsluInfo OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the SLU performance data gathered
+         in resource layer.
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| RSC SLU#index*32 Info (8 bytes)                   |
+              +------------+------------+------------+------------+
+          0x08| RSC SLU#index*32+1 Info (8 bytes)                 |
+              +------------+------------+------------+------------+
+              ~                                                   
+              +------------+------------+------------+------------+
+          0xf8| RSC SLU#index*32+31 Info (8 bytes)                |
+              +------------+------------+------------+------------+
+         RSC SLU information:
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| Read Response Time                                |
+              +------------+------------+------------+------------+
+          0x04| Write Response Time                               |
+              +------------+------------+------------+------------+"
+    ::= { fjdaryPfrscsluEntry 2 }
+
+-------------------------------------------------------------------------------
+--   fjdaryPfcachecopyslu                                                    --
+-------------------------------------------------------------------------------
+fjdaryPfcachecopysluCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of SLU performance data gathered in cache layer table's
+         entry on this system.
+         This is performance data that relates to copy I/O."
+    ::= { fjdaryPfcachecopyslu 1 }
+
+fjdaryPfcachecopysluTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FjdaryPfcachecopysluEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    ::= { fjdaryPfcachecopyslu 2 }
+
+fjdaryPfcachecopysluEntry OBJECT-TYPE
+    SYNTAX FjdaryPfcachecopysluEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    INDEX { fjdaryPfcachecopysluIndex }
+    ::= { fjdaryPfcachecopysluTable 1 }
+
+FjdaryPfcachecopysluEntry ::=
+    SEQUENCE{
+        fjdaryPfcachecopysluIndex INTEGER,
+        fjdaryPfcachecopysluInfo  OCTET STRING
+    }
+
+fjdaryPfcachecopysluIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object uniquely identifies this fjdaryPfcachecopyslu
+         entry."
+    ::= { fjdaryPfcachecopysluEntry 1 }
+
+fjdaryPfcachecopysluInfo OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the SLU performance data gathered
+         in cache layer.
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| CACHE COPY SLU#index*4 Info (48 bytes)            |
+              +------------+------------+------------+------------+
+          0x30| CACHE COPY SLU#index*4+1 Info (48 bytes)          |
+              +------------+------------+------------+------------+
+          0x60| CACHE COPY SLU#index*4+2 Info (48 bytes)          |
+              +------------+------------+------------+------------+
+          0x90| CACHE COPY SLU#index*4+3 Info (48 bytes)          |
+              +------------+------------+------------+------------+
+         CACHE COPY SLU information:
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| Read Command Count                                |
+              +------------+------------+------------+------------+
+          0x04| Write Command Count                               |
+              +------------+------------+------------+------------+
+          0x08| Read Hit Count                                    |
+              +------------+------------+------------+------------+
+          0x0c| Write Hit Count                                   |
+              +------------+------------+------------+------------+
+          0x10| Pre-fetch Read Hit Count                          |
+              +------------+------------+------------+------------+
+          0x14| Read Block Count                                  |
+              +------------+------------+------------+------------+
+          0x18| Write Block Count                                 |
+              +------------+------------+------------+------------+
+          0x1c| Staging Count                                     |
+              +------------+------------+------------+------------+
+          0x20| Write back Count                                  |
+              +------------+------------+------------+------------+
+          0x24| Read Miss Staging Count                           |
+              +------------+------------+------------+------------+
+          0x28| Sequential Read Count                             |
+              +------------+------------+------------+------------+
+          0x2c| Sequential Write Count                            |
+              +------------+------------+------------+------------+"
+    ::= { fjdaryPfcachecopysluEntry 2 }
+
+-------------------------------------------------------------------------------
+--   fjdaryPfcachesdvslu                                                    --
+-------------------------------------------------------------------------------
+fjdaryPfcachesdvsluCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of SLU performance data gathered in cache layer table's
+         entry on this system.
+         This is performance data that relates to snap opc volume."
+    ::= { fjdaryPfcachesdvslu 1 }
+
+fjdaryPfcachesdvsluTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FjdaryPfcachesdvsluEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    ::= { fjdaryPfcachesdvslu 2 }
+
+fjdaryPfcachesdvsluEntry OBJECT-TYPE
+    SYNTAX FjdaryPfcachesdvsluEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    INDEX { fjdaryPfcachesdvsluIndex }
+    ::= { fjdaryPfcachesdvsluTable 1 }
+
+FjdaryPfcachesdvsluEntry ::=
+    SEQUENCE{
+        fjdaryPfcachesdvsluIndex INTEGER,
+        fjdaryPfcachesdvsluInfo  OCTET STRING
+    }
+
+fjdaryPfcachesdvsluIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object uniquely identifies this fjdaryPfcachesdvslu
+         entry."
+    ::= { fjdaryPfcachesdvsluEntry 1 }
+
+fjdaryPfcachesdvsluInfo OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the SLU performance data gathered
+         in cache layer.
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| CACHE SDV SLU#index*4 Info (64 bytes)             |
+              +------------+------------+------------+------------+
+          0x40| CACHE SDV SLU#index*4+1 Info (64 bytes)           |
+              +------------+------------+------------+------------+
+          0x80| CACHE SDV SLU#index*4+2 Info (64 bytes)           |
+              +------------+------------+------------+------------+
+          0xc0| CACHE SDV SLU#index*4+3 Info (64 bytes)           |
+              +------------+------------+------------+------------+
+         CACHE SDV SLU information:
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| Read Command Count                                |
+              +------------+------------+------------+------------+
+          0x04| Write Command Count                               |
+              +------------+------------+------------+------------+
+          0x08| Read Hit Count                                    |
+              +------------+------------+------------+------------+
+          0x0c| Write Hit Count                                   |
+              +------------+------------+------------+------------+
+          0x10| Pre-fetch Read Hit Count                          |
+              +------------+------------+------------+------------+
+          0x14| Read Block Count                                  |
+              +------------+------------+------------+------------+
+          0x18| Write Block Count                                 |
+              +------------+------------+------------+------------+
+          0x1c| Staging Count                                     |
+              +------------+------------+------------+------------+
+          0x20| Write back Count                                  |
+              +------------+------------+------------+------------+
+          0x24| Read Miss Staging Count                           |
+              +------------+------------+------------+------------+
+          0x28| Sequential Read Count                             |
+              +------------+------------+------------+------------+
+          0x2c| Sequential Write Count                            |
+              +------------+------------+------------+------------+
+          0x30| Pre-fetch Staging Count                           |
+              +------------+------------+------------+------------+
+          0x34| Pre-fetch Staging Purge Count                     |
+              +------------+------------+------------+------------+
+          0x38| Reserved                                          |
+              +                                                   +
+          0x3c|                                                   |
+              +------------+------------+------------+------------+"
+    ::= { fjdaryPfcachesdvsluEntry 2 }
+
+-------------------------------------------------------------------------------
+--   fjdaryPfcachecopyolu                                                    --
+-------------------------------------------------------------------------------
+fjdaryPfcachecopyoluCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of OLU performance data gathered in cache layer table's
+         entry on this system.
+         This is performance data that relates to copy."
+    ::= { fjdaryPfcachecopyolu 1 }
+
+fjdaryPfcachecopyoluTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FjdaryPfcachecopyoluEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    ::= { fjdaryPfcachecopyolu 2 }
+
+fjdaryPfcachecopyoluEntry OBJECT-TYPE
+    SYNTAX FjdaryPfcachecopyoluEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    INDEX { fjdaryPfcachecopyoluIndex }
+    ::= { fjdaryPfcachecopyoluTable 1 }
+
+FjdaryPfcachecopyoluEntry ::=
+    SEQUENCE{
+        fjdaryPfcachecopyoluIndex INTEGER,
+        fjdaryPfcachecopyoluInfo  OCTET STRING
+    }
+
+fjdaryPfcachecopyoluIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object uniquely identifies this fjdaryPfcachecopyolu
+         entry."
+    ::= { fjdaryPfcachecopyoluEntry 1 }
+
+fjdaryPfcachecopyoluInfo OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the OLU performance data gathered
+         in cache layer.
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| CACHE COPY OLU#index*4 Info (48 bytes)            |
+              +------------+------------+------------+------------+
+          0x30| CACHE COPY OLU#index*4+1 Info (48 bytes)          |
+              +------------+------------+------------+------------+
+          0x60| CACHE COPY OLU#index*4+2 Info (48 bytes)          |
+              +------------+------------+------------+------------+
+          0x90| CACHE COPY OLU#index*4+3 Info (48 bytes)          |
+              +------------+------------+------------+------------+
+         CACHE COPY OLU information:
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| Read Command Count                                |
+              +------------+------------+------------+------------+
+          0x04| Write Command Count                               |
+              +------------+------------+------------+------------+
+          0x08| Read Hit Count                                    |
+              +------------+------------+------------+------------+
+          0x0c| Write Hit Count                                   |
+              +------------+------------+------------+------------+
+          0x10| Pre-fetch Read Hit Count                          |
+              +------------+------------+------------+------------+
+          0x14| Read Block Count                                  |
+              +------------+------------+------------+------------+
+          0x18| Write Block Count                                 |
+              +------------+------------+------------+------------+
+          0x1c| Staging Count                                     |
+              +------------+------------+------------+------------+
+          0x20| Write back Count                                  |
+              +------------+------------+------------+------------+
+          0x24| Read Miss Staging Count                           |
+              +------------+------------+------------+------------+
+          0x28| Sequential Read Count                             |
+              +------------+------------+------------+------------+
+          0x2c| Sequential Write Count                            |
+              +------------+------------+------------+------------+"
+    ::= { fjdaryPfcachecopyoluEntry 2 }
+
+-------------------------------------------------------------------------------
+--   fjdaryPfcachecommonolu                                                  --
+-------------------------------------------------------------------------------
+fjdaryPfcachecommonoluCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of OLU performance data gathered in cache layer table's
+         entry on this system.
+         This is performance data that relates to host I/O and copy I/O."
+    ::= { fjdaryPfcachecommonolu 1 }
+
+fjdaryPfcachecommonoluTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FjdaryPfcachecommonoluEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    ::= { fjdaryPfcachecommonolu 2 }
+
+fjdaryPfcachecommonoluEntry OBJECT-TYPE
+    SYNTAX FjdaryPfcachecommonoluEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    INDEX { fjdaryPfcachecommonoluIndex }
+    ::= { fjdaryPfcachecommonoluTable 1 }
+
+FjdaryPfcachecommonoluEntry ::=
+    SEQUENCE{
+        fjdaryPfcachecommonoluIndex INTEGER,
+        fjdaryPfcachecommonoluInfo  OCTET STRING
+    }
+
+fjdaryPfcachecommonoluIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object uniquely identifies this
+         fjdaryPfcachecommonolu entry."
+    ::= { fjdaryPfcachecommonoluEntry 1 }
+
+fjdaryPfcachecommonoluInfo OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the SLU performance data gathered
+         in cache layer.
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| CACHE COMMON OLU#index*16 Info (16 bytes)         |
+              +------------+------------+------------+------------+
+          0x10| CACHE COMMON OLU#index*16+1 Info (16 bytes)       |
+              +------------+------------+------------+------------+
+              ~                                                   
+              +------------+------------+------------+------------+
+          0xf0| CACHE COMMON OLU#index*16+15 Info (16 bytes)      |
+              +------------+------------+------------+------------+
+         CACHE COMMON OLU information:
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| Pre-fetch Staging Count                           |
+              +------------+------------+------------+------------+
+          0x04| Pre-fetch Staging Purge Count                     |
+              +------------+------------+------------+------------+
+          0x08| Reserved                                          |
+              +                                                   +
+          0x0c|                                                   |
+              +------------+------------+------------+------------+"
+    ::= { fjdaryPfcachecommonoluEntry 2 }
+
+-------------------------------------------------------------------------------
+--   fjdaryPfcachecommonslu                                                  --
+-------------------------------------------------------------------------------
+fjdaryPfcachecommonsluCount OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The number of SLU performance data gathered in cache layer table's
+         entry on this system.
+         This is performance data that relates to host I/O and copy I/O."
+    ::= { fjdaryPfcachecommonslu 1 }
+
+fjdaryPfcachecommonsluTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF FjdaryPfcachecommonsluEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    ::= { fjdaryPfcachecommonslu 2 }
+
+fjdaryPfcachecommonsluEntry OBJECT-TYPE
+    SYNTAX FjdaryPfcachecommonsluEntry
+    ACCESS not-accessible
+    STATUS mandatory
+    DESCRIPTION
+        ""
+    INDEX { fjdaryPfcachecommonsluIndex }
+    ::= { fjdaryPfcachecommonsluTable 1 }
+
+FjdaryPfcachecommonsluEntry ::=
+    SEQUENCE{
+        fjdaryPfcachecommonsluIndex INTEGER,
+        fjdaryPfcachecommonsluInfo  OCTET STRING
+    }
+
+fjdaryPfcachecommonsluIndex OBJECT-TYPE
+    SYNTAX INTEGER
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object uniquely identifies this
+         fjdaryPfcachecommonslu entry."
+    ::= { fjdaryPfcachecommonsluEntry 1 }
+
+fjdaryPfcachecommonsluInfo OBJECT-TYPE
+    SYNTAX OCTET STRING
+    ACCESS read-only
+    STATUS mandatory
+    DESCRIPTION
+        "The value of this object indicates the SLU performance data gathered
+         in cache layer.
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| CACHE COMMON SLU#index*16 Info (16 bytes)         |
+              +------------+------------+------------+------------+
+          0x10| CACHE COMMON SLU#index*16+1 Info (16 bytes)       |
+              +------------+------------+------------+------------+
+              ~                                                   
+              +------------+------------+------------+------------+
+          0xf0| CACHE COMMON SLU#index*16+15 Info (16 bytes)      |
+              +------------+------------+------------+------------+
+         CACHE COMMON SLU information:
+                  byte 0       byte 1       byte 2       byte 3
+              +------------+------------+------------+------------+
+          0x00| Pre-fetch Staging Count                           |
+              +------------+------------+------------+------------+
+          0x04| Pre-fetch Staging Purge Count                     |
+              +------------+------------+------------+------------+
+          0x08| Reserved                                          |
+              +                                                   +
+          0x0c|                                                   |
+              +------------+------------+------------+------------+"
+    ::= { fjdaryPfcachecommonsluEntry 2 }
+
+--***************************************************************************--
+--   Trap Definitions                                                        --
+--***************************************************************************--
+fjdarye101ConfigChange TRAP-TYPE
+    ENTERPRISE aplNetFjdarye101
+    VARIABLES{
+        fjdarySspMachineId,
+        fjdaryTrapMessage
+    }
+    DESCRIPTION
+        "A configChange trap signifies that the sending protocol entity
+         recognizes the change in configuration information."
+--#TYPE "Configuration changed"
+--#SUMMARY "Configuration changed event from %s, message: %s"
+--#ARGUMENTS {0,1}
+--#SEVERITY INFORMATIONAL
+--#TIMEINDEX 6
+    ::= 0
+
+fjdarye101FirmChange TRAP-TYPE
+    ENTERPRISE aplNetFjdarye101
+    VARIABLES{
+        fjdarySspMachineId,
+        fjdaryTrapMessage
+    }
+    DESCRIPTION
+        "A firmChange trap signifies that the exchange of the firmware was
+         executed."
+--#TYPE "Firmware changed"
+--#SUMMARY "Firmware changed event from %s, message: %s"
+--#ARGUMENTS {0,1}
+--#SEVERITY INFORMATIONAL
+--#TIMEINDEX 6
+    ::= 1
+
+fjdarye101ItemFault TRAP-TYPE
+    ENTERPRISE aplNetFjdarye101
+    VARIABLES{
+        fjdaryTrapItemId,
+        fjdarySspMachineId,
+        fjdaryTrapMessage
+    }
+    DESCRIPTION
+        "A itemFault trap signifies that device was failed."
+--#TYPE "Item fault"
+--#SUMMARY "Item fault event from %s, id: %x, message: %s"
+--#ARGUMENTS {1,0,2}
+--#SEVERITY CRITICAL
+--#TIMEINDEX 6
+    ::= 2
+
+fjdarye101BatteryExpiration TRAP-TYPE
+    ENTERPRISE aplNetFjdarye101
+    VARIABLES{
+        fjdaryTrapItemId,
+        fjdarySspMachineId,
+        fjdaryTrapMessage
+    }
+    DESCRIPTION
+        "A batteryExpiration trap signifies that the exchange time of the
+         battery comes."
+--#TYPE "Battery expiration"
+--#SUMMARY "Battery expiration event from %s, id: %x, message: %s"
+--#ARGUMENTS {1,0,2}
+--#SEVERITY CRITICAL
+--#TIMEINDEX 6
+    ::= 3
+
+fjdarye101RebuildNotStart TRAP-TYPE
+    ENTERPRISE aplNetFjdarye101
+    VARIABLES{
+        fjdarySspMachineId,
+        fjdaryTrapMessage
+    }
+    DESCRIPTION
+        "A rebuildNotStart trap signifies that not to be able to begin to
+         execute the rebuild because there is no spare disk."
+--#TYPE "Rebuild not started"
+--#SUMMARY "Rebuild not started event from %s, message: %s"
+--#ARGUMENTS {0,1}
+--#SEVERITY CRITICAL
+--#TIMEINDEX 6
+    ::= 4
+
+fjdarye101ItemWarning TRAP-TYPE
+    ENTERPRISE aplNetFjdarye101
+    VARIABLES{
+        fjdaryTrapItemId,
+        fjdarySspMachineId,
+        fjdaryTrapMessage,
+        fjdaryTrapWarningInfo
+    }
+    DESCRIPTION
+        "A itemWarning trap signifies that device was warning."
+--#TYPE "Item warning"
+--#SUMMARY "Item warning event from %s, id: %x[%x], message: %s"
+--#ARGUMENTS {1,0,3,2}
+--#SEVERITY MAJOR
+--#TIMEINDEX 6
+    ::= 5
+
+fjdarye101SensorStatusChange TRAP-TYPE
+    ENTERPRISE aplNetFjdarye101
+    VARIABLES{
+        fjdaryTrapItemId,
+        fjdarySspMachineId,
+        fjdaryTrapSensorInfo,
+        fjdaryTrapMessage
+    }
+    DESCRIPTION
+        "A sensorStatusChange trap signifies that environment sensor status
+         changes."
+--#TYPE "Sensor status changed"
+--#SUMMARY "Sensor status changed event from %s, id: %x[%x], message: %s"
+--#ARGUMENTS {1,0,2,3}
+--#SEVERITY CRITICAL
+--#TIMEINDEX 6
+    ::= 6
+
+fjdarye101MaintenanceRequired TRAP-TYPE
+    ENTERPRISE aplNetFjdarye101
+    VARIABLES{
+        fjdarySspMachineId,
+        fjdaryTrapMaintenanceInfo,
+        fjdaryTrapMessage
+    }
+    DESCRIPTION
+        "A maintenanceRequired trap signifies that maintenance information."
+--#TYPE "Maintenance required"
+--#SUMMARY "Maintenance required event from %s, id: %x, message: %s"
+--#ARGUMENTS {0,1,2}
+--#SEVERITY CRITICAL
+--#TIMEINDEX 6
+    ::= 7
+
+fjdarye101Information TRAP-TYPE
+    ENTERPRISE aplNetFjdarye101
+    VARIABLES{
+        fjdarySspMachineId,
+        fjdaryTrapMessage
+    }
+    DESCRIPTION
+        "A Information trap signifies that information events."
+--#TYPE "Information event"
+--#SUMMARY "Information event from %s, message: %s"
+--#ARGUMENTS {0,1}
+--#SEVERITY INFORMATIONAL
+--#TIMEINDEX 6
+    ::= 9
+
+fjdarye101ItemFaultToNormal TRAP-TYPE
+    ENTERPRISE aplNetFjdarye101
+    VARIABLES{
+        fjdaryTrapItemId,
+        fjdarySspMachineId,
+        fjdaryTrapMessage
+    }
+    DESCRIPTION
+        "A itemFaultToNormal trap signifies that the device state has changed
+         to normal after sending itemFault trap."
+--#TYPE "Item fault to normal"
+--#SUMMARY "Item fault to normal, from %s, id: %x, message: %s"
+--#ARGUMENTS {1,0,2}
+--#SEVERITY INFORMATIONAL
+--#TIMEINDEX 6
+    ::= 22
+
+fjdarye101ItemWarningToNormal TRAP-TYPE
+    ENTERPRISE aplNetFjdarye101
+    VARIABLES{
+        fjdaryTrapItemId,
+        fjdarySspMachineId,
+        fjdaryTrapMessage,
+        fjdaryTrapWarningInfo
+    }
+    DESCRIPTION
+        "A itemWarningToNormal trap signifies that the device state has changed
+         to normal after sending itemWarning trap."
+--#TYPE "Item warning to normal"
+--#SUMMARY "Item warning to normal, from %s, id: %x[%x], message: %s"
+--#ARGUMENTS {1,0,3,2}
+--#SEVERITY INFORMATIONAL
+--#TIMEINDEX 6
+    ::= 25
+
+fjdarye101SensorStatusChangeToNormal TRAP-TYPE
+    ENTERPRISE aplNetFjdarye101
+    VARIABLES{
+        fjdaryTrapItemId,
+        fjdarySspMachineId,
+        fjdaryTrapSensorInfo,
+        fjdaryTrapMessage
+    }
+    DESCRIPTION
+        "A sensorStatusChangeToNormal trap signifies that the error or warning
+         state detected by the environment sensor has returned to normal after
+         sending SensorStatusChange trap."
+--#TYPE "Sensor status changed to normal"
+--#SUMMARY "Sensor status changed to normal, from %s, id: %x[%x], message: %s"
+--#SEVERITY INFORMATIONAL
+--#ARGUMENTS {1,0,2,3}
+--#TIMEINDEX 6
+    ::= 26
+
+END

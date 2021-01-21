@@ -1,0 +1,186 @@
+-- *****************************************************************
+-- ACTIDATA-MIB:  ACTIDATA LLC
+--                Structure of Management Information 
+-- 
+-- Copyright (c) 201 by Actidata LLC
+-- All rights reserved. 
+--  
+-- *****************************************************************  
+ACTIDATA-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+ 		MODULE-IDENTITY,
+		OBJECT-IDENTITY,
+	 	enterprises
+ 			FROM SNMPv2-SMI
+	        DisplayString        
+        		FROM SNMPv2-TC;
+actidata MODULE-IDENTITY
+ 	LAST-UPDATED "201111150000Z"
+ 	ORGANIZATION "Actidata LLC"
+ 	CONTACT-INFO "
+  			Tel: +74955454997 
+    			E-mail: info@actidata.ru"
+ 	DESCRIPTION
+		"The Structure of Management Information for the
+ 		 Actidata enterprise."
+ 	REVISION      "201111150000Z"
+ 	DESCRIPTION
+		"Initial version of this MIB module." 	
+::= { enterprises 37758 }	-- assigned by IANA   
+
+consumerProducts OBJECT-IDENTITY
+ 	STATUS	current
+ 	DESCRIPTION
+ 		"consumerProducts is the subtree root for consumer products developed
+		by Actidata" 	
+::= { actidata 1 }  
+
+unitName OBJECT-TYPE
+        SYNTAX     DisplayString (SIZE (64))
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "A name for the module being managed."        
+::= { consumerProducts 1 }
+
+unitVersion OBJECT-TYPE
+        SYNTAX	   INTEGER (0..65535)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "The versoin number of the module being managed."        
+::= { consumerProducts 2 }
+
+relay1 OBJECT-TYPE
+        SYNTAX	   INTEGER (0..65535)
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Relay 1 output"        
+::= { consumerProducts 20 }
+
+relay2 OBJECT-TYPE
+        SYNTAX	   INTEGER (0..65535)
+        MAX-ACCESS read-write
+        STATUS     current
+        DESCRIPTION
+                "Relay 2 output"        
+::= { consumerProducts 21 }
+
+nv1Sensortable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF NV1SensortableEntryS
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"A list of sensor entries"
+::= { consumerProducts 10 }
+
+nv1SensortableEntry OBJECT-TYPE
+	SYNTAX  NV1SensortableEntryS
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		"An entry containing objects for a particular sensor"
+--	INDEX   { NV1SensortableIndex }
+::= { nv1Sensortable 1 }
+
+NV1SensortableEntryS ::=
+SEQUENCE {
+                  nv1SensortableIndex 
+                      INTEGER,
+                  sensor1Value 
+                      INTEGER,
+                  sensor1Valid 
+                      INTEGER,
+                  sensor1Type 
+                      INTEGER,
+                  sensor1Description
+                      DisplayString,
+                  sensor1ID 
+                      DisplayString,
+                  sensor1Alarm
+                      INTEGER,
+                  sensor1AlarmDescr 
+                      DisplayString
+              }
+
+nv1SensortableIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION
+		"A unique value for each sensor."
+::= { nv1SensortableEntry 1 }
+
+
+sensor1Value OBJECT-TYPE
+       SYNTAX	   INTEGER (-550..1250)
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "current sensor values (multiplyed by 10)"        
+::= { nv1SensortableEntry 2 }
+
+
+sensor1Valid OBJECT-TYPE
+       SYNTAX	   INTEGER {valid(0), invalid(1)}
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+                "Sensor validity"        
+::= { nv1SensortableEntry 3 }
+
+sensor1Type OBJECT-TYPE
+       SYNTAX	   INTEGER {none(0), temperature(1), humidity(2), drycontact(3)}
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+                "Sensor type"        
+::= { nv1SensortableEntry 4 }
+
+sensor1Description OBJECT-TYPE
+       SYNTAX     DisplayString (SIZE (64))
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+                "Sensor description as text string"        
+::= { nv1SensortableEntry 5 }
+
+sensor1ID OBJECT-TYPE
+       SYNTAX     DisplayString (SIZE (64))
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+                "Sensor ID as text string"        
+::= { nv1SensortableEntry 6 }
+
+sensor1Alarm OBJECT-TYPE
+       SYNTAX	   INTEGER {norm(0), alarm(1)}
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+                "Sensor alarm"        
+::= { nv1SensortableEntry 7 }
+
+sensor1AlarmDescr OBJECT-TYPE
+       SYNTAX     DisplayString (SIZE (64))
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+                "Sensor alarm description as text string"        
+::= { nv1SensortableEntry 8 }
+
+enteralarm TRAP-TYPE
+	ENTERPRISE	consumerProducts
+	VARIABLES	{ sensor1Value,  sensor1Alarm,  sensor1AlarmDescr}
+	DESCRIPTION
+		"Enter to alarm state"
+	::= 0
+
+exitalarm TRAP-TYPE
+	ENTERPRISE	consumerProducts
+	VARIABLES	{ sensor1Value,  sensor1Alarm,  sensor1AlarmDescr}
+	DESCRIPTION
+		"Exit from alarm state"
+	::= 1
+END 

@@ -1,0 +1,237 @@
+SNI-OS2-MIB DEFINITIONS ::= BEGIN
+
+--
+-- $Copyright$
+-- Copyright (C) Siemens Nixdorf Informationssysteme AG 1996
+-- Copyright (C) Fujitsu Siemens Computers GmbH 2001
+-- All rights reserved
+--
+--
+
+IMPORTS
+    OBJECT-TYPE									FROM RFC-1212
+--  TRAP-TYPE									FROM RFC-1215
+    Counter, Gauge, enterprises					FROM RFC1155-SMI
+--  ibmProd, alert								FROM ibm-mib
+--  alertType, alertDescription, probableCause	FROM IbmFaultMgmt-MIB
+    DisplayString								FROM RFC1213-MIB;
+
+--
+-- The Windows NT MIB compiler doesn't do IMPORTS.
+-- So, include these definitions here. NT defines "DisplayString" as
+-- OCTET STRING (SIZE(0..255)), in RFC1213 it has no explicit size.
+--
+-- DisplayString ::= OCTET  STRING
+-- enterprises     OBJECT IDENTIFIER ::= { iso org(3) dod(6) internet(1) private(4) 1 }
+--
+
+-- SNI Server Management MIB nodes
+
+	sni					OBJECT IDENTIFIER       ::= { enterprises    231 }
+
+	sniProductMibs		OBJECT IDENTIFIER       ::= { sni              2 }
+	sniExtensions		OBJECT IDENTIFIER       ::= { sniProductMibs  10 }
+	sniServerMgmt		OBJECT IDENTIFIER		::= { sniExtensions    2 }
+	sniInventory		OBJECT IDENTIFIER       ::= { sniServerMgmt    1 }
+	sniCommon			OBJECT IDENTIFIER		::= { sniServerMgmt    2 }
+	  sniBios			OBJECT IDENTIFIER		::= { sniCommon        1 }
+	  sniEisa			OBJECT IDENTIFIER		::= { sniCommon        2 }
+	  sniHd				OBJECT IDENTIFIER		::= { sniCommon        3 }
+	  sniBus			OBJECT IDENTIFIER		::= { sniCommon        4 }
+	  sniServerControl	OBJECT IDENTIFIER		::= { sniCommon        5 }
+	sniPcSpecific		OBJECT IDENTIFIER		::= { sniServerMgmt    3 }
+	sniScb				OBJECT IDENTIFIER		::= { sniServerMgmt    4 }
+	sniOsSpecific		OBJECT IDENTIFIER		::= { sniServerMgmt    5 }
+	  sniNetware		OBJECT IDENTIFIER		::= { sniOsSpecific    1 }
+	  sniWinNt			OBJECT IDENTIFIER		::= { sniOsSpecific    2 }
+	  sniOs2			OBJECT IDENTIFIER		::= { sniOsSpecific    3 }
+	  sniUnix			OBJECT IDENTIFIER		::= { sniOsSpecific    4 }
+	sniOemComponents	OBJECT IDENTIFIER		::= { sniServerMgmt    6 }
+	  sniOemDpt			OBJECT IDENTIFIER		::= { sniOemComponents 1 }
+	  sniOemMylex		OBJECT IDENTIFIER		::= { sniOemComponents 2 }
+	    sniMlxDiskArray	OBJECT IDENTIFIER		::= { sniOemMylex      1 }
+	sniSecurity			OBJECT IDENTIFIER		::= { sniServerMgmt    7 }
+	  sniSmSecurity		OBJECT IDENTIFIER		::= { sniSecurity      1 }
+	sniServerView		OBJECT IDENTIFIER       ::= { sniServerMgmt    8 }
+	sniTrapMib			OBJECT IDENTIFIER       ::= { sniExtensions    5 }
+
+
+-- OS2-MIB groups
+
+	sniOS2Universal		OBJECT IDENTIFIER		::= { sniOs2 4 }
+	sniOS2Server		OBJECT IDENTIFIER		::= { sniOs2 5 }
+
+
+-- The MIB objects
+ 
+sniOS2VersionMajor OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Major version number of the OS- specific agent for OS/2."
+    ::= { sniOs2 1 }
+
+
+sniOS2VersionMinor OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Minor version number of the OS- specific agent for OS/2."
+    ::= { sniOs2 2 }
+
+
+-- Group: sniOS2Universal
+
+sniOS2SwappFileSize OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "The Size of the SWAPPER.DAT- File."
+    ::= { sniOS2Universal 1 }
+
+
+
+-- Group: sniOS2Server
+
+sniOS2ServerName OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "The configured COMPUTERNAME of this server machine."
+    ::= { sniOS2Server 1 }
+
+
+sniOS2ServerDomain OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "The configured DOMAIN name this server machine is
+                 a member of."
+    ::= { sniOS2Server 2 }
+
+
+sniOS2ServerSupportedAdapters OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "The number of network adapters the server services are
+                 using ( 1 to 4 )."
+    ::= { sniOS2Server 3 }
+
+
+sniOS2ServerMaxConnections OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "The configured maxconnection- value this server is
+                 supporting."
+    ::= { sniOS2Server 4 }
+
+
+sniOS2ServerMaxUsers OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "The configured maxusers- value this server is
+                 supporting."
+    ::= { sniOS2Server 5 }
+
+
+sniOS2ServerMaxShares OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "The configured maxshares- value this server is
+                 supporting."
+    ::= { sniOS2Server 6 }
+
+
+sniOS2ServerSystemType OBJECT-TYPE
+    SYNTAX  INTEGER { standalone-Server(0),
+                      member-Server-in-Domain(1),
+                      backup-Server-in-Domain(2),
+                      primary-Server-in-Domain(3),
+                      server-not-running(4),
+                      function-failed(9)
+                    }
+    
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "The kind of server this machine is working as."
+    ::= { sniOS2Server 10 }
+
+
+sniOS2ServerCurrentSessions OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "The number of sessions currently established to this server.
+                 Each NET USE <resource> is counted as one of these sessions."
+    ::= { sniOS2Server 11 }
+
+
+sniOS2ServerCurrentUsers OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "The number of users currently logged on to this server."
+    ::= { sniOS2Server 12 }
+
+
+-- Subgroup: sniOS2ServerCurrentServices
+
+sniOS2ServerCurrentServices    OBJECT IDENTIFIER ::= { sniOS2Server 13 }
+
+sniOS2ServicesNumber OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "The number of services currently running on this server."
+   ::= { sniOS2ServerCurrentServices 1 }
+
+
+sniOS2ServicesTable  OBJECT-TYPE
+    SYNTAX  SEQUENCE OF SniOS2ServiceEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+            "A list of services entries. The number of
+             entries is given by the value of ServicesNumber."
+    ::= { sniOS2ServerCurrentServices 2 }
+
+sniOS2ServiceEntry OBJECT-TYPE
+    SYNTAX  SniOS2ServiceEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+            "An service entry containing informations for
+             a particular service running on system."
+    INDEX   { sniOS2ServiceIndex }
+    ::= { sniOS2ServicesTable 1 }
+
+SniOS2ServiceEntry ::=
+    SEQUENCE {
+              sniOS2ServiceIndex INTEGER,
+              sniOS2ServiceName  DisplayString
+             }
+
+sniOS2ServiceIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "A unique value for each running service. Its value
+             ranges between 1 and the value of ServiceNumber."
+    ::= { sniOS2ServiceEntry 1 }
+
+sniOS2ServiceName OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "The system name of a server service out of the range
+             ALERTER, DCDBREPL, LSSERVER, MESSENGER, NETLOGON,
+             NETRUN, REPLICATOR, REQUESTER, SERVER, TIMESOURCE."
+    ::= { sniOS2ServiceEntry 2 }
+
+END

@@ -1,0 +1,209 @@
+-- ----------------------------------------------------------------------
+--
+--					Copyright (c) 2006 by Sinetica Corporation Ltd.
+--
+-- Filename:        RMS-C_SNMPv1_humid1.mib
+--
+-- Author:          Adrian Moruz
+--
+-- Description:     SNMPv1 MIB definition for the RMS Compact Humidity 1 notifications
+--
+-- $Id: RMS-C_SNMPv1_humid1.mib,v 1.1 2006/10/11 11:22:24 adrian.moruz Exp $
+--
+-- $Name:  $
+--
+-- $Log: RMS-C_SNMPv1_humid1.mib,v $
+-- Revision 1.1  2006/10/11 11:22:24  adrian.moruz
+-- Created from RMS-C_SNMPv1.mib v1.2 to separate the different trap enterprise groups into separate MIBs
+--
+--
+-- ----------------------------------------------------------------------
+
+RMS-COMPACT-SNMPv1-HUMID1-MIB DEFINITIONS ::= BEGIN
+
+
+-- {{{ Imports
+--	OBJECT-TYPE, Counter32, Unsigned32,
+
+IMPORTS
+        TRAP-TYPE
+                FROM RFC-1215
+        sysDescr, sysName, DisplayString
+                FROM RFC1213-MIB
+        OBJECT-TYPE
+                FROM RFC-1212
+        enterprises 
+                FROM RFC1155-SMI
+	;
+
+-- }}}
+
+sinetica   OBJECT IDENTIFIER ::= { enterprises 3711 }
+
+
+rms-compact          OBJECT IDENTIFIER ::= { sinetica 15 }
+rms-compact1         OBJECT IDENTIFIER ::= { rms-compact 1 }
+rms-cObjects   OBJECT IDENTIFIER ::= { rms-compact1 1 }
+
+
+-- {{{ rms-cObjects  
+
+rms-cEnviroment   OBJECT IDENTIFIER ::= { rms-cObjects 1  }
+
+-- }}}
+-- {{{ rms-cTemp group    
+
+rms-cHumid1          OBJECT IDENTIFIER ::= { rms-cEnviroment 2 }
+
+-- }}}
+-- {{{
+
+rms-cHumid1LowControlLimitAlarm            TRAP-TYPE
+    ENTERPRISE rms-cHumid1
+    VARIABLES { 
+    			sysDescr,
+    			sysName,
+    			rms-cHumid1Name,
+    			rms-cHumid1LowerControlLevel
+    			}
+    DESCRIPTION
+        "Humidity is below the low control limit."
+	--#TYPE		"Humidity 1 below low control limit"
+	--#SUMMARY	"Humidity %s below %d in %s at %s"
+	--#ARGUMENTS	{2,3,0,1}
+	--#SEVERITY 	MAJOR
+	--#TIMEINDEX	4
+	--#STATE		NONOPERATIONAL
+    ::= 111
+
+rms-cHumid1LowWarningLimitAlarm           TRAP-TYPE
+    ENTERPRISE rms-cHumid1
+    VARIABLES { 
+    			sysDescr,
+    			sysName,
+    			rms-cHumid1Name,
+    			rms-cHumid1LowerWarningLevel
+    			}
+    DESCRIPTION
+        "Humidity is below the low warning limit."
+	--#TYPE		"Humidity 1 below low warning limit"
+	--#SUMMARY	"Humidity %s below %d in %s at %s"
+	--#ARGUMENTS	{2,3,0,1}
+	--#SEVERITY 	MINOR
+	--#TIMEINDEX	4
+	--#STATE		NONOPERATIONAL
+    ::= 112
+
+rms-cHumid1HighWarningLimitAlarm            TRAP-TYPE
+    ENTERPRISE rms-cHumid1
+    VARIABLES { 
+    			sysDescr,
+    			sysName,
+    			rms-cHumid1Name,
+    			rms-cHumid1UpperWarningLevel
+    			}
+    DESCRIPTION
+        "Humidity is over the high warning limit."
+	--#TYPE		"Humidity 1 above high warning limit"
+	--#SUMMARY	"Humidity %s above %d in %s at %s"
+	--#ARGUMENTS	{2,3,0,1}
+	--#SEVERITY 	MINOR
+	--#TIMEINDEX	4
+	--#STATE		NONOPERATIONAL
+    ::= 113
+
+rms-cHumid1HighControlLimitAlarm           TRAP-TYPE
+    ENTERPRISE rms-cHumid1
+    VARIABLES { 
+    			sysDescr,
+    			sysName,
+    			rms-cHumid1Name,
+    			rms-cHumid1UpperControlLevel
+    			}
+    DESCRIPTION
+        "Humidity is over the high control limit."
+	--#TYPE		"Humidity 1 above high control limit"
+	--#SUMMARY	"Humidity %s above %d in %s at %s"
+	--#ARGUMENTS	{2,3,0,1}
+	--#SEVERITY 	MAJOR
+	--#TIMEINDEX	4
+	--#STATE		NONOPERATIONAL
+    ::= 114
+
+rms-cHumid1LowControlLimitNormal            TRAP-TYPE
+    ENTERPRISE rms-cHumid1
+    VARIABLES { 
+    			sysDescr,
+    			sysName,
+    			rms-cHumid1Name,
+    			rms-cHumid1LowerControlLevel
+    			}
+    DESCRIPTION
+        "Humidity is inside the low control limit."
+	--#TYPE		"Humidity 1 above low control limit"
+	--#SUMMARY	"Humidity %s above %d in %s at %s"
+	--#ARGUMENTS	{2,3,0,1}
+	--#SEVERITY 	INFORMATIONAL
+	--#TIMEINDEX	4
+	--#STATE		NONOPERATIONAL
+    ::= 115
+
+rms-cHumid1LowWarningLimitNormal           TRAP-TYPE
+    ENTERPRISE rms-cHumid1
+    VARIABLES { 
+    			sysDescr,
+    			sysName,
+    			rms-cHumid1Name,
+    			rms-cHumid1LowerWarningLevel
+    			}
+    DESCRIPTION
+        "Humidity is inside the low warning limit."
+	--#TYPE		"Humidity 1 above low warning limit"
+	--#SUMMARY	"Humidity %s above %d in %s at %s"
+	--#ARGUMENTS	{2,3,0,1}
+	--#SEVERITY 	INFORMATIONAL
+	--#TIMEINDEX	4
+	--#STATE		NONOPERATIONAL
+    ::= 116
+
+rms-cHumid1HighWarningLimitNormal            TRAP-TYPE
+    ENTERPRISE rms-cHumid1
+    VARIABLES { 
+    			sysDescr,
+    			sysName,
+    			rms-cHumid1Name,
+    			rms-cHumid1UpperWarningLevel
+    			}
+    DESCRIPTION
+        "Humidity is inside the high warning limit."
+	--#TYPE		"Humidity 1 below high warning limit"
+	--#SUMMARY	"Humidity %s below %d in %s at %s"
+	--#ARGUMENTS	{2,3,0,1}
+	--#SEVERITY 	INFORMATIONAL
+	--#TIMEINDEX	4
+	--#STATE		NONOPERATIONAL
+    ::= 117
+
+rms-cHumid1HighControlLimitNormal           TRAP-TYPE
+    ENTERPRISE rms-cHumid1
+    VARIABLES { 
+    			sysDescr,
+    			sysName,
+    			rms-cHumid1Name,
+    			rms-cHumid1UpperControlLevel
+    			}
+    DESCRIPTION
+        "Humidity is inside the high control limit."
+	--#TYPE		"Humidity 1 below high control limit"
+	--#SUMMARY	"Humidity %s below %d in %s at %s"
+	--#ARGUMENTS	{2,3,0,1}
+	--#SEVERITY 	INFORMATIONAL
+	--#TIMEINDEX	4
+	--#STATE		NONOPERATIONAL
+    ::= 118
+
+
+-- }}}
+
+
+END

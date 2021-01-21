@@ -1,0 +1,3375 @@
+PSA-COM-MIB DEFINITIONS ::= BEGIN
+
+--PRIMEQUEST system management MIB for Partition
+--
+--
+--$Copyright$
+--Copyright Fujitsu Limited 2003 - 2009
+--All rights reserved
+--
+--
+--MIB Revision: 02000000
+--
+
+IMPORTS
+	OBJECT-TYPE								FROM RFC-1212
+	TRAP-TYPE								FROM RFC-1215
+	mib-2, DisplayString, PhysAddress		FROM RFC1213-MIB
+	TimeTicks, Counter, Gauge, IpAddress	FROM RFC1155-SMI
+	mgmt, enterprises						FROM RFC1155-SMI
+	InetAddressType, InetAddress			FROM INET-ADDRESS-MIB;
+
+--enterprises	OBJECT IDENTIFIER ::={ iso org(3) dod(6) internet(1) private(4) 1 }
+--
+--PRIMEQUEST system management MIB nodes
+--fujitsu:                    1.3.6.1.4.1.211
+-- products:                  1.3.6.1.4.1.211.1
+--  iaServer:                 1.3.6.1.4.1.211.1.31
+--   primequest:              1.3.6.1.4.1.211.1.31.1
+--    partition:              1.3.6.1.4.1.211.1.31.1.2
+--     partitionCommon:       1.3.6.1.4.1.211.1.31.1.2.100
+--
+
+--FUJITSU PRIMEQUEST system management MIB nodes for Partition
+  fujitsu        OBJECT IDENTIFIER  ::={ enterprises 211 }
+  products       OBJECT IDENTIFIER  ::={ fujitsu 1 }
+  iaServer       OBJECT IDENTIFIER  ::={ products 31 }
+  primequest     OBJECT IDENTIFIER  ::={ iaServer 1 }
+   partition     OBJECT IDENTIFIER  ::={ primequest 2 }
+    partitionCommon	OBJECT IDENTIFIER	::={ partition	100 }
+     physicalComponent	OBJECT IDENTIFIER	::={ partitionCommon 1 }
+     logicalComponentForLinux	OBJECT IDENTIFIER	::={ partitionCommon 2 }
+     logicalComponentForWindows	OBJECT IDENTIFIER	::={ partitionCommon 3 }
+     monitoringFunction	OBJECT IDENTIFIER	::={ partitionCommon 4 }
+     thresholdFunction	OBJECT IDENTIFIER	::={ partitionCommon 5 }
+     statusFunction	OBJECT IDENTIFIER	::={ partitionCommon 6 }
+     otherFunction	OBJECT IDENTIFIER	::={ partitionCommon 7 }
+     pxFunction	OBJECT IDENTIFIER	::={ partitionCommon 8 }
+
+--FUJITSU PRIMEQUEST system management MIB objects for Partition
+
+
+--physicalComponent-MIB groups
+
+     physicalCpuInfo	OBJECT IDENTIFIER	::={ physicalComponent 1 }
+     memoryModuleInfo	OBJECT IDENTIFIER	::={ physicalComponent 2 }
+     hddInfo	OBJECT IDENTIFIER	::={ physicalComponent 3 }
+     nicInfo	OBJECT IDENTIFIER	::={ physicalComponent 4 }
+     pciFunctionInfo	OBJECT IDENTIFIER	::={ physicalComponent 5 }
+     systemBoardInfo	OBJECT IDENTIFIER	::={ physicalComponent 6 }
+     iobInfo	OBJECT IDENTIFIER	::={ physicalComponent 7 }
+     sduInfo	OBJECT IDENTIFIER	::={ physicalComponent 8 }
+     otherBoardInfo	OBJECT IDENTIFIER	::={ physicalComponent 9 }
+
+-- ****************************************************************************
+--
+-- GROUP: physicalCpuInfo
+--
+--	physicalCpuInfo :	.1.3.6.1.4.1.211.1.31.1.2.100.1.1
+--
+--Implementation of this group is mandatory
+--
+-- ****************************************************************************
+
+
+-- ----------------------------------------------------------------------------
+-- TABLE: physicalCpuTable
+--
+--	physicalCpuTable :	.1.3.6.1.4.1.211.1.31.1.2.100.1.1.1
+--
+--Implementation of this table is mandatory
+-- ----------------------------------------------------------------------------
+physicalCpuTable OBJECT-TYPE
+   SYNTAX   SEQUENCE OF PhysicalCpu
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Table with physical CPU information"
+   ::= { physicalCpuInfo 1 }
+
+physicalCpuEntry OBJECT-TYPE
+   SYNTAX   PhysicalCpu
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   INDEX   { phCpuSBNumber,
+	     phCpuNumber }
+   ::= { physicalCpuTable 1 }
+
+PhysicalCpu ::=
+   SEQUENCE {
+      phCpuSBNumber
+         INTEGER,
+      phCpuNumber
+         INTEGER,
+      phCpuPhysicalID
+         DisplayString,
+      phCpuStatus
+         INTEGER,
+      phCpuPredictedStatus
+         INTEGER,
+      phCpuPresentStatus
+         INTEGER,
+      phCpuType
+         DisplayString,
+      phCpuStep
+         DisplayString,
+      phCpuCacheL3Size
+         INTEGER,
+      phCpuCorrectableErrors
+         Counter,
+      phCpuSpeed
+         INTEGER,
+      phCpuNumOfLogicalCpu
+         INTEGER,
+      phCpuModelName
+         DisplayString
+   }
+
+phCpuSBNumber OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "SystemBoard identification number that the CPU belongs.(index: 0 based)"
+   ::= { physicalCpuEntry 1 }
+
+phCpuNumber OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "CPU identification number.(index: 0 based)"
+   ::= { physicalCpuEntry 2 }
+
+phCpuPhysicalID OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "CPU identification name.(e.g. SB#1-CPU#A0)"
+   ::= { physicalCpuEntry 3 }
+
+phCpuStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "CPU total status. (Bit field); deprecated: PSA-2.0.0 or later does not support this objest.
+                    Status                 Bit
+                     ok                       0x00000000    
+                     not-present         0x10000000
+                     error                    0x01000000
+                     warning                0x00100000
+                     degraded             0x00040000
+                     unknown              0x00010000"
+   ::= { physicalCpuEntry 4 }
+
+phCpuPredictedStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "CPU predicted status.(Bit field)
+                    Status                 Bit
+                     ok                       0x00000000    
+                     warning                0x00100000
+                     unknown              0x00010000
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { physicalCpuEntry 5 }
+
+phCpuPresentStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "CPU present status.(Bit field)
+                    Status                 Bit
+                     ok                       0x00000000    
+                     not-present         0x10000000
+                     degraded             0x00040000
+                     unknown              0x00010000"
+   ::= { physicalCpuEntry 6 }
+
+phCpuType OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "CPU type.(e.g. Itanium2 etc...)
+                deprecated: PSA-2.0.0 or later does not support this objest.
+                refer to the 'phCpuModelName' instead of this object."
+   ::= { physicalCpuEntry 7 }
+
+phCpuStep OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "CPU step(revision).
+                This object shows CPU Info value (hex) in PSA-2.0.0 or later."
+   ::= { physicalCpuEntry 8 }
+
+phCpuCacheL3Size OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "CPU cache L3 size.(unit:Kbyte)"
+   ::= { physicalCpuEntry 9 }
+
+phCpuCorrectableErrors OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-write
+   STATUS   mandatory
+   DESCRIPTION "Number of CPU correctable errors. Set the value 0 if you want to reset the CPU error count.
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { physicalCpuEntry 10 }
+
+phCpuSpeed OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "CPU speed(unit:MHz)."
+   ::= { physicalCpuEntry 11 }
+
+phCpuNumOfLogicalCpu OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Number of logical CPUs in this physical CPU; NOSUPPORT."
+   ::= { physicalCpuEntry 12 }
+
+phCpuModelName OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "CPU model name.(e.g. Intel(R) Itanium(R) 2 Processor etc...)"
+   ::= { physicalCpuEntry 13 }
+
+numOfEffectiveCpus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Number of effective CPUs  in the partition."
+   ::= { physicalCpuInfo 2 }
+
+numOfEffectiveSockets OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Number of effective sockets in the partition."
+   ::= { physicalCpuInfo 3 }
+
+
+-- ****************************************************************************
+--
+-- GROUP: memoryModuleInfo
+--
+--	memoryModuleInfo :	.1.3.6.1.4.1.211.1.31.1.2.100.1.2
+--
+--Implementation of this group is mandatory
+--
+-- ****************************************************************************
+
+
+-- ----------------------------------------------------------------------------
+-- TABLE: memoryModuleTable
+--
+--	memoryModuleTable :	.1.3.6.1.4.1.211.1.31.1.2.100.1.2.1
+--
+--Implementation of this table is mandatory
+-- ----------------------------------------------------------------------------
+memoryModuleTable OBJECT-TYPE
+   SYNTAX   SEQUENCE OF MemoryModule
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Table with memory module information"
+   ::= { memoryModuleInfo 1 }
+
+memoryModuleEntry OBJECT-TYPE
+   SYNTAX   MemoryModule
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   INDEX   { memMdSBNumber,
+	     memMdNumber }
+   ::= { memoryModuleTable 1 }
+
+MemoryModule ::=
+   SEQUENCE {
+      memMdSBNumber
+         INTEGER,
+      memMdNumber
+         INTEGER,
+      memMdPhysicalID
+         DisplayString,
+      memMdStatus
+         INTEGER,
+      memMdPredictedStatus
+         INTEGER,
+      memMdPresentStatus
+         INTEGER,
+      memMdPartNo
+         DisplayString,
+      memMdSerialNo
+         DisplayString,
+      memMdSize
+         INTEGER,
+      memMdBank
+         INTEGER,
+      memMdCorrectableErrors
+         Counter,
+      memMdAccessSpeed
+         INTEGER,
+      memMd2bitCorrectableErrors
+         Counter,
+      memMd2bitPredictedStatus
+         INTEGER,
+      memMdRank
+         INTEGER
+   }
+
+memMdSBNumber OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "SystemBoard identification number that the MemoryModule belongs.(index: 0 based)"
+   ::= { memoryModuleEntry 1 }
+
+memMdNumber OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Memory module identification number."
+   ::= { memoryModuleEntry 2 }
+
+memMdPhysicalID OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Memory module identification name."
+   ::= { memoryModuleEntry 3 }
+
+memMdStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Memory module total status.(Bit field)
+                    Status                 Bit
+                     ok                       0x00000000    
+                     not-present         0x10000000
+                     error                    0x01000000
+                     warning                0x00100000
+                     degraded             0x00040000
+                     unknown              0x00010000
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { memoryModuleEntry 4 }
+
+memMdPredictedStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Memory module 1bit error predicted status.(Bit filed)
+                    Status                 Bit
+                     ok                       0x00000000    
+                     warning                0x00100000
+                     unknown              0x00010000
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { memoryModuleEntry 5 }
+
+memMdPresentStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Memory module present status.(Bit field)
+                    Status                 Bit
+                     ok                       0x00000000    
+                     not-present         0x10000000
+                     degraded             0x00040000
+                     unknown              0x00010000"
+   ::= { memoryModuleEntry 6 }
+
+memMdPartNo OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Memory module type."
+   ::= { memoryModuleEntry 7 }
+
+memMdSerialNo OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { memoryModuleEntry 8 }
+
+memMdSize OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Memory module size.(unit:Mbyte)"
+   ::= { memoryModuleEntry 9 }
+
+memMdBank OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Memory module bank number. This object is valid in PRIMEQUEST400/500/500A serise."
+   ::= { memoryModuleEntry 10 }
+
+memMdCorrectableErrors OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-write
+   STATUS   mandatory
+   DESCRIPTION "Number of Memory module correctable errors(1bit). Set the value 0 if you want to reset the Memory module error count.
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { memoryModuleEntry 11 }
+
+memMdAccessSpeed OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Memory module access speed."
+   ::= { memoryModuleEntry 12 }
+
+memMd2bitCorrectableErrors OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-write
+   STATUS   mandatory
+   DESCRIPTION "Number of Memory module correctable errors(2bit). Set the value 0 if you want to reset the Memory module error count.
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { memoryModuleEntry 13 }
+
+memMd2bitPredictedStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Memory module 2bit error predicted status.(Bit filed)
+                    Status                 Bit
+                     ok                       0x00000000    
+                     warning                0x00100000
+                     unknown              0x00010000
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { memoryModuleEntry 14 }
+
+memMdRank OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Memory module rank number."
+   ::= { memoryModuleEntry 15 }
+
+
+-- ****************************************************************************
+--
+-- GROUP: hddInfo
+--
+--	hddInfo :	.1.3.6.1.4.1.211.1.31.1.2.100.1.3
+--
+--Implementation of this group is mandatory
+--
+-- ****************************************************************************
+
+
+-- ----------------------------------------------------------------------------
+-- TABLE: scsiDeviceTable
+--
+--	scsiDeviceTable :	.1.3.6.1.4.1.211.1.31.1.2.100.1.3.1
+--
+--Implementation of this table is mandatory
+-- ----------------------------------------------------------------------------
+scsiDeviceTable OBJECT-TYPE
+   SYNTAX   SEQUENCE OF ScsiDevice
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Table with SCSI device information"
+   ::= { hddInfo 1 }
+
+scsiDeviceEntry OBJECT-TYPE
+   SYNTAX   ScsiDevice
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   INDEX   { scsiDevBusType,
+	     scsiDevSegment,
+	     scsiDevBusNumber,
+	     scsiDevDeviceNumber,
+	     scsiDevFunction,
+	     scsiDevChannel,
+	     scsiDevScsiId,
+	     scsiDevLUN }
+   ::= { scsiDeviceTable 1 }
+
+ScsiDevice ::=
+   SEQUENCE {
+      scsiDevBusType
+         INTEGER,
+      scsiDevSegment
+         INTEGER,
+      scsiDevBusNumber
+         INTEGER,
+      scsiDevDeviceNumber
+         INTEGER,
+      scsiDevFunction
+         INTEGER,
+      scsiDevChannel
+         INTEGER,
+      scsiDevScsiId
+         INTEGER,
+      scsiDevLUN
+         INTEGER,
+      scsiDevPhysicalID
+         DisplayString,
+      scsiDevTotalStatus
+         INTEGER,
+      scsiDevSMARTStatus
+         INTEGER,
+      scsiDevStatus
+         INTEGER,
+      scsiDevName
+         DisplayString,
+      scsiDevType
+         INTEGER,
+      scsiDevVendor
+         DisplayString,
+      scsiDevHostNo
+         INTEGER,
+      scsiDevCapacity
+         INTEGER,
+      scsiDevSector
+         INTEGER,
+      scsiDevCylinder
+         INTEGER,
+      scsiDevBlockSize
+         INTEGER,
+      scsiDevSectorSize
+         INTEGER,
+      scsiDevSerialNo
+         DisplayString,
+      scsiDevRevision
+         DisplayString,
+      scsiDevSpecialFile
+         DisplayString,
+      scsiDevDiskName
+         DisplayString
+   }
+
+scsiDevBusType OBJECT-TYPE
+   SYNTAX   INTEGER{
+      other(0),
+      isa(1),
+      eisa(2),
+      pci(3)
+   }
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Bus type of the SCSI device."
+   ::= { scsiDeviceEntry 1 }
+
+scsiDevSegment OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Segment number of the SCSI device."
+   ::= { scsiDeviceEntry 2 }
+
+scsiDevBusNumber OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Bus number of the SCSI device."
+   ::= { scsiDeviceEntry 3 }
+
+scsiDevDeviceNumber OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Device number of the SCSI device."
+   ::= { scsiDeviceEntry 4 }
+
+scsiDevFunction OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Function number of the SCSI device."
+   ::= { scsiDeviceEntry 5 }
+
+scsiDevChannel OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Channel number of the SCSI device."
+   ::= { scsiDeviceEntry 6 }
+
+scsiDevScsiId OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "SCSI target identification number of the SCSI device."
+   ::= { scsiDeviceEntry 7 }
+
+scsiDevLUN OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Logical Unit Number of the SCSI device."
+   ::= { scsiDeviceEntry 8 }
+
+scsiDevPhysicalID OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "SCSI device identification name."
+   ::= { scsiDeviceEntry 9 }
+
+scsiDevTotalStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "SCSI device total status.(Bit field)
+                    Status                 Bit
+                     ok                       0x00000000    
+                     not-present         0x10000000
+                     error                    0x01000000
+                     warning                0x00100000
+                     degraded             0x00040000
+                     unknown              0x00010000"
+   ::= { scsiDeviceEntry 10 }
+
+scsiDevSMARTStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-write
+   STATUS   mandatory
+   DESCRIPTION "Memory module predicted status.(Bit filed)
+                    Status                 Bit
+                     ok                       0x00000000    
+                     warning                0x00100000
+                     unknown              0x00010000"
+   ::= { scsiDeviceEntry 11 }
+
+scsiDevStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-write
+   STATUS   mandatory
+   DESCRIPTION "SCSI device status.(Bit field)
+                    Status                 Bit
+                     ok                       0x00000000    
+                     error                    0x01000000
+                     warning                0x00100000
+                     unknown              0x00010000"
+   ::= { scsiDeviceEntry 12 }
+
+scsiDevName OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Symbolic name of the SCSI device."
+   ::= { scsiDeviceEntry 13 }
+
+scsiDevType OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "SCSI device type. Refer to the following definitions;
+                value     contens
+                  0          directAccess
+                  1          sequentialAccess
+                  2          printer
+                  3          processor
+                  4          worm
+                  5          cdRom
+                  6          scanner
+                  7          opticalDevice
+                  8          mediumChanger
+                  9          communications
+                 10-13     unknown
+                 100        directAccess-softmirror by Fujitsu's GDS(Linux) or PSDM(Windows) driver."
+   ::= { scsiDeviceEntry 14 }
+
+scsiDevVendor OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "SCSI device vendor name."
+   ::= { scsiDeviceEntry 15 }
+
+scsiDevHostNo OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "SCSI controller host number."
+   ::= { scsiDeviceEntry 16 }
+
+scsiDevCapacity OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Total capacity of the SCSI device(unit:Mbyte)."
+   ::= { scsiDeviceEntry 17 }
+
+scsiDevSector OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "SCSI device number of sector."
+   ::= { scsiDeviceEntry 18 }
+
+scsiDevCylinder OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Cylinder of the SCSI device."
+   ::= { scsiDeviceEntry 19 }
+
+scsiDevBlockSize OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "SCSI device block size(unit:byte); NOSUPPORT."
+   ::= { scsiDeviceEntry 20 }
+
+scsiDevSectorSize OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "SCSI device sector size.(unit:byte)"
+   ::= { scsiDeviceEntry 21 }
+
+scsiDevSerialNo OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "SCSI device serial number."
+   ::= { scsiDeviceEntry 22 }
+
+scsiDevRevision OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "SCSI device revision."
+   ::= { scsiDeviceEntry 23 }
+
+scsiDevSpecialFile OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "SCSI device special file name."
+   ::= { scsiDeviceEntry 24 }
+
+scsiDevDiskName OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "SCSI device disk name.(e.g. Disk 0); This object supports only information on the Windows partition."
+   ::= { scsiDeviceEntry 25 }
+
+
+-- ----------------------------------------------------------------------------
+-- TABLE: diskSliceTable
+--
+--	diskSliceTable :	.1.3.6.1.4.1.211.1.31.1.2.100.1.3.2
+--
+--Implementation of this table is mandatory
+-- ----------------------------------------------------------------------------
+diskSliceTable OBJECT-TYPE
+   SYNTAX   SEQUENCE OF DiskSlice
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Table with disk slice information; This table supports only information on the Linux partition."
+   ::= { hddInfo 2 }
+
+diskSliceEntry OBJECT-TYPE
+   SYNTAX   DiskSlice
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   INDEX   { dsBusType,
+	     dsSegment,
+	     dsBusNumber,
+	     dsDeviceNumber,
+	     dsFunction,
+	     dsChannel,
+	     dsScsiId,
+	     dsLUN,
+	     dsSliceNumber }
+   ::= { diskSliceTable 1 }
+
+DiskSlice ::=
+   SEQUENCE {
+      dsBusType
+         INTEGER,
+      dsSegment
+         INTEGER,
+      dsBusNumber
+         INTEGER,
+      dsDeviceNumber
+         INTEGER,
+      dsFunction
+         INTEGER,
+      dsChannel
+         INTEGER,
+      dsScsiId
+         INTEGER,
+      dsLUN
+         INTEGER,
+      dsSliceNumber
+         INTEGER,
+      dsDeviceSpecialFile
+         DisplayString,
+      dsOffset
+         INTEGER,
+      dsFileSystemType
+         DisplayString,
+      dsCapacity
+         INTEGER
+   }
+
+dsBusType OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Bus type of the disk slice. Refer to the following definitions;
+                value     contens
+                 0           other
+                 1           isa
+                 2           eisa
+                 3           pci"
+   ::= { diskSliceEntry 1 }
+
+dsSegment OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Segment number of the disk slice."
+   ::= { diskSliceEntry 2 }
+
+dsBusNumber OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Bus number of the disk slice."
+   ::= { diskSliceEntry 3 }
+
+dsDeviceNumber OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Device number of the disk slice."
+   ::= { diskSliceEntry 4 }
+
+dsFunction OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Function number of the disk slice."
+   ::= { diskSliceEntry 5 }
+
+dsChannel OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Channel number of the disk slice."
+   ::= { diskSliceEntry 6 }
+
+dsScsiId OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "SCSI target identification number of the disk slice."
+   ::= { diskSliceEntry 7 }
+
+dsLUN OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Logical Unit Number of the disk slice."
+   ::= { diskSliceEntry 8 }
+
+dsSliceNumber OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Disk slice identification number."
+   ::= { diskSliceEntry 9 }
+
+dsDeviceSpecialFile OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Device special file name of the disk slice."
+   ::= { diskSliceEntry 10 }
+
+dsOffset OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Offset of the disk slice.(unit:Mbyte)"
+   ::= { diskSliceEntry 11 }
+
+dsFileSystemType OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "File system type of the disk slice."
+   ::= { diskSliceEntry 12 }
+
+dsCapacity OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Capacity of the disk slice.(unit:Mbyte)"
+   ::= { diskSliceEntry 13 }
+
+
+-- ****************************************************************************
+--
+-- GROUP: nicInfo
+--
+--	nicInfo :	.1.3.6.1.4.1.211.1.31.1.2.100.1.4
+--
+--Implementation of this group is mandatory
+--
+-- ****************************************************************************
+
+
+-- ----------------------------------------------------------------------------
+-- TABLE: nicTable
+--
+--	nicTable :	.1.3.6.1.4.1.211.1.31.1.2.100.1.4.1
+--
+--Implementation of this table is mandatory
+-- ----------------------------------------------------------------------------
+nicTable OBJECT-TYPE
+   SYNTAX   SEQUENCE OF Nic
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { nicInfo 1 }
+
+nicEntry OBJECT-TYPE
+   SYNTAX   Nic
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   INDEX   { nicBusType,
+	     nicSegment,
+	     nicBusNumber,
+	     nicDeviceNumber,
+	     nicFunction }
+   ::= { nicTable 1 }
+
+Nic ::=
+   SEQUENCE {
+      nicBusType
+         INTEGER,
+      nicSegment
+         INTEGER,
+      nicBusNumber
+         INTEGER,
+      nicDeviceNumber
+         INTEGER,
+      nicFunction
+         INTEGER,
+      nicMACAddress
+         PhysAddress,
+      nicSpeed
+         INTEGER,
+      nicTransmissionTotalPacket
+         Counter,
+      nicTransmissionTotalByte
+         Counter,
+      nicDeferredXmits
+         Counter,
+      nicSingleCollisions
+         Counter,
+      nicMultipleCollisions
+         Counter,
+      nicExcessiveCollisions
+         Counter,
+      nicCarrierSenceErrors
+         Counter,
+      nicLateCollisionErrors
+         Counter,
+      nicSQETestErrors
+         Counter,
+      nicMACXmitsErrors
+         Counter,
+      nicReceiveTotalPacket
+         Counter,
+      nicReceiveTotalByte
+         Counter,
+      nicFCSErrors
+         Counter,
+      nicAlignmentErrors
+         Counter,
+      nicFrameTooLong
+         Counter,
+      nicMACReceiveErrors
+         Counter
+   }
+
+nicBusType OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Bus type of the network interface card.. Refer to the following definitions;
+                value     contens
+                 0           other
+                 1           isa
+                 2           eisa
+                 3           pci"
+   ::= { nicEntry 1 }
+
+nicSegment OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Segment number of the network interface card."
+   ::= { nicEntry 2 }
+
+nicBusNumber OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Bus number of the network interface card."
+   ::= { nicEntry 3 }
+
+nicDeviceNumber OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Device number of the network interface card."
+   ::= { nicEntry 4 }
+
+nicFunction OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Function number of the network interface card."
+   ::= { nicEntry 5 }
+
+nicMACAddress OBJECT-TYPE
+   SYNTAX   PhysAddress
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "The interface address of the physical layer of the network interface card."
+   ::= { nicEntry 6 }
+
+nicSpeed OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Ratings speed of network interface card.(unit:Mbit/s)"
+   ::= { nicEntry 7 }
+
+nicTransmissionTotalPacket OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "The total number of packets that higher-level protocols requested be transmitted to
+                 a subnetwork-unicast address; including those that were discarded or not sent."
+   ::= { nicEntry 8 }
+
+nicTransmissionTotalByte OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "The total number of octets transmitted out of the interface; including framing characters."
+   ::= { nicEntry 9 }
+
+nicDeferredXmits OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "A count of frames for which the first transmission attempt on a particular interface
+                is delayed because the medium is busy."
+   ::= { nicEntry 10 }
+
+nicSingleCollisions OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "A count of successfully transmitted frames on a particular interface for which transmission
+                is inhibited by exactly one collision."
+   ::= { nicEntry 11 }
+
+nicMultipleCollisions OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "A count of successfully transmitted frames on a particular interface for which transmission
+                is inhibited by more than one collision."
+   ::= { nicEntry 12 }
+
+nicExcessiveCollisions OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "A count of frames for which transmission on a particular interface fails due to excessive
+                collisions."
+   ::= { nicEntry 13 }
+
+nicCarrierSenceErrors OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "The number of times that the carrier sense condition was lost or never asserted when
+                attempting to transmit a frame on a particular interface."
+   ::= { nicEntry 14 }
+
+nicLateCollisionErrors OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "The number of times that a collision is detected on a particular interface later than
+                512 bit-times into the transmission of a packet."
+   ::= { nicEntry 15 }
+
+nicSQETestErrors OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "A count of times that the SQE TEST ERROR message is generated by the PLS sublayer for a
+                particular interface. The SQE TEST ERROR message is defined in section 7.2.2.2.4 of
+                ANSI/IEEE 802.3-1985 and its generation is described in section 7.2.4.6 of the same document."
+   ::= { nicEntry 16 }
+
+nicMACXmitsErrors OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "A count of frames for which transmission on a particular interface fails due to an internal
+                MAC sublayer transmit error. A frame is only counted by an instance of this object if it is
+                not counted by the corresponding instance of either the dot3StatsLateCollisions object; the
+                dot3StatsExcessiveCollisions object; or the dot3StatsCarrierSenseErrors object."
+   ::= { nicEntry 17 }
+
+nicReceiveTotalPacket OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "The number of subnetwork-unicast packets delivered to a higher-layer protocol."
+   ::= { nicEntry 18 }
+
+nicReceiveTotalByte OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "The total number of octets received on the interface; including framing characters."
+   ::= { nicEntry 19 }
+
+nicFCSErrors OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "A count of frames received on a particular interface that are an integral number of octets
+                in length but do not pass the FCS check."
+   ::= { nicEntry 20 }
+
+nicAlignmentErrors OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "A count of frames received on a particular interface that are not an integral number of
+                octets in length and do not pass the FCS check."
+   ::= { nicEntry 21 }
+
+nicFrameTooLong OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "A count of frames received on a particular interface that exceed the maximum permitted
+                frame size."
+   ::= { nicEntry 22 }
+
+nicMACReceiveErrors OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "A count of frames for which reception on a particular interface fails due to an internal
+                MAC sublayer receive error. A frame is only counted by an instance of this object if it is
+                not counted by the corresponding instance of either the dot3StatsFrameTooLongs object; the
+                dot3StatsAlignmentErrors object; or the dot3StatsFCSErrors object."
+   ::= { nicEntry 23 }
+
+ipPacketIn OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "This object supports only information on the Linux partition."
+   ::= { nicInfo 2 }
+
+ipPacketOut OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "This object supports only information on the Linux partition."
+   ::= { nicInfo 3 }
+
+
+-- ****************************************************************************
+--
+-- GROUP: pciFunctionInfo
+--
+--	pciFunctionInfo :	.1.3.6.1.4.1.211.1.31.1.2.100.1.5
+--
+--Implementation of this group is mandatory
+--
+-- ****************************************************************************
+
+
+-- ----------------------------------------------------------------------------
+-- TABLE: pciFunctionTable
+--
+--	pciFunctionTable :	.1.3.6.1.4.1.211.1.31.1.2.100.1.5.1
+--
+--Implementation of this table is mandatory
+-- ----------------------------------------------------------------------------
+pciFunctionTable OBJECT-TYPE
+   SYNTAX   SEQUENCE OF PciFunction
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { pciFunctionInfo 1 }
+
+pciFunctionEntry OBJECT-TYPE
+   SYNTAX   PciFunction
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   INDEX   { pciFuncBusType,
+	     pciFuncSegment,
+	     pciFuncBusNumber,
+	     pciFuncDeviceNumber,
+	     pciFuncFunction }
+   ::= { pciFunctionTable 1 }
+
+PciFunction ::=
+   SEQUENCE {
+      pciFuncBusType
+         INTEGER,
+      pciFuncSegment
+         INTEGER,
+      pciFuncBusNumber
+         INTEGER,
+      pciFuncDeviceNumber
+         INTEGER,
+      pciFuncFunction
+         INTEGER,
+      pciFuncPhysicalID
+         DisplayString,
+      pciFuncTotalStatus
+         INTEGER,
+      pciFuncStatus
+         INTEGER,
+      pciFuncAdapterModel
+         DisplayString,
+      pciFuncClass
+         OCTET STRING,
+      pciFuncVendor
+         DisplayString,
+      pciFuncRevision
+         DisplayString,
+      pciDeviceName
+         DisplayString,
+      pciFuncWWN
+         DisplayString,
+      pciFuncVPDPN
+         DisplayString,
+      pciFuncConnIOU
+         INTEGER,
+      pciFuncDivSide
+         INTEGER
+   }
+
+pciFuncBusType OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Bus type of the pci device.. Refer to the following definitions;
+                value     contens
+                 0           other
+                 1           isa
+                 2           eisa
+                 3           pci"
+   ::= { pciFunctionEntry 1 }
+
+pciFuncSegment OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Segment number of the pci device."
+   ::= { pciFunctionEntry 2 }
+
+pciFuncBusNumber OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Bus number of the pci device."
+   ::= { pciFunctionEntry 3 }
+
+pciFuncDeviceNumber OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Device number of the pci device."
+   ::= { pciFunctionEntry 4 }
+
+pciFuncFunction OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Function number of the pci device."
+   ::= { pciFunctionEntry 5 }
+
+pciFuncPhysicalID OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Pci device identification name."
+   ::= { pciFunctionEntry 6 }
+
+pciFuncTotalStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Pci device total status.(Bit field)
+                    Status                 Bit
+                     ok                       0x00000000    
+                     not-present         0x10000000
+                     error                    0x01000000
+                     warning                0x00100000
+                     degraded             0x00040000
+                     unknown              0x00010000"
+   ::= { pciFunctionEntry 7 }
+
+pciFuncStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-write
+   STATUS   mandatory
+   DESCRIPTION "Pci Function status.(Bit field)
+                    Status                 Bit
+                     ok                       0x00000000    
+                     error                    0x01000000
+                     warning                0x00100000
+                     unknown              0x00010000"
+   ::= { pciFunctionEntry 9 }
+
+pciFuncAdapterModel OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Pci device model id."
+   ::= { pciFunctionEntry 10 }
+
+pciFuncClass OBJECT-TYPE
+   SYNTAX   OCTET STRING
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Device classification; according to the PCI classification scheme.
+                   Bbyte           Contents
+                      0               BaseClass
+                      1               SubClass
+                      2               ProgIf"
+   ::= { pciFunctionEntry 11 }
+
+pciFuncVendor OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "PCI card vendor id."
+   ::= { pciFunctionEntry 12 }
+
+pciFuncRevision OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "PCI card revision."
+   ::= { pciFunctionEntry 13 }
+
+pciDeviceName OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "PCI device name string. [vendor name + device name]."
+   ::= { pciFunctionEntry 14 }
+
+pciFuncWWN OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "PCI card WWN(World Wide Name) information."
+   ::= { pciFunctionEntry 15 }
+
+pciFuncVPDPN OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "PCI card VPD PN information; deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { pciFunctionEntry 16 }
+
+pciFuncConnIOU OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "IOU number which PCI card connected; deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { pciFunctionEntry 17 }
+
+pciFuncDivSide OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "PCI card divide side; deprecated: PSA-2.0.0 or later does not support this objest.
+                1=no-divided; 2=IOU_A side; 3=IOU_B side"
+   ::= { pciFunctionEntry 18 }
+
+
+-- ****************************************************************************
+--
+-- GROUP: systemBoardInfo
+--
+--	systemBoardInfo :	.1.3.6.1.4.1.211.1.31.1.2.100.1.6
+--
+--Implementation of this group is mandatory
+--
+-- ****************************************************************************
+
+
+-- ----------------------------------------------------------------------------
+-- TABLE: systemBoardTable
+--
+--	systemBoardTable :	.1.3.6.1.4.1.211.1.31.1.2.100.1.6.1
+--
+--Implementation of this table is mandatory
+-- ----------------------------------------------------------------------------
+systemBoardTable OBJECT-TYPE
+   SYNTAX   SEQUENCE OF SystemBoard
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { systemBoardInfo 1 }
+
+systemBoardEntry OBJECT-TYPE
+   SYNTAX   SystemBoard
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   INDEX   { sbSBNumber }
+   ::= { systemBoardTable 1 }
+
+SystemBoard ::=
+   SEQUENCE {
+      sbSBNumber
+         INTEGER,
+      sbPhysicalID
+         DisplayString,
+      sbTotalStatus
+         INTEGER,
+      sbCSFLNPredictedStatus
+         INTEGER,
+      sbCSLDX0PredictedStatus
+         INTEGER,
+      sbCSLDX1PredictedStatus
+         INTEGER,
+      sbCSLDX2PredictedStatus
+         INTEGER,
+      sbCSLDX3PredictedStatus
+         INTEGER,
+      sbType
+         INTEGER,
+      sbModel
+         DisplayString,
+      sbSerialNo
+         DisplayString,
+      sbNumOfEffectiveCpus
+         INTEGER,
+      sbNumOfEffectiveSockets
+         INTEGER,
+      sbNumOfEffectiveMemModules
+         INTEGER,
+      sbNumOfEffectiveMemSlots
+         INTEGER,
+      sbCSFLNErrorCount
+         Counter,
+      sbCSLDX0ErrorCount
+         Counter,
+      sbCSLDX1ErrorCount
+         Counter,
+      sbCSLDX2ErrorCount
+         Counter,
+      sbCSLDX3ErrorCount
+         Counter,
+      sbEntityStatus
+         INTEGER,
+      sbFLNGAC0PredictedStatus
+         INTEGER,
+      sbFLNGAC1PredictedStatus
+         INTEGER,
+      sbLDX0GDX0PredictedStatus
+         INTEGER,
+      sbLDX1GDX1PredictedStatus
+         INTEGER,
+      sbLDX2GDX2PredictedStatus
+         INTEGER,
+      sbLDX3GDX3PredictedStatus
+         INTEGER,
+      sbFLNGAC0ErrorCount
+         Counter,
+      sbFLNGAC1ErrorCount
+         Counter,
+      sbLDX0GDX0ErrorCount
+         Counter,
+      sbLDX1GDX1ErrorCount
+         Counter,
+      sbLDX2GDX2ErrorCount
+         Counter,
+      sbLDX3GDX3ErrorCount
+         Counter,
+      sbLDX1GDX0PredictedStatus
+         INTEGER,
+      sbLDX2GDX1PredictedStatus
+         INTEGER,
+      sbLDX3GDX1PredictedStatus
+         INTEGER,
+      sbLDX1GDX0ErrorCount
+         Counter,
+      sbLDX2GDX1ErrorCount
+         Counter,
+      sbLDX3GDX1ErrorCount
+         Counter
+   }
+
+sbSBNumber OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "System board identification number.(index:0 based)"
+   ::= { systemBoardEntry 1 }
+
+sbPhysicalID OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "System board identification name."
+   ::= { systemBoardEntry 2 }
+
+sbTotalStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "System board total status.(Bit field); deprecated: PSA-2.0.0 or later does not support this objest.
+                    Status                 Bit
+                     ok                       0x00000000    
+                     not-present         0x10000000
+                     error                    0x01000000
+                     warning                0x00100000
+                     degraded             0x00040000
+                     unknown              0x00010000"
+   ::= { systemBoardEntry 3 }
+
+sbCSFLNPredictedStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "System board FLN predicted status.(Bit field); deprecated: PSA-2.0.0 or later does not support this objest.
+                    Status                 Bit
+                     ok                       0x00000000    
+                     warning                0x00100000
+                     unknown              0x00010000"
+   ::= { systemBoardEntry 4 }
+
+sbCSLDX0PredictedStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "System board LDX#0 predicted status.(Bit field)
+                    Status                 Bit
+                     ok                       0x00000000    
+                     warning                0x00100000
+                     unknown              0x00010000
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { systemBoardEntry 5 }
+
+sbCSLDX1PredictedStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "System board LDX#1 predicted status.(Bit field)
+                    Status                 Bit
+                     ok                       0x00000000    
+                     warning                0x00100000
+                     unknown              0x00010000
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { systemBoardEntry 6 }
+
+sbCSLDX2PredictedStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "System board LDX#2 predicted status.(Bit field)
+                    Status                 Bit
+                     ok                       0x00000000    
+                     warning                0x00100000
+                     unknown              0x00010000
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { systemBoardEntry 7 }
+
+sbCSLDX3PredictedStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "System board LDX#3 predicted status.(Bit field)
+                    Status                 Bit
+                     ok                       0x00000000    
+                     warning                0x00100000
+                     unknown              0x00010000
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { systemBoardEntry 8 }
+
+sbType OBJECT-TYPE
+   SYNTAX   INTEGER{
+      normal(1),
+      master0(2),
+      master1(3)
+   }
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "System board type."
+   ::= { systemBoardEntry 9 }
+
+sbModel OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "System board model name."
+   ::= { systemBoardEntry 10 }
+
+sbSerialNo OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "System board serial number."
+   ::= { systemBoardEntry 11 }
+
+sbNumOfEffectiveCpus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Number of effective CPUs on system board."
+   ::= { systemBoardEntry 12 }
+
+sbNumOfEffectiveSockets OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Number of effective sockets on system board."
+   ::= { systemBoardEntry 13 }
+
+sbNumOfEffectiveMemModules OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Number of effective memory modules on system board."
+   ::= { systemBoardEntry 14 }
+
+sbNumOfEffectiveMemSlots OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Number of effective memory slots on system board."
+   ::= { systemBoardEntry 15 }
+
+sbCSFLNErrorCount OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-write
+   STATUS   mandatory
+   DESCRIPTION "Number of FLN correctable errors. Set the value 0 if you want to reset the FLN error count.
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { systemBoardEntry 16 }
+
+sbCSLDX0ErrorCount OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-write
+   STATUS   mandatory
+   DESCRIPTION "Number of LDX#0 correctable errors. Set the value 0 if you want to reset the LDX#0 error count.
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { systemBoardEntry 17 }
+
+sbCSLDX1ErrorCount OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-write
+   STATUS   mandatory
+   DESCRIPTION "Number of LDX#1 correctable errors. Set the value 0 if you want to reset the LDX#1 error count.
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { systemBoardEntry 18 }
+
+sbCSLDX2ErrorCount OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-write
+   STATUS   mandatory
+   DESCRIPTION "Number of LDX#2 correctable errors. Set the value 0 if you want to reset the LDX#2 error count.
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { systemBoardEntry 19 }
+
+sbCSLDX3ErrorCount OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-write
+   STATUS   mandatory
+   DESCRIPTION "Number of LDX#3 correctable errors. Set the value 0 if you want to reset the LDX#3 error count.
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { systemBoardEntry 20 }
+
+sbEntityStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Only System board's total status. This status doesn't include CPU and Memory status
+                which is mounted the System board.(Bit field)
+                    Status                 Bit
+                     ok                       0x00000000    
+                     not-present         0x10000000
+                     error                    0x01000000
+                     warning                0x00100000
+                     degraded             0x00040000
+                     unknown              0x00010000
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { systemBoardEntry 21 }
+
+sbFLNGAC0PredictedStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Predicted status between FLN and GAC#0.(Bit field)
+                    Status                 Bit
+                     ok                       0x00000000    
+                     warning                0x00100000
+                     unknown              0x00010000
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { systemBoardEntry 22 }
+
+sbFLNGAC1PredictedStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Predicted status between FLN and GAC#1.(Bit field)
+                    Status                 Bit
+                     ok                       0x00000000    
+                     warning                0x00100000
+                     unknown              0x00010000
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { systemBoardEntry 23 }
+
+sbLDX0GDX0PredictedStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Predicted status between LDX#0 and GDX#0.(Bit field)
+                    Status                 Bit
+                     ok                       0x00000000    
+                     warning                0x00100000
+                     unknown              0x00010000
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { systemBoardEntry 24 }
+
+sbLDX1GDX1PredictedStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Predicted status between LDX#1 and GDX#1.(Bit field)
+                    Status                 Bit
+                     ok                       0x00000000    
+                     warning                0x00100000
+                     unknown              0x00010000
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { systemBoardEntry 25 }
+
+sbLDX2GDX2PredictedStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Predicted status between LDX#2 and GDX#2.(Bit field)
+                    Status                 Bit
+                     ok                       0x00000000    
+                     warning                0x00100000
+                     unknown              0x00010000
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { systemBoardEntry 26 }
+
+sbLDX3GDX3PredictedStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Predicted status between LDX#3 and GDX#3.(Bit field)
+                    Status                 Bit
+                     ok                       0x00000000    
+                     warning                0x00100000
+                     unknown              0x00010000"
+   ::= { systemBoardEntry 27 }
+
+sbFLNGAC0ErrorCount OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-write
+   STATUS   mandatory
+   DESCRIPTION "Number of correctable errors between FLN and GAC#0. Set the value 0 if you want to reset the error count.
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { systemBoardEntry 28 }
+
+sbFLNGAC1ErrorCount OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-write
+   STATUS   mandatory
+   DESCRIPTION "Number of correctable errors between FLN and GAC#1. Set the value 0 if you want to reset the error count.
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { systemBoardEntry 29 }
+
+sbLDX0GDX0ErrorCount OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-write
+   STATUS   mandatory
+   DESCRIPTION "Number of correctable errors between LDX#0 and GDX#0. Set the value 0 if you want to reset the error count.
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { systemBoardEntry 30 }
+
+sbLDX1GDX1ErrorCount OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-write
+   STATUS   mandatory
+   DESCRIPTION "Number of correctable errors between LDX#1 and GDX#1. Set the value 0 if you want to reset the error count.
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { systemBoardEntry 31 }
+
+sbLDX2GDX2ErrorCount OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-write
+   STATUS   mandatory
+   DESCRIPTION "Number of correctable errors between LDX#2 and GDX#2. Set the value 0 if you want to reset the error count.
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { systemBoardEntry 32 }
+
+sbLDX3GDX3ErrorCount OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-write
+   STATUS   mandatory
+   DESCRIPTION "Number of correctable errors between LDX#3 and GDX#3. Set the value 0 if you want to reset the error count.
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { systemBoardEntry 33 }
+
+sbLDX1GDX0PredictedStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Predicted status between LDX#1 and GDX#0.(Bit field)
+                    Status                 Bit
+                     ok                       0x00000000    
+                     warning                0x00100000
+                     unknown              0x00010000
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { systemBoardEntry 34 }
+
+sbLDX2GDX1PredictedStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Predicted status between LDX#2 and GDX#1.(Bit field)
+                    Status                 Bit
+                     ok                       0x00000000    
+                     warning                0x00100000
+                     unknown              0x00010000
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { systemBoardEntry 35 }
+
+sbLDX3GDX1PredictedStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Predicted status between LDX#3 and GDX#1.(Bit field)
+                    Status                 Bit
+                     ok                       0x00000000    
+                     warning                0x00100000
+                     unknown              0x00010000
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { systemBoardEntry 36 }
+
+sbLDX1GDX0ErrorCount OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-write
+   STATUS   mandatory
+   DESCRIPTION "Number of correctable errors between LDX#1 and GDX#0. Set the value 0 if you want to reset the error count.
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { systemBoardEntry 37 }
+
+sbLDX2GDX1ErrorCount OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-write
+   STATUS   mandatory
+   DESCRIPTION "Number of correctable errors between LDX#2 and GDX#1. Set the value 0 if you want to reset the error count.
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { systemBoardEntry 38 }
+
+sbLDX3GDX1ErrorCount OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-write
+   STATUS   mandatory
+   DESCRIPTION "Number of correctable errors between LDX#3 and GDX#1. Set the value 0 if you want to reset the error count.
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { systemBoardEntry 39 }
+
+
+-- ****************************************************************************
+--
+-- GROUP: iobInfo
+--
+--	iobInfo :	.1.3.6.1.4.1.211.1.31.1.2.100.1.7
+--
+--Implementation of this group is mandatory
+--
+-- ****************************************************************************
+
+
+-- ----------------------------------------------------------------------------
+-- TABLE: iobTable
+--
+--	iobTable :	.1.3.6.1.4.1.211.1.31.1.2.100.1.7.1
+--
+--Implementation of this table is mandatory
+-- ----------------------------------------------------------------------------
+iobTable OBJECT-TYPE
+   SYNTAX   SEQUENCE OF Iob
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Table with I/O board information. In the case of 'PRIMEQUEST 420'; Index 0 of this table
+                 shows the IOU information and index 1 of this table shows the IOX information."
+   ::= { iobInfo 1 }
+
+iobEntry OBJECT-TYPE
+   SYNTAX   Iob
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   INDEX   { iobIOBNumber }
+   ::= { iobTable 1 }
+
+Iob ::=
+   SEQUENCE {
+      iobIOBNumber
+         INTEGER,
+      iobPhysicalID
+         DisplayString,
+      iobTotalStatus
+         INTEGER,
+      iobCSFLIPredictedStatus
+         INTEGER,
+      iobCSFLP0PredictedStatus
+         INTEGER,
+      iobCSFLP1PredictedStatus
+         INTEGER,
+      iobType
+         INTEGER,
+      iobSerialNo
+         DisplayString,
+      iobModelNo
+         DisplayString,
+      iobCSFLIErrorCount
+         Counter,
+      iobCSFLP0ErrorCount
+         Counter,
+      iobCSFLP1ErrorCount
+         Counter,
+      iobFLIGDX0PredictedStatus
+         INTEGER,
+      iobFLIGDX1PredictedStatus
+         INTEGER,
+      iobFLIGDX2PredictedStatus
+         INTEGER,
+      iobFLIGDX3PredictedStatus
+         INTEGER,
+      iobFLIGAC0PredictedStatus
+         INTEGER,
+      iobFLIGAC1PredictedStatus
+         INTEGER,
+      iobFLIGDX0ErrorCount
+         Counter,
+      iobFLIGDX1ErrorCount
+         Counter,
+      iobFLIGDX2ErrorCount
+         Counter,
+      iobFLIGDX3ErrorCount
+         Counter,
+      iobFLIGAC0ErrorCount
+         Counter,
+      iobFLIGAC1ErrorCount
+         Counter
+   }
+
+iobIOBNumber OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "I/O board identification number.(index:0 based)"
+   ::= { iobEntry 1 }
+
+iobPhysicalID OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "I/O board identification name."
+   ::= { iobEntry 2 }
+
+iobTotalStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "I/O board total status.(Bit field); deprecated: PSA-2.0.0 or later does not support this objest.
+                    Status                 Bit
+                     ok                       0x00000000    
+                     not-present         0x10000000
+                     error                    0x01000000
+                     warning                0x00100000
+                     degraded             0x00040000
+                     unknown              0x00010000"
+   ::= { iobEntry 3 }
+
+iobCSFLIPredictedStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "I/Oboard FLI predicted status.(Bit field)
+                    Status                 Bit
+                     ok                       0x00000000    
+                     warning                0x00100000
+                     unknown              0x00010000
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { iobEntry 4 }
+
+iobCSFLP0PredictedStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "I/Oboard FLP#0 predicted status.(Bit field)
+                    Status                 Bit
+                     ok                       0x00000000    
+                     warning                0x00100000
+                     unknown              0x00010000
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { iobEntry 5 }
+
+iobCSFLP1PredictedStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "I/Oboard FLP#1 predicted status.(Bit field)
+                    Status                 Bit
+                     ok                       0x00000000    
+                     warning                0x00100000
+                     unknown              0x00010000
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { iobEntry 6 }
+
+iobType OBJECT-TYPE
+   SYNTAX   INTEGER{
+      normal(1),
+      master0(2),
+      master1(3)
+   }
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "I/O board type; NOSUPPORT."
+   ::= { iobEntry 7 }
+
+iobSerialNo OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "I/O board serial number."
+   ::= { iobEntry 8 }
+
+iobModelNo OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "I/O board model number."
+   ::= { iobEntry 9 }
+
+iobCSFLIErrorCount OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-write
+   STATUS   mandatory
+   DESCRIPTION "Number of FLI correctable errors. Set the value 0 if you want to reset the FLI error count.
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { iobEntry 10 }
+
+iobCSFLP0ErrorCount OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-write
+   STATUS   mandatory
+   DESCRIPTION "Number of FLP#0 correctable errors. Set the value 0 if you want to reset the FLP#0 error count.
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { iobEntry 11 }
+
+iobCSFLP1ErrorCount OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-write
+   STATUS   mandatory
+   DESCRIPTION "Number of FLP#1 correctable errors. Set the value 0 if you want to reset the FLP#1 error count.
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { iobEntry 12 }
+
+iobFLIGDX0PredictedStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Predicted status between FLI and GDX#0.(Bit field)
+                    Status                 Bit
+                     ok                       0x00000000    
+                     warning                0x00100000
+                     unknown              0x00010000
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { iobEntry 13 }
+
+iobFLIGDX1PredictedStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Predicted status between FLI and GDX#1.(Bit field)
+                    Status                 Bit
+                     ok                       0x00000000    
+                     warning                0x00100000
+                     unknown              0x00010000
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { iobEntry 14 }
+
+iobFLIGDX2PredictedStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Predicted status between FLI and GDX#2.(Bit field)
+                    Status                 Bit
+                     ok                       0x00000000    
+                     warning                0x00100000
+                     unknown              0x00010000
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { iobEntry 15 }
+
+iobFLIGDX3PredictedStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Predicted status between FLI and GDX#3.(Bit field)
+                    Status                 Bit
+                     ok                       0x00000000    
+                     warning                0x00100000
+                     unknown              0x00010000
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { iobEntry 16 }
+
+iobFLIGAC0PredictedStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Predicted status between FLI and GAC#0.(Bit field)
+                    Status                 Bit
+                     ok                       0x00000000    
+                     warning                0x00100000
+                     unknown              0x00010000
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { iobEntry 17 }
+
+iobFLIGAC1PredictedStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Predicted status between FLI and GAC#1.(Bit field)
+                    Status                 Bit
+                     ok                       0x00000000    
+                     warning                0x00100000
+                     unknown              0x00010000
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { iobEntry 18 }
+
+iobFLIGDX0ErrorCount OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-write
+   STATUS   mandatory
+   DESCRIPTION "Number of correctable errors between FLI and GDX#0. Set the value 0 if you want to reset the error count.
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { iobEntry 19 }
+
+iobFLIGDX1ErrorCount OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-write
+   STATUS   mandatory
+   DESCRIPTION "Number of correctable errors between FLI and GDX#1. Set the value 0 if you want to reset the error count.
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { iobEntry 20 }
+
+iobFLIGDX2ErrorCount OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-write
+   STATUS   mandatory
+   DESCRIPTION "Number of correctable errors between FLI and GDX#2. Set the value 0 if you want to reset the error count.
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { iobEntry 21 }
+
+iobFLIGDX3ErrorCount OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-write
+   STATUS   mandatory
+   DESCRIPTION "Number of correctable errors between FLI and GDX#3. Set the value 0 if you want to reset the error count.
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { iobEntry 22 }
+
+iobFLIGAC0ErrorCount OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-write
+   STATUS   mandatory
+   DESCRIPTION "Number of correctable errors between FLI and GAC#0. Set the value 0 if you want to reset the error count.
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { iobEntry 23 }
+
+iobFLIGAC1ErrorCount OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-write
+   STATUS   mandatory
+   DESCRIPTION "Number of correctable errors between FLI and GAC#1. Set the value 0 if you want to reset the error count.
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { iobEntry 24 }
+
+
+-- ----------------------------------------------------------------------------
+-- TABLE: iobSlotTable
+--
+--	iobSlotTable :	.1.3.6.1.4.1.211.1.31.1.2.100.1.7.2
+--
+--Implementation of this table is mandatory
+-- ----------------------------------------------------------------------------
+iobSlotTable OBJECT-TYPE
+   SYNTAX   SEQUENCE OF IobSlot
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Table with IOB PCI slots information."
+   ::= { iobInfo 2 }
+
+iobSlotEntry OBJECT-TYPE
+   SYNTAX   IobSlot
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   INDEX   { iobSlotIOBNumber,
+	     iobSlotSlotNumber }
+   ::= { iobSlotTable 1 }
+
+IobSlot ::=
+   SEQUENCE {
+      iobSlotIOBNumber
+         INTEGER,
+      iobSlotSlotNumber
+         INTEGER,
+      iobSlotPresentStatus
+         INTEGER,
+      iobSlotPowerStatus
+         INTEGER
+   }
+
+iobSlotIOBNumber OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "IOB PCI board identification number.(index:0 based)"
+   ::= { iobSlotEntry 1 }
+
+iobSlotSlotNumber OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "IOB PCI slot identification number.(index:0 based)"
+   ::= { iobSlotEntry 2 }
+
+iobSlotPresentStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "IOB PCI slot present status.(Bit field)
+                    Status                 Bit
+                     ok                       0x00000000    
+                     not-present         0x10000000
+                     unknown              0x00010000"
+   ::= { iobSlotEntry 3 }
+
+iobSlotPowerStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "IOB PCI slot power status.
+                    Status                 Value
+                     power-on              0
+                     power-off              1"
+   ::= { iobSlotEntry 4 }
+
+
+-- ****************************************************************************
+--
+-- GROUP: sduInfo
+--
+--	sduInfo :	.1.3.6.1.4.1.211.1.31.1.2.100.1.8
+--
+--Implementation of this group is mandatory
+--
+-- ****************************************************************************
+
+
+-- ----------------------------------------------------------------------------
+-- TABLE: sduTable
+--
+--	sduTable :	.1.3.6.1.4.1.211.1.31.1.2.100.1.8.1
+--
+--Implementation of this table is mandatory
+-- ----------------------------------------------------------------------------
+sduTable OBJECT-TYPE
+   SYNTAX   SEQUENCE OF Sdu
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Table with SCSI disk unit information."
+   ::= { sduInfo 1 }
+
+sduEntry OBJECT-TYPE
+   SYNTAX   Sdu
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   INDEX   { sduNumber }
+   ::= { sduTable 1 }
+
+Sdu ::=
+   SEQUENCE {
+      sduNumber
+         INTEGER,
+      sduPhysicalID
+         DisplayString,
+      sduTotalStatus
+         INTEGER,
+      sduStatusClear
+         INTEGER,
+      sduFANRedundancyStatus
+         INTEGER ,
+      sduPSURedundancyStatus
+         INTEGER,
+      sduModelName
+         DisplayString,
+      sduFirmwareRevision
+         DisplayString,
+      sduLEDStatus
+         INTEGER
+   }
+
+sduNumber OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "SCSI disk unit identification number.(index)"
+   ::= { sduEntry 1 }
+
+sduPhysicalID OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "SCSI disk unit identification name."
+   ::= { sduEntry 2 }
+
+sduTotalStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "SCSI disk unit total status.(Bit field)
+                    Status                 Bit
+                     ok                       0x00000000    
+                     not-present         0x10000000
+                     error                    0x01000000
+                     warning                0x00100000
+                     degraded             0x00040000
+                     unknown              0x00010000"
+   ::= { sduEntry 3 }
+
+sduStatusClear OBJECT-TYPE
+   SYNTAX   INTEGER{
+      clear(1)
+   }
+   ACCESS   read-write
+   STATUS   mandatory
+   DESCRIPTION "SCSI disk unit total status clear."
+   ::= { sduEntry 4 }
+
+sduFANRedundancyStatus OBJECT-TYPE
+   SYNTAX   INTEGER 
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Fan in SCSI disk unit redundancy status.
+                    Status                                                             Value
+                     Redundant                                                       1
+                     Non-Redundant: Sufficient Resources            2
+                     Non-Redundant: Insufficient Resources          3
+                     Unknown                                                          99"
+   ::= { sduEntry 5 }
+
+sduPSURedundancyStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Power supply unit in SCSI disk unit redundancy status.
+                    Status                                                             Value
+                     Redundant                                                       1
+                     Non-Redundant: Sufficient Resources            2
+                     Non-Redundant: Insufficient Resources          3
+                     Unknown                                                          99"
+   ::= { sduEntry 6 }
+
+sduModelName OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "SCSI disk unit model name.(e.g. PS10R...)"
+   ::= { sduEntry 7 }
+
+sduFirmwareRevision OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "SCSI disk unit firmware revision.(e.g. 1.02...)"
+   ::= { sduEntry 8 }
+
+sduLEDStatus OBJECT-TYPE
+   SYNTAX   INTEGER{
+      off(1),
+      on(2)
+   }
+   ACCESS   read-write
+   STATUS   mandatory
+   DESCRIPTION "SCSI disk unit LED status."
+   ::= { sduEntry 9 }
+
+
+-- ----------------------------------------------------------------------------
+-- TABLE: sduControllerTable
+--
+--	sduControllerTable :	.1.3.6.1.4.1.211.1.31.1.2.100.1.8.2
+--
+--Implementation of this table is mandatory
+-- ----------------------------------------------------------------------------
+sduControllerTable OBJECT-TYPE
+   SYNTAX   SEQUENCE OF SduController
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Table with SCSI disk unit's controller information."
+   ::= { sduInfo 2 }
+
+sduControllerEntry OBJECT-TYPE
+   SYNTAX   SduController
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   INDEX   { sduCtlSDUNumber,
+	     sduCtlControllerNumber }
+   ::= { sduControllerTable 1 }
+
+SduController ::=
+   SEQUENCE {
+      sduCtlSDUNumber
+         INTEGER,
+      sduCtlControllerNumber
+         INTEGER,
+      sduCtlPhysicalID
+         DisplayString,
+      sduCtlDestinationPhysicalID
+         DisplayString,
+      sduCtlStatus
+         INTEGER,
+      sduCtlBusType
+         INTEGER,
+      sduCtlSegment
+         INTEGER,
+      sduCtlBusNumber
+         INTEGER,
+      sduCtlDeviceNumber
+         INTEGER,
+      sduCtlFunction
+         INTEGER
+   }
+
+sduCtlSDUNumber OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "SCSI disk unit identification number.(index)"
+   ::= { sduControllerEntry 1 }
+
+sduCtlControllerNumber OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "SCSI disk unit's controller number.(index)"
+   ::= { sduControllerEntry 2 }
+
+sduCtlPhysicalID OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "SCSI disk unit's controller identification name."
+   ::= { sduControllerEntry 3 }
+
+sduCtlDestinationPhysicalID OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "SCSI sidk unit's controller destination identification name."
+   ::= { sduControllerEntry 4 }
+
+sduCtlStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "SCSI disk unit's controller status.(Bit field)
+                    Status                 Bit
+                     ok                       0x00000000    
+                     not-present         0x10000000
+                     error                    0x01000000
+                     warning                0x00100000
+                     degraded             0x00040000
+                     unknown              0x00010000"
+   ::= { sduControllerEntry 5 }
+
+sduCtlBusType OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Bus type of the SCSI disk unit's controller. Refer to the following definitions;
+                value     contens
+                 0           other
+                 1           isa
+                 2           eisa
+                 3           pci"
+   ::= { sduControllerEntry 6 }
+
+sduCtlSegment OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Segment number of the SCSI disk unit's controller."
+   ::= { sduControllerEntry 7 }
+
+sduCtlBusNumber OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Bus number of the SCSI disk unit's controller."
+   ::= { sduControllerEntry 8 }
+
+sduCtlDeviceNumber OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Device number of the SCSI disk unit's controller."
+   ::= { sduControllerEntry 9 }
+
+sduCtlFunction OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Function number of the SCSI disk unit's controller."
+   ::= { sduControllerEntry 10 }
+
+
+-- ----------------------------------------------------------------------------
+-- TABLE: sduFanTable
+--
+--	sduFanTable :	.1.3.6.1.4.1.211.1.31.1.2.100.1.8.3
+--
+--Implementation of this table is mandatory
+-- ----------------------------------------------------------------------------
+sduFanTable OBJECT-TYPE
+   SYNTAX   SEQUENCE OF SduFan
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Table with fan of SCSI disk unit information."
+   ::= { sduInfo 3 }
+
+sduFanEntry OBJECT-TYPE
+   SYNTAX   SduFan
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   INDEX   { sduFanSDUNumber,
+	     sduFanFanNumber }
+   ::= { sduFanTable 1 }
+
+SduFan ::=
+   SEQUENCE {
+      sduFanSDUNumber
+         INTEGER,
+      sduFanFanNumber
+         INTEGER,
+      sduFanPhysicalID
+         DisplayString,
+      sduFanStatus
+         INTEGER
+   }
+
+sduFanSDUNumber OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "SCSI disk unit identification number.(index)"
+   ::= { sduFanEntry 1 }
+
+sduFanFanNumber OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Fan of SCSI disk unit identification number.(index)"
+   ::= { sduFanEntry 2 }
+
+sduFanPhysicalID OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Fan of SCSI disk unit identification name."
+   ::= { sduFanEntry 3 }
+
+sduFanStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Fan of SCSI disk unit status.(Bit field)
+                    Status                 Bit
+                     ok                       0x00000000    
+                     not-present         0x10000000
+                     error                    0x01000000
+                     warning                0x00100000
+                     degraded             0x00040000
+                     unknown              0x00010000"
+   ::= { sduFanEntry 4 }
+
+
+-- ----------------------------------------------------------------------------
+-- TABLE: sduPsuTable
+--
+--	sduPsuTable :	.1.3.6.1.4.1.211.1.31.1.2.100.1.8.4
+--
+--Implementation of this table is mandatory
+-- ----------------------------------------------------------------------------
+sduPsuTable OBJECT-TYPE
+   SYNTAX   SEQUENCE OF SduPsu
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Table with power supply unit of SCSI disk unit information."
+   ::= { sduInfo 4 }
+
+sduPsuEntry OBJECT-TYPE
+   SYNTAX   SduPsu
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   INDEX   { sduPsuSDUNumber,
+	     sduPsuPsuNumber }
+   ::= { sduPsuTable 1 }
+
+SduPsu ::=
+   SEQUENCE {
+      sduPsuSDUNumber
+         INTEGER,
+      sduPsuPsuNumber
+         INTEGER,
+      sduPsuPhysicalID
+         DisplayString,
+      sduPsuStatus
+         INTEGER
+   }
+
+sduPsuSDUNumber OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "SCSI disk unit identification number.(index)"
+   ::= { sduPsuEntry 1 }
+
+sduPsuPsuNumber OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Power supply unit of SCSI disk unit identification number.(index)"
+   ::= { sduPsuEntry 2 }
+
+sduPsuPhysicalID OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Power supply unit of SCSI disk unit identification name."
+   ::= { sduPsuEntry 3 }
+
+sduPsuStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Power supply unit of SCSI disk unit status.(Bit field)
+                    Status                 Bit
+                     ok                       0x00000000    
+                     not-present         0x10000000
+                     error                    0x01000000
+                     warning                0x00100000
+                     degraded             0x00040000
+                     unknown              0x00010000"
+   ::= { sduPsuEntry 4 }
+
+
+-- ****************************************************************************
+--
+-- GROUP: otherBoardInfo
+--
+--	otherBoardInfo :	.1.3.6.1.4.1.211.1.31.1.2.100.1.9
+--
+--Implementation of this group is mandatory
+--
+-- ****************************************************************************
+
+
+-- ----------------------------------------------------------------------------
+-- TABLE: pciboxTable
+--
+--	pciboxTable :	.1.3.6.1.4.1.211.1.31.1.2.100.1.9.1
+--
+--Implementation of this table is mandatory
+-- ----------------------------------------------------------------------------
+pciboxTable OBJECT-TYPE
+   SYNTAX   SEQUENCE OF Pcibox
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Table with PCI-Box information."
+   ::= { otherBoardInfo 1 }
+
+pciboxEntry OBJECT-TYPE
+   SYNTAX   Pcibox
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   INDEX   { pciboxNumber }
+   ::= { pciboxTable 1 }
+
+Pcibox ::=
+   SEQUENCE {
+      pciboxNumber
+         INTEGER,
+      pciboxPhysicalID
+         DisplayString,
+      pciboxModelNo
+         DisplayString,
+      pciboxSerialNo
+         DisplayString
+   }
+
+pciboxNumber OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "PCI-Box identification number.(index)"
+   ::= { pciboxEntry 1 }
+
+pciboxPhysicalID OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "PCI-Box identification name."
+   ::= { pciboxEntry 2 }
+
+pciboxModelNo OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "PCI-Box model name."
+   ::= { pciboxEntry 3 }
+
+pciboxSerialNo OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "PCI-Box serial number."
+   ::= { pciboxEntry 4 }
+
+
+-- ----------------------------------------------------------------------------
+-- TABLE: pciboxSlotTable
+--
+--	pciboxSlotTable :	.1.3.6.1.4.1.211.1.31.1.2.100.1.9.2
+--
+--Implementation of this table is mandatory
+-- ----------------------------------------------------------------------------
+pciboxSlotTable OBJECT-TYPE
+   SYNTAX   SEQUENCE OF PciboxSlot
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Table with PCI-Box slots information."
+   ::= { otherBoardInfo 2 }
+
+pciboxSlotEntry OBJECT-TYPE
+   SYNTAX   PciboxSlot
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   INDEX   { pbSlotPciboxNumber,
+	     pbSlotSlotNumber }
+   ::= { pciboxSlotTable 1 }
+
+PciboxSlot ::=
+   SEQUENCE {
+      pbSlotPciboxNumber
+         INTEGER,
+      pbSlotSlotNumber
+         INTEGER,
+      pbSlotPresentStatus
+         INTEGER,
+      pbSlotPowerStatus
+         INTEGER
+   }
+
+pbSlotPciboxNumber OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "PCI-Box identification number.(index:0 based)"
+   ::= { pciboxSlotEntry 1 }
+
+pbSlotSlotNumber OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "PCI-Box slot identification number.(index:0 based)"
+   ::= { pciboxSlotEntry 2 }
+
+pbSlotPresentStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "PCI-Box slot present status.(Bit field)
+                    Status                 Bit
+                     ok                       0x00000000    
+                     not-present         0x10000000
+                     unknown              0x00010000"
+   ::= { pciboxSlotEntry 3 }
+
+pbSlotPowerStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "PCI-Box slot power status.
+                    Status                Value
+                     power-on              0
+                     power-off              1"
+   ::= { pciboxSlotEntry 4 }
+
+
+-- ----------------------------------------------------------------------------
+-- TABLE: gspbTable
+--
+--	gspbTable :	.1.3.6.1.4.1.211.1.31.1.2.100.1.9.3
+--
+--Implementation of this table is mandatory
+-- ----------------------------------------------------------------------------
+gspbTable OBJECT-TYPE
+   SYNTAX   SEQUENCE OF Gspb
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Table with GSPB information."
+   ::= { otherBoardInfo 3 }
+
+gspbEntry OBJECT-TYPE
+   SYNTAX   Gspb
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   INDEX   { gspbNumber }
+   ::= { gspbTable 1 }
+
+Gspb ::=
+   SEQUENCE {
+      gspbNumber
+         INTEGER,
+      gspbPhysicalID
+         DisplayString,
+      gspbModelNo
+         DisplayString,
+      gspbSerialNo
+         DisplayString
+   }
+
+gspbNumber OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "GSPB identification number.(index:0 based)"
+   ::= { gspbEntry 1 }
+
+gspbPhysicalID OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "GSPB identification name."
+   ::= { gspbEntry 2 }
+
+gspbModelNo OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "GSPB model name."
+   ::= { gspbEntry 3 }
+
+gspbSerialNo OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "GSPB serial number."
+   ::= { gspbEntry 4 }
+
+
+-- ----------------------------------------------------------------------------
+-- TABLE: sasuTable
+--
+--	sasuTable :	.1.3.6.1.4.1.211.1.31.1.2.100.1.9.4
+--
+--Implementation of this table is mandatory
+-- ----------------------------------------------------------------------------
+sasuTable OBJECT-TYPE
+   SYNTAX   SEQUENCE OF Sasu
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Table with SAS-Unit information."
+   ::= { otherBoardInfo 4 }
+
+sasuEntry OBJECT-TYPE
+   SYNTAX   Sasu
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   INDEX   { sasuNumber }
+   ::= { sasuTable 1 }
+
+Sasu ::=
+   SEQUENCE {
+      sasuNumber
+         INTEGER,
+      sasuPhysicalID
+         DisplayString,
+      sasuModelNo
+         DisplayString,
+      sasuSerialNo
+         DisplayString
+   }
+
+sasuNumber OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "SAS-Unit identification number.(index:0 based)"
+   ::= { sasuEntry 1 }
+
+sasuPhysicalID OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "SAS-Unit identification name."
+   ::= { sasuEntry 2 }
+
+sasuModelNo OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "SAS-Unit model name."
+   ::= { sasuEntry 3 }
+
+sasuSerialNo OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "SAS-Unit serial number."
+   ::= { sasuEntry 4 }
+
+
+--logicalComponentForLinux-MIB groups
+
+
+--logicalComponentForWindows-MIB groups
+
+
+--monitoringFunction-MIB groups
+
+
+--thresholdFunction-MIB groups
+
+     thresholdActionInfo	OBJECT IDENTIFIER	::={ thresholdFunction 1 }
+
+-- ****************************************************************************
+--
+-- GROUP: thresholdActionInfo
+--
+--	thresholdActionInfo :	.1.3.6.1.4.1.211.1.31.1.2.100.5.1
+--
+--Implementation of this group is mandatory
+--
+-- ****************************************************************************
+
+thrActionPolicySetting OBJECT-TYPE
+   SYNTAX   INTEGER 
+   ACCESS   read-write
+   STATUS   mandatory
+   DESCRIPTION "Threshold exceeded action. (bit field)
+                   Action          Bit
+                     LOG            0x00000001
+                     TRAP           0x0000000c
+                     MAIL            0x00000010
+                     EXPORT       0x00000040"
+   ::= { thresholdActionInfo 1 }
+
+
+--statusFunction-MIB groups
+
+     physCompStatus	OBJECT IDENTIFIER	::={ statusFunction 1 }
+
+-- ****************************************************************************
+--
+-- GROUP: physCompStatus
+--
+--	physCompStatus :	.1.3.6.1.4.1.211.1.31.1.2.100.6.1
+--
+--Implementation of this group is mandatory
+--
+-- ****************************************************************************
+
+cpuParTotalStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "CPU total status in Partition.(Bit field)
+                    Status                 Bit
+                     ok                       0x00000000    
+                     not-present         0x10000000
+                     error                    0x01000000
+                     warning                0x00100000
+                     degraded             0x00040000
+                     unknown              0x00010000
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { physCompStatus 1 }
+
+memoryParTotalStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Memory module total status in Partition.(Bit field)
+                    Status                 Bit
+                     ok                       0x00000000    
+                     not-present         0x10000000
+                     error                    0x01000000
+                     warning                0x00100000
+                     degraded             0x00040000
+                     unknown              0x00010000
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { physCompStatus 2 }
+
+pciFuncParTotalStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Pci device total status in Partition.(Bit field)
+                    Status                 Bit
+                     ok                       0x00000000    
+                     not-present         0x10000000
+                     error                    0x01000000
+                     warning                0x00100000
+                     degraded             0x00040000
+                     unknown              0x00010000"
+   ::= { physCompStatus 3 }
+
+systemBoardParTotalStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "System board total status in Partition.(Bit field)
+                    Status                 Bit
+                     ok                       0x00000000    
+                     not-present         0x10000000
+                     error                    0x01000000
+                     warning                0x00100000
+                     degraded             0x00040000
+                     unknown              0x00010000
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { physCompStatus 4 }
+
+ioBoardParTotalStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "I/O board total status in Partition.(Bit field)
+                    Status                 Bit
+                     ok                       0x00000000    
+                     not-present         0x10000000
+                     error                    0x01000000
+                     warning                0x00100000
+                     degraded             0x00040000
+                     unknown              0x00010000
+                deprecated: PSA-2.0.0 or later does not support this objest."
+   ::= { physCompStatus 5 }
+
+scsiDevParTotalStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Scsi device total status in Partition.(Bit field)
+                    Status                 Bit
+                     ok                       0x00000000    
+                     not-present         0x10000000
+                     error                    0x01000000
+                     warning                0x00100000
+                     degraded             0x00040000
+                     unknown              0x00010000"
+   ::= { physCompStatus 6 }
+
+
+--otherFunction-MIB groups
+
+     securityInfo	OBJECT IDENTIFIER	::={ otherFunction 1 }
+     agentInfo	OBJECT IDENTIFIER	::={ otherFunction 2 }
+     diskSmartInfo	OBJECT IDENTIFIER	::={ otherFunction 3 }
+     watchdogInfo	OBJECT IDENTIFIER	::={ otherFunction 4 }
+     partitionManagementInfo	OBJECT IDENTIFIER	::={ otherFunction 5 }
+
+-- ****************************************************************************
+--
+-- GROUP: securityInfo
+--
+--	securityInfo :	.1.3.6.1.4.1.211.1.31.1.2.100.7.1
+--
+--Implementation of this group is mandatory
+--
+-- ****************************************************************************
+
+
+-- ****************************************************************************
+--
+-- GROUP: agentInfo
+--
+--	agentInfo :	.1.3.6.1.4.1.211.1.31.1.2.100.7.2
+--
+--Implementation of this group is mandatory
+--
+-- ****************************************************************************
+
+agentVersion OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "PrimeQuest Server Agent's(PSA) version string."
+   ::= { agentInfo 1 }
+
+psaFilterVersion OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "PSA eventlog filter version string.
+                (e.g. VERSION=1; LEVEL=1; PTF-NO=1 --> 01010001)"
+   ::= { agentInfo 2 }
+
+
+-- ****************************************************************************
+--
+-- GROUP: diskSmartInfo
+--
+--	diskSmartInfo :	.1.3.6.1.4.1.211.1.31.1.2.100.7.3
+--
+--Implementation of this group is mandatory
+--
+-- ****************************************************************************
+
+diskSMARTMonitoring OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-write
+   STATUS   mandatory
+   DESCRIPTION "Disk SMART monitoring switch. Refer to the following definitions;
+                value     contens
+                 0           enable
+                 1           diabable
+                 2           not-available"
+   ::= { diskSmartInfo 1 }
+
+
+-- ****************************************************************************
+--
+-- GROUP: watchdogInfo
+--
+--	watchdogInfo :	.1.3.6.1.4.1.211.1.31.1.2.100.7.4
+--
+--Implementation of this group is mandatory
+--
+-- ****************************************************************************
+
+osWatchdogEnable OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-write
+   STATUS   mandatory
+   DESCRIPTION "OS watchdog monitoring switch. It is necessary to set the 'osWatchdogTimeout' object 
+                before setting this object. Refer to the following definitions;
+                value     contens
+                 0           off
+                 1           on"
+   ::= { watchdogInfo 1 }
+
+osWatchdogTimeout OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-write
+   STATUS   mandatory
+   DESCRIPTION "Set the OS watchdog timeout period (unit:sec)"
+   ::= { watchdogInfo 2 }
+
+osWatchdogReaction OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-write
+   STATUS   mandatory
+   DESCRIPTION "OS watchdog timeout action. Refer to the following definitions;
+                value     contens
+                 0           none-action
+                 1           hardware-reset
+                 2           power-down
+                 3           power-cycle
+                 4           init"
+   ::= { watchdogInfo 3 }
+
+bootWatchdogEnable OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-write
+   STATUS   mandatory
+   DESCRIPTION "Boot watchdog monitoring switch. It is necessary to set the 'bootWatchdogTimeout' object 
+                before setting this object. Refer to the following definitions;
+                value     contens
+                 0           off
+                 1           on"
+   ::= { watchdogInfo 4 }
+
+bootWwatchdogTimeout OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-write
+   STATUS   mandatory
+   DESCRIPTION "Set the boot watchdog timeout period (unit:sec)"
+   ::= { watchdogInfo 5 }
+
+
+-- ****************************************************************************
+--
+-- GROUP: partitionManagementInfo
+--
+--	partitionManagementInfo :	.1.3.6.1.4.1.211.1.31.1.2.100.7.5
+--
+--Implementation of this group is mandatory
+--
+-- ****************************************************************************
+
+usingOperatingSystem OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Operating system used with this partition. Refer to the following definitioins;
+                value     contens
+                 0           linux
+                 1           windows"
+   ::= { partitionManagementInfo 1 }
+
+partitionName OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Partition name."
+   ::= { partitionManagementInfo 2 }
+
+hostName OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Host name of the server. This value is written to the network configuration file."
+   ::= { partitionManagementInfo 3 }
+
+fujitsuChassisSerialNo OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Chassis identification number."
+   ::= { partitionManagementInfo 4 }
+
+modelNumber OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Model number."
+   ::= { partitionManagementInfo 5 }
+
+partitionID OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Partition Identification number."
+   ::= { partitionManagementInfo 6 }
+
+partitionManagementAddress OBJECT-TYPE
+   SYNTAX   OCTET STRING
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "SNMP manager can access to the Partition directly with this IP address."
+   ::= { partitionManagementInfo 7 }
+
+fscChassisSerialNo OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "FSCs identification number."
+   ::= { partitionManagementInfo 8 }
+
+mmbManagementAddress OBJECT-TYPE
+   SYNTAX   OCTET STRING
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "SNMP manager can access to the Management board with this IP address."
+   ::= { partitionManagementInfo 9 }
+
+partitionManagementAddress2 OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "SNMP manager can access to the Partition directly with this IP address.
+                Please use this object instead of 'partitionManagementAddress'."
+   ::= { partitionManagementInfo 10 }
+
+mmbManagementAddress2 OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "SNMP manager can access to the Management board with this IP address.
+                Please use this object instead of 'mmbManagementAddress'."
+   ::= { partitionManagementInfo 11 }
+
+modelName OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Chasis model name.(ex: PRIMEQUEST 580)"
+   ::= { partitionManagementInfo 12 }
+
+
+--pxFunction-MIB groups
+
+     managementInfo	OBJECT IDENTIFIER	::={ pxFunction 1 }
+
+-- ****************************************************************************
+--
+-- GROUP: managementInfo
+--
+--	managementInfo :	.1.3.6.1.4.1.211.1.31.1.2.100.8.1
+--
+--Implementation of this group is mandatory
+--
+-- ****************************************************************************
+
+pxInstallationStatus OBJECT-TYPE
+   SYNTAX   INTEGER{
+      installed(1),
+      not-installed(2)
+   }
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { managementInfo 1 }
+
+
+END

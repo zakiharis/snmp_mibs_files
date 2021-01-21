@@ -1,0 +1,3807 @@
+PSA-LinLsiLogicTrap-MIB DEFINITIONS ::= BEGIN
+
+--PRIMEQUEST system management MIB for Partition
+--
+--
+--$Copyright$
+--Copyright Fujitsu Limited 2004-2010
+--All rights reserved
+--
+--
+--MIB Revision: 02000006
+--
+
+IMPORTS
+	OBJECT-TYPE								FROM RFC-1212
+	TRAP-TYPE								FROM RFC-1215
+	mib-2, DisplayString					FROM RFC1213-MIB
+	TimeTicks, Counter, Gauge, IpAddress	FROM RFC1155-SMI
+	mgmt, enterprises						FROM RFC1155-SMI;
+
+--enterprises	OBJECT IDENTIFIER ::={ iso org(3) dod(6) internet(1) private(4) 1 }
+--
+--PRIMEQUEST system management MIB nodes
+--fujitsu:                    1.3.6.1.4.1.211
+-- products:                  1.3.6.1.4.1.211.1
+--  iaServer:                 1.3.6.1.4.1.211.1.31
+--   primequest:              1.3.6.1.4.1.211.1.31.1
+--    partition:	           1.3.6.1.4.1.211.1.31.1.2
+--
+--Trap enterprise is "psaLinLsiLogicTrap"
+
+--FUJITSU PRIMEQUEST system management MIB nodes for Partition
+  fujitsu        OBJECT IDENTIFIER  ::={ enterprises 211 }
+  products       OBJECT IDENTIFIER  ::={ fujitsu 1 }
+  iaServer       OBJECT IDENTIFIER  ::={ products 31 }
+  primequest     OBJECT IDENTIFIER  ::={ iaServer 1 }
+   partition     OBJECT IDENTIFIER  ::={ primequest 2 }
+    parititonVariables	OBJECT IDENTIFIER	::={ partition	200 }
+    partitionEnterprise        OBJECT IDENTIFIER  ::={ partition 201 }
+     psaComTrap                OBJECT IDENTIFIER  ::={ partitionEnterprise 1 }
+     psaLinLanComTrap          OBJECT IDENTIFIER  ::={ partitionEnterprise 2 }
+     psaLinIntelE100Trap       OBJECT IDENTIFIER  ::={ partitionEnterprise 3 }
+     psaLinIntelE1000Trap      OBJECT IDENTIFIER  ::={ partitionEnterprise 4 }
+     psaLinBcm5700Trap         OBJECT IDENTIFIER  ::={ partitionEnterprise 5 }
+     psaLinEmulexTrap          OBJECT IDENTIFIER  ::={ partitionEnterprise 6 }
+     psaLinLsiLogicTrap        OBJECT IDENTIFIER  ::={ partitionEnterprise 7 }
+     psaLinScsiComTrap         OBJECT IDENTIFIER  ::={ partitionEnterprise 8 }
+     psaLinGrmpdTrap           OBJECT IDENTIFIER  ::={ partitionEnterprise 9 }
+     psaLinGdsTrap             OBJECT IDENTIFIER  ::={ partitionEnterprise 10 }
+     psaLinGlsTrap             OBJECT IDENTIFIER  ::={ partitionEnterprise 11 }
+     psaLinTg3Trap             OBJECT IDENTIFIER  ::={ partitionEnterprise 12 }
+     psaLinIbTrap              OBJECT IDENTIFIER  ::={ partitionEnterprise 13 }
+     psaLinXframe2Trap         OBJECT IDENTIFIER  ::={ partitionEnterprise 14 }
+     psaGschTrap               OBJECT IDENTIFIER  ::={ partitionEnterprise 15 }
+     psaLinIntelE1000ETrap     OBJECT IDENTIFIER  ::={ partitionEnterprise 16 }
+     psaLinIntelIgbTrap        OBJECT IDENTIFIER  ::={ partitionEnterprise 17 }
+     psaLinSvsRaidTrap         OBJECT IDENTIFIER  ::={ partitionEnterprise 18 }
+     psaExternalFileUnitTrap   OBJECT IDENTIFIER  ::={ partitionEnterprise 101 }
+
+--***************************************************************************************
+--
+--FUJITSU PRIMEQUEST system management trap parameter variables for Partition
+--	They aren't directly accessibles(can't use snmp get/set command), but sent with trap
+--
+--***************************************************************************************
+
+     trapVarComInfo	OBJECT IDENTIFIER	::={ parititonVariables 1 }
+
+trapPartitionName OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Partition name which trap is generated."
+   ::= { trapVarComInfo 1 }
+
+trapPartitionId OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Paritition identifier which trap is generated."
+   ::= { trapVarComInfo 2 }
+
+trapEventLevel OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Event level"
+   ::= { trapVarComInfo 3 }
+
+trapEventId OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Event Identifier"
+   ::= { trapVarComInfo 4 }
+
+trapUnitName OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Unit name which trap is generated."
+   ::= { trapVarComInfo 5 }
+
+trapMmbVip OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Management board vertual IP address."
+   ::= { trapVarComInfo 6 }
+
+     trapVarDivInfo	OBJECT IDENTIFIER	::={ parititonVariables 2 }
+
+trapPartNo OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Parts number of trap source."
+   ::= { trapVarDivInfo 1 }
+
+trapStepping OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 2 }
+
+trapSerialNo OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Serial number of trap source. "
+   ::= { trapVarDivInfo 3 }
+
+trapModelNo OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Model number of trap source."
+   ::= { trapVarDivInfo 4 }
+
+trapSuspect OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Logical name or pci bus number of trap source."
+   ::= { trapVarDivInfo 5 }
+
+trapVendorId OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Vendor identifier of trap source."
+   ::= { trapVarDivInfo 6 }
+
+trapDeviceId OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Device identifier of trap source."
+   ::= { trapVarDivInfo 7 }
+
+trapRevision OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Revision of trap source."
+   ::= { trapVarDivInfo 8 }
+
+trapCardName OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Device name of trap source."
+   ::= { trapVarDivInfo 9 }
+
+trapErrDetail OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 10 }
+
+trapErrCode OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 11 }
+
+trapIrpCode OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 12 }
+
+trapHbaNo OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 13 }
+
+trapErrCause OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 14 }
+
+trapPathNo OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 15 }
+
+trapDiskId OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 16 }
+
+trapFmrDiskId OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 17 }
+
+trapCurDiskId OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 18 }
+
+trapPathId OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 19 }
+
+trapPhysIf OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 20 }
+
+trapVirtualIf OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 21 }
+
+trapLogicalIp OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 22 }
+
+trapWatchIp OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 23 }
+
+trapInterface OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 24 }
+
+trapSourceIp OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 25 }
+
+trapDestIp OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 26 }
+
+trapModelName OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Model name of trap source."
+   ::= { trapVarDivInfo 27 }
+
+trapFlagcode OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 28 }
+
+--***************************************************************************************
+--
+--FUJITSU PRIMEQUEST system management TRAP definition for Partition
+--	Trap enterprise:	psaLinLsiLogicTrap (.1.3.6.1.4.1.211.1.31.1.2.201.7)
+--
+--***************************************************************************************
+
+scsiLsiEvent0 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (NULL or BAD request frame ptr)"
+   --#TYPE			"Scsi Lsi Event 0"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Software error (NULL or BAD request frame ptr)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 13000
+
+scsiLsiEvent1 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Unexpected msg function reply received)"
+   --#TYPE			"Scsi Lsi Event 1"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Software error (Unexpected msg function reply received)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 13001
+
+scsiLsiEvent2 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (32 BIT PCI BUS DMA ADDRESSING NOT SUPPORTED)"
+   --#TYPE			"Scsi Lsi Event 2"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Adapter error (32 BIT PCI BUS DMA ADDRESSING NOT SUPPORTED)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13002
+
+scsiLsiEvent3 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Insufficient memory to add adapter)"
+   --#TYPE			"Scsi Lsi Event 3"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (Insufficient memory to add adapter)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13003
+
+scsiLsiEvent4 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (MPT adapter has no memory region defined)"
+   --#TYPE			"Scsi Lsi Event 4"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (MPT adapter has no memory region defined)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13004
+
+scsiLsiEvent5 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Unable to map adapter memory)"
+   --#TYPE			"Scsi Lsi Event 5"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (Unable to map adapter memory)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13005
+
+scsiLsiEvent6 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Unable allocate interrupt)"
+   --#TYPE			"Scsi Lsi Event 6"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Software error (Unable allocate interrupt)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 13006
+
+scsiLsiEvent7 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (Not initialize properly)"
+   --#TYPE			"Scsi Lsi Event 7"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (Not initialize properly) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13007
+
+scsiLsiEvent8 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (pci-suspend: IOC msg unit reset failed)"
+   --#TYPE			"Scsi Lsi Event 8"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (pci-suspend: IOC msg unit reset failed) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13008
+
+scsiLsiEvent9 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (pci-resume: Cannot recover)"
+   --#TYPE			"Scsi Lsi Event 9"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (pci-resume: Cannot recover) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13009
+
+scsiLsiEvent10 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Owned by PEER..skipping)"
+   --#TYPE			"Scsi Lsi Event 10"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Software error (Owned by PEER..skipping)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 13010
+
+scsiLsiEvent11 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (Adapter not ready)"
+   --#TYPE			"Scsi Lsi Event 11"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (Adapter not ready) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13011
+
+scsiLsiEvent12 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (Adapter not ready)"
+   --#TYPE			"Scsi Lsi Event 12"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (Adapter not ready) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13012
+
+scsiLsiEvent13 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (FIFO mgmt alloc)"
+   --#TYPE			"Scsi Lsi Event 13"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Software error (FIFO mgmt alloc)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 13013
+
+scsiLsiEvent14 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (init failure)"
+   --#TYPE			"Scsi Lsi Event 14"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (init failure) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13014
+
+scsiLsiEvent15 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (firmware upload failure)"
+   --#TYPE			"Scsi Lsi Event 15"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Adapter error (firmware upload failure)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13015
+
+scsiLsiEvent16 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Already bound iocx <==> iocy)"
+   --#TYPE			"Scsi Lsi Event 16"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (Already bound %s)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 13016
+
+scsiLsiEvent17 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (firmware downloadboot failure)"
+   --#TYPE			"Scsi Lsi Event 17"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Adapter error (firmware downloadboot failure)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13017
+
+scsiLsiEvent18 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (Unexpected doorbell active)"
+   --#TYPE			"Scsi Lsi Event 18"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (Unexpected doorbell active) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13018
+
+scsiLsiEvent19 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (IOC is in FAULT state)"
+   --#TYPE			"Scsi Lsi Event 19"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (IOC is in FAULT state) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		INFORMATIONAL
+   ::= 13019
+
+scsiLsiEvent20 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (IOC msg unit reset failed)"
+   --#TYPE			"Scsi Lsi Event 20"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (IOC msg unit reset failed) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13020
+
+scsiLsiEvent21 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (IO unit reset failed)"
+   --#TYPE			"Scsi Lsi Event 21"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (IO unit reset failed) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13021
+
+scsiLsiEvent22 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (Wait IOC_READY state timeout)"
+   --#TYPE			"Scsi Lsi Event 22"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (Wait IOC_READY state timeout) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13022
+
+scsiLsiEvent23 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (Can't get IOCFacts; IOC NOT READY)"
+   --#TYPE			"Scsi Lsi Event 23"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (Can't get IOCFacts; IOC NOT READY) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13023
+
+scsiLsiEvent24 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (IOC reported invalid 0 request size)"
+   --#TYPE			"Scsi Lsi Event 24"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Software error (IOC reported invalid 0 request size)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 13024
+
+scsiLsiEvent25 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (Invalid IOC facts reply)"
+   --#TYPE			"Scsi Lsi Event 25"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (Invalid IOC facts reply) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13025
+
+scsiLsiEvent26 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (Can't get IOCFacts; IOC NOT READY)"
+   --#TYPE			"Scsi Lsi Event 26"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (Can't get IOCFacts; IOC NOT READY) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13026
+
+scsiLsiEvent27 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (Wait IOC_OP state timeout)"
+   --#TYPE			"Scsi Lsi Event 27"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (Wait IOC_OP state timeout) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13027
+
+scsiLsiEvent28 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (Failed to come READY after reset)"
+   --#TYPE			"Scsi Lsi Event 28"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (Failed to come READY after reset) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13028
+
+scsiLsiEvent29 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (Enable Diagnostic mode FAILED)"
+   --#TYPE			"Scsi Lsi Event 29"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (Enable Diagnostic mode FAILED) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13029
+
+scsiLsiEvent31 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (ResetHistory bit failed to clear)"
+   --#TYPE			"Scsi Lsi Event 31"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (ResetHistory bit failed to clear) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13031
+
+scsiLsiEvent32 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (Diagnostic reset FAILED)"
+   --#TYPE			"Scsi Lsi Event 32"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (Diagnostic reset FAILED) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13032
+
+scsiLsiEvent34 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Unable to allocate Reply Request; Chain Buffers)"
+   --#TYPE			"Scsi Lsi Event 34"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Software error (Unable to allocate Reply Request; Chain Buffers)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 13034
+
+scsiLsiEvent35 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Unable to allocate Sense Buffers)"
+   --#TYPE			"Scsi Lsi Event 35"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Software error (Unable to allocate Sense Buffers)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 13035
+
+scsiLsiEvent36 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (Doorbell ACK timeout)"
+   --#TYPE			"Scsi Lsi Event 36"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (Doorbell ACK timeout) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13036
+
+scsiLsiEvent37 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (Doorbell INT timeout)"
+   --#TYPE			"Scsi Lsi Event 37"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (Doorbell INT timeout) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13037
+
+scsiLsiEvent38 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (Handshake reply failure)"
+   --#TYPE			"Scsi Lsi Event 38"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (Handshake reply failure) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13038
+
+scsiLsiEvent39 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Unable to allocate event ACK request frame)"
+   --#TYPE			"Scsi Lsi Event 39"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Software error (Unable to allocate event ACK request frame)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 13039
+
+scsiLsiEvent40 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (Firmware Reload FAILED)"
+   --#TYPE			"Scsi Lsi Event 40"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (Firmware Reload FAILED) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13040
+
+scsiLsiEvent41 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (Cannot recover)"
+   --#TYPE			"Scsi Lsi Event 41"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (Cannot recover) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13041
+
+scsiLsiEvent42 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (LogInfo)"
+   --#TYPE			"Scsi Lsi Event 42"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (LogInfo) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13042
+
+scsiLsiEvent44 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Unable to copy mpt_ioctl_header data)"
+   --#TYPE			"Scsi Lsi Event 44"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (Unable to copy mpt_ioctl_header data)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13044
+
+scsiLsiEvent45 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Unable to copy mpt_ioctl_diag_reset struct)"
+   --#TYPE			"Scsi Lsi Event 45"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (Unable to copy mpt_ioctl_diag_reset struct)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13045
+
+scsiLsiEvent46 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (reset Failed)"
+   --#TYPE			"Scsi Lsi Event 46"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Adapter error (reset Failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13046
+
+scsiLsiEvent47 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Unable to copy mpt_fw_xfer struct)"
+   --#TYPE			"Scsi Lsi Event 47"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (Unable to copy mpt_fw_xfer struct)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13047
+
+scsiLsiEvent48 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Unable to copy f/w buffer hunk)"
+   --#TYPE			"Scsi Lsi Event 48"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (Unable to copy f/w buffer hunk)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13048
+
+scsiLsiEvent49 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (IOC says it doesn't support F/W download)"
+   --#TYPE			"Scsi Lsi Event 49"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (IOC says it doesn't support F/W download) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13049
+
+scsiLsiEvent50 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (IOC says: IOC_BUSY)"
+   --#TYPE			"Scsi Lsi Event 50"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (IOC says: IOC_BUSY) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13050
+
+scsiLsiEvent51 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (IOC returned bad status)"
+   --#TYPE			"Scsi Lsi Event 51"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (IOC returned bad status) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13051
+
+scsiLsiEvent52 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Not enough memory)"
+   --#TYPE			"Scsi Lsi Event 52"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (Not enough memory)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13052
+
+scsiLsiEvent53 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Chain required)"
+   --#TYPE			"Scsi Lsi Event 53"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (Chain required)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13053
+
+scsiLsiEvent54 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Too many SG frags)"
+   --#TYPE			"Scsi Lsi Event 54"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (Too many SG frags)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13054
+
+scsiLsiEvent55 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (No memory available)"
+   --#TYPE			"Scsi Lsi Event 55"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (No memory available)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13055
+
+scsiLsiEvent56 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Unable to read in mpt_ioctl_iocinfo struct)"
+   --#TYPE			"Scsi Lsi Event 56"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (Unable to read in mpt_ioctl_iocinfo struct)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13056
+
+scsiLsiEvent57 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Structure size mismatch)"
+   --#TYPE			"Scsi Lsi Event 57"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (Structure size mismatch)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13057
+
+scsiLsiEvent58 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Unable to write out mpt_ioctl_iocinfo struct)"
+   --#TYPE			"Scsi Lsi Event 58"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (Unable to write out mpt_ioctl_iocinfo struct)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13058
+
+scsiLsiEvent59 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Unable to read in mpt_ioctl_targetinfo struct)"
+   --#TYPE			"Scsi Lsi Event 59"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (Unable to read in mpt_ioctl_targetinfo struct)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13059
+
+scsiLsiEvent60 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (No memory available)"
+   --#TYPE			"Scsi Lsi Event 60"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (No memory available)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13060
+
+scsiLsiEvent62 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Buffer is full but volume is available on IOC)"
+   --#TYPE			"Scsi Lsi Event 62"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Software error (Buffer is full but volume is available on IOC)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 13062
+
+scsiLsiEvent63 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Buffer is full but more targets are available on IOC)"
+   --#TYPE			"Scsi Lsi Event 63"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Software error (Buffer is full but more targets are available on IOC)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 13063
+
+scsiLsiEvent64 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Unable to write out mpt_ioctl_targetinfo struct)"
+   --#TYPE			"Scsi Lsi Event 64"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (Unable to write out mpt_ioctl_targetinfo struct)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13064
+
+scsiLsiEvent66 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Unable to read in mpt_ioctl_test struct)"
+   --#TYPE			"Scsi Lsi Event 66"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (Unable to read in mpt_ioctl_test struct)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13066
+
+scsiLsiEvent67 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Unable to write out mpt_ioctl_test struct)"
+   --#TYPE			"Scsi Lsi Event 67"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (Unable to write out mpt_ioctl_test struct)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13067
+
+scsiLsiEvent68 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Unable to read in mpt_ioctl_eventquery struct)"
+   --#TYPE			"Scsi Lsi Event 68"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (Unable to read in mpt_ioctl_eventquery struct)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13068
+
+scsiLsiEvent69 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Unable to write out mpt_ioctl_eventquery struct)"
+   --#TYPE			"Scsi Lsi Event 69"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (Unable to write out mpt_ioctl_eventquery struct)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13069
+
+scsiLsiEvent70 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Unable to read in mpt_ioctl_eventenable struct)"
+   --#TYPE			"Scsi Lsi Event 70"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (Unable to read in mpt_ioctl_eventenable struct)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13070
+
+scsiLsiEvent71 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Insufficient memory to add adapter)"
+   --#TYPE			"Scsi Lsi Event 71"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (Insufficient memory to add adapter)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13071
+
+scsiLsiEvent72 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Unable to read in mpt_ioctl_eventreport struct)"
+   --#TYPE			"Scsi Lsi Event 72"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (Unable to read in mpt_ioctl_eventreport struct)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13072
+
+scsiLsiEvent73 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Unable to write out mpt_ioctl_eventreport struct)"
+   --#TYPE			"Scsi Lsi Event 73"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (Unable to write out mpt_ioctl_eventreport struct)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13073
+
+scsiLsiEvent74 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Unable to read in mpt_ioctl_replace_fw struct)"
+   --#TYPE			"Scsi Lsi Event 74"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (Unable to read in mpt_ioctl_replace_fw struct)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13074
+
+scsiLsiEvent75 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Unable to read in mpt_ioctl_replace_fw image)"
+   --#TYPE			"Scsi Lsi Event 75"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (Unable to read in mpt_ioctl_replace_fw image)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13075
+
+scsiLsiEvent76 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Unable to read in mpt_ioctl_command struct)"
+   --#TYPE			"Scsi Lsi Event 76"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (Unable to read in mpt_ioctl_command struct)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13076
+
+scsiLsiEvent77 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (No memory available during Software init)"
+   --#TYPE			"Scsi Lsi Event 77"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (No memory available during Software init)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13077
+
+scsiLsiEvent78 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (Busy with IOC Reset)"
+   --#TYPE			"Scsi Lsi Event 78"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Adapter error (Busy with IOC Reset)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13078
+
+scsiLsiEvent79 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Request frame too large)"
+   --#TYPE			"Scsi Lsi Event 79"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (Request frame too large)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13079
+
+scsiLsiEvent80 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Unable to read MF from mpt_ioctl_command struct)"
+   --#TYPE			"Scsi Lsi Event 80"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (Unable to read MF from mpt_ioctl_command struct)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13080
+
+scsiLsiEvent81 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Target ID out of bounds)"
+   --#TYPE			"Scsi Lsi Event 81"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (Target ID out of bounds)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13081
+
+scsiLsiEvent82 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (SCSI driver is not loaded)"
+   --#TYPE			"Scsi Lsi Event 82"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (SCSI driver is not loaded)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13082
+
+scsiLsiEvent84 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter or Software error (SCSI driver not loaded or SCSI host not found)"
+   --#TYPE			"Scsi Lsi Event 84"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Adapter or Software error (SCSI driver not loaded or SCSI host not found)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13084
+
+scsiLsiEvent85 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (IOC_INIT issued with 1 or more incorrect parameters.Rejected)"
+   --#TYPE			"Scsi Lsi Event 85"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (IOC_INIT issued with 1 or more incorrect parameters.Rejected)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13085
+
+scsiLsiEvent86 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Illegal request)"
+   --#TYPE			"Scsi Lsi Event 86"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (Illegal request)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13086
+
+scsiLsiEvent87 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Unable to read user data struct)"
+   --#TYPE			"Scsi Lsi Event 87"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (Unable to read user data struct)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13087
+
+scsiLsiEvent88 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (Timeout Occurred on IOCTL! Reset IOC)"
+   --#TYPE			"Scsi Lsi Event 88"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Adapter error (Timeout Occurred on IOCTL! Reset IOC)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13088
+
+scsiLsiEvent89 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Unable to write out reply frame)"
+   --#TYPE			"Scsi Lsi Event 89"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (Unable to write out reply frame)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13089
+
+scsiLsiEvent90 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Unable to write sense data to user)"
+   --#TYPE			"Scsi Lsi Event 90"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (Unable to write sense data to user)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13090
+
+scsiLsiEvent91 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Unable to write data to user)"
+   --#TYPE			"Scsi Lsi Event 91"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (Unable to write data to user)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13091
+
+scsiLsiEvent92 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Unable to read in hp_host_info struct)"
+   --#TYPE			"Scsi Lsi Event 92"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (Unable to read in hp_host_info struct)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13092
+
+scsiLsiEvent93 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Unable to write out  hp_host_info)"
+   --#TYPE			"Scsi Lsi Event 93"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (Unable to write out  hp_host_info)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13093
+
+scsiLsiEvent94 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Unable to read in hp_host_targetinfo struct)"
+   --#TYPE			"Scsi Lsi Event 94"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (Unable to read in hp_host_targetinfo struct)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13094
+
+scsiLsiEvent95 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Unable to write out mpt_ioctl_targetinfo struct)"
+   --#TYPE			"Scsi Lsi Event 95"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (Unable to write out mpt_ioctl_targetinfo struct)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13095
+
+scsiLsiEvent96 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Can't register misc device)"
+   --#TYPE			"Scsi Lsi Event 96"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (Can't register misc device)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13096
+
+scsiLsiEvent97 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Failed to register with Fusion MPT base Software)"
+   --#TYPE			"Scsi Lsi Event 97"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (Failed to register with Fusion MPT base Software)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13097
+
+scsiLsiEvent99 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (NULL ScsiCmd ptr)"
+   --#TYPE			"Scsi Lsi Event 99"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Software error (NULL ScsiCmd ptr)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 13099
+
+scsiLsiEvent100 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (Skipping because it's not operational)"
+   --#TYPE			"Scsi Lsi Event 100"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (Skipping because it's not operational) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13100
+
+scsiLsiEvent101 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (Skipping because it's disabled)"
+   --#TYPE			"Scsi Lsi Event 101"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (Skipping because it's disabled) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13101
+
+scsiLsiEvent102 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (SCSI Initiator mode is NOT enabled)"
+   --#TYPE			"Scsi Lsi Event 102"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (SCSI Initiator mode is NOT enabled) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13102
+
+scsiLsiEvent103 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Unable to register controller with SCSI subsystem)"
+   --#TYPE			"Scsi Lsi Event 103"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Software error (Unable to register controller with SCSI subsystem)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 13103
+
+scsiLsiEvent104 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (DV thread still active)"
+   --#TYPE			"Scsi Lsi Event 104"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (DV thread still active)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13104
+
+scsiLsiEvent105 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (TMHandler NULL ioc)"
+   --#TYPE			"Scsi Lsi Event 105"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (TMHandler NULL ioc)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13105
+
+scsiLsiEvent106 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (IOC issue of TaskMgmt failed)"
+   --#TYPE			"Scsi Lsi Event 106"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (IOC issue of TaskMgmt failed) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13106
+
+scsiLsiEvent107 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (Error issuing abort task)"
+   --#TYPE			"Scsi Lsi Event 107"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (Error issuing abort task) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13107
+
+scsiLsiEvent109 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (Error processing TaskMgmt request)"
+   --#TYPE			"Scsi Lsi Event 109"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (Error processing TaskMgmt request) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13109
+
+scsiLsiEvent110 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (Firmware Reload FAILED)"
+   --#TYPE			"Scsi Lsi Event 110"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Adapter error (Firmware Reload FAILED)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13110
+
+scsiLsiEvent111 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (slave_alloc kmalloc FAILED)"
+   --#TYPE			"Scsi Lsi Event 111"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Software error (slave_alloc kmalloc FAILED)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 13111
+
+scsiLsiEvent113 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (ScanDvComplete)"
+   --#TYPE			"Scsi Lsi Event 113"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Software error (ScanDvComplete)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 13113
+
+scsiLsiEvent114 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (ScanDvComplete)"
+   --#TYPE			"Scsi Lsi Event 114"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Software error (ScanDvComplete)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 13114
+
+scsiLsiEvent115 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (Firmware Reload FAILED)"
+   --#TYPE			"Scsi Lsi Event 115"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (Firmware Reload FAILED) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13115
+
+scsiLsiEvent116 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Null cmdPtr)"
+   --#TYPE			"Scsi Lsi Event 116"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Software error (Null cmdPtr)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 13116
+
+scsiLsiEvent117 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Device error (Release failed)"
+   --#TYPE			"Scsi Lsi Event 117"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Device error (Release failed) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13117
+
+scsiLsiEvent119 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (unexpected boot option ignored)"
+   --#TYPE			"Scsi Lsi Event 119"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (unexpected boot option ignored)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13119
+
+scsiLsiEvent120 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (detects pci parity error)"
+   --#TYPE			"Scsi Lsi Event 120"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (detects pci parity error) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13120
+
+scsiLsiEvent121 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (detects pci parity error)"
+   --#TYPE			"Scsi Lsi Event 121"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (detects pci parity error) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13121
+
+scsiLsiEvent122 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (couldn't read pci register)"
+   --#TYPE			"Scsi Lsi Event 122"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (couldn't read pci register) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13122
+
+scsiLsiEvent123 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (detects pci parity error)"
+   --#TYPE			"Scsi Lsi Event 123"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (detects pci parity error) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13123
+
+scsiLsiEvent124 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (detects pci parity error)"
+   --#TYPE			"Scsi Lsi Event 124"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (detects pci parity error) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13124
+
+scsiLsiEvent125 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (detects pci parity error)"
+   --#TYPE			"Scsi Lsi Event 125"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (detects pci parity error) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13125
+
+scsiLsiEvent126 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Failed to alloc memory) "
+   --#TYPE			"Scsi Lsi Event 126"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Software error (Failed to alloc memory)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 13126
+
+scsiLsiEvent127 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (PCI-MSI enabled) "
+   --#TYPE			"Scsi Lsi Event 127"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Software error (PCI-MSI enabled)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 13127
+
+scsiLsiEvent128 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (host page buffers free failed) "
+   --#TYPE			"Scsi Lsi Event 128"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (host page buffers free failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13128
+
+scsiLsiEvent129 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (Sending IOCInit failed)"
+   --#TYPE			"Scsi Lsi Event 129"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (Sending IOCInit failed) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13129
+
+scsiLsiEvent130 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (Sending PortEnable failed)"
+   --#TYPE			"Scsi Lsi Event 130"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (Sending PortEnable failed) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13130
+
+scsiLsiEvent133 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Received a mf that was already freed)"
+   --#TYPE			"Scsi Lsi Event 133"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Software error (Received a mf that was already freed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 13133
+
+scsiLsiEvent134 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (target reset)"
+   --#TYPE			"Scsi Lsi Event 134"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (target reset) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13134
+
+scsiLsiEvent135 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (bus reset)"
+   --#TYPE			"Scsi Lsi Event 135"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (bus reset) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13135
+
+scsiLsiEvent136 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Device error (Received a mf that was already freed)"
+   --#TYPE			"Scsi Lsi Event 136"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Device error (Received a mf that was already freed) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13136
+
+scsiLsiEvent137 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (mpt_turbo_reply: Invalid cb_idx)"
+   --#TYPE			"Scsi Lsi Event 137"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (mpt_turbo_reply: Invalid cb_idx) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13137
+
+scsiLsiEvent138 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (mpt_reply: Invalid cb_idx)"
+   --#TYPE			"Scsi Lsi Event 138"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (mpt_reply: Invalid cb_idx) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13138
+
+scsiLsiEvent139 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (LogInfo)"
+   --#TYPE			"Scsi Lsi Event 139"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (LogInfo) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13139
+
+scsiLsiEvent140 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (Skipping because it's not operational)"
+   --#TYPE			"Scsi Lsi Event 140"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (Skipping because it's not operational) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13140
+
+scsiLsiEvent141 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (Skipping because it's disabled)"
+   --#TYPE			"Scsi Lsi Event 141"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (Skipping because it's disabled) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13141
+
+scsiLsiEvent142 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (Skipping because SCSI Initiator mode is NOT enabled)"
+   --#TYPE			"Scsi Lsi Event 142"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (Skipping because SCSI Initiator mode is NOT enabled) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13142
+
+scsiLsiEvent143 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Unable to register controller with SCSI subsystem)"
+   --#TYPE			"Scsi Lsi Event 143"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Software error (Unable to register controller with SCSI subsystem)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 13143
+
+scsiLsiEvent144 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (F/W Response)"
+   --#TYPE			"Scsi Lsi Event 144"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Software error (F/W Response)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 13144
+
+scsiLsiEvent145 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (no msg frames)"
+   --#TYPE			"Scsi Lsi Event 145"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (no msg frames)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13145
+
+scsiLsiEvent146 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (operation failed)"
+   --#TYPE			"Scsi Lsi Event 146"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Adapter error (operation failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13146
+
+scsiLsiEvent147 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (Controller disabled)"
+   --#TYPE			"Scsi Lsi Event 147"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Adapter error (Controller disabled)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13147
+
+scsiLsiEvent148 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (reset failed)"
+   --#TYPE			"Scsi Lsi Event 148"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Adapter error (reset failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13148
+
+scsiLsiEvent149 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Failed to register with Fusion MPT base driver)"
+   --#TYPE			"Scsi Lsi Event 149"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (Failed to register with Fusion MPT base driver)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13149
+
+scsiLsiEvent150 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (slave_alloc kzalloc failed)"
+   --#TYPE			"Scsi Lsi Event 150"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (slave_alloc kzalloc failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13150
+
+scsiLsiEvent151 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (dma_alloc_coherent for parameters failed)"
+   --#TYPE			"Scsi Lsi Event 151"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (dma_alloc_coherent for parameters failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13151
+
+scsiLsiEvent152 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (mpt_config failed)"
+   --#TYPE			"Scsi Lsi Event 152"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (mpt_config failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13152
+
+scsiLsiEvent153 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (readl: detects master abort)"
+   --#TYPE			"Scsi Lsi Event 153"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (readl: detects master abort) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13153
+
+scsiLsiEvent154 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (mptscsih_slave_destroy is NULL)"
+   --#TYPE			"Scsi Lsi Event 154"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Software error (mptscsih_slave_destroy is NULL)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 13154
+
+scsiLsiEvent155 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (mptsas_hotplug_print: Notified id is invalid)"
+   --#TYPE			"Scsi Lsi Event 155"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Software error (mptsas_hotplug_print: Notified id is invalid)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 13155
+
+scsiLsiEvent156 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (mptsas_remove_target: Notified id is invalid)"
+   --#TYPE			"Scsi Lsi Event 156"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Software error (mptsas_remove_target: Notified id is invalid)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 13156
+
+scsiLsiEvent157 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (mptsas_add_device: Notified id is invalid)"
+   --#TYPE			"Scsi Lsi Event 157"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Software error (mptsas_add_device: Notified id is invalid)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 13157
+
+scsiLsiEvent158 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (mptsas_scan_target: Notified id is invalid)"
+   --#TYPE			"Scsi Lsi Event 158"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Software error (mptsas_scan_target: Notified id is invalid)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 13158
+
+scsiLsiEvent159 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (mptsas_hotplug_work: Notified id is invalid)"
+   --#TYPE			"Scsi Lsi Event 159"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Software error (mptsas_hotplug_work: Notified id is invalid)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 13159
+
+scsiLsiEvent160 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Target Bus out of bounds)"
+   --#TYPE			"Scsi Lsi Event 160"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (Target Bus out of bounds)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13160
+
+scsiLsiEvent161 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (IOC Not operational)"
+   --#TYPE			"Scsi Lsi Event 161"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: %s Adapter error (IOC Not operational) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13161
+
+scsiLsiEvent162 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (HardReset FAILED!!)"
+   --#TYPE			"Scsi Lsi Event 162"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Adapter error (HardReset FAILED!!)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13162
+
+scsiLsiEvent163 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (ioc_state: DOORBELL_ACTIVE)"
+   --#TYPE			"Scsi Lsi Event 163"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: %s Adapter error (ioc_state: DOORBELL_ACTIVE) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13163
+
+scsiLsiEvent164 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (lost hotplug event)"
+   --#TYPE			"Scsi Lsi Event 164"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (lost hotplug event)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13164
+
+scsiLsiEvent165 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (mpt_turbo_reply: Invalid REPLY_TYPE)"
+   --#TYPE			"Scsi Lsi Event 165"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (mpt_turbo_reply: Invalid REPLY_TYPE) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13165
+
+scsiLsiEvent166 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (IOCStatus)"
+   --#TYPE			"Scsi Lsi Event 166"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (IOCStatus) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13166
+
+scsiLsiEvent167 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (LogInfo)"
+   --#TYPE			"Scsi Lsi Event 167"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Adapter error (LogInfo)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13167
+
+scsiLsiEvent168 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Unable to allocate memory)"
+   --#TYPE			"Scsi Lsi Event 168"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (Unable to allocate memory)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13168
+
+scsiLsiEvent169 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Unable to copy mpt_fw)"
+   --#TYPE			"Scsi Lsi Event 169"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (Unable to copy mpt_fw)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13169
+
+scsiLsiEvent170 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Target_List=NULL)"
+   --#TYPE			"Scsi Lsi Event 170"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Software error (Target_List=NULL)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 13170
+
+scsiLsiEvent171 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (HardResetHandler FAILED!!)"
+   --#TYPE			"Scsi Lsi Event 171"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (HardResetHandler FAILED!!) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13171
+
+scsiLsiEvent172 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter or Software error (Invalid channel)"
+   --#TYPE			"Scsi Lsi Event 172"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter or Software error (Invalid channel) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13172
+
+scsiLsiEvent173 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (no suitable DMA mask)"
+   --#TYPE			"Scsi Lsi Event 173"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (no suitable DMA mask) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13173
+
+scsiLsiEvent174 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Adapter not found!)"
+   --#TYPE			"Scsi Lsi Event 174"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Software error (Adapter not found!)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 13174
+
+scsiLsiEvent175 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (Adapter not found!)"
+   --#TYPE			"Scsi Lsi Event 175"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Software error (Adapter not found!)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13175
+
+scsiLsiEvent176 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (HardReset FAILED!!)"
+   --#TYPE			"Scsi Lsi Event 176"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (HardReset FAILED!!) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13176
+
+scsiLsiEvent177 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (reset failed)"
+   --#TYPE			"Scsi Lsi Event 177"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (reset failed) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13177
+
+scsiLsiEvent178 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (DVCmdTimer_expired: HardReset FAILED!)"
+   --#TYPE			"Scsi Lsi Event 178"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (DVCmdTimer_expired: HardReset FAILED!) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13178
+
+scsiLsiEvent179 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (pciras_readl(); recovered pci parity error with retry)"
+   --#TYPE			"Scsi Lsi Event 179"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Software error (pciras_readl(); recovered pci parity error with retry)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 13179
+
+scsiLsiEvent180 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (pciras_writel(); recovered pci parity error with retry)"
+   --#TYPE			"Scsi Lsi Event 180"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Software error (pciras_writel(); recovered pci parity error with retry)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 13180
+
+scsiLsiEvent181 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (mpt_fault_reset_work: HardReset)"
+   --#TYPE			"Scsi Lsi Event 181"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (mpt_fault_reset_work: HardReset) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13181
+
+scsiLsiEvent182 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (IOC is in FAULT state after reset)"
+   --#TYPE			"Scsi Lsi Event 182"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (IOC is in FAULT state after reset) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13182
+
+scsiLsiEvent183 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (pci_enable_device: failed)"
+   --#TYPE			"Scsi Lsi Event 183"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (pci_enable_device: failed) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13183
+
+scsiLsiEvent184 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (firmware upload failure!)"
+   --#TYPE			"Scsi Lsi Event 184"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (firmware upload failure!) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13184
+
+scsiLsiEvent185 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (firmware downloadboot failure)"
+   --#TYPE			"Scsi Lsi Event 185"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (firmware downloadboot failure) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13185
+
+scsiLsiEvent186 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (host page buffers free failed)"
+   --#TYPE			"Scsi Lsi Event 186"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (host page buffers free failed) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13186
+
+scsiLsiEvent187 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (Firmware Reload FAILED)"
+   --#TYPE			"Scsi Lsi Event 187"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (Firmware Reload FAILED) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13187
+
+scsiLsiEvent188 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (pci_enable_device_mem() failed)"
+   --#TYPE			"Scsi Lsi Event 188"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (pci_enable_device_mem() failed) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13188
+
+scsiLsiEvent189 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Software error (failed setting 35 bit addressing for Request/Reply/Chain and Sense Buffers)"
+   --#TYPE			"Scsi Lsi Event 189"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Software error (failed setting 35 bit addressing for Request/Reply/Chain and Sense Buffers)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 13189
+
+scsiLsiEvent190 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (adapter_reset retry exhausted; stop reset operation)"
+   --#TYPE			"Scsi Lsi Event 190"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (adapter_reset retry exhausted; stop reset operation) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13190
+
+scsiLsiEvent191 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (adapter_reset failed)"
+   --#TYPE			"Scsi Lsi Event 191"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (adapter_reset failed) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13191
+
+scsiLsiEvent192 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (IOC msg unit reset failed to put ioc in ready state)"
+   --#TYPE			"Scsi Lsi Event 192"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (IOC msg unit reset failed to put ioc in ready state) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13192
+
+scsiLsiEvent193 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (Errata on LSI53C1030 occurred)"
+   --#TYPE			"Scsi Lsi Event 193"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih: Adapter error (Errata on LSI53C1030 occurred)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 13193
+
+scsiLsiEvent194 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Device error (target reset failed)"
+   --#TYPE			"Scsi Lsi Event 194"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Device error (target reset failed) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13194
+
+scsiLsiEvent195 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih:Adapter error (IOC Not operational)"
+   --#TYPE			"Scsi Lsi Event 195"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (IOC Not operational) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13195
+
+scsiLsiEvent196 TRAP-TYPE
+   ENTERPRISE   psaLinLsiLogicTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "mptscsih: Adapter error (Issuing HardReset)"
+   --#TYPE			"Scsi Lsi Event 196"
+   --#SUMMARY		"%s(PID=%d) %s %d %s mptscsih:%s Adapter error (Issuing HardReset) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 13196
+
+END

@@ -1,0 +1,159 @@
+--
+--      THIS IS PROPRIETARY SOURCE CODE OF FUJITSU TECHNOLOGY
+--      SOLUTIONS.
+--      This computer program is protected by copyright law
+--      and international treaties. Unauthorized reproduction,
+--      distribution or use of this computer program or any
+--      part thereof may result in civil and criminal
+--      penalties which shall be prosecuted to the fullest
+--      extent permitted by law.
+--      The copyright notice does not evidence any
+--      actual or intended publication of such source code.
+--
+--      Copyright (c) 2009 Fujitsu Technology Solutions
+--      All Rights Reserved
+--
+FTS-x10sure-MIB DEFINITIONS ::= BEGIN
+--
+-- Title:   MIB for for interpreting x10sure traps
+--
+-- Version: 1
+-- Date:    30 July 2008
+-- Author:  FTS TSP ES&S SWE SOL 2
+--
+--          Fujitsu Technology Solutions
+--          Heinz-Nixdorf Ring 1
+--          33102 Paderborn
+--
+-- Reason:  Initial version.
+--
+
+IMPORTS
+        enterprises
+            FROM RFC1155-SMI
+        DisplayString
+            FROM RFC1213-MIB
+        OBJECT-TYPE
+            FROM RFC1212-MIB
+        TRAP-TYPE 
+	    FROM RFC-1215;
+
+
+sni                        OBJECT IDENTIFIER ::= { enterprises 231 }
+sniProductMibs             OBJECT IDENTIFIER ::= { sni 2 }
+ftsX10sureMIB              OBJECT IDENTIFIER ::= { sniProductMibs 52 }
+
+
+x10sureObjects             OBJECT IDENTIFIER ::= { ftsX10sureMIB 1 }
+
+x10sureNotifications       OBJECT IDENTIFIER ::= { ftsX10sureMIB 2 }
+x10sureTraps               OBJECT IDENTIFIER ::= { x10sureNotifications 0 }
+x10sureNotificationsData   OBJECT IDENTIFIER ::= { x10sureNotifications 1 }
+
+
+x10sureTrapDateAndTime OBJECT-TYPE
+        SYNTAX          DisplayString
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                        "Date and Time the trap occured."
+        ::= { x10sureNotificationsData 1 }
+
+x10sureTrapMessage OBJECT-TYPE
+        SYNTAX          DisplayString
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                        "Text containing the event description."
+        ::= { x10sureNotificationsData 2 }
+
+x10sureTrapFarmName OBJECT-TYPE
+        SYNTAX          DisplayString
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                        "The farmname sending the trap."
+        ::= { x10sureNotificationsData 3 }
+
+x10sureTrapOrigin OBJECT-TYPE
+        SYNTAX          DisplayString
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                        "The name of the control node sending the message."
+        ::= { x10sureNotificationsData 4 }
+
+x10sureTrapStateChange OBJECT-TYPE
+        SYNTAX          DisplayString
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION
+                        "The string containg the old state, the new state and the corresponding hostname."
+        ::= { x10sureNotificationsData 5 }
+
+
+x10sureEventTrap  TRAP-TYPE
+    ENTERPRISE  x10sureNotifications
+    VARIABLES   {
+                        x10sureTrapFarmName,
+                        x10sureTrapOrigin,
+                        x10sureTrapDateAndTime,
+                        x10sureTrapMessage
+                }
+    DESCRIPTION
+                "Nice to know information of events that occurred."
+		--#TYPE "x10sure EVENT Trap"
+                --#SEVERITY     INFORMATIONAL
+                --#ARGUMENTS    { 0, 1, 2, 3 }
+                --#SUMMARY      "Farm Name: %s, Control Node Name: %s, Date: %s, Message: %s"
+    ::= 1
+
+x10sureWarningTrap  TRAP-TYPE
+    ENTERPRISE  x10sureNotifications
+    VARIABLES   {
+                        x10sureTrapFarmName,
+                        x10sureTrapOrigin,
+                        x10sureTrapDateAndTime,
+                        x10sureTrapMessage
+                }
+    DESCRIPTION
+                "For future use."
+		--#TYPE "x10sure WARNING Trap"
+                --#SEVERITY     MINOR
+                --#ARGUMENTS    { 0, 1, 2, 3 }
+                --#SUMMARY      "Farm Name: %s, Control Node Name: %s, Date: %s, Message: %s"
+    ::= 2
+
+x10sureErrorTrap  TRAP-TYPE
+    ENTERPRISE  x10sureNotifications
+    VARIABLES   {
+                        x10sureTrapFarmName,
+                        x10sureTrapOrigin,
+                        x10sureTrapDateAndTime,
+                        x10sureTrapMessage
+                }
+    DESCRIPTION
+                "x10sure error description which may require operator intervention."
+		--#TYPE "x10sure ERROR Trap"
+                --#SEVERITY     MAJOR
+                --#ARGUMENTS    { 0, 1, 2, 3 }
+                --#SUMMARY      "Farm Name: %s, Control Node Name: %s, Date: %s, Message: %s"
+    ::= 3
+
+x10sureFatalTrap  TRAP-TYPE
+    ENTERPRISE  x10sureNotifications
+    VARIABLES   {
+                        x10sureTrapFarmName,
+                        x10sureTrapOrigin,
+                        x10sureTrapDateAndTime,
+                        x10sureTrapMessage
+                }
+    DESCRIPTION
+                "x10sure fatal error description which may require operator intervention."
+		--#TYPE "x10sure FATAL Trap"
+                --#SEVERITY     CRITICAL
+                --#ARGUMENTS    { 0, 1, 2, 3 }
+                --#SUMMARY      "Farm Name: %s, Control Node Name: %s, Date: %s, Message: %s"
+    ::= 4
+
+END

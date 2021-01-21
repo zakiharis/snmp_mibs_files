@@ -1,0 +1,2109 @@
+--===================================================================
+--===================================================================
+-- Fusion-io ioDimm
+-- Management Information Base for SNMP Network Management
+--
+-- Draft Revision: 1.20
+-- Date: 2013/6/11
+--
+-- Copyright 2009-2013 Fusion-io
+-- All rights reserved.
+--
+-- The information contained herein is proprietary, confidential and
+-- may change without notice. No warranty is implied hereby.
+--===================================================================
+--===================================================================
+
+FUSIONIO-IODIMM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    enterprises,
+    Counter
+        FROM RFC1155-SMI
+    sysName,
+    DisplayString
+        FROM RFC1213-MIB
+    OBJECT-TYPE
+        FROM RFC-1212
+    TRAP-TYPE
+        FROM RFC-1215;
+
+-- SimpleTime :== TEXTUAL-CONVENTION
+--      SYNTAX  DisplayString
+--      STATUS  mandatory
+--      DESCRIPTION
+--
+--      "The date and time in text format:
+--           YYYY/MM/DD-HH:MM:SS
+--
+--      May be simplified by expressing only the date."
+
+SimpleTime ::= DisplayString
+
+Boolean ::= INTEGER {
+                true(1),
+                false(2) }
+
+fusionio OBJECT IDENTIFIER
+    -- 1.3.6.1.4.1.30018
+    ::= { enterprises 30018 }
+
+fusionIoDimm OBJECT IDENTIFIER
+    -- 1.3.6.1.4.1.30018.1
+    ::= { fusionio 1 }
+
+fusionIoDimmMib OBJECT IDENTIFIER
+    -- 1.3.6.1.4.1.30018.1.1
+    ::= { fusionIoDimm 1 }
+
+fusionIoDimmMibRevMajor OBJECT-TYPE
+    SYNTAX  INTEGER (1..65535)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Major MIB revision. This will increment when
+         incompatible structural changes occur."
+    -- 1.3.6.1.4.1.30018.1.1.1
+    ::= { fusionIoDimmMib 1 }
+
+fusionIoDimmMibRevMinor OBJECT-TYPE
+    SYNTAX  INTEGER (0..65535)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Minor MIB revision. This will increment when minor
+         additions occur."
+    -- 1.3.6.1.4.1.30018.1.1.2
+    ::= { fusionIoDimmMib 2 }
+
+fusionIoDimmMIBCondition OBJECT-TYPE
+    SYNTAX  INTEGER {
+                other(1),
+                ok(2),
+                degraded(3),
+                failed(4) }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The overall MIB condition."
+    -- 1.3.6.1.4.1.30018.1.1.3
+    ::= { fusionIoDimmMib 3 }
+
+fusionIoDimmComponent OBJECT IDENTIFIER
+    -- 1.3.6.1.4.1.30018.1.2
+    ::= { fusionIoDimm 2 }
+
+fusionIoDimmInfo OBJECT IDENTIFIER
+    -- 1.3.6.1.4.1.30018.1.2.1
+    ::= { fusionIoDimmComponent 1 }
+
+fusionIoDimmInfoTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF FusionIoDimmInfoEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "There will be an entry in this table for each
+        ioDrive device installed."
+    -- 1.3.6.1.4.1.30018.1.2.1.1
+    ::= { fusionIoDimmInfo 1 }
+
+fusionIoDimmInfoEntry OBJECT-TYPE
+    SYNTAX  FusionIoDimmInfoEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "Each entry represents an ioDrive device."
+    INDEX {
+        fusionIoDimmInfoIndex }
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1
+    ::= { fusionIoDimmInfoTable 1 }
+
+FusionIoDimmInfoEntry ::= SEQUENCE {
+    fusionIoDimmInfoIndex                    INTEGER,
+    fusionIoDimmInfoStatus                   INTEGER,
+    fusionIoDimmInfoName                     DisplayString,
+    fusionIoDimmInfoSerialNumber             DisplayString,
+    fusionIoDimmInfoPartNumber               DisplayString,
+    fusionIoDimmInfoSubVendorPartNumber      DisplayString,
+    fusionIoDimmInfoSparePartNumber          DisplayString,
+    fusionIoDimmInfoAssemblyNumber           DisplayString,
+    fusionIoDimmInfoFirmwareVersion          DisplayString,
+    fusionIoDimmInfoDriverVersion            DisplayString,
+    fusionIoDimmInfoUID                      DisplayString,
+    fusionIoDimmInfoState                    INTEGER,
+    fusionIoDimmInfoClientDeviceName         DisplayString,
+    fusionIoDimmInfoBeacon                   Boolean,
+    fusionIoDimmInfoPCIAddress               DisplayString,
+    fusionIoDimmInfoPCIDeviceID              DisplayString,
+    fusionIoDimmInfoPCISubdeviceID           DisplayString,
+    fusionIoDimmInfoPCIVendorID              DisplayString,
+    fusionIoDimmInfoPCISubvendorID           DisplayString,
+    fusionIoDimmInfoPCISlot                  INTEGER,
+    fusionIoDimmInfoWearoutIndicator         Boolean,
+    fusionIoDimmInfoFlashbackIndicator       Boolean,
+    fusionIoDimmInfoWritableIndicator        INTEGER,
+    fusionIoDimmInfoInternalTemp             INTEGER,
+    fusionIoDimmInfoHealthPercentage         INTEGER,
+    fusionIoDimmInfoShortTermWearoutDate     SimpleTime,
+    fusionIoDimmInfoLongTermWearoutDate      SimpleTime,
+    fusionIoDimmInfoShortTermNonWritableDate SimpleTime,
+    fusionIoDimmInfoLongTermNonWritableDate  SimpleTime,
+    fusionIoDimmInfoMinimalModeReason        INTEGER,
+    fusionIoDimmInfoReducedWriteReason       INTEGER,
+    fusionIoDimmInfoMilliVolts               INTEGER,
+    fusionIoDimmInfoMilliVoltsPeak           INTEGER,
+    fusionIoDimmInfoMilliVoltsMin            INTEGER,
+    fusionIoDimmInfoMilliWatts               INTEGER,
+    fusionIoDimmInfoMilliWattsPeak           INTEGER,
+    fusionIoDimmInfoMilliAmps                INTEGER,
+    fusionIoDimmInfoMilliAmpsPeak            INTEGER,
+    fusionIoDimmInfoAdapterType              INTEGER,
+    fusionIoDimmInfoAdapterPort              INTEGER,
+    fusionIoDimmInfoAdapterSerialNumber      DisplayString,
+    fusionIoDimmInfoAdapterExtPowerPresent   Boolean,
+    fusionIoDimmInfoPowerlossProtectDisabled Boolean,
+    fusionIoDimmInfoInternalTempHigh         Boolean,
+    fusionIoDimmInfoAmbientTemp              INTEGER,
+    fusionIoDimmInfoPCIBandwidthCompatibility  INTEGER,
+    fusionIoDimmInfoPCIPowerCompatibility      INTEGER,
+    fusionIoDimmInfoActualGoverningLevel       INTEGER,
+    fusionIoDimmInfoLifespanGoverningLevel     INTEGER,
+    fusionIoDimmInfoPowerGoverningLevel        INTEGER,
+    fusionIoDimmInfoThermalGoverningLevel      INTEGER,
+    fusionIoDimmInfoLifespanGoverningEnabled   Boolean,
+    fusionIoDimmInfoLifespanGoverningTgtDate   DisplayString,
+    fusionIoDimmInfoInternalTempCritical     Boolean,
+    fusionIoDimmInfoInternalTempShutdown     Boolean,
+    fusionIoDimmInfoPcieErrorsIndicator      Boolean,
+    fusionIoDimmInfoMissingLebMapIndicator   Boolean,
+    fusionIoDimmInfoVccIntErrorIndicator     Boolean,
+    fusionIoDimmInfoVccAuxErrorIndicator     Boolean,
+    fusionIoDimmInfoOverPowerIndicator       Boolean,
+    fusionIoDimmInfoUpgradeInProgressIndicator Boolean,
+    fusionIoDimmInfoInternalTempHighThreshold INTEGER,
+    fusionIoDimmInfoInternalTempCriticalThreshold INTEGER,
+    fusionIoDimmInfoInternalTempShutdownThreshold INTEGER,
+    fusionIoDimmInfoVirtualControllerNumber  INTEGER,
+    fusionIoDimmInfoVirtualControllerCount   INTEGER,
+    fusionIoDimmInfoActiveMediaPercent       INTEGER }
+
+fusionIoDimmInfoIndex OBJECT-TYPE
+    SYNTAX  INTEGER (1..1024)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Unique index for ioDrive entries."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.1
+    ::= { fusionIoDimmInfoEntry 1 }
+
+fusionIoDimmInfoStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+                other(1),
+                ok(2),
+                degraded(3),
+                failed(4) }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The overall status of the ioDrive device."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.2
+    ::= { fusionIoDimmInfoEntry 2 }
+
+fusionIoDimmInfoName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..50))
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "System control device name for this device."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.3
+    ::= { fusionIoDimmInfoEntry 3 }
+
+fusionIoDimmInfoSerialNumber OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..50))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Serial number of this device."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.4
+    ::= { fusionIoDimmInfoEntry 4 }
+
+fusionIoDimmInfoPartNumber OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..50))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "System part number of this device."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.5
+    ::= { fusionIoDimmInfoEntry 5 }
+
+fusionIoDimmInfoSubVendorPartNumber OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..50))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Sub-vendor system part number of this device."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.6
+    ::= { fusionIoDimmInfoEntry 6 }
+
+fusionIoDimmInfoSparePartNumber OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..50))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The spare part number of this device."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.7
+    ::= { fusionIoDimmInfoEntry 7 }
+
+fusionIoDimmInfoAssemblyNumber OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..50))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The assembly number of this device (HW revision)."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.8
+    ::= { fusionIoDimmInfoEntry 8 }
+
+fusionIoDimmInfoFirmwareVersion OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..50))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Firmware version of this device."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.9
+    ::= { fusionIoDimmInfoEntry 9 }
+
+fusionIoDimmInfoDriverVersion OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..50))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Device driver version."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.10
+    ::= { fusionIoDimmInfoEntry 10 }
+
+fusionIoDimmInfoUID OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..50))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Device UID written at format time."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.11
+    ::= { fusionIoDimmInfoEntry 11 }
+
+fusionIoDimmInfoState OBJECT-TYPE
+    SYNTAX  INTEGER {
+                unknown(0),
+                detached(1),
+                attached(2),
+                minimal(3),
+                error(4),
+                detaching(5),
+                attaching(6),
+                scanning(7),
+                formatting(8),
+                updating(9),
+                attach(10),
+                detach(11),
+                format(12),
+                update(13) }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "The current state of the attached client device.
+         In order to function normally, the device must be
+         in the 'attached' state.
+
+         Quiescent states:
+
+             attached   = device is ready for normal use
+             detached   = device is stopped
+             minimal    = driver loaded but firmware needs updating
+             error      = device is not working properly
+
+         Transitional states:
+
+             attaching  = device is initializing
+             scanning   = part of device initialization
+             detaching  = device is stopping
+             formatting = the format operation is in process
+             updating   = the firmware is being updated
+
+         Operations:
+
+             attach     = make device operational
+             detach     = take device off-line
+             format     = re-formats device
+             update     = firmware update
+
+         Device state must be minimal or detached to update the
+         firmware and must be detached in order format."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.12
+    ::= { fusionIoDimmInfoEntry 12 }
+
+fusionIoDimmInfoClientDeviceName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..25))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The name of the attached client device."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.13
+    ::= { fusionIoDimmInfoEntry 13 }
+
+fusionIoDimmInfoBeacon OBJECT-TYPE
+    SYNTAX  Boolean
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+        "Writing a true value here will turn on the LED
+         flashing beacon for visual card identification. A
+         false value will turn the LED beacon off."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.14
+    ::= { fusionIoDimmInfoEntry 14 }
+
+fusionIoDimmInfoPCIAddress OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..15))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Device address on the PCI bus."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.15
+    ::= { fusionIoDimmInfoEntry 15 }
+
+fusionIoDimmInfoPCIDeviceID OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..25))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Device PCI ID."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.16
+    ::= { fusionIoDimmInfoEntry 16 }
+
+fusionIoDimmInfoPCISubdeviceID OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..25))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Device PCI subdevice ID."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.17
+    ::= { fusionIoDimmInfoEntry 17 }
+
+fusionIoDimmInfoPCIVendorID OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..25))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Device PCI vendor ID."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.18
+    ::= { fusionIoDimmInfoEntry 18 }
+
+fusionIoDimmInfoPCISubvendorID OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..25))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Device PCI subvendor ID."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.19
+    ::= { fusionIoDimmInfoEntry 19 }
+
+fusionIoDimmInfoPCISlot OBJECT-TYPE
+    SYNTAX  INTEGER (0..16)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Device PCI slot number."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.20
+    ::= { fusionIoDimmInfoEntry 20 }
+
+fusionIoDimmInfoWearoutIndicator OBJECT-TYPE
+    SYNTAX  Boolean
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "A true condition indicates that the device has
+	 surpassed the wearout threshold."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.21
+    ::= { fusionIoDimmInfoEntry 21 }
+
+-- this field is not relevant for drivers newer than 2.3.1.
+fusionIoDimmInfoFlashbackIndicator OBJECT-TYPE
+    SYNTAX  Boolean
+    ACCESS  read-only
+    STATUS  obsolete
+    DESCRIPTION
+        "A true condition indicates that flashback redundancy
+         is degraded."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.22
+    ::= { fusionIoDimmInfoEntry 22 }
+
+fusionIoDimmInfoWritableIndicator OBJECT-TYPE
+    SYNTAX  INTEGER {
+                writeReduced(0),
+                nonWritable(1),
+                normal(2),
+                unknown(3) }
+
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "A value that indicates the writability of the device."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.23
+    ::= { fusionIoDimmInfoEntry 23 }
+
+fusionIoDimmInfoInternalTemp OBJECT-TYPE
+    SYNTAX  INTEGER (-100..100)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The current internal temperature of the device in Celsius."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.24
+    ::= { fusionIoDimmInfoEntry 24 }
+
+fusionIoDimmInfoHealthPercentage OBJECT-TYPE
+    SYNTAX  INTEGER (-1..100)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "An estimate of the health of the drive expressed
+         as the remaining percentage of drive life before write rate
+         is reduced due to wearout. If health percentage is not available
+	 the value will be set to -1."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.25
+    ::= { fusionIoDimmInfoEntry 25 }
+
+fusionIoDimmInfoShortTermWearoutDate OBJECT-TYPE
+	SYNTAX  SimpleTime
+	ACCESS  read-only
+	STATUS  obsolete
+	DESCRIPTION
+		"The date that the drive is estimated to reach the
+		wearout threshold based on drive usage in the short-term
+		interval."
+	-- 1.3.6.1.4.1.30018.1.2.1.1.1.26
+	::= { fusionIoDimmInfoEntry 26 }
+
+
+fusionIoDimmInfoLongTermWearoutDate OBJECT-TYPE
+	SYNTAX  SimpleTime
+	ACCESS  read-only
+	STATUS  obsolete
+	DESCRIPTION
+		"The date that the drive is estimated to reach the
+		wearout threshold based on drive usage in the long-term
+		interval."
+	-- 1.3.6.1.4.1.30018.1.2.1.1.1.27
+	::= { fusionIoDimmInfoEntry 27 }
+
+
+fusionIoDimmInfoShortTermNonWritableDate OBJECT-TYPE
+	SYNTAX  SimpleTime
+	ACCESS  read-only
+	STATUS  obsolete
+	DESCRIPTION
+		"The date that the drive is estimated to go non-writable
+		based on drive usage in the short-term interval."
+	-- 1.3.6.1.4.1.30018.1.2.1.1.1.28
+	::= { fusionIoDimmInfoEntry 28 }
+
+
+fusionIoDimmInfoLongTermNonWritableDate OBJECT-TYPE
+	SYNTAX  SimpleTime
+	ACCESS  read-only
+	STATUS  obsolete
+	DESCRIPTION
+		"The date that the drive is estimated to go non-writable
+		based on drive usage in the long-term interval."
+	-- 1.3.6.1.4.1.30018.1.2.1.1.1.29
+	::= { fusionIoDimmInfoEntry 29 }
+
+fusionIoDimmInfoMinimalModeReason OBJECT-TYPE
+    SYNTAX  INTEGER {
+                unknown(0),
+                firmwareOutOfDate(1),
+                lowPower(2),
+                dualPlaneFail(3),
+                forced(4),
+                internal(5),
+                cardLimitExceeded(6),
+                notInMinimalMode(7),
+                unsupportedOS(8),
+                insufficientMemory(9),
+                bootloaderMode(10),
+                missingMidprom(11),
+                unsupportedNand(12),
+                driverOutOfDate(13),
+                hardwareFailure(14),
+                channelInitFail(15),
+                fallbackFirmware(16) }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "Reason card is in minimal mode."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.30
+    ::= { fusionIoDimmInfoEntry 30 }
+
+fusionIoDimmInfoReducedWriteReason OBJECT-TYPE
+    SYNTAX  INTEGER {
+                none(0),
+                userRequested(1),
+                noMdBlocks(2),
+                noMemory(3),
+                dieFailure(4),
+                wearout(5),
+                adapterPower(6),
+                internal(7),
+                powerLimiting(8),
+                unavailable(9),
+                groomFails(10) }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "Reason card is in reduced write mode."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.31
+    ::= { fusionIoDimmInfoEntry 31 }
+
+fusionIoDimmInfoMilliVolts OBJECT-TYPE
+    SYNTAX  INTEGER (0..65535)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Current voltage level of PCIe 12 volt bus in millivolts.
+         A value of 0 means value could not be determined."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.32
+    ::= { fusionIoDimmInfoEntry 32 }
+
+fusionIoDimmInfoMilliVoltsPeak OBJECT-TYPE
+    SYNTAX  INTEGER (0..65535)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Peak voltage level of PCIe 12 volt bus in millivolts.
+         A value of 0 means value could not be determined."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.33
+    ::= { fusionIoDimmInfoEntry 33 }
+
+fusionIoDimmInfoMilliVoltsMin OBJECT-TYPE
+    SYNTAX  INTEGER (0..65535)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Minimum voltage level of PCIe 12 volt bus in millivolts.
+         A value of 0 means value could not be determined."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.34
+    ::= { fusionIoDimmInfoEntry 34 }
+
+fusionIoDimmInfoMilliWatts OBJECT-TYPE
+    SYNTAX  INTEGER (0..65535)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Current wattage drawn on the PCIe 12 volt bus in milliwatts.
+         A value of 0 means value could not be determined."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.35
+    ::= { fusionIoDimmInfoEntry 35 }
+
+fusionIoDimmInfoMilliWattsPeak OBJECT-TYPE
+    SYNTAX  INTEGER (0..65535)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Peak wattage drawn on the PCIe 12 volt bus in milliwatts.
+         A value of 0 means value could not be determined."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.36
+    ::= { fusionIoDimmInfoEntry 36 }
+
+fusionIoDimmInfoMilliAmps OBJECT-TYPE
+    SYNTAX  INTEGER (0..65535)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Amperage flowing on the PCIe 12 volt bus in milliamps.
+         A value of 0 means value could not be determined."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.37
+    ::= { fusionIoDimmInfoEntry 37 }
+
+fusionIoDimmInfoMilliAmpsPeak OBJECT-TYPE
+    SYNTAX  INTEGER (0..65535)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Peak amperage flowing on the PCIe 12 volt bus in milliamps.
+         A value of 0 means value could not be determined."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.38
+    ::= { fusionIoDimmInfoEntry 38 }
+
+fusionIoDimmInfoAdapterType OBJECT-TYPE
+    SYNTAX  INTEGER {
+                unknown(-1),
+                singleAdapter(0),
+                dualAdapter(1),
+                ioSanAdapter(2),
+                octalBaseAdapter(3),
+                octalMezzAdapter(4),
+                ioDimm(5),
+                ioMono(6),
+                ioXtreme(7),
+                hpMezz(8),
+                controller(9),
+                hpAdrenaline3(10),
+                fused(11),
+                nandModule(12),
+                dualControllerAdapter(13),
+                singleControllerAdapter(14),
+                ciscoMezz(15) }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+            "Type of ioDimm adapter."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.39
+    ::= { fusionIoDimmInfoEntry 39 }
+
+fusionIoDimmInfoAdapterPort OBJECT-TYPE
+    SYNTAX  INTEGER (-1..65535)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Port number of this ioDimm on the adapter. If port number
+	 is not available the value will be set to -1."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.40
+    ::= { fusionIoDimmInfoEntry 40 }
+
+fusionIoDimmInfoAdapterSerialNumber OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..50))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Serial number of the adapter where this ioDimm is connected."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.41
+    ::= { fusionIoDimmInfoEntry 41 }
+
+fusionIoDimmInfoAdapterExtPowerPresent OBJECT-TYPE
+    SYNTAX  Boolean
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "A true condition indicates that external power is connected
+         on the adapter where this ioDimm is connected."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.42
+    ::= { fusionIoDimmInfoEntry 42 }
+
+fusionIoDimmInfoPowerlossProtectDisabled OBJECT-TYPE
+    SYNTAX  Boolean
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "A true condition indicates that powerloss protection is
+	 available but disabled."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.43
+    ::= { fusionIoDimmInfoEntry 43 }
+
+fusionIoDimmInfoInternalTempHigh OBJECT-TYPE
+    SYNTAX  Boolean
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "A true condition indicates that the internal temperature
+         is nearing the maximum rating."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.44
+    ::= { fusionIoDimmInfoEntry 44 }
+
+fusionIoDimmInfoAmbientTemp OBJECT-TYPE
+    SYNTAX  INTEGER (-100..100)
+    ACCESS  read-only
+    STATUS  obsolete
+    DESCRIPTION
+        "The current ambient temperature of the device in Celsius."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.45
+    ::= { fusionIoDimmInfoEntry 45 }
+
+fusionIoDimmInfoPCIBandwidthCompatibility OBJECT-TYPE
+    SYNTAX  INTEGER {
+                incompatible(0),
+                suboptimal(16),
+                optimal(2048),
+                unknown(32768) }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The bandwidth compatibility of the PCI-E slot. If the value is not optimal,
+         the status and condition variables will be set accordingly."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.46
+    ::= { fusionIoDimmInfoEntry 46 }
+
+fusionIoDimmInfoPCIPowerCompatibility OBJECT-TYPE
+    SYNTAX  INTEGER {
+                incompatible(0),
+                suboptimal(16),
+                optimal(2048),
+                unknown(32768) }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The power compatibility of the PCI-E slot. If the value is not optimal,
+         the status and condition variables will be set accordingly."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.47
+    ::= { fusionIoDimmInfoEntry 47 }
+
+fusionIoDimmInfoActualGoverningLevel OBJECT-TYPE
+    SYNTAX  INTEGER {
+                none(0),
+                light(1),
+                moderate(2),
+                heavy(3),
+                unavailable(4) }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The level of governing currently happening on the device.  This may be
+         due to any of several reasons.  Current reasons are because of high
+         temperature, power shortage, or to prolong life of the drive.
+
+             none           = no governing active
+             light          = light governing
+             moderate       = moderate governing
+             heavy          = heavy governing
+             unavailable    = governing level unavailable"
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.48
+    ::= { fusionIoDimmInfoEntry 48 }
+
+fusionIoDimmInfoLifespanGoverningLevel OBJECT-TYPE
+    SYNTAX  INTEGER {
+                none(0),
+                light(1),
+                moderate(2),
+                heavy(3),
+                unavailable(4) }
+    ACCESS  read-only
+    STATUS  obsolete
+    DESCRIPTION
+        "Governing may be impacted for the sake of prolonging longevity of the
+         device.  This value indicates the level of contribution for longevity.
+
+             none           = no governing active
+             light          = light governing
+             moderate       = moderate governing
+             heavy          = heavy governing
+             unavailable    = governing level unavailable"
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.49
+    ::= { fusionIoDimmInfoEntry 49 }
+
+fusionIoDimmInfoPowerGoverningLevel OBJECT-TYPE
+    SYNTAX  INTEGER {
+                none(0),
+                light(1),
+                moderate(2),
+                heavy(3),
+                unavailable(4) }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Governing may be impacted due to a lack of power available to the
+         device.  This value indicates the level of contribution due to
+         lack of power.
+
+             none           = no governing active
+             light          = light governing
+             moderate       = moderate governing
+             heavy          = heavy governing
+             unavailable    = governing level unavailable"
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.50
+    ::= { fusionIoDimmInfoEntry 50 }
+
+fusionIoDimmInfoThermalGoverningLevel OBJECT-TYPE
+    SYNTAX  INTEGER {
+                none(0),
+                light(1),
+                moderate(2),
+                heavy(3),
+                unavailable(4) }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Governing may be impacted due to the device reaching high
+         temperatures.  This value indicates the level of contribution due to
+         high temperatures.
+
+             none           = no governing active
+             light          = light governing
+             moderate       = moderate governing
+             heavy          = heavy governing
+             unavailable    = governing level unavailable"
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.51
+    ::= { fusionIoDimmInfoEntry 51 }
+
+fusionIoDimmInfoLifespanGoverningEnabled OBJECT-TYPE
+    SYNTAX  Boolean
+    ACCESS  read-only
+    STATUS  obsolete
+    DESCRIPTION
+        "A true condition indicates that lifespan governing is enabled."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.52
+    ::= { fusionIoDimmInfoEntry 52 }
+
+fusionIoDimmInfoLifespanGoverningTgtDate OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..50))
+    ACCESS  read-only
+    STATUS  obsolete
+    DESCRIPTION
+        "The target lifespan governing date."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.53
+    ::= { fusionIoDimmInfoEntry 53 }
+
+fusionIoDimmInfoInternalTempCritical OBJECT-TYPE
+    SYNTAX  Boolean
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "A true condition indicates that temperature is
+        at a critical level."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.54
+    ::= { fusionIoDimmInfoEntry 54 }
+
+fusionIoDimmInfoInternalTempShutdown OBJECT-TYPE
+    SYNTAX  Boolean
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "A true condition indicates that temperature is
+        has surpassed a critical level and the device
+        will shut down."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.55
+    ::= { fusionIoDimmInfoEntry 55 }
+
+fusionIoDimmInfoPcieErrorsIndicator OBJECT-TYPE
+    SYNTAX  INTEGER {
+                none(0),
+                correctable(1),
+                uncorrectable(2) }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Indicates whether correctable or uncorrectable PCIe
+        errors have been detected on the PCIe bus."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.56
+    ::= { fusionIoDimmInfoEntry 56 }
+
+fusionIoDimmInfoMissingLebMapIndicator OBJECT-TYPE
+    SYNTAX  Boolean
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "A true condition indicates the device is
+        missing a LEB map and cannot be attached."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.57
+    ::= { fusionIoDimmInfoEntry 57 }
+
+fusionIoDimmInfoVccIntErrorIndicator OBJECT-TYPE
+    SYNTAX  Boolean
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "A true condition indicates the device is
+        experiencing a VccInt out of range error."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.58
+    ::= { fusionIoDimmInfoEntry 58 }
+
+fusionIoDimmInfoVccAuxErrorIndicator OBJECT-TYPE
+    SYNTAX  Boolean
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "A true condition indicates the device is
+        experiencing a VccAux out of range error."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.59
+    ::= { fusionIoDimmInfoEntry 59 }
+
+fusionIoDimmInfoOverPowerIndicator OBJECT-TYPE
+    SYNTAX  Boolean
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "A true condition indicates the device is
+        experiencing an overpower error.  Plug in
+        external power to solve the problem."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.60
+    ::= { fusionIoDimmInfoEntry 60 }
+
+fusionIoDimmInfoUpgradeInProgressIndicator OBJECT-TYPE
+    SYNTAX  Boolean
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "A true condition indicates the device is
+        currently in the process of being upgraded
+        to a new major revision of the VSL driver."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.61
+    ::= { fusionIoDimmInfoEntry 61 }
+
+fusionIoDimmInfoInternalTempHighThreshold  OBJECT-TYPE
+    SYNTAX  INTEGER (0..65535)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Threshold at which temperature will be considered
+        high (warning level) and temperature high trap will
+        be fired."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.62
+    ::= { fusionIoDimmInfoEntry 62 }
+
+fusionIoDimmInfoInternalTempCriticalThreshold  OBJECT-TYPE
+    SYNTAX  INTEGER (0..65535)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Threshold at which temperature will be at a critical
+        level and a critical temperature trap will be fired."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.63
+    ::= { fusionIoDimmInfoEntry 63 }
+
+fusionIoDimmInfoInternalTempShutdownThreshold  OBJECT-TYPE
+    SYNTAX  INTEGER (0..65535)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "Threshold at which temperature will be at a shutdown
+        level and a critical temperature trap will be fired."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.64
+    ::= { fusionIoDimmInfoEntry 64 }
+
+fusionIoDimmInfoVirtualControllerNumber  OBJECT-TYPE
+    SYNTAX  INTEGER (0..65535)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The number of this virtual controller on the
+        physical ioMemory device."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.65
+    ::= { fusionIoDimmInfoEntry 65 }
+
+fusionIoDimmInfoVirtualControllerCount  OBJECT-TYPE
+    SYNTAX  INTEGER (0..65535)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total number of active virtual controllers on the
+        physical ioMemory device."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.66
+    ::= { fusionIoDimmInfoEntry 66 }
+
+fusionIoDimmInfoActiveMediaPercent  OBJECT-TYPE
+    SYNTAX  INTEGER (0..100)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The total active media on the device as a percent."
+    -- 1.3.6.1.4.1.30018.1.2.1.1.1.67
+    ::= { fusionIoDimmInfoEntry 67 }
+
+fusionIoDimmExtn OBJECT IDENTIFIER
+    -- 1.3.6.1.4.1.30018.1.2.2
+    ::= { fusionIoDimmComponent 2 }
+
+fusionIoDimmExtnTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF FusionIoDimmExtnEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "Fusion-io ioDrive extension table."
+    -- 1.3.6.1.4.1.30018.1.2.2.1
+    ::= { fusionIoDimmExtn 1 }
+
+fusionIoDimmExtnEntry OBJECT-TYPE
+    SYNTAX  FusionIoDimmExtnEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "Represents an entry in the fusionIoDimmExtnTable."
+    INDEX {
+        fusionIoDimmExtnIndex }
+    -- 1.3.6.1.4.1.30018.1.2.2.1.1
+    ::= { fusionIoDimmExtnTable 1 }
+
+FusionIoDimmExtnEntry ::= SEQUENCE {
+    fusionIoDimmExtnIndex                 INTEGER,
+    fusionIoDimmExtnTotalPhysCapacityU    Counter,
+    fusionIoDimmExtnTotalPhysCapacityL    Counter,
+    fusionIoDimmExtnUsablePhysCapacityU   Counter,
+    fusionIoDimmExtnUsablePhysCapacityL   Counter,
+    fusionIoDimmExtnUsedPhysCapacityU     Counter,
+    fusionIoDimmExtnUsedPhysCapacityL     Counter,
+    fusionIoDimmExtnTotalLogCapacityU     Counter,
+    fusionIoDimmExtnTotalLogCapacityL     Counter,
+    fusionIoDimmExtnAvailLogCapacityU     Counter,
+    fusionIoDimmExtnAvailLogCapacityL     Counter,
+    fusionIoDimmExtnBytesReadU            Counter,
+    fusionIoDimmExtnBytesReadL            Counter,
+    fusionIoDimmExtnBytesWrittenU         Counter,
+    fusionIoDimmExtnBytesWrittenL         Counter,
+    fusionIoDimmExtnLogBytesWrittenU      Counter,
+    fusionIoDimmExtnLogBytesWrittenL      Counter,
+    fusionIoDimmExtnShortTermStartDate    SimpleTime,
+    fusionIoDimmExtnShortTermWindow       INTEGER,
+    fusionIoDimmExtnShortTermEndDate      SimpleTime,
+    fusionIoDimmExtnShortTermEndDateFloat INTEGER,
+    fusionIoDimmExtnLongTermStartDate     SimpleTime,
+    fusionIoDimmExtnLongTermWindow        INTEGER,
+    fusionIoDimmExtnLongTermEndDate       SimpleTime,
+    fusionIoDimmExtnLongTermEndDateFloat  INTEGER,
+    fusionIoDimmExtnWriteRateAutoCalc     INTEGER,
+    fusionIoDimmExtnShortTermAvgU         Counter,
+    fusionIoDimmExtnShortTermAvgL         Counter,
+    fusionIoDimmExtnLongTermAvgU          Counter,
+    fusionIoDimmExtnLongTermAvgL          Counter,
+    fusionIoDimmExtnConfidenceInterval    INTEGER,
+    fusionIoDimmExtnFormattedBlockSize    INTEGER,
+    fusionIoDimmExtnCurrentRAMUsageU      Counter,
+    fusionIoDimmExtnCurrentRAMUsageL      Counter,
+    fusionIoDimmExtnPeakRAMUsageU         Counter,
+    fusionIoDimmExtnPeakRAMUsageL         Counter }
+
+fusionIoDimmExtnIndex OBJECT-TYPE
+    SYNTAX  INTEGER (1..256)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The unique index for the ioDrive extension table.
+         There should be an entry in this table for each entry
+         in the ioDrive table."
+    -- 1.3.6.1.4.1.30018.1.2.2.1.1.1
+    ::= { fusionIoDimmExtnEntry 1 }
+
+fusionIoDimmExtnTotalPhysCapacityU OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The upper word of the max format size in bytes."
+    -- 1.3.6.1.4.1.30018.1.2.2.1.1.2
+    ::= { fusionIoDimmExtnEntry 2 }
+
+fusionIoDimmExtnTotalPhysCapacityL OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The lower word of the max format size in bytes."
+    -- 1.3.6.1.4.1.30018.1.2.2.1.1.3
+    ::= { fusionIoDimmExtnEntry 3 }
+
+fusionIoDimmExtnUsablePhysCapacityU OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  obsolete
+    DESCRIPTION
+        "The upper word of the usable physical capacity
+         in bytes. This is space that is holding valid data,
+         is erased and ready for writing or waiting to be
+         reclaimed via garbage collection."
+    -- 1.3.6.1.4.1.30018.1.2.2.1.1.4
+    ::= { fusionIoDimmExtnEntry 4 }
+
+fusionIoDimmExtnUsablePhysCapacityL OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  obsolete
+    DESCRIPTION
+        "The lower word of the usable physical capacity
+         in bytes. This is space that is holding valid data,
+         is erased and ready for writing or waiting to be
+         reclaimed via garbage collection."
+    -- 1.3.6.1.4.1.30018.1.2.2.1.1.5
+    ::= { fusionIoDimmExtnEntry 5 }
+
+fusionIoDimmExtnUsedPhysCapacityU OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  obsolete
+    DESCRIPTION
+        "The upper word used physical capacity in bytes.
+         This is the space holding valid, current data."
+    -- 1.3.6.1.4.1.30018.1.2.2.1.1.6
+    ::= { fusionIoDimmExtnEntry 6 }
+
+fusionIoDimmExtnUsedPhysCapacityL OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  obsolete
+    DESCRIPTION
+        "The lower word used physical capacity in bytes.
+         This is the space holding valid, current data."
+    -- 1.3.6.1.4.1.30018.1.2.2.1.1.7
+    ::= { fusionIoDimmExtnEntry 7 }
+
+fusionIoDimmExtnTotalLogCapacityU OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The upper word of the total logical capacity in
+         bytes as formatted."
+    -- 1.3.6.1.4.1.30018.1.2.2.1.1.8
+    ::= { fusionIoDimmExtnEntry 8 }
+
+fusionIoDimmExtnTotalLogCapacityL OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The lower word of the total logical capacity in
+         bytes as formatted."
+    -- 1.3.6.1.4.1.30018.1.2.2.1.1.9
+    ::= { fusionIoDimmExtnEntry 9 }
+
+fusionIoDimmExtnAvailLogCapacityU OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  obsolete
+    DESCRIPTION
+        "The upper word of the available logical capacity
+         in bytes."
+    -- 1.3.6.1.4.1.30018.1.2.2.1.1.10
+    ::= { fusionIoDimmExtnEntry 10 }
+
+fusionIoDimmExtnAvailLogCapacityL OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  obsolete
+    DESCRIPTION
+        "The lower word of the available logical capacity
+         in bytes."
+    -- 1.3.6.1.4.1.30018.1.2.2.1.1.11
+    ::= { fusionIoDimmExtnEntry 11 }
+
+fusionIoDimmExtnBytesReadU OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The upper word of the total number of bytes read
+         since the device was formatted."
+    -- 1.3.6.1.4.1.30018.1.2.2.1.1.12
+    ::= { fusionIoDimmExtnEntry 12 }
+
+fusionIoDimmExtnBytesReadL OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The lower word of the total number of bytes read
+         since the device was formatted."
+    -- 1.3.6.1.4.1.30018.1.2.2.1.1.13
+    ::= { fusionIoDimmExtnEntry 13 }
+
+fusionIoDimmExtnBytesWrittenU OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The upper word of the total bytes written."
+    -- 1.3.6.1.4.1.30018.1.2.2.1.1.14
+    ::= { fusionIoDimmExtnEntry 14 }
+
+fusionIoDimmExtnBytesWrittenL OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The lower word of the total bytes written."
+    -- 1.3.6.1.4.1.30018.1.2.2.1.1.15
+    ::= { fusionIoDimmExtnEntry 15 }
+
+fusionIoDimmExtnLogBytesWrittenU OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  obsolete
+	DESCRIPTION
+		"The upper word of the number of user data bytes
+		written."
+	-- 1.3.6.1.4.1.30018.1.2.2.1.1.16
+	::= { fusionIoDimmExtnEntry 16 }
+
+
+fusionIoDimmExtnLogBytesWrittenL OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-only
+	STATUS  obsolete
+	DESCRIPTION
+		"The lower word of the number of user data bytes
+		written."
+	-- 1.3.6.1.4.1.30018.1.2.2.1.1.17
+	::= { fusionIoDimmExtnEntry 17 }
+
+
+fusionIoDimmExtnShortTermStartDate OBJECT-TYPE
+	SYNTAX  SimpleTime
+	ACCESS  read-write
+	STATUS  obsolete
+	DESCRIPTION
+		"The start date used to characterize short-term
+		drive usage."
+	-- 1.3.6.1.4.1.30018.1.2.2.1.1.18
+	::= { fusionIoDimmExtnEntry 18 }
+
+
+fusionIoDimmExtnShortTermWindow OBJECT-TYPE
+	SYNTAX  INTEGER (0..100000)
+	ACCESS  read-write
+	STATUS  obsolete
+	DESCRIPTION
+		"The number of hours in the short-term usage
+		characterization window. If this value is non-zero,
+		then the short-term start date will automatically
+		track with the short-term end date by the number of
+		hours specified."
+	-- 1.3.6.1.4.1.30018.1.2.2.1.1.19
+	::= { fusionIoDimmExtnEntry 19 }
+
+
+fusionIoDimmExtnShortTermEndDate OBJECT-TYPE
+	SYNTAX  SimpleTime
+	ACCESS  read-write
+	STATUS  obsolete
+	DESCRIPTION
+		"The end date used to characterize short-term
+		drive usage."
+	-- 1.3.6.1.4.1.30018.1.2.2.1.1.20
+	::= { fusionIoDimmExtnEntry 20 }
+
+
+fusionIoDimmExtnShortTermEndDateFloat OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-write
+	STATUS  obsolete
+	DESCRIPTION
+		"Set this variable true to automatically have the
+		short-term end date automatically updated to
+		the present date."
+	-- 1.3.6.1.4.1.30018.1.2.2.1.1.21
+	::= { fusionIoDimmExtnEntry 21 }
+
+
+fusionIoDimmExtnLongTermStartDate OBJECT-TYPE
+	SYNTAX  SimpleTime
+	ACCESS  read-write
+	STATUS  obsolete
+	DESCRIPTION
+		"The start date used to characterize long-term
+		drive usage."
+	-- 1.3.6.1.4.1.30018.1.2.2.1.1.22
+	::= { fusionIoDimmExtnEntry 22 }
+
+
+fusionIoDimmExtnLongTermWindow OBJECT-TYPE
+	SYNTAX  INTEGER (0..100000)
+	ACCESS  read-write
+	STATUS  obsolete
+	DESCRIPTION
+		"The number of hours in the long-term usage
+		characterization window. If this value is non-zero,
+		then the long-term start date will automatically
+		track with the long-term end date by the number of
+		hours specified."
+	-- 1.3.6.1.4.1.30018.1.2.2.1.1.23
+	::= { fusionIoDimmExtnEntry 23 }
+
+
+fusionIoDimmExtnLongTermEndDate OBJECT-TYPE
+	SYNTAX  SimpleTime
+	ACCESS  read-write
+	STATUS  obsolete
+	DESCRIPTION
+		"The end date used to characterize long-term
+		drive usage."
+	-- 1.3.6.1.4.1.30018.1.2.2.1.1.24
+	::= { fusionIoDimmExtnEntry 24 }
+
+
+fusionIoDimmExtnLongTermEndDateFloat OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-write
+	STATUS  obsolete
+	DESCRIPTION
+		"Set this variable true to automatically have the
+		long-term end date automatically updated to
+		the present date."
+	-- 1.3.6.1.4.1.30018.1.2.2.1.1.25
+	::= { fusionIoDimmExtnEntry 25 }
+
+
+fusionIoDimmExtnWriteRateAutoCalc OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-write
+	STATUS  obsolete
+	DESCRIPTION
+		"Set this true to automatically calculate the long-term
+		and short-term average write rate based on the start and
+		end dates selected. Otherwise, the average write rate must
+		be set manually."
+	-- 1.3.6.1.4.1.30018.1.2.2.1.1.26
+	::= { fusionIoDimmExtnEntry 26 }
+
+
+fusionIoDimmExtnShortTermAvgU OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-write
+	STATUS  obsolete
+	DESCRIPTION
+		"The upper word of the short-term average write
+		rate used to characterize drive usage. This will be
+		automatically calculated based on short-term start and
+		end dates if the auto calc value is true."
+	-- 1.3.6.1.4.1.30018.1.2.2.1.1.27
+	::= { fusionIoDimmExtnEntry 27 }
+
+
+fusionIoDimmExtnShortTermAvgL OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-write
+	STATUS  obsolete
+	DESCRIPTION
+		"The lower word of the short-term average write
+		rate used to characterize drive usage. This will be
+		automatically calculated based on short-term start and
+		end dates if the auto calc value is true."
+	-- 1.3.6.1.4.1.30018.1.2.2.1.1.28
+	::= { fusionIoDimmExtnEntry 28 }
+
+
+fusionIoDimmExtnLongTermAvgU OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-write
+	STATUS  obsolete
+	DESCRIPTION
+		"The upper word of the long-term average write
+		rate used to characterize drive usage. This will be
+		automatically calculated based on long-term start and
+		end dates if the auto calc value is true."
+	-- 1.3.6.1.4.1.30018.1.2.2.1.1.29
+	::= { fusionIoDimmExtnEntry 29 }
+
+
+fusionIoDimmExtnLongTermAvgL OBJECT-TYPE
+	SYNTAX  Counter
+	ACCESS  read-write
+	STATUS  obsolete
+	DESCRIPTION
+		"The lower word of the long-term average write
+		rate used to characterize drive usage. This will be
+		automatically calculated based on long-term start and
+		end dates if the auto calc value is true."
+	-- 1.3.6.1.4.1.30018.1.2.2.1.1.30
+	::= { fusionIoDimmExtnEntry 30 }
+
+
+fusionIoDimmExtnConfidenceInterval OBJECT-TYPE
+	SYNTAX  INTEGER (0..100)
+	ACCESS  read-write
+	STATUS  obsolete
+	DESCRIPTION
+		"This defines the confidence interval used to calculate
+		the wearout and non-writable dates. Expressed as a
+		percentage, this value reflects the confidence in the
+		short and long-term averages used to characterize drive
+		usage."
+	-- 1.3.6.1.4.1.30018.1.2.2.1.1.31
+	::= { fusionIoDimmExtnEntry 31 }
+
+fusionIoDimmExtnFormattedBlockSize OBJECT-TYPE
+    SYNTAX  INTEGER (512..4096)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "The block size that this device is formatted to use."
+    -- 1.3.6.1.4.1.30018.1.2.2.1.1.32
+    ::= { fusionIoDimmExtnEntry 32 }
+
+fusionIoDimmExtnCurrentRAMUsageU OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"The upper word of the current RAM usage in bytes for the drive."
+    -- 1.3.6.1.4.1.30018.1.2.2.1.1.33
+    ::= { fusionIoDimmExtnEntry 33 }
+
+fusionIoDimmExtnCurrentRAMUsageL OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"The lower word of the current RAM usage in bytes for the drive."
+    -- 1.3.6.1.4.1.30018.1.2.2.1.1.34
+    ::= { fusionIoDimmExtnEntry 34 }
+
+fusionIoDimmExtnPeakRAMUsageU OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"The upper word of the peak RAM usage in bytes for the drive."
+    -- 1.3.6.1.4.1.30018.1.2.2.1.1.35
+    ::= { fusionIoDimmExtnEntry 35 }
+
+fusionIoDimmExtnPeakRAMUsageL OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"The lower word of the peak RAM usage in bytes for the drive."
+    -- 1.3.6.1.4.1.30018.1.2.2.1.1.36
+    ::= { fusionIoDimmExtnEntry 36 }
+
+
+fusionIoDimmCapacity OBJECT IDENTIFIER
+    -- 1.3.6.1.4.1.30018.1.2.3
+    ::= { fusionIoDimmComponent 3 }
+
+fusionIoDimmCapacityTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF FusionIoDimmCapacityEntry
+    ACCESS  not-accessible
+    STATUS  optional
+    DESCRIPTION
+        "A table of usable physical capacity values over
+         time."
+    -- 1.3.6.1.4.1.30018.1.2.3.1
+    ::= { fusionIoDimmCapacity 1 }
+
+fusionIoDimmCapacityEntry OBJECT-TYPE
+    SYNTAX  FusionIoDimmCapacityEntry
+    ACCESS  not-accessible
+    STATUS  optional
+    DESCRIPTION
+        "Defines an entry of the usable physical capacity
+         history table."
+    INDEX {
+        fusionIoDimmCapacityInfoIndex,
+        fusionIoDimmCapacityIndex }
+    -- 1.3.6.1.4.1.30018.1.2.3.1.1
+    ::= { fusionIoDimmCapacityTable 1 }
+
+FusionIoDimmCapacityEntry ::= SEQUENCE {
+        fusionIoDimmCapacityInfoIndex INTEGER,
+        fusionIoDimmCapacityIndex     INTEGER,
+        fusionIoDimmCapacityValueU    Counter,
+        fusionIoDimmCapacityValueL    Counter,
+        fusionIoDimmCapacityTimestamp SimpleTime }
+
+fusionIoDimmCapacityInfoIndex OBJECT-TYPE
+    SYNTAX  INTEGER (1..256)
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+        "The ioDrive index. This correlates to the drive index
+         in the info table."
+    -- 1.3.6.1.4.1.30018.1.2.3.1.1.1
+    ::= { fusionIoDimmCapacityEntry 1 }
+
+fusionIoDimmCapacityIndex OBJECT-TYPE
+    SYNTAX  INTEGER (1..1000)
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+        "Unique index for the usable physical capacity log."
+    -- 1.3.6.1.4.1.30018.1.2.3.1.1.2
+    ::= { fusionIoDimmCapacityEntry 2 }
+
+fusionIoDimmCapacityValueU OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+        "The upper word of the physical usable capacity
+         at this point in time."
+    -- 1.3.6.1.4.1.30018.1.2.3.1.1.3
+    ::= { fusionIoDimmCapacityEntry 3 }
+
+fusionIoDimmCapacityValueL OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+        "The lower word of the physical usable capacity
+         at this point in time."
+    -- 1.3.6.1.4.1.30018.1.2.3.1.1.4
+    ::= { fusionIoDimmCapacityEntry 4 }
+
+fusionIoDimmCapacityTimestamp OBJECT-TYPE
+    SYNTAX  SimpleTime
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+        "The time stamp of this value entry."
+    -- 1.3.6.1.4.1.30018.1.2.3.1.1.5
+    ::= { fusionIoDimmCapacityEntry 5 }
+
+fusionIoDimmWrite OBJECT IDENTIFIER
+    -- 1.3.6.1.4.1.30018.1.2.4
+    ::= { fusionIoDimmComponent 4 }
+
+fusionIoDimmWriteTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF FusionIoDimmWriteEntry
+    ACCESS  not-accessible
+    STATUS  optional
+    DESCRIPTION
+        "A log of write volume history."
+    -- 1.3.6.1.4.1.30018.1.2.4.1
+    ::= { fusionIoDimmWrite 1 }
+
+fusionIoDimmWriteEntry OBJECT-TYPE
+    SYNTAX  FusionIoDimmWriteEntry
+    ACCESS  not-accessible
+    STATUS  optional
+    DESCRIPTION
+        "An entry in the write volume history table."
+    INDEX {
+        fusionIoDimmWriteInfoIndex,
+        fusionIoDimmWriteIndex }
+    -- 1.3.6.1.4.1.30018.1.2.4.1.1
+    ::= { fusionIoDimmWriteTable 1 }
+
+FusionIoDimmWriteEntry ::= SEQUENCE {
+    fusionIoDimmWriteInfoIndex INTEGER,
+    fusionIoDimmWriteIndex     INTEGER,
+    fusionIoDimmWriteValueU    Counter,
+    fusionIoDimmWriteValueL    Counter,
+    fusionIoDimmWriteTimestamp DisplayString }
+
+fusionIoDimmWriteInfoIndex OBJECT-TYPE
+    SYNTAX  INTEGER (1..256)
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+        "The ioDrive index. This correlates with the index
+	 in the info table."
+    -- 1.3.6.1.4.1.30018.1.2.4.1.1.1
+    ::= { fusionIoDimmWriteEntry 1 }
+
+fusionIoDimmWriteIndex OBJECT-TYPE
+    SYNTAX  INTEGER (1..1000)
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+        "Unique index for this write volume entry."
+    -- 1.3.6.1.4.1.30018.1.2.4.1.1.2
+    ::= { fusionIoDimmWriteEntry 2 }
+
+fusionIoDimmWriteValueU OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+        "The upper word of the total physical number of
+	 bytes written at a given moment in time."
+    -- 1.3.6.1.4.1.30018.1.2.4.1.1.3
+    ::= { fusionIoDimmWriteEntry 3 }
+
+fusionIoDimmWriteValueL OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+        "The lower word of the total physical number of
+         bytes written at a given moment in time."
+    -- 1.3.6.1.4.1.30018.1.2.4.1.1.4
+    ::= { fusionIoDimmWriteEntry 4 }
+
+fusionIoDimmWriteTimestamp OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+        "The timestamp entry for this value."
+    -- 1.3.6.1.4.1.30018.1.2.4.1.1.5
+    ::= { fusionIoDimmWriteEntry 5 }
+
+fusionIoDimmTemp OBJECT IDENTIFIER
+    -- 1.3.6.1.4.1.30018.1.2.5
+    ::= { fusionIoDimmComponent 5 }
+
+fusionIoDimmTempTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF FusionIoDimmTempEntry
+    ACCESS  not-accessible
+    STATUS  optional
+    DESCRIPTION
+        "Device temperature history table."
+    -- 1.3.6.1.4.1.30018.1.2.5.1
+    ::= { fusionIoDimmTemp 1 }
+
+fusionIoDimmTempEntry OBJECT-TYPE
+    SYNTAX  FusionIoDimmTempEntry
+    ACCESS  not-accessible
+    STATUS  optional
+    DESCRIPTION
+        "Device temperature history entry."
+    INDEX {
+        fusionIoDimmTempInfoIndex,
+        fusionIoDimmTempIndex }
+    -- 1.3.6.1.4.1.30018.1.2.5.1.1
+    ::= { fusionIoDimmTempTable 1 }
+
+FusionIoDimmTempEntry ::= SEQUENCE {
+    fusionIoDimmTempInfoIndex INTEGER,
+    fusionIoDimmTempIndex     INTEGER,
+    fusionIoDimmTempValue     INTEGER,
+    fusionIoDimmTempTimestamp SimpleTime }
+
+fusionIoDimmTempInfoIndex OBJECT-TYPE
+    SYNTAX  INTEGER (1..256)
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+            "The device index. This correlates to the index in
+            the info table."
+    -- 1.3.6.1.4.1.30018.1.2.5.1.1.1
+    ::= { fusionIoDimmTempEntry 1 }
+
+fusionIoDimmTempIndex OBJECT-TYPE
+    SYNTAX  INTEGER (0..255)
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+        "Unique index for this temperature log entry."
+    -- 1.3.6.1.4.1.30018.1.2.5.1.1.2
+    ::= { fusionIoDimmTempEntry 2 }
+
+fusionIoDimmTempValue OBJECT-TYPE
+    SYNTAX  INTEGER (0..50)
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+        "The current temperature of the device in Celsius.."
+    -- 1.3.6.1.4.1.30018.1.2.5.1.1.3
+    ::= { fusionIoDimmTempEntry 3 }
+
+fusionIoDimmTempTimestamp OBJECT-TYPE
+    SYNTAX  SimpleTime
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+        "The timestamp for this entry."
+    -- 1.3.6.1.4.1.30018.1.2.5.1.1.4
+    ::= { fusionIoDimmTempEntry 4 }
+
+fusionIoDimmProc OBJECT IDENTIFIER
+    -- 1.3.6.1.4.1.30018.1.2.6
+    ::= { fusionIoDimmComponent 6 }
+
+fusionIoDimmProcTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF FusionioProcEntry
+    ACCESS  not-accessible
+    STATUS  obsolete
+    DESCRIPTION
+        "A table of processes that support device operation."
+    -- 1.3.6.1.4.1.30018.1.2.6.1
+    ::= { fusionIoDimmProc 1 }
+
+fusionIoDimmProcEntry OBJECT-TYPE
+    SYNTAX  FusionioProcEntry
+    ACCESS  not-accessible
+    STATUS  obsolete
+    DESCRIPTION
+        "Each entry represents a process."
+    INDEX {
+        fusionIoDimmProcIndex }
+    -- 1.3.6.1.4.1.30018.1.2.6.1.1
+    ::= { fusionIoDimmProcTable 1 }
+
+FusionioProcEntry ::= SEQUENCE {
+    fusionIoDimmProcIndex INTEGER,
+    fusionIoDimmProcName  DisplayString,
+    fusionIoDimmProcState DisplayString,
+    fusionIoDimmProcRAM   Counter,
+    fusionIoDimmProcCPU   INTEGER }
+
+fusionIoDimmProcIndex OBJECT-TYPE
+    SYNTAX  INTEGER (0..500)
+    ACCESS  read-only
+    STATUS  obsolete
+    DESCRIPTION
+        "A unique index for each process."
+    -- 1.3.6.1.4.1.30018.1.2.6.1.1.1
+    ::= { fusionIoDimmProcEntry 1 }
+
+fusionIoDimmProcName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..50))
+    ACCESS  read-only
+    STATUS  obsolete
+    DESCRIPTION
+        "The process name."
+    -- 1.3.6.1.4.1.30018.1.2.6.1.1.2
+    ::= { fusionIoDimmProcEntry 2 }
+
+fusionIoDimmProcState OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..100))
+    ACCESS  read-only
+    STATUS  obsolete
+    DESCRIPTION
+        "The process state."
+    -- 1.3.6.1.4.1.30018.1.2.6.1.1.3
+    ::= { fusionIoDimmProcEntry 3 }
+
+fusionIoDimmProcRAM OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  obsolete
+    DESCRIPTION
+            "The bytes of RAM currently in use by the process."
+    -- 1.3.6.1.4.1.30018.1.2.6.1.1.4
+    ::= { fusionIoDimmProcEntry 4 }
+
+fusionIoDimmProcCPU OBJECT-TYPE
+    SYNTAX  INTEGER (0..100)
+    ACCESS  read-only
+    STATUS  obsolete
+    DESCRIPTION
+            "The overall percentage of CPU usage."
+    -- 1.3.6.1.4.1.30018.1.2.6.1.1.5
+    ::= { fusionIoDimmProcEntry 5 }
+
+fusionIoDimmTrapFlags OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  obsolete
+    DESCRIPTION
+        "This is a collection of flags used only during trap
+         delivery.
+             Each bit has the following meaning:
+                 Bit 5-31: Reserved (always 0)
+                 Bit 2-4: Trap Condition
+                    0 = Not used (for backward compatibility)
+                    1 = Condition unknown or N/A
+                    2 = Condition ok
+                    3 = Condition degraded
+                    4 = Condition failed
+                 Bit 1: Reserved (always zero)
+                 Bit 0: Reserved (always zero)
+
+             NOTE:   bit 31 is the most significant bit,
+                     bit 0 is the least significant."
+    -- 1.3.6.1.4.1.30018.25
+    ::= { fusionio 25 }
+
+fusionIoDimmWearoutTrap TRAP-TYPE
+    ENTERPRISE fusionio
+    VARIABLES {
+        sysName,
+        fusionIoDimmTrapFlags,
+        fusionIoDimmInfoWearoutIndicator,
+        fusionIoDimmInfoIndex,
+        fusionIoDimmInfoName,
+        fusionIoDimmInfoFirmwareVersion,
+        fusionIoDimmInfoPartNumber,
+        fusionIoDimmInfoSerialNumber,
+        fusionIoDimmInfoPCISlot}
+    DESCRIPTION
+        "Generated when the device begins to wear out."
+ ::= 1001
+
+fusionIoDimmNonWritableTrap TRAP-TYPE
+    ENTERPRISE fusionio
+    VARIABLES {
+        sysName,
+        fusionIoDimmTrapFlags,
+        fusionIoDimmInfoWritableIndicator,
+        fusionIoDimmInfoIndex,
+        fusionIoDimmInfoName,
+        fusionIoDimmInfoFirmwareVersion,
+        fusionIoDimmInfoPartNumber,
+        fusionIoDimmInfoSerialNumber,
+        fusionIoDimmInfoPCISlot,
+        fusionIoDimmInfoStatus}
+    DESCRIPTION
+        "Generated when the device is in write-reduced or
+         non-writable mode based on the
+         fusionIoDimmInfoWritableIndicator. This can be due to
+         excessive wear or other device problem."
+ ::= 1002
+
+fusionIoDimmFlashbackTrap TRAP-TYPE
+    ENTERPRISE fusionio
+    VARIABLES {
+        sysName,
+        fusionIoDimmTrapFlags,
+        fusionIoDimmInfoFlashbackIndicator,
+        fusionIoDimmInfoIndex,
+        fusionIoDimmInfoName,
+        fusionIoDimmInfoFirmwareVersion,
+        fusionIoDimmInfoPartNumber,
+        fusionIoDimmInfoSerialNumber,
+        fusionIoDimmInfoPCISlot,
+        fusionIoDimmInfoStatus}
+    DESCRIPTION
+        "Generated when flashback protection becomes degraded."
+ ::= 1003
+
+fusionIoDimmTempHighTrap TRAP-TYPE
+    ENTERPRISE fusionio
+    VARIABLES {
+        sysName,
+        fusionIoDimmTrapFlags,
+        fusionIoDimmInfoInternalTemp,
+        fusionIoDimmInfoIndex,
+        fusionIoDimmInfoName,
+        fusionIoDimmInfoFirmwareVersion,
+        fusionIoDimmInfoPartNumber,
+        fusionIoDimmInfoSerialNumber,
+        fusionIoDimmInfoPCISlot,
+        fusionIoDimmInfoStatus}
+    DESCRIPTION
+        "Generated when the temperature sensor surpasses the
+         warning threshold."
+ ::= 1004
+
+fusionIoDimmTempOkTrap TRAP-TYPE
+    ENTERPRISE fusionio
+    VARIABLES {
+        sysName,
+        fusionIoDimmTrapFlags,
+        fusionIoDimmInfoInternalTemp,
+        fusionIoDimmInfoIndex,
+        fusionIoDimmInfoName,
+        fusionIoDimmInfoFirmwareVersion,
+        fusionIoDimmInfoPartNumber,
+        fusionIoDimmInfoSerialNumber,
+        fusionIoDimmInfoPCISlot,
+        fusionIoDimmInfoStatus}
+    DESCRIPTION
+        "Generated when temperature returns to a safe level."
+ ::= 1005
+
+fusionIoDimmErrorTrap TRAP-TYPE
+    ENTERPRISE fusionio
+    VARIABLES {
+        sysName,
+        fusionIoDimmTrapFlags,
+        fusionIoDimmInfoState,
+        fusionIoDimmInfoIndex,
+        fusionIoDimmInfoName,
+        fusionIoDimmInfoFirmwareVersion,
+        fusionIoDimmInfoPartNumber,
+        fusionIoDimmInfoSerialNumber,
+        fusionIoDimmInfoPCISlot,
+        fusionIoDimmInfoStatus}
+    DESCRIPTION
+        "Generated when device is in an error state."
+ ::= 1006
+
+fusionIoDimmPowerlossProtectTrap TRAP-TYPE
+    ENTERPRISE fusionio
+    VARIABLES {
+        sysName,
+        fusionIoDimmTrapFlags,
+        fusionIoDimmInfoPowerlossProtectDisabled,
+        fusionIoDimmInfoIndex,
+        fusionIoDimmInfoName,
+        fusionIoDimmInfoFirmwareVersion,
+        fusionIoDimmInfoPartNumber,
+        fusionIoDimmInfoSerialNumber,
+        fusionIoDimmInfoPCISlot,
+        fusionIoDimmInfoStatus}
+    DESCRIPTION
+        "Generated when the powerloss protection feature is available but disabled."
+ ::= 1007
+
+fusionIoDimmCriticalTempTrap TRAP-TYPE
+    ENTERPRISE fusionio
+    VARIABLES {
+        sysName,
+        fusionIoDimmTrapFlags,
+        fusionIoDimmInfoInternalTemp,
+        fusionIoDimmInfoIndex,
+        fusionIoDimmInfoName,
+        fusionIoDimmInfoFirmwareVersion,
+        fusionIoDimmInfoPartNumber,
+        fusionIoDimmInfoSerialNumber,
+        fusionIoDimmInfoPCISlot,
+        fusionIoDimmInfoStatus}
+    DESCRIPTION
+        "Generated when the temperature sensor is at a critical threshold."
+ ::= 1008
+
+fusionIoDimmShutdownTempTrap TRAP-TYPE
+    ENTERPRISE fusionio
+    VARIABLES {
+        sysName,
+        fusionIoDimmTrapFlags,
+        fusionIoDimmInfoInternalTemp,
+        fusionIoDimmInfoIndex,
+        fusionIoDimmInfoName,
+        fusionIoDimmInfoFirmwareVersion,
+        fusionIoDimmInfoPartNumber,
+        fusionIoDimmInfoSerialNumber,
+        fusionIoDimmInfoPCISlot,
+        fusionIoDimmInfoStatus}
+    DESCRIPTION
+        "Generated when the temperature sensor surpasses the shutdown threshold."
+ ::= 1009
+
+fusionIoDimmPcieErrorsTrap TRAP-TYPE
+    ENTERPRISE fusionio
+    VARIABLES {
+        sysName,
+        fusionIoDimmTrapFlags,
+        fusionIoDimmInfoPcieErrorsIndicator,
+        fusionIoDimmInfoIndex,
+        fusionIoDimmInfoName,
+        fusionIoDimmInfoFirmwareVersion,
+        fusionIoDimmInfoPartNumber,
+        fusionIoDimmInfoSerialNumber,
+        fusionIoDimmInfoPCISlot,
+        fusionIoDimmInfoStatus}
+    DESCRIPTION
+        "Generated when PCIe bus errors are detected."
+ ::= 1010
+
+fusionIoDimmMissingLebMapTrap TRAP-TYPE
+    ENTERPRISE fusionio
+    VARIABLES {
+        sysName,
+        fusionIoDimmTrapFlags,
+        fusionIoDimmInfoMissingLebMapIndicator,
+        fusionIoDimmInfoIndex,
+        fusionIoDimmInfoName,
+        fusionIoDimmInfoFirmwareVersion,
+        fusionIoDimmInfoPartNumber,
+        fusionIoDimmInfoSerialNumber,
+        fusionIoDimmInfoPCISlot,
+        fusionIoDimmInfoStatus}
+    DESCRIPTION
+        "Generated when the ioMemory is found to be missing a LEB map."
+ ::= 1011
+
+fusionIoDimmSlotBandwidthIncompatibleTrap TRAP-TYPE
+    ENTERPRISE fusionio
+    VARIABLES {
+        sysName,
+        fusionIoDimmTrapFlags,
+        fusionIoDimmInfoPCIBandwidthCompatibility,
+        fusionIoDimmInfoIndex,
+        fusionIoDimmInfoName,
+        fusionIoDimmInfoFirmwareVersion,
+        fusionIoDimmInfoPartNumber,
+        fusionIoDimmInfoSerialNumber,
+        fusionIoDimmInfoPCISlot,
+        fusionIoDimmInfoStatus}
+    DESCRIPTION
+        "Generated when the ioMemory is found to be in an incompatible PCIe slot."
+ ::= 1012
+
+fusionIoDimmSlotBandwidthSuboptimalTrap TRAP-TYPE
+    ENTERPRISE fusionio
+    VARIABLES {
+        sysName,
+        fusionIoDimmTrapFlags,
+        fusionIoDimmInfoPCIBandwidthCompatibility,
+        fusionIoDimmInfoIndex,
+        fusionIoDimmInfoName,
+        fusionIoDimmInfoFirmwareVersion,
+        fusionIoDimmInfoPartNumber,
+        fusionIoDimmInfoSerialNumber,
+        fusionIoDimmInfoPCISlot,
+        fusionIoDimmInfoStatus}
+    DESCRIPTION
+        "Generated when the ioMemory is found to be in an sub-optimal PCIe slot."
+ ::= 1013
+
+fusionIoDimmLowReservesTrap TRAP-TYPE
+    ENTERPRISE fusionio
+    VARIABLES {
+        sysName,
+        fusionIoDimmTrapFlags,
+        fusionIoDimmInfoHealthPercentage,
+        fusionIoDimmInfoIndex,
+        fusionIoDimmInfoName,
+        fusionIoDimmInfoFirmwareVersion,
+        fusionIoDimmInfoPartNumber,
+        fusionIoDimmInfoSerialNumber,
+        fusionIoDimmInfoPCISlot,
+        fusionIoDimmInfoStatus}
+    DESCRIPTION
+        "Generated when the ioMemory is low on reserve space, but not yet depleted."
+ ::= 1014
+
+fusionIoDimmVccIntTrap TRAP-TYPE
+    ENTERPRISE fusionio
+    VARIABLES {
+        sysName,
+        fusionIoDimmTrapFlags,
+        fusionIoDimmInfoVccIntErrorIndicator,
+        fusionIoDimmInfoIndex,
+        fusionIoDimmInfoName,
+        fusionIoDimmInfoFirmwareVersion,
+        fusionIoDimmInfoPartNumber,
+        fusionIoDimmInfoSerialNumber,
+        fusionIoDimmInfoPCISlot,
+        fusionIoDimmInfoStatus}
+    DESCRIPTION
+        "Generated when the ioMemory is out of range for vccint."
+ ::= 1015
+
+fusionIoDimmVccAuxTrap TRAP-TYPE
+    ENTERPRISE fusionio
+    VARIABLES {
+        sysName,
+        fusionIoDimmTrapFlags,
+        fusionIoDimmInfoVccAuxErrorIndicator,
+        fusionIoDimmInfoIndex,
+        fusionIoDimmInfoName,
+        fusionIoDimmInfoFirmwareVersion,
+        fusionIoDimmInfoPartNumber,
+        fusionIoDimmInfoSerialNumber,
+        fusionIoDimmInfoPCISlot,
+        fusionIoDimmInfoStatus}
+    DESCRIPTION
+        "Generated when the ioMemory is out of range for vccaux."
+ ::= 1016
+
+fusionIoDimmMinimalModeTrap TRAP-TYPE
+    ENTERPRISE fusionio
+    VARIABLES {
+        sysName,
+        fusionIoDimmTrapFlags,
+        fusionIoDimmInfoMinimalModeReason,
+        fusionIoDimmInfoIndex,
+        fusionIoDimmInfoName,
+        fusionIoDimmInfoFirmwareVersion,
+        fusionIoDimmInfoPartNumber,
+        fusionIoDimmInfoSerialNumber,
+        fusionIoDimmInfoPCISlot,
+        fusionIoDimmInfoStatus}
+    DESCRIPTION
+        "Generated when the ioMemory is in minimal mode."
+ ::= 1017
+
+fusionIoDimmOverPowerTrap TRAP-TYPE
+    ENTERPRISE fusionio
+    VARIABLES {
+        sysName,
+        fusionIoDimmTrapFlags,
+        fusionIoDimmInfoOverPowerIndicator,
+        fusionIoDimmInfoIndex,
+        fusionIoDimmInfoName,
+        fusionIoDimmInfoFirmwareVersion,
+        fusionIoDimmInfoPartNumber,
+        fusionIoDimmInfoSerialNumber,
+        fusionIoDimmInfoPCISlot,
+        fusionIoDimmInfoStatus}
+    DESCRIPTION
+        "Generated when the ioMemory is using too much power.
+        Plug in an external power cable to correct the issue."
+ ::= 1018
+
+fusionIoDimmUpgradeInProgressTrap TRAP-TYPE
+    ENTERPRISE fusionio
+    VARIABLES {
+        sysName,
+        fusionIoDimmTrapFlags,
+        fusionIoDimmInfoUpgradeInProgressIndicator,
+        fusionIoDimmInfoIndex,
+        fusionIoDimmInfoName,
+        fusionIoDimmInfoFirmwareVersion,
+        fusionIoDimmInfoPartNumber,
+        fusionIoDimmInfoSerialNumber,
+        fusionIoDimmInfoPCISlot,
+        fusionIoDimmInfoStatus}
+    DESCRIPTION
+        "Generated when the ioMemory is in the process of
+        upgrading to a new major driver version."
+ ::= 1019
+
+END

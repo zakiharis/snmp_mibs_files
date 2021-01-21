@@ -1,0 +1,18 @@
+FA-CONTROL-FILE DEFINITIONS ::= BEGIN
+
+IMPORTS
+   enterprises
+        FROM RFC1155-SMI
+   OBJECT-TYPE
+        FROM RFC-1212;
+   emc                  OBJECT IDENTIFIER ::= { enterprises 1139 }
+
+--   emc   OBJECT-TYPE
+--      DEFAULT  get-function-async   get_int_async
+--      DEFAULT  set-function-async   null_set_async
+--      DEFAULT  test-function-async  it_exists_async
+--      DEFAULT  next-function-async  std_next_async
+--      DEFAULT  cookie               0
+--      DEFAULT  view-mask            ((bits32_t) 0xFFFF0000L)
+--      ::= { enterprises 1139 }
+END

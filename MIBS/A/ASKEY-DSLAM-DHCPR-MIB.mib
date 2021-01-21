@@ -1,0 +1,199 @@
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+--
+--  File         : askeyDhcpr.mib
+--  Description  : Askey defined to record all managed objects for dhcp opt82
+--  Version      : 1.0
+--  Date         : Nov. 15, 2004 by Dennis Tseng   
+--  test : snmpgetnext 10.5.5.17 public .1.3.6.1.4.1.3646.1300.2.7.4.1.1.101 
+--         to get circuit-id
+--
+--  Copyright (c) 1999-2004 Askey International, Corp.  All Rights Reserved.
+--
+--  ipDslam                 FROM ASKEY-DSLAM-MIB
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+
+ASKEY-DSLAM-DHCPR-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE,
+    MODULE-IDENTITY,
+    Integer32,
+    IpAddress               FROM SNMPv2-SMI
+
+    TEXTUAL-CONVENTION,
+    RowStatus,
+    DisplayString,
+    TruthValue		        FROM SNMPv2-TC    
+
+    ipDslam                 FROM ASKEY-DSLAM-MIB
+
+    InterfaceIndex,
+    ifIndex   		    	FROM IF-MIB    
+    ;
+
+dhcpr MODULE-IDENTITY
+    LAST-UPDATED    "200411150000Z"  -- Nov 15, 2004
+    ORGANIZATION    "ASKEY Inc."
+    CONTACT-INFO    "ASKEY Inc.
+                    E-mail: jht@askey.com.tw"
+
+    DESCRIPTION     "ASKEY DHCP RELAY AGENT MIB OID defines and documentation."
+
+    ::= { ipDslam 7 }
+
+    askeyDhcprRelay   OBJECT-TYPE
+	    SYNTAX INTEGER {
+               enabled(1),
+               disabled(2)
+          }
+	    MAX-ACCESS    read-write
+	    STATUS        current
+	    DESCRIPTION
+	    "Enable/Disable dhcp relay function"
+	    ::= { dhcpr 1 }    
+
+    askeyDhcprOpt82   OBJECT-TYPE
+	    SYNTAX INTEGER {
+               enabled(1),
+               disabled(2)
+          }
+	    MAX-ACCESS    read-write
+	    STATUS        current
+	    DESCRIPTION
+	    "Enable/Disable option 82"
+	    ::= { dhcpr 2 }    
+
+---
+--- askeyDhcprRelayTable
+---
+    askeyDhcprRelayTable   OBJECT-TYPE                          
+        SYNTAX        SEQUENCE OF AskeyDhcprRelayEntry            
+        MAX-ACCESS    not-accessible                         
+        STATUS        current                                
+        DESCRIPTION                                            
+            "List all relay server information"                                                 
+    ::= { dhcpr 3 }                                            
+                                                               
+    askeyDhcprRelayEntry   OBJECT-TYPE                              
+        SYNTAX        AskeyDhcprRelayEntry                        
+        MAX-ACCESS    not-accessible                         
+        STATUS        current                                
+        DESCRIPTION   "relay server information"                                     
+        INDEX         { askeyDhcprRelayServerIp }                 
+    ::= { askeyDhcprRelayTable 1 }                                  
+                                                               
+    AskeyDhcprRelayEntry ::=                                    
+        SEQUENCE {                                             
+             askeyDhcprRelayServerIp          		IpAddress,
+--             askeyDhcprRelayServerVid        	 	INTEGER, 
+             askeyDhcprRelayRowStatus   	  		RowStatus
+    }                                                          
+                                                               
+    askeyDhcprRelayServerIp OBJECT-TYPE                             
+        SYNTAX      IpAddress 
+        MAX-ACCESS  not-accessible
+        STATUS      current                                    
+        DESCRIPTION                                            
+            "ip address of dhcp server"                                                 
+    ::= { askeyDhcprRelayEntry 1 }                                  
+        
+--	askeyDhcprRelayServerVid OBJECT-TYPE                             
+--        SYNTAX      INTEGER 
+--        MAX-ACCESS  read-create                                
+--        STATUS      current                                    
+--        DESCRIPTION                                            
+--            "vlan-id for this dhcp server"                                                 
+--    ::= { askeyDhcprRelayEntry 2 }     
+    
+	askeyDhcprRelayRowStatus OBJECT-TYPE
+	    SYNTAX      RowStatus
+	    MAX-ACCESS  read-create
+	    STATUS      current
+	    DESCRIPTION
+	    "Corresponds to raw status"
+	    ::= { askeyDhcprRelayEntry 2 }        
+
+---
+--- askeyDhcprOpt82Table
+---
+    askeyDhcprOpt82Table   OBJECT-TYPE                          
+        SYNTAX        SEQUENCE OF AskeyDhcprOpt82Entry            
+        MAX-ACCESS    not-accessible                         
+        STATUS        current                                
+        DESCRIPTION                                            
+            "list all option 82 parameters"                                                 
+    ::= { dhcpr 4 }                                            
+
+
+    askeyDhcprOpt82Entry   OBJECT-TYPE                              
+        SYNTAX        AskeyDhcprOpt82Entry                        
+        MAX-ACCESS    not-accessible                         
+        STATUS        current                                
+        DESCRIPTION   ""                                     
+        INDEX         { ifIndex }                 
+    ::= { askeyDhcprOpt82Table 1 }  
+
+    
+    AskeyDhcprOpt82Entry ::=                                    
+        SEQUENCE {                                             
+             askeyDhcprOpt82CircuitId  		  	DisplayString,
+             askeyDhcprOpt82RemoteId	 		DisplayString
+    }                                                          
+    
+    askeyDhcprOpt82CircuitId OBJECT-TYPE
+	    SYNTAX      DisplayString
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+	    "shelf.slot.port"
+	    ::= { askeyDhcprOpt82Entry 1 }        
+
+    askeyDhcprOpt82RemoteId OBJECT-TYPE
+	    SYNTAX      DisplayString (SIZE (0..63))
+	    MAX-ACCESS  read-write
+	    STATUS      current
+	    DESCRIPTION
+	    "Transparently sent to server 63"
+	    ::= { askeyDhcprOpt82Entry 2 }        
+	    
+    askeyDhcprBroadcastControl   OBJECT-TYPE
+        SYNTAX INTEGER {
+               enabled(1),
+               disabled(2)
+          }
+	    MAX-ACCESS    read-write
+	    STATUS        current
+	    DESCRIPTION
+	    "Enable/Disable DHCP broadcast control"
+	    ::= { dhcpr 5 }
+	    
+    askeyDhcprBroadcastControlRate   OBJECT-TYPE
+        SYNTAX INTEGER (1..100000)
+	    MAX-ACCESS    read-write
+	    STATUS        current
+	    DESCRIPTION
+	    "DHCP broadcast packet rate limit, packets per second"
+	    ::= { dhcpr 6 }
+
+    askeyDhcprBroadcastControlAction   OBJECT-TYPE
+        SYNTAX INTEGER {
+               noAction (0),
+               dropOnly (1),
+               alarmOnly (2),
+               dropAndAlarm (3)
+        }
+	    MAX-ACCESS    read-write
+	    STATUS        current
+	    DESCRIPTION
+	    "action for packets over DHCP broadcast rate limit"
+	    ::= { dhcpr 7 }
+
+
+--
+-- END of ASKEY-DHCPR-MIB                
+--
+
+END
+    

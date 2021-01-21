@@ -1,0 +1,409 @@
+ADTRAN-ATLAS890-FRONTPANEL-MIB  DEFINITIONS ::= BEGIN
+
+-- TITLE:               ADTRAN ATLAS 890 FRONT PANEL MIB  (1200321L1)
+-- FILENAME:            AT890FP.MIB
+-- PARTNUMBER:
+-- AUTHORS:             JOHNATHAN CARLSON, CHIP BAGWELL, JAY ALLISON
+-- DATE:                10/04/01
+
+-- Adtran ATLAS 890 Front Panel Group
+
+-- The Adtran ATLAS 890 Front Panel Group contains ASN.1 objects that store the
+-- current state of all LEDs, fan tachometers, alarm relays, external inputs, and cable connection
+-- on the ATLAS 890 Product.
+
+-- The Adtran ATLAS 890 Front Panel Group consists of seven sub-groups
+--      Controller LED Group
+--      Module LED Table
+--      System LED Group
+--      ACO Switch
+
+-- The Adtran products that support this group are:
+--      ATLAS 890
+
+IMPORTS
+    enterprises
+        FROM RFC1155-SMI
+    OBJECT-TYPE
+        FROM RFC-1212
+    DisplayString
+        FROM RFC1213-MIB;
+
+-- OBJECT IDENTIFIERS
+
+adtran          OBJECT IDENTIFIER ::= { enterprises 664 }
+adMgmt          OBJECT IDENTIFIER ::= { adtran 2 }
+adATLASmg       OBJECT IDENTIFIER ::= { adMgmt 154 }
+adATLAS890mg       OBJECT IDENTIFIER ::= { adATLASmg 6 }
+adATLAS890Fpnl     OBJECT IDENTIFIER ::= { adATLAS890mg 1 }
+
+-- The LED Groups
+
+adATLAS890FpnlLeds      OBJECT IDENTIFIER ::= { adATLAS890Fpnl 1 }
+
+-- The Controller LED Group
+
+adATLAS890FpnlContLeds   OBJECT IDENTIFIER ::= { adATLAS890FpnlLeds 1 }
+
+-- The Controller LED Table
+
+adATLAS890FpnlCLTable     OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AdATLAS890FpnlCLEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "The Controller LED Table."
+    ::= { adATLAS890FpnlContLeds 1 }
+
+-- The Controller LED Entry
+
+adATLAS890FpnlCLEntry     OBJECT-TYPE
+    SYNTAX  AdATLAS890FpnlCLEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "An entry in the Controller LED Table."
+    INDEX       { adATLAS890FpnlCLIndex }
+    ::= { adATLAS890FpnlCLTable 1 }
+
+AdATLAS890FpnlCLEntry ::=
+    SEQUENCE {
+        adATLAS890FpnlCLIndex
+            INTEGER,
+        adATLAS890FpnlCLStatus
+            INTEGER,
+        adATLAS890FpnlCLOnline
+            INTEGER,
+        adATLAS890FpnlCLTest
+            INTEGER,
+        adATLAS890FpnlCLLink
+            INTEGER
+    }
+
+-- The Controller LED Table Index
+
+adATLAS890FpnlCLIndex OBJECT-TYPE
+    SYNTAX  INTEGER {
+                clactive(0),
+                clstandby(18)
+            }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This variable indicates which slot is selected on the ATLAS 890
+        Product.  Slot 0 indicates the Active Controller.  Slot 18
+        indicates the standy (redundant) controller.  These slot numbers
+        are unrelated to the physical slots A and B."
+
+    ::= { adATLAS890FpnlCLEntry 1 }
+
+-- The Controller Status LED
+
+adATLAS890FpnlCLStatus    OBJECT-TYPE
+    SYNTAX  INTEGER {
+                clstatusok(1),
+                clstatuswarn(2),
+                clstatuserr(3),
+                clstatusflashgreen(4),
+                clstatusflashyellow(5),
+                clstatusflashred(6),
+                clstatusoff(7)
+            }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This variable indicates the status of the controller card located in the slot
+        determined by the CLIndex variable.
+
+        The choices for this variable are
+        Number  State           Status
+        ------  -----           ------
+        1       OK              Green
+        2       Warning         Yellow
+        3       Error           Red
+        4       Flash. Green    Flash. Green
+        5       Flash. Yellow   Flash. Yellow
+        6       Flash. Red      Flash. Red
+        7       Off             Off"
+
+    ::= { adATLAS890FpnlCLEntry 2 }
+
+-- The Controller Online LED
+
+adATLAS890FpnlCLOnline    OBJECT-TYPE
+    SYNTAX  INTEGER {
+                clonlineok(1),
+                clonlinewarn(2),
+                clonlineerr(3),
+                clonlineflashgreen(4),
+                clonlineflashyellow(5),
+                clonlineflashred(6),
+                clonlineoff(7)
+            }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This variable indicates whether the controller card located in the slot
+        determined by the CLIndex is online or offline.
+
+        The choices for this variable are
+        Number  State           Status
+        ------  -----           ------
+        1       OK              Green
+        2       Warning         Yellow
+        3       Error           Red
+        4       Flash. Green    Flash. Green
+        5       Flash. Yellow   Flash. Yellow
+        6       Flash. Red      Flash. Red
+        7       Off             Off"
+
+    ::= { adATLAS890FpnlCLEntry 3 }
+
+-- The Controller Test LED
+
+adATLAS890FpnlCLTest      OBJECT-TYPE
+    SYNTAX  INTEGER {
+                clteston(1),
+                cltestflash(2),
+                cltestoff(3)
+            }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This variable indicates whether the controller card located in the slot
+        determined by the CLIndex is in a test mode or not.
+
+        The choices for this variable are
+        Number  State               Status
+        ------  -----               ------
+        1       Test in Progress    Yellow
+        2       Flashing            Flashing Yellow
+        3       Off                 Off"
+
+    ::= { adATLAS890FpnlCLEntry 4 }
+
+-- The Controller Link LED
+
+adATLAS890FpnlCLLink      OBJECT-TYPE
+    SYNTAX  INTEGER {
+                cllinkon(1),
+                cllinkflash(2),
+                cllinkoff(3)
+            }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This variable indicates the link status of the controller card located in the slot
+        determined by the CLIndex.
+
+        The choices for this variable are
+        Number  State               Status
+        ------  -----               ------
+        1       Linked              Green
+        2       Flashing???         Flashing Green
+        3       Off                 Off"
+
+    ::= { adATLAS890FpnlCLEntry 5 }
+
+-- The Module LED Group
+
+adATLAS890FpnlModLeds      OBJECT IDENTIFIER ::= { adATLAS890FpnlLeds 2 }
+
+-- The Module LED Table
+
+adATLAS890FpnlMLTable     OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AdATLAS890FpnlMLEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "The Module LED Table."
+    ::= { adATLAS890FpnlModLeds 1 }
+
+-- The Module LED Entry
+
+adATLAS890FpnlMLEntry     OBJECT-TYPE
+    SYNTAX  AdATLAS890FpnlMLEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+        "An entry in the Module LED Table."
+    INDEX       { adATLAS890FpnlMLIndex }
+    ::= { adATLAS890FpnlMLTable 1 }
+
+AdATLAS890FpnlMLEntry ::=
+    SEQUENCE {
+        adATLAS890FpnlMLIndex
+            INTEGER,
+        adATLAS890FpnlMLStatus
+            INTEGER,
+        adATLAS890FpnlMLOnline
+            INTEGER,
+        adATLAS890FpnlMLTest
+            INTEGER
+    }
+
+-- The Module LED Table Index
+
+adATLAS890FpnlMLIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This variable indicates which slot is selected on the ATLAS
+        Product.  The number of this variable is the same as the number of the
+        slot on the ATLAS Product."
+
+    ::= { adATLAS890FpnlMLEntry 1 }
+
+-- The Module Status LED
+
+adATLAS890FpnlMLStatus    OBJECT-TYPE
+    SYNTAX  INTEGER {
+                mlstatusok(1),
+                mlstatuswarn(2),
+                mlstatuserr(3),
+                mlstatusflashgreen(4),
+                mlstatusflashyellow(5),
+                mlstatusflashred(6),
+                mlstatusoff(7)
+            }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This variable indicates the status of the card located in the slot
+        determined by the MLIndex variable.
+
+        The choices for this variable are
+        Number  State           Status
+        ------  -----           ------
+        1       OK              Green
+        2       Warning         Yellow
+        3       Error           Red
+        4       Flash. Green    Flash. Green
+        5       Flash. Yellow   Flash. Yellow
+        6       Flash. Red      Flash. Red
+        7       Off             Off"
+
+    ::= { adATLAS890FpnlMLEntry 2 }
+
+-- The Module Online LED
+
+adATLAS890FpnlMLOnline    OBJECT-TYPE
+    SYNTAX  INTEGER {
+                mlonlineon(1),
+                mlonlineflash(2),
+                mlonlineoff(3)
+            }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This variable indicates whether the card located in the slot
+        determined by the MLIndex is online or offline.
+
+        The choices for this variable are
+        Number  State           Status
+        ------  -----           ------
+        1       Online          Green
+        2       Flashing        Flashing Green
+        3       Offline         Off"
+
+    ::= { adATLAS890FpnlMLEntry 3 }
+
+-- The Module Test LED
+
+adATLAS890FpnlMLTest      OBJECT-TYPE
+    SYNTAX  INTEGER {
+                mlteston(1),
+                mltestflash(2),
+                mltestoff(3)
+            }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This variable indicates whether the card located in the slot
+        determined by the MLIndex is in a test mode or not.
+
+        The choices for this variable are
+        Number  State               Status
+        ------  -----               ------
+        1       Test in Progress    Yellow
+        2       Flashing            Flashing Yellow
+        3       Off                 Off"
+
+    ::= { adATLAS890FpnlMLEntry 4 }
+
+
+-- The System group of LEDs
+
+adATLAS890FpnlSysLeds   OBJECT IDENTIFIER ::= { adATLAS890FpnlLeds 3 }
+
+-- The Fans LED
+
+adATLAS890FpnlSysFansLed    OBJECT-TYPE
+    SYNTAX  INTEGER {
+                fansok(1),
+                fansalarm(2),
+                fanswarn(3)
+            }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This variable indicates the status of the Fans LED. When the Fans
+        LED changes state, this variable also changes state.
+
+        The various Fans LED states are:
+            Number  State           Status
+            ------  -----           ------
+            1       OK              Green
+            2       Failure         Red
+            3       Warning         Yellow"
+
+    ::= { adATLAS890FpnlSysLeds 1 }
+
+-- The Alarm LED
+
+adATLAS890FpnlSysAlarm     OBJECT-TYPE
+    SYNTAX  INTEGER {
+                sysalarmon(1),
+                sysalarmflash(2),
+                sysalarmoff(3)
+            }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This variable indicates the status of the Alarm LED.  When the Alarm
+         LED changes state, this variable also changes state.
+
+        The various Alarm LED states are:
+            Number  State           Status
+            ------  -----           ------
+            1       Alarm           Red
+            2       Warning         Flashing Red
+            3       Off             Off"
+
+    ::= { adATLAS890FpnlSysLeds 2 }
+
+-- The ACO LED
+
+adATLAS890FpnlSysACO     OBJECT-TYPE
+    SYNTAX  INTEGER {
+                sysacoon(1),
+                sysacoflash(2),
+                sysacooff(3)
+            }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+        "This variable indicates the status of the ACO LED.  When the
+         ACO switch is pressed, this LED is lit.
+
+        The various CSU Test states are:
+            Number  State               Status
+            ------  -----               ------
+            1       Clear               Yellow
+            2       Flash               Flashing Yellow
+            3       Off                 Off"
+
+    ::= { adATLAS890FpnlSysLeds 3 }
+
+END

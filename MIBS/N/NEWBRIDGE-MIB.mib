@@ -1,0 +1,2948 @@
+-- @(#)nnci.mib	9.1 10/16/98
+-- -----------------------------------------------------------------------------
+-- file: nnci.mib
+--
+-- contents:
+--	The Newbridge Networks Corporation (Interim) MIB definition in
+--      "concise" (aka RFC 1212) form.
+--
+-- history:
+--    1.0 / 91.07.01 / J. Watt / Creation
+--    1.1 / 91.11.27 / J. Watt / Updated to match M112
+--    1.2 / 92.08.21 / J. Watt / Updates to remove errors 
+--    2.0 / 93.08.06 / J. Watt / Update to coexist with 82X1 modules, renamed
+--							   to match purpose.
+--    2.2 / 93.11.22 / M. Tooker / Place in 4602 source code control;
+--                                 tweak syntax so it can be read by 4602.
+
+-- Copyright 1991 to 1993 Newbridge Networks Corporation.  All Rights Reserved.
+-- 
+        
+NEWBRIDGE-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+                enterprises, Counter 
+                        FROM RFC1155-SMI
+                
+                OBJECT-TYPE
+                        FROM RFC-1212
+
+				DisplayString, PhysAddress
+						FROM RFC1213-MIB
+
+				nncInterimMib
+						FROM NNCGNI00X1-SMI;
+
+
+        --      The alarm mechanism has 3 queues (Major, Minor, Diagnostic) each
+        --      of which can hold 64 alarms.
+
+	AlarmCode               ::= INTEGER (1..255)
+	AlarmQueue              ::= INTEGER { major(1), minor(2), diag(3) }
+	AlarmQueueIndex 	::= INTEGER (1..64)
+
+        --      Many counters and time stamps are kept as eight byte values
+
+	ExtendedCounter         ::= OCTET STRING (SIZE(8..8))
+	ExtendedTime            ::= OCTET STRING (SIZE(8..8))
+
+        -- Each Network Element has one or more positions that hold interfaces
+	-- and/or can accept plug in modules.
+
+	PositionNumber          ::= INTEGER 
+	CircuitNumber           ::= INTEGER (1..32)
+	DescendantNumber        ::= INTEGER (1..1023 )
+
+        -- Often PositionNumber, CircuitNumber and DescendantNumber and 
+        -- lumped together as a value and take on of two forms:
+        --         a)      pos.B, cct.B, des.B or
+        --         b)      pos.B, cct.B, desH.B, 1, desL.B
+        -- Taken together, this is said to be a "device number"
+
+	DeviceNumber            ::= OCTET STRING
+
+        -- Positions can contain modules which have types and ids.  They 
+        -- also can optionally contain sub-modules which also have types 
+        -- and ids
+
+	ModuleType              ::= INTEGER 
+	ModuleID                ::= INTEGER
+                
+	SubModuleType           ::= INTEGER
+	SubModuleID             ::= INTEGER
+
+        -- The address filter and permanent database consist of eight byte 
+        -- entries.  The first six bytes are the MAC address and the last
+        -- two bytes are flags
+
+	FilterEntry             ::= OCTET STRING (SIZE(8..8))
+
+        -- A "BridgeIdentifier" in 802.1d is two bytes of priority followed
+        -- by six bytes of MAC address
+
+	BridgeIdentifier        ::= OCTET STRING (SIZE(8..8))
+
+        -- The range of ifIndex, i.e. (1..ifNumber.0)
+
+	InterfaceIndex          ::= INTEGER
+
+        -- Generic single byte value
+
+	OneByte                 ::= INTEGER (0..255)
+
+        -- T1 and E1 links both allow the same loopbacks to be performed 
+        -- upon them use the same format of bitvector to report their
+	-- us
+
+	T1E1Loopback            ::= INTEGER {   none(1), 
+						equipment(2),
+						equipment-all-ones(3), 
+						equipment-digital(4),
+						line(5), 
+						line-and-equipment(6) }
+        
+	T1E1Status              ::= INTEGER (0..65535)
+	ControlLeads		::= INTEGER (0..255)
+
+	
+        nnciSystem      OBJECT IDENTIFIER ::= { nncInterimMib 1  }
+        nnciSp          OBJECT IDENTIFIER ::= { nncInterimMib 2  }
+        nnciAlarm       OBJECT IDENTIFIER ::= { nncInterimMib 4  }
+        nnciDiag        OBJECT IDENTIFIER ::= { nncInterimMib 3  }
+        nnciNetSynch    OBJECT IDENTIFIER ::= { nncInterimMib 7  }
+        nnciSlot        OBJECT IDENTIFIER ::= { nncInterimMib 10 }
+        nnciT1Slot      OBJECT IDENTIFIER ::= { nncInterimMib 22 }
+        nnciE1Slot      OBJECT IDENTIFIER ::= { nncInterimMib 20 }
+        nnciDev         OBJECT IDENTIFIER ::= { nncInterimMib 11 }
+        nnciT1          OBJECT IDENTIFIER ::= { nncInterimMib 23 }
+        nnciE1          OBJECT IDENTIFIER ::= { nncInterimMib 21 }
+        nnciSdc         OBJECT IDENTIFIER ::= { nncInterimMib 72 }
+        nnciHdlc        OBJECT IDENTIFIER ::= { nncInterimMib 66 }
+        nnciBridge      OBJECT IDENTIFIER ::= { nncInterimMib 55 }
+        nnciBrdgSt      OBJECT IDENTIFIER ::= { nncInterimMib 61 }
+       	nnciFilter      OBJECT IDENTIFIER ::= { nncInterimMib 62 }
+        nnciStp         OBJECT IDENTIFIER ::= { nncInterimMib 63 }
+
+
+                
+-- -----------------------------------------------------------------------------
+--
+-- 	NNC Interim System Table
+--
+-- -----------------------------------------------------------------------------
+
+	nnciSystemTable  OBJECT-TYPE
+		SYNTAX	SEQUENCE OF NnciSystemTableEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION 
+			"This table contains interesting general information
+			 about the managed element in its entirety"
+		::= {nnciSystem 1}
+		
+		
+	nnciSystemTableEntry OBJECT-TYPE
+		SYNTAX	NnciSystemTableEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION 
+			"A list of general information about the managed
+			 element"
+		::= {nnciSystemTable 1}
+		
+		
+	NnciSystemTableEntry
+		::= SEQUENCE {
+			nnciSystemDate
+				DisplayString,
+			nnciSystemProductName
+				DisplayString,
+			nnciSystemGeneric
+				DisplayString,
+			nnciSystemNVMAllocation
+				OCTET STRING,
+			nnciSystemNVMRepairInfo
+				OCTET STRING,
+			nnciSystemTime
+				DisplayString
+		}
+
+
+       nnciSystemDate       OBJECT-TYPE
+                SYNTAX  DisplayString
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "The current date as known by the node.The date is 
+                         formatted as a sequence of nine ASCII characters in the
+                         form DD-MMM-YY, where DD is the day of the month 
+                         (01..31), MMM is the month of the year, e.g. JAN, and
+                         YY is the last two digits of the year, e.g. 90."
+                ::= {nnciSystemTableEntry 2} 
+                
+        
+        nnciSystemProductName  OBJECT-TYPE
+                SYNTAX  DisplayString
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "The marketing name for the product, e.g.
+			 8230 MainStreet for something if 
+			 sysObjectId.0 = nnci8230"
+                ::= {nnciSystemTableEntry 4}
+        
+        
+        nnciSystemGeneric   OBJECT-TYPE
+                SYNTAX  DisplayString
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object identifies the revision of the firmware in 
+                        the standard Newbridge fashion.  The identifier is a 
+                        string of 10 ASCII characters of the form M11D-HL-PP 
+                        where:
+                          D indicates the release number of the software 
+                          LL indicates the load of the software, and
+                          PP indicates the patch-level of the firmware."
+                ::= {nnciSystemTableEntry 5}
+        
+        
+        nnciSystemNVMAllocation      OBJECT-TYPE
+                SYNTAX  OCTET STRING
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object provides status information about the 
+                         non-volatile memory present on the main card of the 
+                         system.  The information returned includes the size of 
+                         a single block of NVM, the total number of blocks 
+						 available for use, the number of bad blocks and the
+						 number of blocks in use."
+		--INDEX { INTEGER }
+                ::= {nnciSystemTableEntry 30}
+        
+        
+        nnciSystemNVMRepairInfo OBJECT-TYPE
+                SYNTAX  OCTET STRING      
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object returns the details of the latest repair 
+                         performed on the non-volatile memory present on the 
+                         main card."
+                ::= {nnciSystemTableEntry 31}
+        
+        
+        nnciSystemTime    OBJECT-TYPE
+                SYNTAX  DisplayString
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "The current time of day including seconds.  The time is
+                         represented as a sequence of 9 ASCII characters in the 
+                         form HH:MM:SS, where HH is the hour of the day (0..12),
+                         MM is the minute of the hour and SS are the seconds of
+                         the minute (0..59)"
+                ::= {nnciSystemTableEntry 38} 
+
+
+-- -----------------------------------------------------------------------------
+--
+-- 	NNC Interim Serial Port Table
+--
+-- -----------------------------------------------------------------------------
+       
+	nnciSerialPortTable  OBJECT-TYPE
+		SYNTAX	SEQUENCE OF NnciSerialPortTableEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION 
+			"This table contains the configuration information for
+			 an asynchronous management port for a standalone
+			 node."
+		::= {nnciSp 1}
+		
+		
+	nnciSerialPortTableEntry OBJECT-TYPE
+		SYNTAX	NnciSerialPortTableEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION 
+			"A list of configuration information for a management
+			 port on a standalone node"
+		--INDEX { SerialPortNumber }
+		::= {nnciSerialPortTable 1}
+		
+		
+	NnciSerialPortTableEntry
+		::= SEQUENCE {
+			nnciSpBaudRate
+				INTEGER,
+			nnciSpWordLength
+				INTEGER,
+			nnciSpStopBits
+				INTEGER,
+			nnciSpParity
+				INTEGER
+		}
+
+
+	nnciSpBaudRate   OBJECT-TYPE
+                SYNTAX  INTEGER {
+				  auto(1), b300(2), b600(3), b1200(4), b2400(5),
+				  b4800(6), b9600(7), b38400(8)
+                        	}
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "The baud rate of the asynchronous management port."
+                ::= {nnciSerialPortTableEntry 1}
+        
+        
+        nnciSpWordLength OBJECT-TYPE
+                SYNTAX  INTEGER { seven(3), eight(4) }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "The word length used on the asynchronous management
+			 port."
+                ::= {nnciSerialPortTableEntry 2}
+        
+        
+        nnciSpStopBits   OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "The number of stop bits used by the asynchronous 
+                         management port."
+                ::= {nnciSerialPortTableEntry 3}
+        
+        
+        nnciSpParity     OBJECT-TYPE
+                SYNTAX  INTEGER { odd(1), even(2), none(3) }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "The parity used on the asynchronous management port."
+                ::= {nnciSerialPortTableEntry 4}
+        
+                
+-- -----------------------------------------------------------------------------
+--
+-- 	NNC Interim Alarm Table
+--
+-- -----------------------------------------------------------------------------
+
+	nnciAlarmTable  OBJECT-TYPE
+		SYNTAX	SEQUENCE OF NnciAlarmTableEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION 
+			"This table contains all the configuration and status
+			 information about the alarm mechanism along with the
+			 alarms themselves."
+		::= {nnciAlarm 1}
+		
+		
+	nnciAlarmTableEntry OBJECT-TYPE
+		SYNTAX	NnciAlarmTableEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION
+			"A list of all of the configuration and status 
+			 information for a node, along with the alarm queues
+			 themselves."
+		::= {nnciAlarmTable 1}
+		
+		
+	NnciAlarmTableEntry
+		::= SEQUENCE {
+			nnciAlarmCount
+				INTEGER,
+			nnciAlarmQueueEntry
+				OCTET STRING,
+			nnciAlarmQueueEntryStatus
+				INTEGER,
+			nnciAlarmSeqNum
+				INTEGER,
+			nnciAlarmCodePriority
+				INTEGER,
+			nnciAlarmsDeleteQueueEntry
+				INTEGER,
+			nnciAlarmQueueType
+				INTEGER
+		}
+
+
+        nnciAlarmCount OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "The number of alarms in the specified queue."
+                --INDEX {AlarmQueue}
+                ::= {nnciAlarmTableEntry 1}
+        
+        
+        nnciAlarmQueueEntry OBJECT-TYPE
+                SYNTAX  OCTET STRING
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "When read, this object returns the particulars of the 
+                         entry in the specified queue."
+                --INDEX {AlarmQueue}
+                ::= {nnciAlarmTableEntry 2}
+        
+        
+        nnciAlarmQueueEntryStatus        OBJECT-TYPE
+                SYNTAX  INTEGER { nonTep1e(0), unackNotRemedied(1), 
+                                  unackRedmedyUnack(2),
+                                  ackNotRemedied(3), ackRemedyUnack(4),
+                                  ackRemedyAck(5), clearingAlarmUnack(6), 
+                                  clearingAlarmAck(7) }
+                ACCESS  write-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "The status of an alarm."
+                --INDEX {AlarmQueue, AlarmEntry}
+                ::= {nnciAlarmTableEntry 3}
+        
+        
+        nnciAlarmSeqNum        OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "The next sequence number that will be used by the node.
+			 The sequence numbers are a unique, within a single
+			 node, identifier for an alarm."
+                ::= {nnciAlarmTableEntry 4}
+        
+                
+        nnciAlarmCodePriority  OBJECT-TYPE
+                SYNTAX  INTEGER { major(1), minor(2), diagnostic(3) }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This value of this object controls into which queue an 
+                         alarm is placed."
+                --INDEX {AlarmCode}
+                ::= {nnciAlarmTableEntry 6}
+        
+        
+        nnciAlarmDeleteQueueEntry     OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  write-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "A set to this object is deletes the first N alarms from
+                         the specified alarm queue."
+                --INDEX {AlarmQueue}
+                ::= {nnciAlarmTableEntry 8}
+        
+        
+        nnciAlarmQueueType  OBJECT-TYPE
+                SYNTAX  INTEGER { fixedAlarmQueue(1), circularAlarmQueue(2) }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This paramater is used to control the behaviour of the 
+                        alarm queue in the overlfow case, i.e. when the alarm 
+                        facility attempts to place the 65th alarm into the queue.
+                        If the queue type is set to Fixed, the 65th and 64th 
+                        alarms will be discarded and the 'Too Many Alarms' alarm
+                        added as the last entry in the queue.  If the queue type
+                        is set to Circular, the 65th alarm will overwrite the 
+                        first alarm in the queue "
+                --INDEX {AlarmQueue}
+                ::= {nnciAlarmTableEntry 9}
+                
+-- -----------------------------------------------------------------------------
+--
+-- 	NNC Interim Diagnostics Table
+--
+-- -----------------------------------------------------------------------------
+
+	nnciDiagTable  OBJECT-TYPE
+		SYNTAX	SEQUENCE OF NnciDiagTableEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION 
+			"This table contains all of the configuration and
+			 status information related to diagnostics on a
+			 node."
+		::= {nnciDiag 1}
+		
+		
+	nnciDiagTableEntry OBJECT-TYPE
+		SYNTAX	NnciDiagTableEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION 
+			"A list of all of the configuration and status
+			 information related to node diagnostics."
+		::= {nnciDiagTable 1}
+		
+		
+	NnciDiagTableEntry
+		::= SEQUENCE {
+			nnciDiagEnableBackground
+				INTEGER,
+			nnciDiagResults
+				INTEGER
+		}
+
+
+        nnciDiagEnable   OBJECT-TYPE
+                SYNTAX  INTEGER { enabled(1), disabled(2) }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object controls whether or not background 
+                        diagnostics are run.  If the object is set to 2 
+                        (enabled), then background diagnostics are run 
+                        periodically.
+                        If the object is set to 1 (disabled), background 
+                        diagnostics are not performed."
+                ::= {nnciDiagTableEntry 1}
+        
+        
+        nnciDiagResults     OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object indicates the results of power on and 
+                        background diagnostics.  Any bit that is asserted 
+                        corresponds to a failure of a component of the card."
+                ::= {nnciDiagTableEntry 5}
+        
+-- -----------------------------------------------------------------------------
+--
+-- 	NNC Interim Network Synchronization Table
+--
+-- -----------------------------------------------------------------------------
+    
+	nnciNetSynchTable  OBJECT-TYPE
+		SYNTAX	SEQUENCE OF NnciNetSynchTableEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION 
+			"This table contains all of the configuration and status
+			 information for the network synchronization mechanism
+			 for a standalone node."
+		::= {nnciNetSynch 1}
+		
+		
+	nnciNetSynchTableEntry OBJECT-TYPE
+		SYNTAX	NnciNetSynchTableEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION 
+			"A list of all of the configuration and status 
+			 information related to network synchronization."
+		::= {nnciNetSynchTable 1}
+		
+		
+	NnciNetSynchTableEntry
+		::= SEQUENCE {
+			nnciNetSynchSourceStatus
+				INTEGER,
+			nnciNetSynchTimingSource
+				INTEGER,
+			nnciNetSynchReacquisitionMode
+				INTEGER,
+			nnciNetSynchCurrentSource
+				INTEGER,
+			nnciNetSynchRecoveryInterval
+				INTEGER,
+			nnciNetSynchQuality
+				INTEGER,
+			nnciNetSynchSourceClass
+				INTEGER,
+			nnciNetSynchNodeClass
+				INTEGER
+		}
+
+
+	nnciNetSynchSourceStatus OBJECT-TYPE
+                SYNTAX  INTEGER { disabled(1), ready(2), current(3),
+				  timedRecovery(4), failed(5), shutDown(6),
+				  notReady(7), autoRecovery(8), cannotLock(9),
+				  enabled(10), illegalState(11),
+                        	  undefinedSource(12), unavailable(13),
+				  acquiring(14) }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object returns the current status of the specified
+                        source of synchronization.  A set to this object changes
+                        the enabled/disabled status of the source.  If the
+			 source is disabled, writing anything other than
+			 'Disabled' will cause the source to be enabled, and its
+			 state will change to one of Not Ready, Ready, or
+			 Current.  If the source is enabled, writing 'Disabled'
+			 to this object will disable the source."
+                --INDEX   { NetSynchSource }
+                ::= {nnciNetSynchTableEntry 1}
+        
+        
+        nnciNetSynchTimingSource OBJECT-TYPE
+                SYNTAX  INTEGER { exp1(3), exp2(4), freerun(18) }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "The device which provides timing when the specified 
+                        source of synchronization is selected.  The sync source
+                        must be disabled before changing this object."
+                --INDEX   { NetSynchSource }
+                ::= {nnciNetSynchTableEntry 2}
+        
+        
+        nnciNetSynchReacquisitionMode    OBJECT-TYPE
+                SYNTAX  INTEGER { manual(1), automatic(2), timed(3) }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "How the source of synchronization will be treated in
+			 the event a failure is detected.  If Manual is
+			 selected, the source will remain unused until it is
+			 re-selected.  If Automatic recovery is selected, the
+			 source will be returned to use as soon as it is valid,
+			 e.g. when a T1 link regains frame alignment. If Timed
+			 recovery is selected, the node will attempt to use the
+			 source at the specified interval."
+                --INDEX   { NetSynchSource }
+                ::= {nnciNetSynchTableEntry 3}
+        
+        
+        nnciNetSynchCurrentSource        OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "The current source of synchronization for the node.  
+                        A set to this object toggles the ready/current status of
+                        the source.  If the source is ready, it will become the 
+                        current source.  If the source is current, it will
+			become ready, and the next-best source will become the
+			current source.  If the source is neither ready nor
+			current, a set to this object has no effect."
+                ::= {nnciNetSynchTableEntry 4}
+        
+        
+        nnciNetSynchRecoveryInterval     OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object is used to set the interval between
+			 recovery attempts for a source of synchronization
+			 that is using Timed recovery in seconds."
+                --INDEX   { NetSynchSource }
+                ::= {nnciNetSynchTableEntry 6}
+        
+        
+        nnciNetSynchQuality      OBJECT-TYPE
+                SYNTAX  INTEGER 
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object is used to set the maximum permissible 
+                         number of failures that can be experienced by a source
+		 	 in an hour.  If this limit is exceeded, an alarm is
+			 raised and the source is placed into the disabled
+			 state."
+                --INDEX   { NetSynchSource }
+                ::= {nnciNetSynchTableEntry 9}
+        
+        
+        nnciNetSynchSourceClass        OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object is used to set the class of a source.  The 
+                        source with the best class will provide system sync when
+                        several sources are Ready.  Note that the freerun source
+                        (source 5) does not actually make use of this object.  
+                        It gets its class from nnciNetSynchNodeClass."
+                --INDEX   { NetSynchSource }
+                ::= {nnciNetSynchTableEntry 11}
+        
+        
+        nnciNetSynchNodeClass    OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object is used to set the class of the node.  The 
+                        node will freerun if the value of this object is 
+                        lower than the nnciNetSynchSourceClass of the other
+			sources."
+                ::= {nnciNetSynchTableEntry 12}
+        
+-- -----------------------------------------------------------------------------
+--
+-- 	NNC Interim Slot Table
+--
+-- -----------------------------------------------------------------------------
+
+	nnciSlotTable  OBJECT-TYPE
+		SYNTAX	SEQUENCE OF NnciSlotTableEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION 
+			"This table contains all of the common, slot
+			 configuration and status information for a standalone
+			 node"
+		::= {nnciSlot 1}
+		
+		
+	nnciSlotTableEntry OBJECT-TYPE
+		SYNTAX	NnciSlotTableEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION 
+			"A list of all of the common, per-slot configuration and
+			 status information for a standalone node."
+		--INDEX { PositionNumber }
+		::= {nnciSlotTable 1}
+		
+		
+	NnciSlotTableEntry
+		::= SEQUENCE {
+			nnciSlotName
+				DisplayString,
+			nnciSlotProgType
+				ModuleType,
+			nnciSlotPresType
+				ModuleType,
+			nnciSlotStatus
+				INTEGER,
+			nnciSlotModuleID
+				ModuleID,
+			nnciSlotSubModuleProgType
+				SubModuleType,
+			nnciSlotSubModulePresType
+				SubModuleType,
+			nnciSlotFirmwareID
+				INTEGER,
+			nnciSlotBusyOut
+				INTEGER,
+			nnciSlotSubModuleID
+				SubModuleID,
+			nnciSlotVariantID
+				INTEGER,
+			nnciSlotResetCard
+				INTEGER,
+			nnciSlotHardwareRevision
+				INTEGER
+		}
+
+
+        nnciSlotName	OBJECT-TYPE
+                SYNTAX  DisplayString
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "An arbitrary name for a slot."
+                ::= {nnciSlotTableEntry 1}
+        
+        
+        nnciSlotProgType         OBJECT-TYPE
+                SYNTAX  ModuleType      
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object is used to specify what kind of module 
+                        should be present in the specified position .  If the 
+                        value in this object does not match the value in the 
+                        nnciSlotPresType object, then the position will be held 
+                        out of service."
+                ::= {nnciSlotTableEntry 2}
+        
+        
+        nnciSlotPresType OBJECT-TYPE
+                SYNTAX  ModuleType
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object is used to specify what kind of module is 
+                        present in the specified position .  If the value of 
+                        this object does not match the value of the 
+                        nnciSlotProgType object, the position will be 
+                        held out of service."
+                ::= {nnciSlotTableEntry 3}
+        
+        
+        nnciSlotStatus OBJECT-TYPE
+                SYNTAX  INTEGER { empty(1), ok(2), fault-on-module(3), 
+                                  module-dead(4), unknown-module-type(5), 
+                                  module-type-mismatch(6), 
+                                  sub-module-type-mismatch(7), 
+                                  wrong-firmware(9), wrong-variant(12)}
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object contains the current status of the
+			 specified position .  The status reflects whether a
+			 module is present,  and if so, is it of the expected
+			 type."
+                ::= {nnciSlotTableEntry 4}
+        
+        
+        nnciSlotModuleID   OBJECT-TYPE
+                SYNTAX  ModuleID
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "The hardware identification number assigned to the 
+                        module that is present in the specified position.  If 
+                        there is no module installed in the position, the value 
+                        returned will be 0 (zero). Note that this identification
+                        number identifies what kind of module is present; the 
+                        revision level of the module is available in the 
+                        nnciSlotHardwareRevision object "
+                ::= {nnciSlotTableEntry 5}
+        
+        
+        nnciSlotSubModuleProgType   OBJECT-TYPE
+                SYNTAX  SubModuleType
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "What kind of 'sub-module' should be present in the 
+                         specified slot.  If the value in this object does not 
+                         match the value in the nnciSlotModulePresType object,
+			 then the position will be held out of service.  Any
+			 attempt to set this object for other than the expansion
+			 module positions will be rejected."
+                ::= {nnciSlotTableEntry 6}
+        
+        
+        nnciSlotSubModulePresType  OBJECT-TYPE
+                SYNTAX  SubModuleType
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "What kind of 'sub-module' is present in the specified 
+                        position. If the value of this object does not match the
+                        value of the nnciSlotModuleProgType object, the position 
+                        will be held out of service."
+                ::= {nnciSlotTableEntry 7}
+        
+        
+        nnciSlotFirmwareID       OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "The revision level of the firmware, if any, that is 
+                         present on a module.  If no firmware is present, the
+                         value will be zero."
+                ::= {nnciSlotTableEntry 8}
+        
+        
+        nnciSlotBusyOut  OBJECT-TYPE
+                SYNTAX  INTEGER { normal(1), hold-out-of-service(2) }   
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object is used to take circuits on a specified
+			 slot out of service.  If the value of this object is 
+                         hold-out-of-service, then the circuits on the slot will
+                         not be used even if all alarms are cleared and the 
+                         circuits would normally be placed into service.  If the
+                         value of this object is normal, then the circuits will 
+                         operate as if this object did not exist. If the
+			 circuits are the specified position are in service when
+			 the object is set, it will be immediately removed from
+			 service."
+                ::= {nnciSlotTableEntry 9}
+        
+        
+        nnciSlotSubModuleID OBJECT-TYPE
+                SYNTAX  SubModuleID
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "The hardware identification number assigned to the 
+                        sub-module that is present in the specified position.  
+                        If there is no sub-module installed in the position, or 
+                        no sub-module present, the value returned will be zero."
+                ::= {nnciSlotTableEntry 10}
+        
+        
+        nnciSlotVariantID        OBJECT-TYPE
+                SYNTAX  INTEGER 
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "The variant identification number for the module which
+			 is installed in the specified slot.  If there is no
+			 module installed, the value returned will be zero."
+                ::= {nnciSlotTableEntry 14}
+       
+	
+	nnciSlotResetCard        OBJECT-TYPE
+                SYNTAX  INTEGER 
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object is used to cause the node to re-initialize 
+                        the specified module.  Any set to this object will cause
+                        the specified module to be re-initialized.  If a set is 
+                        attempted with the modifier set to select the main card, 
+			the whole node will be reset.  A get on this object will 
+			always return zero."
+                ::= {nnciSlotTableEntry 15}
+        
+        
+        nnciSlotHardwareRevision OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "The engineering revision level of the module that 
+                        occupies the specified position. The high nibble of the 
+                        returned value is the major revision level and the low 
+                        nibble is the minor revision, e.g. Engineering Revision 
+                        21 will be returned as $21."
+                ::= {nnciSlotTableEntry 19}
+        
+-- -----------------------------------------------------------------------------
+--
+-- 	NNC Interim T1 Slot Table
+--
+-- -----------------------------------------------------------------------------
+       
+	nnciT1SlotTable  OBJECT-TYPE
+		SYNTAX	SEQUENCE OF NnciT1SlotTableEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION 
+			"This table contains all of the configuration and status
+			 information for a T1 interface."
+		::= {nnciT1Slot 1}
+		
+		
+	nnciT1SlotTableEntry OBJECT-TYPE
+		SYNTAX	NnciT1SlotTableEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION 
+			"A list of all of the configuration and status
+			 information for a T1 interface."
+		--INDEX { PositionNumber }
+		::= {nnciT1SlotTable 1}
+		
+		
+	NnciT1SlotTableEntry
+		::= SEQUENCE {
+			nnciT1SlotAlarmControl
+				INTEGER,
+			nnciT1SlotFramingStyle
+				INTEGER,
+			nnciT1SlotZeroSuppression
+				INTEGER,
+			nnciT1SlotLinkStatus
+				T1E1Status,
+			nnciT1SlotLoopLength
+				INTEGER,
+			nnciT1SlotThreshold
+				INTEGER,
+			nnciT1SlotLoopback
+				T1E1Loopback,
+			nnciT1SlotTrunkConditioningEnable
+				INTEGER,
+			nnciT1SlotAlarmDeclarationTime
+				INTEGER,
+			nnciT1SlotAlarmClearingTime
+				INTEGER,
+			nnciT1SlotCRCFraming
+				INTEGER
+		}
+
+
+	nnciT1SlotAlarmControl   OBJECT-TYPE
+                SYNTAX  INTEGER { noAlarm(1), forceYellow(2), forceAIS(3) }     
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object can be used to control the alarm condition 
+                         that is indicated by the specified interface. If 
+                         ForceYellow is selected, the interface will provide the
+                         same indication to the far end as if the local
+			 interface had lost frame.  If ForceAIS is selected,
+			 the interface will transmit an unframed all ones signal
+			 towards the far end."
+                ::= {nnciT1SlotTableEntry 1}
+        
+        
+        nnciT1SlotFramingStyle   OBJECT-TYPE
+                SYNTAX  INTEGER { d4Framing(1), esfFraming(2) } 
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object is used to select either D4 or ESF framing 
+                         for the T1 link."
+                ::= {nnciT1SlotTableEntry 2}
+        
+        
+        nnciT1SlotZeroSuppression        OBJECT-TYPE
+                SYNTAX  INTEGER { none(1), b8zs(2), jamBit7(3) }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object is used to select the kind, if any, of 
+                         zero-code suppression to be used on the link."
+                ::= {nnciT1SlotTableEntry 3}
+        
+        
+        nnciT1SlotLinkStatus     OBJECT-TYPE
+                SYNTAX  T1E1Status
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object returns the current 'alarm' state of the 
+                         T1 facility."
+                ::= {nnciT1SlotTableEntry 7}
+        
+        
+        nnciT1SlotLoopLength     OBJECT-TYPE
+                SYNTAX  INTEGER { short(1), medium(2), long(3) }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object is used to control the pre-equalization 
+                         applied to signal before transmission."
+                ::= {nnciT1SlotTableEntry 8}
+        
+        
+        nnciT1SlotThreshold      OBJECT-TYPE
+                SYNTAX  INTEGER 
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object controls the system's tolerance of failures
+                         on the specified T1 link.  If more than the specified 
+                         number of failures occurs in one hour, the interface
+			 will be removed from consideration as a source of 
+                         synchronization.  A failure is defined as the
+			 occurrence of an alarm condition on the interface, i.e.
+			 one that results in any bits other than 0 (zero) or
+			 9 (nine) being set in the nnciT1SlotLinkStatus object."
+                ::= {nnciT1SlotTableEntry 9}
+        
+        
+        nnciT1SlotLoopback       OBJECT-TYPE
+                SYNTAX  INTEGER {   none(1), 
+                                    equipment(2),
+                                    equipment-all-ones(3), 
+                                    equipment-digital(4),
+                                    line(5), 
+                                    line-and-equipment(6) }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object is used to set or remove loopbacks on the 
+                         T1 link"
+                ::= {nnciT1SlotTableEntry 11}
+        
+        
+        nnciT1SlotTrunkConditioningEnable        OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object controls when trunk-conditioning is applied
+                        to the specified T1 link.  Trunk- conditioning is the 
+                        process by which all of the connections to the link are 
+                        temporarily broken and a known pattern is sent on each 
+                        channel of the T1."
+                ::= {nnciT1SlotTableEntry 16}
+        
+        
+        nnciT1SlotAlarmDeclarationTime   OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object controls the interval for which the local 
+                        loss-of-frame condition is debounced.  The debounce 
+                        algorithm and default value correspond to the 
+                        requirements of AT&T PUB 62411."
+                ::= {nnciT1SlotTableEntry 17}
+        
+        
+        nnciT1SlotAlarmClearingTime      OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object controls the interval for which the 
+                         reacquisition of local frame is debounced.  The
+			 debounce algorithm and default value correspond to the 
+                         requirements of AT&T PUB 62411."
+                ::= {nnciT1SlotTableEntry 18}
+        
+        
+        nnciT1SlotCRCFraming     OBJECT-TYPE
+                SYNTAX  INTEGER { enabled(1), disabled(2) }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object controls whether a Cyclic Redundancy Check 
+                         is used when the specified T1 link reframes.  This is 
+                         only applicable to T1 links that a programmed for ESF 
+                         operation."
+                ::= {nnciT1SlotTableEntry 20} 
+        
+-- -----------------------------------------------------------------------------
+--
+-- 	NNC Interim E1 Slot Table
+--
+-- -----------------------------------------------------------------------------
+
+	nnciE1SlotTable  OBJECT-TYPE
+		SYNTAX	SEQUENCE OF NnciE1SlotTableEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION 
+			"This table contains all of the configuration and status
+			 information for a E1 interface"
+		::= {nnciE1Slot 1}
+		
+		
+	nnciE1SlotTableEntry OBJECT-TYPE
+		SYNTAX	NnciE1SlotTableEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION 
+			"A list of all of the configuration and status
+			 information for a E1 interface."
+		--INDEX { PositionNumber }
+		::= {nnciE1SlotTable 1}
+		
+		
+	NnciE1SlotTableEntry
+		::= SEQUENCE {
+			nnciE1SlotAlarmControl
+				INTEGER,
+			nnciE1SlotLoopback
+				T1E1Loopback,
+			nnciE1SlotSignalling
+				INTEGER,
+			nnciE1SlotShieldLevel
+				INTEGER,
+			nnciE1SlotLinkStatus
+				T1E1Status,
+			nnciE1SlotThreshold
+				INTEGER,
+			nnciE1TypeOfStats
+				INTEGER,
+			nnciE1SlotTrunkConditioningEnable
+				INTEGER,
+			nnciE1SlotAlarmDeclarationTime
+				INTEGER,
+			nnciE1SlotAlarmClearingTime
+				INTEGER,
+			nnciE1SlotCRCFraming
+				INTEGER
+		}
+
+
+        nnciE1SlotAlarmControl   OBJECT-TYPE
+                SYNTAX  INTEGER { nonalarm(1), forceAISInTS16(2), forceAISInA11TS(3) }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object can be used to control the alarm condition 
+                         that is indicated by the specified interface. If 
+                         ForceAISInTS16  is selected, the interface will 
+                         transmit a continuous all ones pattern in TS16 of the 
+                         E1 link.  If ForceAISAllTS is selected, the interface 
+                         will transmit an un-framed 'all ones' signal on the 
+                         interface."
+                ::= {nnciE1SlotTableEntry 1}
+        
+        
+        nnciE1SlotLoopback       OBJECT-TYPE
+                SYNTAX  INTEGER {   none(1), 
+                                    equipment(2),
+                                    equipment-all-ones(3), 
+                                    equipment-digital(4),
+                                    line(5), 
+                                    line-and-equipment(6) }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object is used to set or remove loopbacks on the 
+                         E1 interface."
+                ::= {nnciE1SlotTableEntry 4}
+        
+        
+        nnciE1SlotSignalling     OBJECT-TYPE
+                SYNTAX  INTEGER { cas(1), ccs(2), thirtyOneChan(3) }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object is used to select either Common Channel 
+                         Signalling (CCS) or Channel Associated Signalling (CAS)
+                         operation for the interface.  CCS operation makes 
+                         timeslot 16 of the E1 link available for user data .  
+                         31CHAN mode allows TS16 to be used for super-rate data,
+                         whereas CCS does not.  In CAS operation, timeslot 16 is
+                         used to transfer ABCD bit signalling and thus is not 
+                         available to carry user data."
+                ::= {nnciE1SlotTableEntry 7}
+        
+        
+        nnciE1SlotShieldLevel    OBJECT-TYPE
+                SYNTAX  INTEGER { both-grounded(1), 
+				  onlyRX-grounded(2), 
+				  onlyTX-grounded(3), 
+				  neither-grounded(4)
+				 }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object is used to control the level of the coax 
+                         shield at the E1 physical interface for each of the 
+                         receive and transmit lines.  The two shields (receive 
+                         and transmit) can be controlled independently."
+                ::= {nnciE1SlotTableEntry 9}
+        
+        
+        nnciE1SlotLinkStatus     OBJECT-TYPE
+                SYNTAX  T1E1Status
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object returns the current 'alarm' state of the 
+                         E1 interface."
+                ::= {nnciE1SlotTableEntry 11}
+        
+        
+        nnciE1SlotThreshold      OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object controls the system's tolerance of failures
+                        on the specified interface.  If more than the specified 
+                        number of failures occurs in one hour, the interface
+			will be removed from consideration as a source of 
+                        synchronization.  A failure is defined as the occurrence
+                        of an alarm condition on the interface, i.e. one that 
+                        results in any bits other than 0 (zero) or 9 (nine)
+			being set in the nnciE1SlotLinkStatus object."
+                ::= {nnciE1SlotTableEntry 12}
+        
+        
+        nnciE1TypeOfStats      OBJECT-TYPE
+                SYNTAX  INTEGER  { hdb3(1), crc4(2) }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "The type of stats to be collected for this E1 link."
+                ::= {nnciE1SlotTableEntry 14}
+		
+        
+        nnciE1SlotTrunkConditioningEnable        OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object controls when trunk-conditioning is applied
+                         to the specified interface.  Trunk- conditioning is the
+                         process by which all of the connections to the
+			 interface are temporarily broken and a known pattern
+			 is sent on each channel of the interface."
+                ::= {nnciE1SlotTableEntry 21}
+        
+        
+        nnciE1SlotAlarmDeclarationTime   OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object controls the interval for which the local 
+                         loss-of-frame condition is debounced."
+                ::= {nnciE1SlotTableEntry 22}
+        
+        
+        nnciE1SlotAlarmClearingTime      OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object controls the interval for which the 
+                         reacquisition of local frame is debounced."
+                ::= {nnciE1SlotTableEntry 23}
+        
+        
+        nnciE1SlotCRCFraming     OBJECT-TYPE
+                SYNTAX  INTEGER { enabled(1), disabled(2) }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object controls the generation and use of a Cyclic
+                         Redundancy Check during reframing."
+                ::= {nnciE1SlotTableEntry 25}
+        
+-- -----------------------------------------------------------------------------
+--
+-- 	NNC Interim Common Device Table
+--
+-- -----------------------------------------------------------------------------
+
+	nnciDevTable  OBJECT-TYPE
+		SYNTAX	SEQUENCE OF NnciDevTableEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION 
+			"This table contains all of the common, per-device
+			 configuration and status information for a circuit.
+			 Device-type specific information is found in other
+			 tables as appropriate."
+		::= {nnciDev 1}
+		
+		
+	nnciDevTableEntry OBJECT-TYPE
+		SYNTAX	NnciDevTableEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION 
+			"A list of all of the common, per-device configuration
+			 and status information."
+		--INDEX { PositionNumber, CircuitNumber, DescendantNumber }
+		::= {nnciDevTable 1}
+		
+		
+	NnciDevTableEntry
+		::= SEQUENCE {
+			nnciDevName
+				DisplayString,
+			nnciDevLoopback
+				INTEGER,
+			nnciDevMateDevice
+				DeviceNumber,
+			nnciDevSetShowSig
+				INTEGER,
+			nnciDevReady
+				INTEGER,
+			nnciDevActive
+				INTEGER,
+			nnciDevConnected
+				INTEGER,
+			nnciDevOutOfService
+				INTEGER,
+			nnciDevUnderMaintenance
+				INTEGER,
+			nnciDevBusyOut
+				INTEGER,
+			nnciDevFailed
+				INTEGER,
+			nnciDevDiagEnable
+				INTEGER
+		}
+
+
+        nnciDevName      OBJECT-TYPE
+                SYNTAX  DisplayString
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "A user-defined name for the specified circuit."
+                ::= {nnciDevTableEntry 2}
+        
+        nnciDevLoopback  OBJECT-TYPE
+                SYNTAX  INTEGER { none(1), lpbkA(2), lpbkB(3), lpbkC(4) }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object is used to apply and remove loopbacks on 
+                         the specified circuit.  Note that it may not be 
+                         possible to apply loopbacks to some circuit types."
+                ::= {nnciDevTableEntry 4}
+        
+        
+        nnciDevMateDevice   OBJECT-TYPE
+                SYNTAX  DeviceNumber
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "The device number of the device, if any, that is 
+                         cross-connected to the device of interest.  If 
+                        there is no programmed connection, the device number 
+                        will be zero."
+                ::= {nnciDevTableEntry 5}
+        
+              
+        nnciDevSetShowSig        OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "A get from this object will return the current value of
+                         signalling, as appropriate for the type of the
+			 specified device.  When set, the bit pattern supplied
+			 will be used as the signalling that is being sent by
+			 the circuit."
+                ::= {nnciDevTableEntry 10}
+        
+	
+        nnciDevReady        OBJECT-TYPE
+                SYNTAX  INTEGER { notReady(0), ready(1) }
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "Whether or not the circuit is ready for use."
+                ::= {nnciDevTableEntry 15}
+
+
+        nnciDevActive        OBJECT-TYPE
+                SYNTAX  INTEGER { notActive(0), active(1) }
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "Whether or not the circuit is active."
+                ::= {nnciDevTableEntry 16}
+
+
+        nnciDevConnected        OBJECT-TYPE
+                SYNTAX  INTEGER { notConnected(0), connected(1) }
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "Whether or not the circuit is connected."
+                ::= {nnciDevTableEntry 17}
+
+
+        nnciDevOutOfService        OBJECT-TYPE
+                SYNTAX  INTEGER { inService(0), outOfService(1) }
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "Whether or not the circuit has detected an OutOfService
+			 condition."
+                ::= {nnciDevTableEntry 18}
+
+
+        nnciDevUnderMaintenance        OBJECT-TYPE
+                SYNTAX  INTEGER { noMaint(0), underMaint(1) }
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "True iff the circuit has been subject to a maintenance
+			 operation, e.g. a loopback."
+                ::= {nnciDevTableEntry 21}
+
+       
+        nnciDevBusyOut        OBJECT-TYPE
+                SYNTAX  INTEGER { notBusy(0), busiedOut(1) }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object is used to remove a circuit from service."
+                ::= {nnciDevTableEntry 22}
+
+
+        nnciDevFailed        OBJECT-TYPE
+                SYNTAX  INTEGER { notFailed(0), failed(1) }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "True iff this circuit has failed a diagnostics test."
+                ::= {nnciDevTableEntry 23}
+
+
+        nnciDevDiagEnable        OBJECT-TYPE
+                SYNTAX  INTEGER { diagDisabled(0), diagEnabled(1) }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "Whether or not background diagnostics are enabled for
+			 this circuit (if applicable)."
+                ::= {nnciDevTableEntry 24}
+
+-- -----------------------------------------------------------------------------
+--
+-- 	NNC Interim T1 Device Table
+--
+-- -----------------------------------------------------------------------------
+
+	nnciT1Table  OBJECT-TYPE
+		SYNTAX	SEQUENCE OF NnciT1TableEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION 
+			"This table contains all of the configuration and status
+			 information for a T1 circuit"
+		::= {nnciT1 1}
+		
+		
+	nnciT1TableEntry OBJECT-TYPE
+		SYNTAX	NnciT1TableEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION 
+			"A list of all of the configuration and status
+			 information for an T1 circuit"
+		--INDEX { PositionNumber, CircuitNumber, Descendant }
+		::= {nnciT1Table 1}
+		
+		
+	NnciT1TableEntry
+		::= SEQUENCE {
+			nnciT1BusyOut
+				INTEGER,
+			nnciT1RobbedBitSig
+				INTEGER,
+			nnciT1Inversion
+				INTEGER,
+			nnciT1DefaultData
+				OneByte,
+			nnciT1FirstCode
+				INTEGER,
+			nnciT1SecondCode
+				INTEGER,
+			nnciT1PartOfSuperRate
+				CircuitNumber,
+			nnciT1BitsUsed
+				INTEGER,
+			nnciT1SuperRateCircuitMap
+				INTEGER,
+			nnciT1SuperRateNumCircuits
+				INTEGER
+		}
+
+
+	nnciT1BusyOut    OBJECT-TYPE
+                SYNTAX  INTEGER { idle(1), seized(2), oosA(3), oosB(4) }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "What action will be taken on the circuit when the 
+                         circuit is not connected."
+                ::= {nnciT1TableEntry 1}
+        
+        
+        nnciT1RobbedBitSig       OBJECT-TYPE
+                SYNTAX  INTEGER { rbsOn(1), rbsOff(2) }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object is used to enable or disable Robbed-Bit 
+                         Signalling for the circuit."
+                ::= {nnciT1TableEntry 4}
+        
+        
+        nnciT1Inversion  OBJECT-TYPE
+                SYNTAX  INTEGER { invertOn(1), invertOff(2) }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "Whether or not data transmitted on this circuit is 
+                         inverted."
+                ::= {nnciT1TableEntry 5}
+        
+        
+        nnciT1DefaultData        OBJECT-TYPE
+                SYNTAX  OneByte
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION     
+                        "The value that is to be transmitted on the circuit 
+                         when it is not connected."
+                ::= {nnciT1TableEntry 8}
+        
+        
+        nnciT1FirstCode  OBJECT-TYPE
+                SYNTAX  INTEGER (0..15)
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "The nnciT1FirstCode object is one of two which
+			 determines the signalling that will be sent during the 
+                         Trunk-Conditioning process.  This object determines the
+                         signalling that will be sent during a timed-break, 
+                         if one is applied."
+                ::= {nnciT1TableEntry 9}
+        
+        
+        nnciT1SecondCode OBJECT-TYPE
+                SYNTAX  INTEGER (0..15)
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "The nnciT1SecondCode object is the second of two
+			 objects which determines the signalling that will be
+			 sent during the Trunk-Conditioning process.  This
+			 object determines the signalling that will be sent
+			 for the duration of the trunk-conditioning process,
+			 following the timed-break."
+                ::= {nnciT1TableEntry 10}
+        
+        
+        nnciT1PartOfSuperRate    OBJECT-TYPE
+                SYNTAX  CircuitNumber
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This parameter is used to form a circular linked list 
+                         of circuit numbers which make up a superrate connection
+                         It contains the circuit number of the next circuit in 
+                         the superrate connection or zero if the circuit is not 
+                         part of a super-rate group"
+                ::= {nnciT1TableEntry 12}
+        
+        
+        nnciT1BitsUsed  OBJECT-TYPE
+                SYNTAX  INTEGER (0..255)
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "A bitmap which indicates which bits of the T1 circuit
+			 are to be used for data."
+                ::= {nnciT1TableEntry 13}
+
+
+        nnciT1SuperRateCircuitMap   OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "When written to, this object builds the 
+                         circularly-linked list of circuits represented by the 
+                         one bits in the value written.  When read, this object
+                         returns the bit map corresponding to the super-rate 
+                         group of which this circuit is a member"
+                ::= {nnciT1TableEntry 20} 
+        
+        
+        nnciT1SuperRateNumCircuits   OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "When written to, this object builds the 
+                         circularly-linked list of circuits to represent the 
+                         super-rate group which begins at this circuit and 
+                         contains the specified number of circuits.  When read,
+                         this object returns the number of circuits in the 
+                         super-rate group of which this circuit is a member"
+                ::= {nnciT1TableEntry 21} 
+        
+-- -----------------------------------------------------------------------------
+--
+-- 	NNC Interim E1 Device Table
+--
+-- -----------------------------------------------------------------------------
+
+	nnciE1Table  OBJECT-TYPE
+		SYNTAX	SEQUENCE OF NnciE1TableEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION 
+			"This table contains all of the configuration and status
+			 information for a E1 circuit"
+		::= {nnciE1 1}
+		
+		
+	nnciE1TableEntry OBJECT-TYPE
+		SYNTAX	NnciE1TableEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION 
+			"A list of all of the configuration and status
+			 information for an E1 circuit"
+		--INDEX { PositionNumber, CircuitNumber, Descendant }
+		::= {nnciE1Table 1}
+		
+		
+	NnciE1TableEntry
+		::= SEQUENCE {
+			nnciE1BusyOut
+				INTEGER,
+			nnciE1AlternateDigitInversion
+				INTEGER,
+			nnciE1DefaultData
+				OneByte,
+			nnciE1FirstCode
+				INTEGER,
+			nnciE1SecondCode
+				INTEGER,
+			nnciE1PartOfSuperRate
+				CircuitNumber,
+			nnciE1BitsUsed
+				INTEGER,
+			nnciE1SuperRateCircuitMap
+				INTEGER,
+			nnciE1SuperRateNumCircuits
+				INTEGER
+		}
+
+
+        nnciE1BusyOut    OBJECT-TYPE
+                SYNTAX  INTEGER { idle(1), seized(2), oosA(3), oosB(4) }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "What signalling will be transmitted on the circuit when
+                         the circuit is not connected."
+                ::= {nnciE1TableEntry 3}
+        
+        
+        nnciE1AlternateDigitInversion      OBJECT-TYPE
+                SYNTAX  INTEGER { adiOn(1), adiOff(2) }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "Whether or not Alternate Digit Inversion (ADI) will be 
+                         applied to the data transmitted and received on the 
+                         circuit."
+                ::= {nnciE1TableEntry 6}
+        
+        
+        nnciE1DefaultData        OBJECT-TYPE
+                SYNTAX  OneByte
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "The value that is to be transmitted on the circuit when
+                         it is not connected."
+                ::= {nnciE1TableEntry 9}
+        
+        
+        nnciE1FirstCode  OBJECT-TYPE
+                SYNTAX  INTEGER (0..15)
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "The nnciE1FirstCode object is one of two which
+			 determines the signalling that will be sent during the 
+                         Trunk-Conditioning process.  This object determines 
+                         the signalling that will be sent during a timed-break,
+                         if one is applied."
+                ::= {nnciE1TableEntry 10}
+        
+        
+        nnciE1SecondCode OBJECT-TYPE
+                SYNTAX  INTEGER (0..15)
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "The nnciE1SecondCode object is the second of two
+			 objects which determines the signalling that will be
+			 sent during the Trunk-Conditioning process.  This
+			 object determines the signalling that will be sent
+			 for the duration of the trunk-conditioning process,
+			 following the timed-break."
+                ::= {nnciE1TableEntry 11}
+        
+        
+        nnciE1PartOfSuperRate    OBJECT-TYPE
+                SYNTAX  CircuitNumber
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This parameter is used to form a circular linked list 
+                         of circuit numbers which make up a superrate
+			 connection.  It contains the circuit number of the next
+			 circuit in the superrate connection or zero if the
+			 circuit is not part of a super-rate group."
+                ::= {nnciE1TableEntry 13}
+        
+        
+        nnciE1BitsUsed  OBJECT-TYPE
+                SYNTAX  INTEGER (0..255)
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "A bitmap which indicates which bits of the E1 circuit
+			 are to be used for data."
+                ::= {nnciE1TableEntry 14}
+
+
+        nnciE1SuperRateCircuitMap   OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "When written to, this object builds the 
+                        circularly-linked list of circuits represented by the 
+                        one bits in the value written.  When read, this object
+                        returns the bit map corresponding to the super-rate 
+                        group of which this circuit is a member"
+                ::= {nnciE1TableEntry 21} 
+        
+        
+        nnciE1SuperRateNumCircuits   OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "When written to, this object builds the 
+                         circularly-linked list of circuits to represent the 
+                         super-rate group which begins at this circuit and 
+                         contains the specified number of circuits.  When read,
+                         this object returns the number of circuits in the 
+                         super-rate group of which this circuit is a member."
+                ::= {nnciE1TableEntry 22} 
+        
+-- -----------------------------------------------------------------------------
+--
+-- 	NNC Interim Synchronous Data Circuits Table
+--
+-- -----------------------------------------------------------------------------
+
+	nnciSdcTable  OBJECT-TYPE
+		SYNTAX	SEQUENCE OF NnciSdcTableEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION 
+			"This table contains all of the configuration and status
+			 information for a Synchronous Data Module circuit."
+		::= {nnciSdc 1}
+		
+		
+	nnciSdcTableEntry OBJECT-TYPE
+		SYNTAX	NnciSdcTableEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION 
+			"A list of all of the configuration and status
+			 information required for a Synchronous Data Module
+			 circuit."
+		--INDEX { PositionNumber, CircuitNumber, Descendant }
+		::= {nnciSdcTable 1}
+		
+		
+	NnciSdcTableEntry
+		::= SEQUENCE {
+			nnciSdcInterfaceControl
+				INTEGER,
+			nnciSdcInterfaceSpeed
+				INTEGER,
+			nnciSdcLeadsDefaultOn
+				ControlLeads,
+			nnciSdcLeadDefaultOff
+				ControlLeads,
+			nnciSdcInterfaceStatus
+				ControlLeads
+		}
+
+
+        nnciSdcInterfaceControl  OBJECT-TYPE
+                SYNTAX  INTEGER { dce(0), dte(16) }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "Determines the gender (DTE/DCE)  of the specified 
+                         circuit.  The gender is used to a) control the
+			 operation and interpretation of the control leads
+			 and determine the source of clocks for the interface."
+                ::= {nnciSdcTableEntry 1}
+        
+        
+        nnciSdcInterfaceSpeed    OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object determines the speed of the specified 
+                         interface in multiples of 800 bits/s.  When the 
+                         interface is in Data Terminal Equipment (DTE) mode 
+                         (see nnciSdcInterfaceControl), the interface will run 
+                         at the speed of the supplied clocks, regardless of the 
+                         value of this object."
+                ::= {nnciSdcTableEntry 2}
+        
+        
+        nnciSdcLeadsDefaultOn    OBJECT-TYPE
+                SYNTAX  ControlLeads
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This controls the state of the control leads on the 
+                         specified interface.  The control leads that are 
+                         affected by this object are determined by a) the type 
+                         of the interface and b) the mode (or gender) of the 
+                         interface.  The leads specified by this object are 
+                         asserted towards the attached equipment.  If there is a
+                         conflict between the leads that are 'defaulted on' and
+                         those that are 'defaulted off', the value of this 
+                         object is taken to be correct."
+                ::= {nnciSdcTableEntry 3}
+        
+        
+        nnciSdcLeadDefaultOff    OBJECT-TYPE
+                SYNTAX  ControlLeads
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "The interface control leads specified by this object 
+                         are de-asserted towards the attached equipment."
+                ::= {nnciSdcTableEntry 4}
+        
+        
+        nnciSdcInterfaceStatus   OBJECT-TYPE
+                SYNTAX  ControlLeads
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object reports the current status of the control 
+                         leads associated with the specified interface. The
+                         meanings of the bits reported by this object depend on
+                         the type and gender of the interface."
+                ::= {nnciSdcTableEntry 5}
+        
+-- -----------------------------------------------------------------------------
+--
+-- 	NNC Interim HDLC Statistics Table
+--
+-- -----------------------------------------------------------------------------
+
+	nnciHdlcTable  OBJECT-TYPE
+		SYNTAX	SEQUENCE OF NnciHdlcTableEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION 
+			"This table contains all of the configuration, status
+			 and statistical information required for an HDLC
+			 circuit."
+		::= {nnciHdlc 1}
+		
+		
+	nnciHdlcTableEntry OBJECT-TYPE
+		SYNTAX	NnciHdlcTableEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION 
+			"A list of all of the configuration, status and
+			 statistical information required for an HDLC circuit."
+		--INDEX { PositionNumber, CircuitNumber, Descendant }
+		::= {nnciHdlcTable 1}
+		
+		
+	NnciHdlcTableEntry
+		::= SEQUENCE {
+			nnciHdlcBytesTransmitted
+				ExtendedCounter,
+			nnciHdlcFramesTransmitted
+				ExtendedCounter,
+			nnciHdlcRxGoodBytes
+				ExtendedCounter,
+			nnciHdlcRxGoodFrames
+				ExtendedCounter,
+			nnciHdlcUnderrun
+				ExtendedCounter,
+			nnciHdlcCRCError
+				ExtendedCounter,
+			nnciHdlcAlignmentError
+				ExtendedCounter,
+			nnciHdlcOverrun
+				ExtendedCounter,
+			nnciHdlcAbort
+				ExtendedCounter,
+			nnciHdlcSinceLastReset
+				ExtendedTime,
+			nnciHdlcApplication
+				INTEGER
+		}
+
+
+        nnciHdlcBytesTransmitted OBJECT-TYPE
+                SYNTAX  ExtendedCounter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "A count of data and padding bytes that were
+			 successfully transmitted."
+                ::= {nnciHdlcTableEntry 1}
+        
+        
+        nnciHdlcFramesTransmitted	OBJECT-TYPE
+                SYNTAX  ExtendedCounter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "The number of frames that were successfully
+			 transmitted."
+                ::= { nnciHdlcTableEntry 2}
+        
+        
+        nnciHdlcRxGoodBytes      OBJECT-TYPE
+                SYNTAX  ExtendedCounter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "The number of  bytes in frames that were successfully 
+                         received."
+                ::= {nnciHdlcTableEntry 3}
+        
+        
+        nnciHdlcRxGoodFrames     OBJECT-TYPE
+                SYNTAX  ExtendedCounter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "The number of frames that were successfully received."
+                ::= {nnciHdlcTableEntry 4}
+        
+        
+        nnciHdlcUnderrun OBJECT-TYPE
+                SYNTAX  ExtendedCounter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "The number of frames that should have been transmitted 
+                         by the station, but could not be transmitted due to an
+                         internal MAC sublayer transmit error."
+                ::= {nnciHdlcTableEntry 5}
+        
+        
+        nnciHdlcCRCError OBJECT-TYPE
+                SYNTAX  ExtendedCounter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "The number of frames that contained an integral number 
+                         of bytes but did not pass the frame sequence."
+                ::= {nnciHdlcTableEntry 6}
+        
+        
+        nnciHdlcAlignmentError   OBJECT-TYPE
+                SYNTAX  ExtendedCounter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "The number of frames that did not contain an integral 
+                        number of bytes and did not pass the frame sequence."
+                ::= {nnciHdlcTableEntry 7}
+        
+        
+        nnciHdlcOverrun  OBJECT-TYPE
+                SYNTAX  ExtendedCounter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "The number of frames which should have been received by
+                         the station, but could not be accepted due to an 
+                         internal MAC sublayer receive error."
+                ::= {nnciHdlcTableEntry 8}
+        
+        
+        nnciHdlcAbort    OBJECT-TYPE
+                SYNTAX  ExtendedCounter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "The number of the number of times that a minimum of 
+                         seven consecutive ones was received during frame 
+                         reception."
+                ::= {nnciHdlcTableEntry 9}
+        
+	
+	nnciHdlcSinceLastReset  OBJECT-TYPE
+                SYNTAX  ExtendedTime
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION     
+                        "This object indicates the elapsed time in hundredths of
+                         a second since the HDLC device's statistical counters
+                         were last reset."
+                ::= {nnciHdlcTableEntry 11}
+        
+	nnciHdlcApplication  OBJECT-TYPE
+                SYNTAX  INTEGER { none(0), cpss(1), bridge(2), frameStream(3) }
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION     
+                        "This object indicates the elapsed time in hundredths of
+                         a second since the HDLC device's statistical counters
+                         were last reset."
+                ::= {nnciHdlcTableEntry 12}
+
+
+-- -----------------------------------------------------------------------------
+--
+-- 	NNC Interim Bridge Table
+--
+-- -----------------------------------------------------------------------------
+	
+	nnciBridgeTable  OBJECT-TYPE
+		SYNTAX	SEQUENCE OF NnciBridgeTableEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION 
+			"This table contains all of the configuration
+			 information for a Bridge."
+		::= {nnciBridge 1}
+		
+		
+	nnciBridgeTableEntry OBJECT-TYPE
+		SYNTAX	NnciBridgeTableEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION 
+			"A list of all of the configuration information required
+			 for a Bridge."
+		::= {nnciBridgeTable 1}
+		
+		
+	NnciBridgeTableEntry
+		::= SEQUENCE {
+			nnciBrdgAddress
+				PhysAddress,
+			nnciBrdgUptime
+				ExtendedTime,
+			nnciBrdgInterfaceCount
+				INTEGER,
+			nnciBrdgMaxInterfaceCount
+				INTEGER,
+			nnciBrdgMapCircuitToInterface
+				InterfaceIndex
+		}
+		
+		
+        nnciBrdgAddress  OBJECT-TYPE
+                SYNTAX  PhysAddress
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "The data-link layer address to which messages destined
+                         for the bridge should be sent."
+                ::={nnciBridgeTableEntry 3}
+        
+        
+        nnciBrdgUptime   OBJECT-TYPE
+                SYNTAX  ExtendedTime
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "The elapsed time in hundredths of a second since the 
+                         bridge entity was last reset."
+                ::= {nnciBridgeTableEntry 4}
+        
+        
+        nnciBrdgInterfaceCount   OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "The number of interfaces which are programmed to be
+			 used for/by the bridge."
+                ::= {nnciBridgeTableEntry 5}
+
+
+        nnciBrdgMaxInterfaceCount        OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "The maximum possible number of interfaces supported by 
+                         the bridge."
+                ::= {nnciBridgeTableEntry 6}
+
+
+        nnciBrdgMapCircuitToInterface    OBJECT-TYPE
+                SYNTAX  InterfaceIndex
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "Which interface the specified device belongs to."
+                ::= {nnciBridgeTableEntry 7 }
+                
+-- -----------------------------------------------------------------------------
+--
+-- 	NNC Interim Bridge Statistics Table
+--
+-- -----------------------------------------------------------------------------
+
+	nnciBridgeStPhase1 OBJECT IDENTIFIER ::= {nnciBrdgSt 1}
+	nnciBridgeStPhase1GroupOne OBJECT IDENTIFIER ::= {nnciBridgeStPhase1 1}
+
+        nnciBrdgStFramesFiltered OBJECT-TYPE
+                SYNTAX  ExtendedCounter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "The number of frames received by the bridge and 
+                         discarded based on information in the address filter."
+                ::= {nnciBridgeStPhase1GroupOne 4}
+        
+        
+        nnciBrdgStFramesForwarded        OBJECT-TYPE
+                SYNTAX  ExtendedCounter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "The number of frames received by the bridge, not 
+                         discarded and forwarded to a single destination."
+                ::= {nnciBridgeStPhase1GroupOne 5}
+        
+        
+        nnciBrdgStFramesFlooded  OBJECT-TYPE
+                SYNTAX  ExtendedCounter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "The number of frames received by the bridge, not 
+                         discarded, but re-transmitted on all interfaces"
+                ::= {nnciBridgeStPhase1GroupOne 6}
+        
+        
+        nnciBrdgStTimeSinceLastReset        OBJECT-TYPE
+                SYNTAX  ExtendedTime
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "The elapsed time in hundredths of a second since the 
+                         bridge's statistical counters were last reset."
+                ::= {nnciBridgeStPhase1GroupOne 11}
+
+
+-- -----------------------------------------------------------------------------
+--
+-- 	NNC Interim Filter Table
+--
+-- -----------------------------------------------------------------------------
+
+	nnciFilterTable  OBJECT-TYPE
+		SYNTAX	SEQUENCE OF NnciFilterTableEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION 
+			"This table contains all of the configuration and status
+			 information related to the filtering mechanism of a
+			 Transparent Bridge."
+		::= {nnciFilter 1}
+		
+		
+	nnciFilterTableEntry OBJECT-TYPE
+		SYNTAX	NnciFilterTableEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION 
+			"A list of all of the configuration and status
+			 information related to the filtering mechanism of a
+			 Transparent Bridge."
+		::= {nnciFilterTable 1}
+		
+		
+	NnciFilterTableEntry
+		::= SEQUENCE {
+			nnciFilterReset
+				INTEGER,
+			nnciFilterLearn
+				INTEGER,
+			nnciFilterPermDBChange
+				INTEGER,
+			nnciFilterPermDBEntryCount
+				INTEGER,
+			nnciFilterPermDBContents
+				FilterEntry,
+			nnciFilterAddPermDBEntry
+				FilterEntry,
+			nnciFilterDeletePermDBEntry
+				FilterEntry,
+			nnciFilterAFMaxEntries
+				INTEGER,
+			nnciFilterAFEntryLifetime
+				INTEGER,
+			nnciFilterAFEntryCount
+				INTEGER,
+			nnciFilterAFContents
+				FilterEntry,
+			nnciFilterForwardMatrix
+				INTEGER,
+			nnciFilterFloodUnicastMatrix
+				INTEGER,
+			nnciFilterTakeSnapShot
+				INTEGER,
+			nnciFilterFloodMulticastMatrix
+				INTEGER,
+			nnciFilterFloodBroadcastMatrix
+				INTEGER,
+			nnciFilterPermNVDBContents
+				FilterEntry,
+			nnciFilterDeleteAllPermEntries
+				INTEGER
+		}
+
+
+        nnciFilterReset  OBJECT-TYPE
+                SYNTAX  INTEGER { nop(0), reset(1) }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object forces the bridge to reset the filtering 
+                         database by first removing all of the entries from the
+                         filter and then re-initializing it with the entries 
+                         from the permanent database.  A get on this object will
+                         always return zero"
+                ::= {nnciFilterTableEntry 1}
+        
+        
+        nnciFilterLearn  OBJECT-TYPE
+                SYNTAX  INTEGER { doNotLearn(0), learn(1) }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object determines whether the address filter will 
+                         learn the source addresses of frames transmitted on 
+                         networks to which it is directly attached."
+                ::= {nnciFilterTableEntry 2}
+                
+        
+        nnciFilterPermDBChange   OBJECT-TYPE
+                SYNTAX  INTEGER { same-as-before(0), changed(1) }
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object indicates that the permanent database 
+                         entries have changed since the last filter reset."
+                ::= {nnciFilterTableEntry 4}    
+		
+        
+        nnciFilterPermDBMaxEntries       OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object indicates the maximum number of entries 
+                         that may be placed in the permanent database of the 
+                         bridge."
+                ::= {nnciFilterTableEntry 5}
+        
+        
+        nnciFilterPermDBEntryCount       OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object returns the number of entries currently in 
+                         the permanent database."
+                ::= {nnciFilterTableEntry 6}
+        
+        
+        nnciFilterPermDBContents OBJECT-TYPE
+                SYNTAX  FilterEntry
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object provides access to the contents of the 
+                         permanent database.  The modifier is the entry number 
+                         which can range from 1 to FILTER-PermDBEntryCount.  If
+                         an attempt is made to access an entry that is not 
+                         defined, an error will be returned."
+                --INDEX { INTEGER }
+                ::= {nnciFilterTableEntry 7}
+        
+        
+        nnciFilterAddPermDBEntry OBJECT-TYPE
+                SYNTAX  FilterEntry     
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object provides a way to add an entry to the 
+                         permanent database of the bridge.  If the maximum size
+                         of the permanent database is exceeded, an error will be
+                         returned."
+                ::= {nnciFilterTableEntry 8}
+        
+        
+        nnciFilterDeletePermDBEntry      OBJECT-TYPE
+                SYNTAX  FilterEntry 
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object provides a way to delete an entry from the
+                         permanent database of the bridge.  If the specified
+			 entry does not exist, an error will be returned."
+                ::= {nnciFilterTableEntry 9}
+        
+        
+        nnciFilterAFMaxEntries   OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object stores the maximum number of entries that 
+                         may be placed in the address filter. The number
+			 includes both entries copied from the permanent
+			 database and learned entries."
+                ::= {nnciFilterTableEntry 10}
+        
+        
+        nnciFilterAFEntryLifetime        OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object determined the lifetime of an entry in the 
+                         address filter.  Any entry that is present in the
+			 filter but not repeated within n
+			 nnciFilterAFEntryLifetime will be deleted from the
+			 filter.  If the Spanning Tree Protocol is used, TBD
+			 this value of STP-ForwardDelay used to age
+                         the filter entries."
+                ::= {nnciFilterTableEntry 11}
+        
+        
+        nnciFilterAFEntryCount   OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object returns the number of entries currently in 
+                         the address filter.  This can be used in conjunction 
+                         with nnciFilterAFContents to obtain the current
+			 contents of the address filter."
+                ::= {nnciFilterTableEntry 12}
+        
+        
+        nnciFilterAFContents     OBJECT-TYPE
+                SYNTAX  FilterEntry
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object provides access tot he current contents of 
+                         the address filter."
+                --INDEX { INTEGER }
+                ::= {nnciFilterTableEntry 13}
+        
+        
+        nnciFilterForwardMatrix  OBJECT-TYPE
+                SYNTAX  INTEGER 
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object determines any restrictions on bridged 
+                         traffic flow from a particular interface to all of the 
+                         other interfaces.  The restrictions are organized as a 
+                         bit vector where the values are either permit or deny.
+                         The value of nnciFilterForwardMatrix [i,j] must be
+			 permit if any frame originating on interface i may be 
+                         transmitted on interface j."
+                ::= {nnciFilterTableEntry 14}
+        
+        
+        nnciFilterFloodUnicastMatrix    OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object determines the handling of a unicast frame
+			 with an unrecognized destination.  The bridge normally
+			 floods such frames on all interfaces except the one on
+			 which the frame was received. This object can be used
+			 to prevent frames being flooded onto specific
+			 interfaces.  The restrictions are organized as a bit
+			 vector for each interface, where the values are either
+			 permit or deny."
+                ::= {nnciFilterTableEntry 15}
+        
+        
+        nnciFilterTakeSnapShot   OBJECT-TYPE
+                SYNTAX  INTEGER { nop(0), snapshot(1) }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "A set with a value of snapshot will make a copy of the 
+                         address filter that can be accessed by gets from 
+                         nnciFilterContents"
+                ::= {nnciFilterTableEntry 17}
+        
+        
+        nnciFilterFloodMulticastMatrix    OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object determines the handling of a multicast frame with
+			 an unrecognized destination.  The bridge normally floods 
+                         such frames on all interfaces except the one on which 
+                         the frame was received. This object can be used to 
+                         prevent frames being flooded onto specific interfaces.
+                         The restrictions are organized as a bit vector for each
+                         interface, where the values are either permit or deny."
+                ::= {nnciFilterTableEntry 18}
+
+
+        nnciFilterFloodBroadcastMatrix    OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object determines the handling of a broadcast frame with
+			 an unrecognized destination.  The bridge normally floods 
+                         such frames on all interfaces except the one on which 
+                         the frame was received. This object can be used to 
+                         prevent frames being flooded onto specific interfaces.
+                         The restrictions are organized as a bit vector for each
+                         interface, where the values are either permit or deny."
+                ::= {nnciFilterTableEntry 19}
+
+
+        nnciFilterPermNVDBContents       OBJECT-TYPE
+                SYNTAX  FilterEntry
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object provides access to the permanent entries 
+                         stored in NVM, it is used to provide a degree of 
+                         indirection through the permanent entry vector 
+                         necessary for minimal manipulation of the 
+                         database during deletion of permanent entries."
+                ::= {nnciFilterTableEntry 20}
+        
+        
+        nnciFilterDeleteAllPermEntries   OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object provides a way to delete all permanent 
+                         entries from the database in one operation."
+                ::= {nnciFilterTableEntry 21}
+        
+-- -----------------------------------------------------------------------------
+--
+-- 	NNC Interim Spanning Tree Table
+--
+-- -----------------------------------------------------------------------------
+        
+	nnciStpTable  OBJECT-TYPE
+		SYNTAX	SEQUENCE OF NnciStpTableEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION 
+			"This table contains all of the configuration and status
+			 information relating to the operation of the 802.1d
+			 Spanning Tree Protocol."
+		::= {nnciStp 1}
+		
+		
+	nnciStpTableEntry OBJECT-TYPE
+		SYNTAX	NnciStpTableEntry
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION 
+			"A list of all of the configuration and status
+			 information relating to the operation of the 802.1d
+			 Spanning Tree Protocol."
+		::= {nnciStpTable 1}
+		
+		
+	NnciStpTableEntry
+		::= SEQUENCE {
+			nnciStpEnable
+				INTEGER,
+			nnciStpBridgePriority
+				INTEGER,
+			nnciStpRoot
+				BridgeIdentifier,
+			nnciStpRootPathCost
+				INTEGER,
+			nnciStpRootInterface
+				InterfaceIndex,
+			nnciStpMaxAge
+				INTEGER,
+			nnciStpHelloTime
+				INTEGER,
+			nnciStpForwardDelay
+				INTEGER,
+			nnciStpMyMaxAge
+				INTEGER,
+			nnciStpMyHelloTime
+				INTEGER,
+			nnciStpMyForwardDelay
+				INTEGER,
+			nnciStpTopologyChangeDetected
+				INTEGER,
+			nnciStpSendingTopologyChange
+				INTEGER,
+			nnciStpTimeSinceLastTopologyChange
+				ExtendedTime,
+			nnciStpTopologyChanges
+				Counter,
+			nnciStpTopologyChangeAck
+				INTEGER,
+			nnciStpInterfacePriority
+				INTEGER,
+			nnciStpInterfaceCost
+				INTEGER,
+			nnciStpDesignatedBridge
+				BridgeIdentifier,
+			nnciStpDesignatedInterface
+				InterfaceIndex,
+			nnciStpDesignatedRoot
+				BridgeIdentifier,
+			nnciStpDesignatedCost
+				INTEGER,
+			nnciStpConfigurationMessagePending
+				INTEGER,
+			nnciStpAllowableDeviations
+				INTEGER,
+			nnciStpCostMultiplier
+				INTEGER,
+			nnciStpUserAssignedCost
+				INTEGER
+		}
+
+
+        nnciStpEnable    OBJECT-TYPE
+                SYNTAX  INTEGER { stpOff(0), stpOn(1) }
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object enables or disables the Spanning Tree 
+                         Protocol.  If the protocol is disabled, the bridge acts
+                         as a simple bridge, which routes packets based only on 
+                         information in the address filter. Working without the
+                         Spanning Tree Protocol may lead to loops in the network
+                         topology and is not recommended. The remaining objects
+                         in this section are only defined when the Spanning 
+                         Tree Protocol is enabled."
+                ::= {nnciStpTableEntry 1}
+        
+        
+        nnciStpBridgePriority    OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object determines the role of the bridge in the 
+                         spanning tree. It is used to decide which bridge in the
+                         network should be the root, which bridges should be 
+                         active, and which bridges should operate in a standby 
+                         mode. By changing the bridge priority, one can affect 
+                         the configuration of the spanning tree. Bridges
+                         with smaller priority values are preferentially active 
+                         i.e. smaller values indicate higher priorities. The 
+                         bridge priority forms the upper two bytes of the bridge
+                         identifier used by the Spanning Tree Protocol."
+                ::= {nnciStpTableEntry 2}
+        
+        
+        nnciStpRoot      OBJECT-TYPE
+                SYNTAX  BridgeIdentifier
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object identifies the bridge that is the root of 
+                         the spanning tree."
+                ::= {nnciStpTableEntry 3}
+        
+        
+        nnciStpRootPathCost      OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This cost of a path is the sum of the costs of the 
+                         individual hops along the path to the root, where the 
+                         cost of a hop is a user-assignable object usually 
+                         related to the speed of the physical link 
+                        (speed in Mbits/sec) - see also nnciStpInterfaceCost."
+                ::={nnciStpTableEntry 4}
+        
+        
+        nnciStpRootInterface     OBJECT-TYPE
+                SYNTAX  InterfaceIndex
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object indicates the interface currently used to 
+                         send messages to the root bridge.  It is chosen as the
+                         interface which provides the least-cost path to the 
+                         root."
+                ::= {nnciStpTableEntry 5}
+        
+        
+        nnciStpMaxAge    OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object defines the maximum permissible age in 
+                         seconds of the configuration information held for each 
+                         interface.  If the information becomes older than 
+                         nnciStpMaxAge, without being updated by another 
+                         configuration message from the root bridge, it is 
+                         discarded, and the bridge attempts to become the 
+                         designated bridge for that link. In this way, failures
+                         of the root or other bridges are detected. 
+                         (See also nnciStpMyMaxAge)."
+                ::= {nnciStpTableEntry 6}
+        
+        
+        nnciStpHelloTime OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object is the value of the HelloTimer used by the
+			 root bridge. The present Spanning Tree protocol
+			 propogates this value, but the bridges never use it;
+			 they use nnciStpMyHelloTime instead. "
+                ::= {nnciStpTableEntry 7}
+        
+        
+        nnciStpForwardDelay      OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object defines the number of seconds that an
+			 interface is kept in the listening or learning state
+			 before being moved to the next state.  If a topology
+			 change has been detected (i.e., nnciStpTopologyChange
+			 is true), then this value is also used as the maximum
+			 lifetime of entries in the address filter."
+                ::= {nnciStpTableEntry 8}
+        
+        
+        nnciStpMyMaxAge  OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object is assigned to nnciStpMaxAge if this bridge
+                         becomes the root of the spanning tree."
+                ::= {nnciStpTableEntry 9}
+        
+        
+        nnciStpMyHelloTime       OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object is the interval between transmission of 
+                         configuration BPDUs (also called Hello messages) by the
+                         bridge. This object is also assigned to
+			 nnciStpHelloTime if this bridge becomes the root of
+			 the Spanning Tree."
+                ::={nnciStpTableEntry 10}
+        
+        
+        nnciStpMyForwardDelay    OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object is assigned to nnciStpForwardDelay if this 
+                         bridge becomes the root of the Spanning Tree."
+                ::= {nnciStpTableEntry 11}
+        
+        
+        nnciStpTopologyChangeDetected    OBJECT-TYPE
+                SYNTAX  INTEGER { no(0), yes(1) }
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "If this object is true, then this bridge has detected a
+                         topology change recently and is sending topology change
+                         notifications (TCNs) to the root bridge."
+                ::= {nnciStpTableEntry 12}
+        
+        
+        nnciStpSendingTopologyChange    OBJECT-TYPE
+                SYNTAX  INTEGER { no(0), yes(1) }
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "If this object is true, then the bridge has recently 
+                         received a configuration BPDU with the topology change
+                         flag set. This indicates that the bridge has been 
+                         notified (or has itself detected) a topology change, 
+                         and all bridges in the network should use 
+                         nnciStpForwardDelay as the aging time of entries 
+                         in the filtering database for as long as the flag 
+                         is set."
+                ::={nnciStpTableEntry 13}
+        
+        
+        nnciStpTimeSinceLastTopologyChange       OBJECT-TYPE
+                SYNTAX  ExtendedTime
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object provides the elapsed time in seconds since
+                         the last change in network topology.  This object is 
+                         set to zero when a bridge reset occurs."
+                ::= {nnciStpTableEntry 14}
+        
+        
+        nnciStpTopologyChanges       OBJECT-TYPE
+                SYNTAX  Counter
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object indicates the number of times that the 
+                         topology change flag has been set to true since the 
+                         last bridge reset."
+                ::= {nnciStpTableEntry 15}
+        
+        
+        nnciStpTopologyChangeAck OBJECT-TYPE
+                SYNTAX  INTEGER { no(0), yes(1) }
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This flag indicates whether the topology change 
+                         acknowledge flag should be set in the next hello
+			 message generated on this interface. Setting this flag 
+                         acknowledges the receipt of a topology change 
+                         notification (TCN) from another bridge on the
+			 interface."
+                --INDEX { InterfaceIndex }
+               ::= {nnciStpTableEntry 16}
+        
+        
+        nnciStpInterfacePriority OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object is a user-settable priority assigned to 
+                         each interface.  The interface priority allows the
+			 network manager to indicate that a given interface
+			 should be preferentially used for forwarding messages.
+			 Interfaces with smaller numbers (higher priorities) are
+                         preferentially used for bridge traffic."
+                --INDEX { InterfaceIndex }
+                ::= {nnciStpTableEntry 17}
+        
+        
+        nnciStpInterfaceCost     OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object indicates the relative cost of sending a 
+                         frame out on a given interface. It is computed in the 
+                         following manner. If nnciStpCostMultiplier is non-zero,
+                         then nnciStpInterfaceCost = (nnciStpCostMultiplier/100)
+                          * (10^9 / ifSpeed). If nnciStpCostMultiplier is zero, 
+                         then nnciStpInterfaceCost = nnciStpUserAssignedCost. 
+                         In this way, the cost of an interface can either track
+                         the bandwidth allocated, or be assigned a fixed value.
+                         Note that the value is not allowed to be zero."
+                --INDEX { InterfaceIndex }
+                ::= {nnciStpTableEntry 18}
+        
+        
+        nnciStpDesignatedBridge  OBJECT-TYPE
+                SYNTAX  BridgeIdentifier
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object specifies the designated bridge for the 
+                         link (LAN or WAN) attached to the interface. 
+                         Specifically, it is the id of the designated bridge. 
+                         The designated bridge for a link is chosen as the 
+                         bridge with the least-cost path to the root. "
+                --INDEX { InterfaceIndex }
+                ::= {nnciStpTableEntry 19}
+        
+        
+        nnciStpDesignatedInterface    OBJECT-TYPE
+                SYNTAX  InterfaceIndex
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object indicates the interface that the bridge 
+                         given by nnciStpDesignatedBridge uses to send 
+                         configuration messages over the link (LAN or WAN).  
+                         Specifically, it is the id of the interface  (i.e., 
+                         the concatenation of the interface  priority and the 
+                         interface address). This object is of interest if the 
+                         designated bridge has more than one interface connected
+                         to the link."
+                --INDEX { InterfaceIndex }
+                ::= {nnciStpTableEntry 20}
+        
+        
+        nnciStpDesignatedRoot    OBJECT-TYPE
+                SYNTAX  BridgeIdentifier
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object indicates who the designated bridge thinks 
+                         is the root (i.e., what the value of nnciStpRoot is on 
+                         the bridge given by nnciStpDesignateBridge).  This
+			 object will only differ from nnciStpRoot when the
+			 topology of the spanning tree is changing."
+                --INDEX { InterfaceIndex }
+                ::= {nnciStpTableEntry 21}
+        
+        
+        nnciStpDesignatedCost    OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object provides the cost of the cheapest path 
+                         between nnciStpDesignatedBridge and
+			 nnciStpDesignatedRoot."
+                --INDEX { InterfaceIndex }
+                ::= {nnciStpTableEntry 22}
+        
+        
+        nnciStpConfigurationMessagePending       OBJECT-TYPE
+                SYNTAX  INTEGER { no(0), yes(1) }
+                ACCESS  read-only
+                STATUS  mandatory
+                DESCRIPTION
+                        "If this object is true, then a configuration BPDU has 
+                         been queued for transmission due to the transmission of
+                         another configuration BPDU within the last second."
+                --INDEX { InterfaceIndex }
+                ::= {nnciStpTableEntry 23}
+        
+        
+        nnciStpAllowableDeviations       OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object specifies those deviations from the 802.1d 
+                         document that will be tolerated by the bridge. If the 
+                         bit in the specified position is 1, then that deviation
+                         will be allowed."
+                ::= {nnciStpTableEntry 24}
+        
+        
+        nnciStpCostMultiplier    OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object is the weight assigned to the default cost,
+                        expressed as a percentage. That is, a multiplier of 50
+                        means the interface should have half its default cost as
+                        determined by its speed. See the description of 
+                        nnciStpInterfaceCost for more details."
+                --INDEX { InterfaceIndex }
+                ::= {nnciStpTableEntry 25}
+        
+        
+        nnciStpUserAssignedCost  OBJECT-TYPE
+                SYNTAX  INTEGER
+                ACCESS  read-write
+                STATUS  mandatory
+                DESCRIPTION
+                        "This object is used to determine the cost assigned to 
+                         a interface. See the description of
+			 nnciStpInterfaceCost for the details."
+                --INDEX { InterfaceIndex }
+                ::= {nnciStpTableEntry 26}
+	END

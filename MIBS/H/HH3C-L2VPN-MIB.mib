@@ -1,0 +1,473 @@
+-- =============================================================================
+-- Copyright (c) 2004-2015 Hangzhou H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: Layer 2 Virtual Private Network (L2VPN) MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+-- V1.0 2015-01-16 Created by Yanneng
+-- =============================================================================
+HH3C-L2VPN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        RowStatus, TruthValue
+    FROM SNMPv2-TC
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        Unsigned32,
+        IpAddress,
+        NOTIFICATION-TYPE
+    FROM SNMPv2-SMI
+        InterfaceIndex
+    FROM IF-MIB
+        hh3cCommon
+    FROM HH3C-OID-MIB;
+
+-- =============================================================================
+-- module identity part
+-- =============================================================================
+hh3cL2vpn MODULE-IDENTITY
+    LAST-UPDATED "201501160000Z"       -- Jan 16, 2015 at 00:00 GMT
+    ORGANIZATION
+        "Hangzhou H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team Hangzhou H3C Tech. Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085
+        "
+    DESCRIPTION
+        "This MIB contains objects to manage L2VPN."
+    REVISION
+        "201501160000Z"   -- Jan 16, 2015 at 00:00 GMT
+    DESCRIPTION
+        "Initial version."
+    ::= { hh3cCommon 162 }
+
+-- ==================================================================
+-- =================== hh3cL2VpnPwNotifications definition ==========
+-- ==================================================================
+
+hh3cL2vpnPwNotifications OBJECT IDENTIFIER ::= { hh3cL2vpn 0 }
+
+-- ==================================================================
+-- ======================= hh3cL2vpnGlobalTable definition ==========
+-- ==================================================================
+
+hh3cL2vpnGlobalTable OBJECT IDENTIFIER ::= { hh3cL2vpn 2 }
+
+hh3cL2vpnPwcTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cL2vpnPwcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains pseudowire (PW) class information."
+    ::= { hh3cL2vpnGlobalTable 1 }
+
+hh3cL2vpnPwcEntry OBJECT-TYPE
+    SYNTAX      Hh3cL2vpnPwcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Provides information about a PW class entry."
+    INDEX
+        {
+            hh3cL2vpnPwcName
+        }
+    ::= { hh3cL2vpnPwcTable 1 }
+
+Hh3cL2vpnPwcEntry ::= SEQUENCE
+    {
+        hh3cL2vpnPwcName             OCTET STRING,
+        hh3cL2vpnPwcCvType           INTEGER,
+        hh3cL2vpnPwcCcType           INTEGER,
+        hh3cL2vpnPwcControlWord      TruthValue,
+        hh3cL2vpnPwcPwType           INTEGER,
+        hh3cL2vpnPwcRowStatus        RowStatus
+    }
+
+hh3cL2vpnPwcName OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(1..19))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "PW class name."
+    ::= { hh3cL2vpnPwcEntry 1 }
+
+hh3cL2vpnPwcCvType OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+        unknown(1),
+        bfd(2),
+        rawBFD(3)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Virtual Circuit Connectivity Verification (VCCV) Bidirectional
+         Forwarding Detection (BFD) type."
+    ::= { hh3cL2vpnPwcEntry 2 }
+
+hh3cL2vpnPwcCcType OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+        unknown(1),
+        controlWord(2),
+        routerAlert(3),
+        ttl(4)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Virtual Circuit Connectivity Verification (VCCV) Control Channel
+        (CC) type."
+    ::= { hh3cL2vpnPwcEntry 3 }
+
+hh3cL2vpnPwcControlWord OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Whether control word is enabled."
+    DEFVAL { false }
+    ::= { hh3cL2vpnPwcEntry 4 }
+
+hh3cL2vpnPwcPwType OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+        vlan(4),
+        ethernet(5)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "PW encapsulation type."
+    DEFVAL { vlan }
+    ::= { hh3cL2vpnPwcEntry 5 }
+
+hh3cL2vpnPwcRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Operation status of this table entry.  A row entry cannot be modified
+         when the value of this object is 'active'."
+    ::= { hh3cL2vpnPwcEntry 6 }
+
+-- ==================================================================
+-- =======================hh3cL2vpnVpwsTable definition  ============
+-- ==================================================================
+
+hh3cL2vpnVpwsTable OBJECT IDENTIFIER ::= { hh3cL2vpn 3 }
+
+-- ==================================================================
+-- =======================hh3cL2vpnXcgTable definition  ============
+-- ==================================================================
+hh3cL2vpnXcgTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cL2vpnXcgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains cross-connect group information."
+    ::= { hh3cL2vpnVpwsTable 1 }
+
+hh3cL2vpnXcgEntry OBJECT-TYPE
+    SYNTAX      Hh3cL2vpnXcgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Provides information about a cross-connect group entry."
+    INDEX
+        {
+            hh3cL2vpnXcgName
+        }
+    ::= { hh3cL2vpnXcgTable 1 }
+
+Hh3cL2vpnXcgEntry ::= SEQUENCE
+    {
+        hh3cL2vpnXcgName            OCTET STRING,
+        hh3cL2vpnXcgAdminState      INTEGER,
+        hh3cL2vpnXcgRowStatus       RowStatus
+    }
+
+hh3cL2vpnXcgName OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(1..31))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Cross-connect group name."
+    ::= { hh3cL2vpnXcgEntry 1 }
+
+hh3cL2vpnXcgAdminState OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+        adminUp(1),
+        adminDown(2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The desired state of the cross-connect group.  The column doesn't exist
+         when this group hasn't any connection."
+    ::= { hh3cL2vpnXcgEntry 2 }
+
+hh3cL2vpnXcgRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Operation status of this table entry."
+    ::= { hh3cL2vpnXcgEntry 3 }
+-- ==================================================================
+-- ====================hh3cL2vpnXcgConnTable definition  ============
+-- ==================================================================
+hh3cL2vpnXcgConnTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cL2vpnXcgConnEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains cross-connect information."
+    ::= { hh3cL2vpnVpwsTable 2 }
+
+hh3cL2vpnXcgConnEntry OBJECT-TYPE
+    SYNTAX      Hh3cL2vpnXcgConnEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Provides information about a cross-connect entry."
+    INDEX
+        {
+            hh3cL2vpnXcgName,
+            hh3cL2vpnXcgConnName
+        }
+    ::= { hh3cL2vpnXcgConnTable 1 }
+
+Hh3cL2vpnXcgConnEntry ::= SEQUENCE
+    {
+        hh3cL2vpnXcgConnName         OCTET STRING,
+        hh3cL2vpnXcgConnRowStatus    RowStatus
+    }
+
+hh3cL2vpnXcgConnName OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(1..20))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Cross-connect name."
+    ::= { hh3cL2vpnXcgConnEntry 1 }
+
+hh3cL2vpnXcgConnRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Operation status of this table entry."
+    ::= { hh3cL2vpnXcgConnEntry 2 }
+-- ==================================================================
+-- ====================hh3cL2vpnXcgAcTable definition  ==============
+-- ==================================================================
+hh3cL2vpnXcgAcTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cL2vpnXcgAcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains information about attachment circuits (ACs)
+         bound to cross-connects"
+    ::= { hh3cL2vpnVpwsTable 3 }
+
+hh3cL2vpnXcgAcEntry OBJECT-TYPE
+    SYNTAX      Hh3cL2vpnXcgAcEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Provides information about an attachment circuit entry."
+    INDEX
+        {
+            hh3cL2vpnXcgName,
+            hh3cL2vpnXcgConnName,
+            hh3cL2vpnXcgAcIfIndex,
+            hh3cL2vpnXcgAcEvcSrvInstId
+        }
+    ::= { hh3cL2vpnXcgAcTable 1 }
+
+Hh3cL2vpnXcgAcEntry ::= SEQUENCE
+    {
+        hh3cL2vpnXcgAcIfIndex            InterfaceIndex,
+        hh3cL2vpnXcgAcEvcSrvInstId       Unsigned32,
+        hh3cL2vpnXcgAcAccessMode         INTEGER,
+        hh3cL2vpnXcgAcRowStatus          RowStatus
+    }
+
+hh3cL2vpnXcgAcIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Index of the interface."
+    ::= { hh3cL2vpnXcgAcEntry 1 }
+
+hh3cL2vpnXcgAcEvcSrvInstId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Index of the service instance.  The value is always 0 when the
+         interface isn't a layer 2 Ethernet interface."
+    ::= { hh3cL2vpnXcgAcEntry 2 }
+
+hh3cL2vpnXcgAcAccessMode OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+        vlan(1),
+        ethernet(2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Access mode of the AC.  The value is meaningless when the
+         interface isn't a layer 2 Ethernet interface."
+    ::= { hh3cL2vpnXcgAcEntry 3 }
+
+hh3cL2vpnXcgAcRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Operation status of this table entry.  A row entry cannot be modified
+         when the value of this object is 'active'."
+    ::= { hh3cL2vpnXcgAcEntry 4 }
+-- ==================================================================
+-- ====================hh3cL2vpnXcgPwTable definition  ==============
+-- ==================================================================
+hh3cL2vpnXcgPwTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cL2vpnXcgPwEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains PW information."
+    ::= { hh3cL2vpnVpwsTable 4 }
+
+hh3cL2vpnXcgPwEntry OBJECT-TYPE
+    SYNTAX      Hh3cL2vpnXcgPwEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Provides information about a PW entry."
+    INDEX
+        {
+            hh3cL2vpnXcgName,
+            hh3cL2vpnXcgConnName,
+            hh3cL2vpnXcgPwIndex
+        }
+    ::= { hh3cL2vpnXcgPwTable 1 }
+
+Hh3cL2vpnXcgPwEntry ::= SEQUENCE
+    {
+        hh3cL2vpnXcgPwIndex            Unsigned32,
+        hh3cL2vpnXcgPwCfgType          INTEGER,
+        hh3cL2vpnXcgPwClassName        OCTET STRING,
+        hh3cL2vpnXcgPwTunnelPolicy     OCTET STRING,
+        hh3cL2vpnXcgPwPeerIp           IpAddress,
+        hh3cL2vpnXcgPwPwID             Unsigned32,
+        hh3cL2vpnXcgPwRowStatus        RowStatus
+    }
+
+hh3cL2vpnXcgPwIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "A unique index for a PW."
+    ::= { hh3cL2vpnXcgPwEntry 1 }
+
+hh3cL2vpnXcgPwCfgType OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+        primary(1),
+        backup(2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "PW attribute."
+    ::= { hh3cL2vpnXcgPwEntry 2 }
+
+hh3cL2vpnXcgPwClassName OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(1..19))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "PW class name."
+    ::= { hh3cL2vpnXcgPwEntry 3 }
+
+hh3cL2vpnXcgPwTunnelPolicy OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(1..19))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Tunnel policy name."
+    ::= { hh3cL2vpnXcgPwEntry 4 }
+
+hh3cL2vpnXcgPwPeerIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Peer IP address."
+    ::= { hh3cL2vpnXcgPwEntry 5 }
+
+hh3cL2vpnXcgPwPwID OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "PW identifier(ID)."
+    ::= { hh3cL2vpnXcgPwEntry 6 }
+
+hh3cL2vpnXcgPwRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Operation status of this table entry.  A row entry cannot be modified
+         when the value of this object is 'active'."
+    ::= { hh3cL2vpnXcgPwEntry 7 }
+-- ==================================================================
+-- ===============hh3cL2vpnPwNotifications definition  ==============
+-- ==================================================================
+hh3cL2vpnPwSwitchPtoB NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cL2vpnXcgPwIndex,
+            hh3cL2vpnXcgPwPeerIp,
+            hh3cL2vpnXcgPwPwID,
+            hh3cL2vpnXcgPwIndex,
+            hh3cL2vpnXcgPwPeerIp,
+            hh3cL2vpnXcgPwPwID
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when a primary-to-backup PW switching
+         happens.  The first three elements show the primary PW,
+         and the second three elements show the backup PW."
+    ::= { hh3cL2vpnPwNotifications 1 }
+
+hh3cL2vpnPwSwitchBtoP NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cL2vpnXcgPwIndex,
+            hh3cL2vpnXcgPwPeerIp,
+            hh3cL2vpnXcgPwPwID,
+            hh3cL2vpnXcgPwIndex,
+            hh3cL2vpnXcgPwPeerIp,
+            hh3cL2vpnXcgPwPwID
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when a backup-to-primary PW switching
+         happens.  The first three elements show the backup PW,
+         and the second three elements show the primary PW."
+    ::= { hh3cL2vpnPwNotifications 2 }
+-- ==================================================================
+
+END

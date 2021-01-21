@@ -1,0 +1,60 @@
+UM-PINGER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+			experimental, Gauge
+				FROM RFC1155-SMI
+			OBJECT-TYPE
+				FROM RFC-1212;
+
+umPinger		OBJECT IDENTIFIER ::= { experimental 1001 }
+
+umPingerCheckFrom	OBJECT-TYPE
+			SYNTAX	OCTET STRING
+			ACCESS	read-only
+			STATUS	current
+DESCRIPTION ""
+			::= { umPinger 1 }
+
+umPingerCheckLast	OBJECT-TYPE
+			SYNTAX	OCTET STRING
+			ACCESS	read-only
+			STATUS	current
+DESCRIPTION ""
+			::= { umPinger 2 }
+
+umPingerTimeTotal	OBJECT-TYPE
+			SYNTAX	INTEGER
+			ACCESS	read-only
+			STATUS	current
+DESCRIPTION ""
+			::= { umPinger 3 }
+
+umPingerTimeUp		OBJECT-TYPE
+			SYNTAX	INTEGER
+			ACCESS	read-only
+			STATUS	current
+DESCRIPTION ""
+			::= { umPinger 4 }
+
+umPingerTimeOnline	OBJECT-TYPE
+			SYNTAX	INTEGER
+			ACCESS	read-only
+			STATUS	current
+DESCRIPTION ""
+			::= { umPinger 5 }
+
+umPingerPctUp		OBJECT-TYPE
+			SYNTAX	OCTET STRING
+			ACCESS	read-only
+			STATUS	current
+DESCRIPTION ""
+			::= { umPinger 6 }
+
+umPingerPctOnline	OBJECT-TYPE
+			SYNTAX	OCTET STRING
+			ACCESS	read-only
+			STATUS	current
+DESCRIPTION ""
+			::= { umPinger 7 }
+
+END

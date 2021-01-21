@@ -1,0 +1,118 @@
+EXPAND-TRAP-MIB DEFINITIONS ::= BEGIN
+
+		IMPORTS 
+			expand, InterfaceIndex
+				FROM ExpandAccelerator-MIB
+--			expand-networks, interfaceIndex			
+--				FROM EXPAND-NETWORKS-SMI			
+			TRAP-TYPE			
+				FROM RFC-1215;
+	
+	
+	
+--
+-- Trap definitions
+--
+	
+-- Expand-Networks Private Enterprise Traps
+		redundantPowerSupplyUp TRAP-TYPE
+			ENTERPRISE expand
+			DESCRIPTION
+				"A redundantPowerSupplyUp trap signifies that both
+				power supplies are working (after redundantPowerSupplyDown trap was issued). 
+				Applicable to Accelerators with dual power supplies."
+			::=  1
+			
+		redundantPowerSupplyDown  TRAP-TYPE
+			ENTERPRISE expand
+			DESCRIPTION
+				"A redundantPowerSupplyDown trap signifies that
+				one of the redundant power supplies stopped working.
+				Applicable to Accelerators with dual power supplies."
+			::=  2
+			
+		connectionInboundUp TRAP-TYPE
+			ENTERPRISE expand
+			VARIABLES { interfaceIndex }
+			DESCRIPTION
+				"A connectionInboundUp trap signifies that 
+				the inbound direction has successfully synchronized
+				(Logically, when Expand's Acceleration protocols are properly
+				working) with a remote Accelerator."
+			::=  3
+			
+		connectionInboundDown TRAP-TYPE
+			ENTERPRISE expand
+			VARIABLES { interfaceIndex }
+			DESCRIPTION
+				"A connectionInboundDown trap signifies that	
+				the inbound direction has lost synchronization with
+				a remote Accelerator. After this Trap is sent, Accelerator 
+				performs in Software bypass mode."
+			::=  4
+			
+		connectionOutboundUp TRAP-TYPE
+			ENTERPRISE expand
+			DESCRIPTION
+				"A connectionOutboundUp trap signifies that 
+				the outbound direction has successfully synchronized
+				(Logically, when Expand's Acceleration protocols are
+				properly working) with a remote Accelerator."
+			::=  5
+			
+		connectionOutboundDown TRAP-TYPE
+			ENTERPRISE expand
+			DESCRIPTION
+				"A connectionOutboundDown trap signifies that 
+				outbound direction has lost synchronization with a remote
+				Accelerator. After this Trap is sent, Accelerator performs
+				in Software bypass mode."
+			::=  6
+			
+		hardwareBypassActivated TRAP-TYPE
+			ENTERPRISE expand
+			DESCRIPTION
+				"A hardwareBypassActivated trap signifies that 
+				the user has switched the Accelerator to 
+				Hardware bypass mode."
+			::=  7
+			
+		hardwareBypassdeactivated TRAP-TYPE
+			ENTERPRISE expand
+			DESCRIPTION
+				"A hardwareBypassdeactivated trap signifies that
+				the user has switched off Hardware bypass mode."
+			::=  8
+			
+		generalAuthenticationFailure TRAP-TYPE
+			ENTERPRISE expand
+			DESCRIPTION
+				"A generalAuthenticationFailure trap signifies that
+				the user failed to authenticate on any user interface
+				(WEB Management, Console, Telnet)."
+			::=  9
+			
+		generalAuthenticationEnableFailure TRAP-TYPE
+			ENTERPRISE expand
+			DESCRIPTION
+				"A generalAuthenticationEnableFailure trap signifies that 
+				the user attempted and failed to obtain privileged access 
+				(Enable mode) to the accelerator."
+			::=  10
+			
+		generalAuthorizeExecFailure TRAP-TYPE
+			ENTERPRISE expand
+			DESCRIPTION
+				"A generalAuthorizeExecFailure signifies that
+				the user attempted to execute a command to which he/she
+				does not have authorization to execute."
+			::=  11
+			
+	
+	END
+
+--
+-- EXPAND-TRAP-MIB.my
+--
+
+

@@ -1,0 +1,141 @@
+-- COPYRIGHT FUJITSU LIMITED 2000
+-- Alert Definition Originator 2.0 MIB
+-- Author:	Tetsuo Oda (OdaMan de PON the AMiGA t2o-MaNiaC)
+-- Created:	Jun 30, 2000
+
+Alert-Definition-Originator-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	enterprises
+		FROM RFC1155-SMI
+
+	TRAP-TYPE
+		FROM RFC-1215
+
+	snmp
+		FROM RFC1213-MIB;
+
+fujitsu					OBJECT IDENTIFIER ::= { enterprises 211 }
+application			OBJECT IDENTIFIER ::= { fujitsu 4 }
+aplNetwork			OBJECT IDENTIFIER ::= { application 1 }
+aplNetWinNT			OBJECT IDENTIFIER ::= { aplNetwork 4 }
+aplNetPcSvrMgr	OBJECT IDENTIFIER ::= { aplNetWinNT 6 }
+
+-- Trap Information
+
+deviceName			OBJECT-TYPE
+								SYNTAX			OCTET STRING
+								ACCESS			not-accessible
+								STATUS			mandatory
+								DESCRIPTION	"Device Name of LDSM SNMP Trap."
+								::= { aplNetPcSvrMgr 1 }
+
+alertMessage		OBJECT-TYPE
+								SYNTAX			OCTET STRING
+								ACCESS			not-accessible
+								STATUS			mandatory
+								DESCRIPTION	"Alert Message of LDSM SNMP Trap."
+								::= { aplNetPcSvrMgr 2 }
+
+alertDate				OBJECT-TYPE
+								SYNTAX			OCTET STRING
+								ACCESS			not-accessible
+								STATUS			mandatory
+								DESCRIPTION	"Alert Date and Time of LDSM SNMP Trap."
+								::= { aplNetPcSvrMgr 3 }
+
+alertSeverity		OBJECT-TYPE
+								SYNTAX			OCTET STRING
+								ACCESS			not-accessible
+								STATUS			mandatory
+								DESCRIPTION	"Alert Severity of LDSM SNMP Trap."
+								::= { aplNetPcSvrMgr 4 }
+
+-- Trap Macros
+-- Category is for HP OpenView Network Node Manager
+
+ldsmTrap-Monitored			TRAP-TYPE
+	ENTERPRISE						aplNetPcSvrMgr
+	VARIABLES							{ deviceName, alertMessage, alertDate, alertSeverity }
+	DESCRIPTION
+		"LDSM has reported a Monitored Event."
+	--#TYPE							"LDSM Monitored Event"
+	--#SUMMARY						"LDSM has reported: %s %s %s %s"
+	--#ARGUMENTS					{ 0, 1, 2, 3 }
+	--#SEVERITY						INFORMATIONAL
+	--#TIMEINDEX					1
+	--#STATE							OPERATIONAL
+	--#CATEGORY						"Status Events"
+	::= 1
+
+ldsmTrap-Informational	TRAP-TYPE
+	ENTERPRISE						aplNetPcSvrMgr
+	VARIABLES							{ deviceName, alertMessage, alertDate, alertSeverity }
+	DESCRIPTION
+		"LDSM has reported a Informational Event."
+	--#TYPE							"LDSM Informational Event"
+	--#SUMMARY						"LDSM has reported: %s %s %s %s"
+	--#ARGUMENTS					{ 0, 1, 2, 3 }
+	--#SEVERITY						INFORMATIONAL
+	--#TIMEINDEX					1
+	--#STATE							OPERATIONAL
+	--#CATEGORY						"Status Events"
+	::= 2
+
+ldsmTrap-Recovered			TRAP-TYPE
+	ENTERPRISE						aplNetPcSvrMgr
+	VARIABLES							{ deviceName, alertMessage, alertDate, alertSeverity }
+	DESCRIPTION
+		"LDSM has reported a Recovered Event."
+	--#TYPE							"LDSM Recovered Event"
+	--#SUMMARY						"LDSM has reported: %s %s %s %s"
+	--#ARGUMENTS					{ 0, 1, 2, 3 }
+	--#SEVERITY						INFORMATIONAL
+	--#TIMEINDEX					1
+	--#STATE							OPERATIONAL
+	--#CATEGORY						"Status Events"
+	::= 4
+
+ldsmTrap-NonCritical		TRAP-TYPE
+	ENTERPRISE						aplNetPcSvrMgr
+	VARIABLES							{ deviceName, alertMessage, alertDate, alertSeverity }
+	DESCRIPTION
+		"LDSM has reported a NonCritical Event."
+	--#TYPE							"LDSM NonCritical Event"
+	--#SUMMARY						"LDSM has reported: %s %s %s %s"
+	--#ARGUMENTS					{ 0, 1, 2, 3 }
+	--#SEVERITY						MINOR
+	--#TIMEINDEX					1
+	--#STATE							OPERATIONAL
+	--#CATEGORY						"Status Events"
+	::= 8
+
+ldsmTrap-Critical				TRAP-TYPE
+	ENTERPRISE						aplNetPcSvrMgr
+	VARIABLES							{ deviceName, alertMessage, alertDate, alertSeverity }
+	DESCRIPTION
+		"LDSM has reported a Critical Event."
+	--#TYPE							"LDSM Critical Event"
+	--#SUMMARY						"LDSM has reported: %s %s %s %s"
+	--#ARGUMENTS					{ 0, 1, 2, 3 }
+	--#SEVERITY						CRITICAL
+	--#TIMEINDEX					1
+	--#STATE							OPERATIONAL
+	--#CATEGORY						"Status Events"
+	::= 16
+
+ldsmTrap-NonRecoverable	TRAP-TYPE
+	ENTERPRISE						aplNetPcSvrMgr
+	VARIABLES							{ deviceName, alertMessage, alertDate, alertSeverity }
+	DESCRIPTION
+		"LDSM has reported a NonRecoverable Event."
+	--#TYPE							"LDSM NonRecoverable Event"
+	--#SUMMARY						"LDSM has reported: %s %s %s %s"
+	--#ARGUMENTS					{ 0, 1, 2, 3 }
+	--#SEVERITY						CRITICAL
+	--#TIMEINDEX					1
+	--#STATE							OPERATIONAL
+	--#CATEGORY						"Status Events"
+	::= 32
+
+END

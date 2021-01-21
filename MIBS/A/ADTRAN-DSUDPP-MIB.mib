@@ -1,0 +1,1239 @@
+     ADTRAN-DSUDPP-MIB   DEFINITIONS ::= BEGIN
+
+     -- TITLE:          The ADTRAN DSUDP Plus MIB (1103.008L2)
+     -- FILENAME:       DSUDPP.MIB
+     -- PARTNUMBER:     9950.017L1-3A
+     -- AUTHOR:         Jim Franklin
+     -- DATE:           95/06/22
+     --
+     -- MODIFICATIONS:
+     --   95/01/12 initial version
+     --   95/06/22 added Suppress LBE option to Scrambler Mode
+     --
+     
+     IMPORTS
+          enterprises, Counter
+               FROM RFC1155-SMI
+          OBJECT-TYPE
+               FROM RFC-1212
+          DisplayString
+               FROM RFC1213-MIB
+          TRAP-TYPE
+               FROM RFC-1215
+          adProdPhysAddress
+               FROM ADTRAN-MIB;     
+
+    -- OBJECT IDENTIFIERS
+    
+    adtran          OBJECT IDENTIFIER ::= { enterprises 664 }
+    adProducts      OBJECT IDENTIFIER ::= { adtran 1 }
+    adDSUDP         OBJECT IDENTIFIER ::= { adProducts 8 }
+    adMgmt          OBJECT IDENTIFIER ::= { adtran 2 }
+    adDSUDPmg       OBJECT IDENTIFIER ::= { adMgmt 8 }
+    adDSUDPprov     OBJECT IDENTIFIER ::= { adDSUDPmg 3 }
+    adDSUDPprovNet  OBJECT IDENTIFIER ::= { adDSUDPprov 1 }
+    adDSUDPprovDte  OBJECT IDENTIFIER ::= { adDSUDPprov 2 }
+    adDSUDPprovTest OBJECT IDENTIFIER ::= { adDSUDPprov 3 }
+    adDSUDPprovDial OBJECT IDENTIFIER ::= { adDSUDPprov 4 }
+    adDSUDPperform  OBJECT IDENTIFIER ::= { adDSUDPmg 4 }
+    adDSUDPalarm    OBJECT IDENTIFIER ::= { adDSUDPmg 5 }
+    adDSUDPtest     OBJECT IDENTIFIER ::= { adDSUDPmg 6 }
+    adDSUDPstatus   OBJECT IDENTIFIER ::= { adDSUDPmg 7 }
+    adDSUDPcall     OBJECT IDENTIFIER ::= { adDSUDPmg 8 }
+
+
+    --
+    -- DSUDP Provision Network Group
+    --
+    
+    adDSUDPnetLoopRate  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    bps2400(1),
+                    bps4800(2),
+                    bps9600(3),
+                    bps19k(4),
+                    bps38k(5),
+                    bps56k(6),
+                    bps64k(7)
+                    }
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "Indicates the DS0 loop data rate"
+        ::= { adDSUDPprovNet 1 }
+
+    adDSUDPnetType   OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    dds(1),
+                    accunetSW56(2),
+                    usSprintSW56(3)
+                    }
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "Selects the network type"
+        ::= { adDSUDPprovNet 2 }
+            
+    adDSUDPnetScrambler OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    normalData(1),
+                    scrambledData(2),
+                    suppressLBE(3)
+                    }
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "Disables/Enables Scrambling"
+        ::= { adDSUDPprovNet 3 }
+
+    adDSUDPnetRemoteCfg OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    enable(1),
+                    disable(2)
+                    }
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "Enables/Disables configuration by a remote DSUDP"
+        ::= { adDSUDPprovNet 4 }
+
+    --
+    -- DSUDP Provision DTE Group
+    --
+    
+    adDSUDPdteRate   OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    bps2400(1),
+                    bps4800(2),
+                    bps9600(3),
+                    bps19k(4),
+                    bps38k(5),
+                    bps56kor57p6k(6),
+                    bps64k(7)
+                    }
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "Selects bit rate of primary DTE"
+        ::= { adDSUDPprovDte 1 }
+
+    adDSUDPdteFormat OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    asynchronous(1),
+                    synchronous(2)
+                    }
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "Selects DTE data format"
+        ::= { adDSUDPprovDte 2 }
+
+    adDSUDPdteWordLength OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    bits9(1),
+                    bits10(2),
+                    bits11(3)
+                    }   
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "Selects DTE asynchronous word length"
+        ::= { adDSUDPprovDte 3 }
+
+    adDSUDPdteInBandCommand    OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    disable(1),
+                    enableAT(2),
+                    enableV25SDLC(3),
+                    enableV25BCCASY(4)
+                    }
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "Selects DTE in-band command type"
+        ::= { adDSUDPprovDte 4 }
+
+    adDSUDPdteTxClock    OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    internal(1),
+                    external(2)
+                    }
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "Selects transmit timing source"
+        ::= { adDSUDPprovDte 5 }
+
+    adDSUDPdteCSOptions  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    forceOn(1),
+                    followsRS(2),
+                    onWithCD(3),
+                    onWithRSandCD(4),
+                    off5secAfterLOCD(5)
+                    }
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "Configures CS signal lead on primary DTE"
+        ::= { adDSUDPprovDte 6 }
+
+    adDSUDPdteAntiStream   OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    disable(1),
+                    active10Sec(2),
+                    active30Sec(3),
+                    active60Sec(4)
+                    }
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "Configures DTE Anti-Streaming Disconnect"
+        ::= { adDSUDPprovDte 7 }
+    
+    adDSUDPdteCDOptions  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    forceOn(1),
+                    normal(2),
+                    off5SecAfterLOCD(3)
+                    }
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "Configures CD signal lead on primary DTE"
+        ::= { adDSUDPprovDte 8 }
+
+    adDSUDPdteTROptions  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    ignore(1),
+                    normal(2),
+                    offOnDials0(3),
+                    offOnDials1(4)
+                    }
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "Configures handling of TR lead from Primary DTE"
+        ::= { adDSUDPprovDte 9 }
+
+    adDSUDPdteSROptions  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    forceOn(1),
+                    offWithOOS(2),
+                    offWithLOCD(3),
+                    offInTest(4),
+                    offInTestAndOOS(5),
+                    offInTestAndLOCD(6)
+                    }
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "Configures SR signal lead to primary DTE"
+        ::= { adDSUDPprovDte 10 }
+
+    adDSUDPdteRSCSDelay  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    shortDelay(1),
+                    longDelay(2)
+                    }
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "Configures DTE signals RS-CS delay"
+        ::= { adDSUDPprovDte 11 }
+
+    --
+    -- DSUDP Provision Test Group
+    --
+    
+    adDSUDPtestTimeout   OBJECT-TYPE
+        SYNTAX      INTEGER
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "Configures test timeout in seconds"
+        ::= { adDSUDPprovTest 1 }
+
+    adDSUDPtestRdlCfg    OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    enable(1),
+                    disable(2)
+                    }
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "Enables/Disables response to Remote Digital Loopback"
+        ::= { adDSUDPprovTest 2 }
+
+    --
+    -- DSUDP Provision Dial Group
+    --
+    
+    adDSUDPDialStored1   OBJECT-TYPE
+        SYNTAX      DisplayString
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "Edit or View stored Dial Location 1"
+        ::= { adDSUDPprovDial 1 }
+
+    adDSUDPDialStored2   OBJECT-TYPE
+        SYNTAX      DisplayString
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "Edit or View stored Dial Location 2"
+        ::= { adDSUDPprovDial 2 }
+
+    adDSUDPDialStored3   OBJECT-TYPE
+        SYNTAX      DisplayString
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "Edit or View stored Dial Location 3"
+        ::= { adDSUDPprovDial 3 }
+
+    adDSUDPDialStored4   OBJECT-TYPE
+        SYNTAX      DisplayString
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "Edit or View stored Dial Location 4"
+        ::= { adDSUDPprovDial 4 }
+
+    adDSUDPDialStored5   OBJECT-TYPE
+        SYNTAX      DisplayString
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "Edit or View stored Dial Location 5"
+        ::= { adDSUDPprovDial 5 }
+
+    adDSUDPDialStored6   OBJECT-TYPE
+        SYNTAX      DisplayString
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "Edit or View stored Dial Location 6"
+        ::= { adDSUDPprovDial 6 }
+
+    adDSUDPDialStored7   OBJECT-TYPE
+        SYNTAX      DisplayString
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "Edit or View stored Dial Location 7"
+        ::= { adDSUDPprovDial 7 }
+
+    adDSUDPDialStored8   OBJECT-TYPE
+        SYNTAX      DisplayString
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "Edit or View stored Dial Location 8"
+        ::= { adDSUDPprovDial 8 }
+
+    adDSUDPDialStored9   OBJECT-TYPE
+        SYNTAX      DisplayString
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "Edit or View stored Dial Location 9"
+        ::= { adDSUDPprovDial 9 }
+
+    adDSUDPDialStored10  OBJECT-TYPE
+        SYNTAX      DisplayString
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "Edit or View stored Dial Location 10"
+        ::= { adDSUDPprovDial 10 }
+
+    adDSUDPAutoAnswer    OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    enable(1),
+                    disable(2)
+                    }
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "Enables/Disables automatic answer of incoming calls"
+        ::= { adDSUDPprovDial 11 }
+
+    --
+    -- DSUDP Test Control Group
+    --
+    
+    adDSUDPTestCmd  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    noTest(1),
+                    doLocalDigital(2),
+                    doRemoteLoopback(3),
+                    doRemoteLoopbackPtrn(4),
+                    doTestPatternOnly(5),
+                    doDTEAndLoop(6),
+                    doRTTest(7),
+                    doDTEOnly(8),
+                    doDTEAndPtrn(9),
+                    doSelfTest(10)
+                    }
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "A SET performs the selected test"
+        ::= { adDSUDPtest 1 }
+
+    adDSUDPTestStatus OBJECT-TYPE
+        SYNTAX     INTEGER {
+                   noTest(1),
+                   localAnalogLoop(2),
+                   localLoopRT(3),
+                   loopAndDTE(4),
+                   remoteConfigMaster(5),
+                   remoteConfigSlave(6),
+                   remoteLoop(7),
+                   remoteLoopPtrn(8),
+                   localAnalogLoopPtrn(9),
+                   testPattern(10),
+                   localLoopFromCO(11),
+                   remoteTestFromCO(12),
+                   remoteDigitalLoop(13)
+                   }
+        ACCESS     read-only
+        STATUS     mandatory
+        DESCRIPTION
+            "Current test status"
+        ::= { adDSUDPtest 2 }
+
+    adDSUDPTestErrors  OBJECT-TYPE
+        SYNTAX      INTEGER
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "This variable accumulates errors for the active test
+             pattern.  A SET operation will clear the error count."
+        ::= { adDSUDPtest 3 }
+            
+    adDSUDPTestRxPattern  OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    noTest(1),
+                    noSync(2),
+                    patternSync(3)
+                    }
+        ACCESS     read-only
+        STATUS     mandatory
+        DESCRIPTION
+            "Receive test pattern status"
+        ::= { adDSUDPtest 4 }
+
+    adDSUDPSelfDiagnostics   OBJECT-TYPE
+        SYNTAX     INTEGER {
+                   inTest(1),
+                   selfTestPass(2),
+                   failedEEPROM(3),
+                   failedSRAM(4),
+                   failedChecksum(5),
+                   failedBERT(6)
+                   }
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+            "Current Self Test status"
+        ::= { adDSUDPtest 5 }
+
+    adDSUDPTestTxPattern   OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    ptrn2047(1),
+                    ptrn511(2),
+                    ptrnStress1(3),
+                    ptrnStress2(4),
+                    ptrnStress3(5),
+                    ptrnStress4(6)
+                    }
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "SETs default transmit test pattern"
+        ::= { adDSUDPtest 6 }
+
+    adDSUDPInjectError  OBJECT-TYPE
+        SYNTAX      INTEGER
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "SET injects one error into active test pattern"
+        ::= { adDSUDPtest 7 }
+
+    --
+    -- DSUDP Status Group
+    --
+    
+    adDSUDPStatusEIA  OBJECT-TYPE
+        SYNTAX      INTEGER
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+            "Bit map status of Primay DTE EIA interface signals
+             (off = 0, on = 1), where bit positions are:
+                1   RI
+                2   RD
+                4   SD
+                8   CD
+                16  CS
+                32  RS
+                64  SR
+                128 TR"
+        ::= { adDSUDPstatus 1 }
+
+    adDSUDPStatusConnector      OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    connectorV35(1),
+                    connectorEIA232(2)
+                    }
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+            "The jumper selected DTE interface connector on DSUDP"
+        ::={ adDSUDPstatus 2 }
+
+    adDSUDPMode       OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    idle(1),
+                    incomingCall(2),
+                    dialing(3),
+                    data(4),
+                    command(5)
+                    }
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+            "Current mode of DSUDP"
+        ::={ adDSUDPstatus 3 }
+
+    adDSUDPLedStatus    OBJECT-TYPE
+        SYNTAX      INTEGER 
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+            "This variable contains bit encoded values
+             for LED status (0=off, 1=on):
+                1  IDL
+                2  ALM
+                4  TST
+                8  ERR"
+
+        ::= { adDSUDPstatus 4 }
+        
+
+    --
+    -- DSUDP Call Control Group
+    --
+
+    adDSUDPDialStored  OBJECT-TYPE
+        SYNTAX      INTEGER (1..10)
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "Dials the stored number in register 1-10"
+        ::= { adDSUDPcall 1 }
+
+    adDSUDPManualDial     OBJECT-TYPE
+        SYNTAX      DisplayString
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "A SET dials the input command string"
+        ::= { adDSUDPcall 2 }
+
+
+    adDSUDPAnswerCall     OBJECT-TYPE
+        SYNTAX      INTEGER
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "A SET answers an incoming call"
+        ::= { adDSUDPcall 3 }
+
+
+    adDSUDPHangUp     OBJECT-TYPE
+        SYNTAX      INTEGER
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "A SET commands the DSUDP to go on-hook"
+        ::= { adDSUDPcall 4 }
+
+
+
+   -- DSUDP DS0 PERFORMANCE MONITOR SECTION
+
+   -- The DSUDP monitors channel performance and reports
+   -- parameter statistics in Interval and Daily accumulation
+   -- tables.  Parameter threshold values are settable for
+   -- Interval and Daily statistics.  The Alert table controls
+   -- SNMP trap generation for threshold crossing events.
+
+   --
+   --  Performance Monitor Interval Table
+   --
+   
+   adDSUDPds0IntervalTable        OBJECT-TYPE
+        SYNTAX      SEQUENCE OF AdDSUDPds0IntervalEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION
+            "The DS0 Interval Table."
+        ::= { adDSUDPperform 2 }
+
+   adDSUDPds0IntervalEntry        OBJECT-TYPE
+        SYNTAX      AdDSUDPds0IntervalEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION
+            "An entry in the DS0 Interval Table."
+        INDEX   { adDSUDPds0IntervalIndex, adDSUDPds0IntervalNumber }
+        ::= { adDSUDPds0IntervalTable 1 }
+
+   AdDSUDPds0IntervalEntry ::=
+        SEQUENCE {
+                adDSUDPds0IntervalIndex
+                INTEGER,
+                adDSUDPds0IntervalNumber
+                INTEGER,
+                adDSUDPds0IntervalUASs
+                Counter
+                }
+
+   adDSUDPds0IntervalIndex        OBJECT-TYPE
+        SYNTAX      INTEGER
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+            "The index value which uniquely identifies  the
+             DS0 interface  to which this entry is applicable."
+        ::= { adDSUDPds0IntervalEntry 1 }
+
+   adDSUDPds0IntervalNumber       OBJECT-TYPE
+        SYNTAX      INTEGER (1..97)
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+            "A number between 1 and 97, where 1 is the current
+             accumulating  15 minute interval and  2-97 are
+             completed 15 minute intervals.  2 is the most recent
+             completed interval and 97 is the least recent completed
+             15 minute interval (assuming that all 97 intervals are
+             valid)."
+        ::= { adDSUDPds0IntervalEntry 2 }
+
+   adDSUDPds0IntervalUASs         OBJECT-TYPE
+        SYNTAX      Counter
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+            "The number of Unavailable Seconds encountered by a
+             DS0 interface in one of the 97, individual 15 minute,
+             intervals."
+        ::= { adDSUDPds0IntervalEntry 3 }
+
+   --
+   --  Performance Monitor Daily Table
+   --
+   
+   adDSUDPds0DailyTable           OBJECT-TYPE
+        SYNTAX      SEQUENCE OF AdDSUDPds0DailyEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION
+            "The DS0 Daily table."
+        ::= { adDSUDPperform 3 }
+
+   adDSUDPds0DailyEntry           OBJECT-TYPE
+        SYNTAX      AdDSUDPds0DailyEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION
+            "An entry in the DS0 Daily table."
+        INDEX   { adDSUDPds0DailyIndex, adDSUDPds0DailyNumber }
+        ::= { adDSUDPds0DailyTable 1 }
+
+   AdDSUDPds0DailyEntry ::=
+        SEQUENCE {
+                    adDSUDPds0DailyIndex
+                    INTEGER,
+                    adDSUDPds0DailyNumber
+                    INTEGER,
+                    adDSUDPds0DailyUASs
+                    Counter,
+                    adDSUDPds0DailyAvail
+                    INTEGER,
+                    adDSUDPds0DailyAvgAvail
+                    INTEGER
+                }
+
+   adDSUDPds0DailyIndex           OBJECT-TYPE
+        SYNTAX      INTEGER
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+            "The index value which uniquely identifies  the
+            DS0 interface to which this entry is applicable."
+        ::= { adDSUDPds0DailyEntry 1 }
+
+   adDSUDPds0DailyNumber          OBJECT-TYPE
+        SYNTAX      INTEGER
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+            "A number between 1 and 7, where 1 is the current
+             accumulating Daily Interval and 2-7 are the completed
+             Daily Intervals.  2 is the most recent completed Daily
+             Interval and 7 is the least recent completed Daily
+             Interval (assuming that all 7 Daily Intervals are
+             valid)."
+        ::= { adDSUDPds0DailyEntry 2 }
+
+   adDSUDPds0DailyUASs            OBJECT-TYPE
+        SYNTAX      Counter
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+            "The number of Unavailable Seconds encountered by
+             a DS0 interface in one of the 7 Daily Intervals."
+        ::= { adDSUDPds0DailyEntry 3 }
+
+   adDSUDPds0DailyAvail           OBJECT-TYPE
+        SYNTAX      INTEGER
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+            "The percentage (times 100) of channel availability
+             encountered by a DS0 interface in one of the 7 Daily
+             Intervals."
+        ::= { adDSUDPds0DailyEntry 4 }
+
+   adDSUDPds0DailyAvgAvail        OBJECT-TYPE
+        SYNTAX      INTEGER
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+            "The percentage (times 100) of channel availability
+             averaged over the last 7 days"
+        ::= { adDSUDPds0DailyEntry 5 }
+
+   --
+   --  Interval Threshold Table
+   --
+   
+   adDSUDPds0IntervalThrsTable    OBJECT-TYPE
+        SYNTAX      SEQUENCE OF AdDSUDPds0IntervalThrsEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION
+            "The DS0 Interval Threshold Table."
+        ::= { adDSUDPperform 4 }
+
+   adDSUDPds0IntervalThrsEntry    OBJECT-TYPE
+        SYNTAX      AdDSUDPds0IntervalThrsEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION
+            "An entry in the DS0 Threshold Table."
+        INDEX   { adDSUDPds0IntervalThrsIndex }
+        ::= { adDSUDPds0IntervalThrsTable 1 }
+
+   AdDSUDPds0IntervalThrsEntry ::=
+        SEQUENCE {
+                    adDSUDPds0IntervalThrsIndex
+                    INTEGER,
+                    adDSUDPds0IntervalThrsUASs
+                    INTEGER
+                }
+
+   adDSUDPds0IntervalThrsIndex    OBJECT-TYPE
+        SYNTAX      INTEGER
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+            "The index value which uniquely identifies the
+             DS0 interface  to which this entry is applicable."
+        ::= { adDSUDPds0IntervalThrsEntry 1 }
+
+   adDSUDPds0IntervalThrsUASs     OBJECT-TYPE
+        SYNTAX      INTEGER
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "The DS0 performance monitor Threshold Value for the
+            15 minute Unavailable Seconds parameter.  The default
+            value is 1, which equates to approximately 99.9%
+            Availability for a 15 minute Interval."
+        ::= { adDSUDPds0IntervalThrsEntry 2 }
+
+   --
+   --  Daily Threshold Table
+   --
+
+   adDSUDPds0DailyThrsTable       OBJECT-TYPE
+        SYNTAX      SEQUENCE OF AdDSUDPds0DailyThrsEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION
+            "The DS0 Daily Threshold Table."
+        ::= { adDSUDPperform 5 }
+
+   adDSUDPds0DailyThrsEntry       OBJECT-TYPE
+        SYNTAX      AdDSUDPds0DailyThrsEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION
+            "An entry in the DS0 Threshold Table."
+        INDEX   { adDSUDPds0DailyThrsIndex }
+        ::= { adDSUDPds0DailyThrsTable 1 }
+
+   AdDSUDPds0DailyThrsEntry ::=
+        SEQUENCE {
+                    adDSUDPds0DailyThrsIndex
+                    INTEGER,
+                    adDSUDPds0DailyThrsUASs
+                    INTEGER,
+                    adDSUDPds0DailyThrsAvail
+                    INTEGER
+                }
+
+   adDSUDPds0DailyThrsIndex       OBJECT-TYPE
+        SYNTAX      INTEGER
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+            "The index value which uniquely identifies  the
+            DS0 interface  to which this entry is applicable."
+        ::= { adDSUDPds0DailyThrsEntry 1 }
+
+   adDSUDPds0DailyThrsUASs        OBJECT-TYPE
+        SYNTAX      INTEGER
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "The DS0 performance monitor Threshold Value for
+            the Daily Unavailable Seconds parameter.  The
+            default value is 86, which equates to approximately
+            99.9% Availability for a Daily Interval."
+        ::= { adDSUDPds0DailyThrsEntry 2 }
+
+   adDSUDPds0DailyThrsAvail       OBJECT-TYPE
+        SYNTAX      INTEGER
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "The DS0 performance monitor Threshold Value for
+            the percentage channel Availability parameter.
+            The default value is 9950 (% times 100), which equates
+            to 99.5% Availability for a Daily Interval."
+        ::= { adDSUDPds0DailyThrsEntry 3 }
+
+   --
+   --  Performance Monitor Alert Table
+   --
+   
+   adDSUDPds0AlertTable   OBJECT-TYPE
+        SYNTAX      SEQUENCE OF AdDSUDPds0AlertEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION
+            "The DS0  Performance Monitor Alert Table"
+        ::= { adDSUDPperform 6 }
+            
+   adDSUDPds0AlertEntry   OBJECT-TYPE
+        SYNTAX      AdDSUDPds0AlertEntry
+        ACCESS      not-accessible
+        STATUS      mandatory
+        DESCRIPTION
+            "An entry in the DS0  PM Alert Table"
+        INDEX   { adDSUDPds0AlertIndex }
+        ::= { adDSUDPds0AlertTable 1 }
+
+   AdDSUDPds0AlertEntry ::=
+        SEQUENCE {
+                adDSUDPds0AlertIndex
+                INTEGER,
+                adDSUDPds0AlertStatus
+                INTEGER,
+                adDSUDPds0AlertEnable
+                INTEGER
+                }
+
+   adDSUDPds0AlertIndex        OBJECT-TYPE
+        SYNTAX      INTEGER
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+            "The index value which uniquely identifies  the
+             DS0  PM interface to which this entry is applicable."
+        ::= { adDSUDPds0AlertEntry 1 }
+            
+    adDSUDPds0AlertStatus  OBJECT-TYPE
+        SYNTAX      INTEGER
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+            "This bit map variable indicates Threshold Crossing
+             Events for DS0  performance monitored parameters.
+             When a parameter exceeds its threshold value, the
+             parameter's bit is set in this variable.  A SNMP
+             trap is generated if the parameter's alert enable
+             bit is set. 
+
+             The alert event bit values are:
+                1   Interval UAS
+                2   Daily UAS
+                4   Daily percent Availability"
+
+        ::= { adDSUDPds0AlertEntry 2 }
+                
+                
+    adDSUDPds0AlertEnable  OBJECT-TYPE
+        SYNTAX      INTEGER
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "This bit map variable enables changes in the DS0 
+             PM Alert Status to generate a SNMP Trap.
+
+             The alert enable bit values are:
+                1   Interval UAS
+                2   Daily UAS
+                4   Daily percent Availability"
+
+        ::= { adDSUDPds0AlertEntry 3 }
+
+    
+    --
+    --  DSUDP Alarm Group
+    --
+    
+    adDSUDPAlarmStatus    OBJECT-TYPE
+        SYNTAX      INTEGER
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+            "This bit map variable indicates changes in the DSUDP
+             status.  When a status bit changes state, the
+             the corresponding bit is set in this variable.
+
+            The alarm event bit values are:
+                1   No Alarm
+                2   0
+                4   0
+                8   Self diagnostics failed
+                16  OOS/OOF from network
+                32  DSUDP Loopback
+                64  Channel Loopback
+                128 OCU Loopback"
+
+        ::= { adDSUDPalarm 1 }
+
+    adDSUDPAlarmMajor     OBJECT-TYPE
+        SYNTAX      INTEGER
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+            "A bit mask to select items of the
+             AlarmStatus which represent a Major Alarm"
+        ::= { adDSUDPalarm 2 }
+
+    adDSUDPAlarmMinor     OBJECT-TYPE
+        SYNTAX      INTEGER
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+            "A bit mask to select items of the
+             AlarmStatus which represent a Minor Alarm"
+        ::= { adDSUDPalarm 3 }
+
+    adDSUDPAlarmAlert      OBJECT-TYPE
+        SYNTAX      INTEGER
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+            "A bit mask to select items of the
+             AlarmStatus which represent an Alert Alarm"
+        ::= { adDSUDPalarm 4 }
+
+    adDSUDPAlarmInfo          OBJECT-TYPE
+        SYNTAX      INTEGER
+        ACCESS      read-only
+        STATUS      mandatory
+        DESCRIPTION
+            "A bit mask to select items of the
+             AlarmStatus which represent an Info Alarm"
+        ::= { adDSUDPalarm 5 }
+
+    adDSUDPAlarmEnable    OBJECT-TYPE
+        SYNTAX      INTEGER
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "This bit map variable enables changes in the DSUDP
+             Alarm Status to generate a SNMP Trap.
+
+             The alarm enable bit values are:
+                1   0
+                2   0
+                4   0
+                8   Self diagnostics failed
+                16  OOS/OOF from network
+                32  DSUDP Loopback
+                64  Channel Loopback
+                128 OCU Loopback"
+
+        ::= { adDSUDPalarm 6 }
+
+    --
+    -- DSUDP Alarm Traps
+    --
+    
+    adDSUDPSelfTestPass TRAP-TYPE
+        ENTERPRISE  adDSUDP
+        VARIABLES   {
+                    adProdPhysAddress
+                    }
+        DESCRIPTION
+            "The DSUDP Self Diagnostics Passed."
+        --#TYPE       "Error - Self Diagnostics"
+        --#SUMMARY    "DSUDP 806: Self Diagnostics has passed for "
+        --#SUMMARY    "Unit Id: %x"
+        --#ARGUMENTS  {0}
+        --#SEVERITY   MAJOR
+        --#GENERIC    6
+        --#CATEGORY   "Error Events"
+        --#SOURCE_ID  "A"
+        --#TIMEINDEX  0
+        ::= 806
+        
+    adDSUDPSelfTestFail TRAP-TYPE
+        ENTERPRISE  adDSUDP
+        VARIABLES   {
+                    adProdPhysAddress
+                    }
+        DESCRIPTION
+            "The DSUDP Self Diagnostics Failed"
+        --#TYPE       "Error - Self Diagnostics"
+        --#SUMMARY    "DSUDP 807: Self Diagnostics has failed for "
+        --#SUMMARY    "Unit Id: %x"
+        --#ARGUMENTS  {0}
+        --#SEVERITY   MAJOR
+        --#GENERIC    6
+        --#CATEGORY   "Error Events"
+        --#SOURCE_ID  "A"
+        --#TIMEINDEX  0
+        ::= 807
+
+    adDSUDPNetworkINS   TRAP-TYPE
+        ENTERPRISE  adDSUDP
+        VARIABLES   {
+                    adProdPhysAddress
+                    }
+        DESCRIPTION
+            "The network channel is In-Service.  The OOS/OOF
+             condition has cleared."
+        --#TYPE       "Error - Network OOS/OOF"
+        --#SUMMARY    "DSUDP 808: Network Out of Service/Out of Frame state has cleared for "
+        --#SUMMARY    "Unit Id: %x"
+        --#ARGUMENTS  {0}
+        --#SEVERITY   MAJOR
+        --#GENERIC    6
+        --#CATEGORY   "Error Events"
+        --#SOURCE_ID  "A"
+        --#TIMEINDEX  0
+        ::= 808
+
+    adDSUDPNetworkOOS   TRAP-TYPE
+        ENTERPRISE  adDSUDP
+        VARIABLES   {
+                    adProdPhysAddress
+                    }
+        DESCRIPTION
+            "The network channel is in an Out-Of-Service state."
+        --#TYPE       "Error - Network OOS/OOF"
+        --#SUMMARY    "DSUDP 809: Network Out of Service/Out of Frame state is active for "
+        --#SUMMARY    "Unit Id: %x"
+        --#ARGUMENTS  {0}
+        --#SEVERITY   MAJOR
+        --#GENERIC    6
+        --#CATEGORY   "Error Events"
+        --#SOURCE_ID  "A"
+        --#TIMEINDEX  0
+        ::= 809
+
+    adDSUDPdsuLoopbackClear   TRAP-TYPE
+        ENTERPRISE  adDSUDP
+        VARIABLES   {
+                    adProdPhysAddress
+                    }
+        DESCRIPTION
+            "The DSU Loopback test condition cleared."
+        --#TYPE       "Status - DSU Loopback"
+        --#SUMMARY    "DSUDP 810: DSU loopback test condition has cleared for "
+        --#SUMMARY    "Unit Id: %x"
+        --#ARGUMENTS  {0}
+        --#SEVERITY   WARNING
+        --#GENERIC    6
+        --#CATEGORY   "Status Events"
+        --#SOURCE_ID  "A"
+        --#TIMEINDEX  0
+        ::= 810
+
+    adDSUDPdsuLoopback   TRAP-TYPE
+        ENTERPRISE  adDSUDP
+        VARIABLES   {
+                    adProdPhysAddress
+                    }
+        DESCRIPTION
+            "The DSU Loopback test is active."
+        --#TYPE       "Status - DSU Loopback"
+        --#SUMMARY    "DSUDP 811: DSU loopback test condition is active for "
+        --#SUMMARY    "Unit Id: %x"
+        --#ARGUMENTS  {0}
+        --#SEVERITY   WARNING
+        --#GENERIC    6
+        --#CATEGORY   "Status Events"
+        --#SOURCE_ID  "A"
+        --#TIMEINDEX  0
+        ::= 811
+
+    adDSUDPchannelLoopbackClear   TRAP-TYPE
+        ENTERPRISE  adDSUDP
+        VARIABLES   {
+                    adProdPhysAddress
+                    }
+        DESCRIPTION
+            "The Channel Loopback test cleared."
+        --#TYPE       "Status - Channel Loopback"
+        --#SUMMARY    "DSUDP 812: Channel loopback test condition has cleared for "
+        --#SUMMARY    "Unit Id: %x"
+        --#ARGUMENTS  {0}
+        --#SEVERITY   WARNING
+        --#GENERIC    6
+        --#CATEGORY   "Status Events"
+        --#SOURCE_ID  "A"
+        --#TIMEINDEX  0
+        ::= 812
+
+    adDSUDPchannelLoopback   TRAP-TYPE
+        ENTERPRISE  adDSUDP
+        VARIABLES   {
+                    adProdPhysAddress
+                    }
+        DESCRIPTION
+            "The Channel Loopback test is active."
+        --#TYPE       "Status - Channel Loopback"
+        --#SUMMARY    "DSUDP 813: Channel loopback test condition is active for "
+        --#SUMMARY    "Unit Id: %x"
+        --#ARGUMENTS  {0}
+        --#SEVERITY   WARNING
+        --#GENERIC    6
+        --#CATEGORY   "Status Events"
+        --#SOURCE_ID  "A"
+        --#TIMEINDEX  0
+        ::= 813
+
+    adDSUDPocuLoopbackClear   TRAP-TYPE
+        ENTERPRISE  adDSUDP
+        VARIABLES   {
+                    adProdPhysAddress
+                    }
+        DESCRIPTION
+            "The OCU Loopback test cleared."
+        --#TYPE       "Status - OCU Loopback"
+        --#SUMMARY    "DSUDP 814: OCU loopback test condition has cleared for "
+        --#SUMMARY    "Unit Id: %x"
+        --#ARGUMENTS  {0}
+        --#SEVERITY   WARNING
+        --#GENERIC    6
+        --#CATEGORY   "Status Events"
+        --#SOURCE_ID  "A"
+        --#TIMEINDEX  0
+        ::= 814
+
+    adDSUDPocuLoopback   TRAP-TYPE
+        ENTERPRISE  adDSUDP
+        VARIABLES   {
+                    adProdPhysAddress
+                    }
+        DESCRIPTION
+            "The OCU Loopback test is active."
+        --#TYPE       "Status - OCU Loopback"
+        --#SUMMARY    "DSUDP 815: OCU loopback test condition is active for "
+        --#SUMMARY    "Unit Id: %x"
+        --#ARGUMENTS  {0}
+        --#SEVERITY   WARNING
+        --#GENERIC    6
+        --#CATEGORY   "Status Events"
+        --#SOURCE_ID  "A"
+        --#TIMEINDEX  0
+        ::= 815
+
+    --                
+    -- DSUDP Threshold Crossing Alert Traps
+    --
+
+    adDSUDPThrsAlertIntUAS    TRAP-TYPE
+        ENTERPRISE  adDSUDP
+        VARIABLES   {
+                    adProdPhysAddress
+                    }
+        DESCRIPTION
+            "The Interval Un-Available Seconds (UAS) parameter has
+             reached or exceeds its threshold value."
+        --#TYPE       "Threshold - Interval Unavailable Seconds"
+        --#SUMMARY    "DSUDP 883:  Interval unavailable second threshold exceeded for "
+        --#SUMMARY    "Unit Id: %x"
+        --#ARGUMENTS  {0}
+        --#SEVERITY   MAJOR
+        --#GENERIC    6
+        --#CATEGORY   "Threshold Events"
+        --#SOURCE_ID  "A"
+        --#TIMEINDEX  0
+        ::= 883
+
+
+    adDSUDPThrsAlertDailyUAS    TRAP-TYPE
+        ENTERPRISE  adDSUDP
+        VARIABLES   {
+                    adProdPhysAddress
+                    }
+        DESCRIPTION
+            "The Daily Un-Available Seconds UAS parameter has
+             reached or exceeds its threshold value."
+        --#TYPE       "Threshold - Daily Unavailable Seconds"
+        --#SUMMARY    "DSUDP 867: Daily unavailable second threshold exceeded for "
+        --#SUMMARY    "Unit Id: %x"
+        --#ARGUMENTS  {0}
+        --#SEVERITY   MAJOR
+        --#GENERIC    6
+        --#CATEGORY   "Threshold Events"
+        --#SOURCE_ID  "A"
+        --#TIMEINDEX  0
+        ::= 867
+
+    adDSUDPThrsAlertDailyAvail    TRAP-TYPE
+        ENTERPRISE  adDSUDP
+        VARIABLES   {
+                    adProdPhysAddress
+                    }
+        DESCRIPTION
+            "The daily percent channel availability has reached or
+             dropped below its threshold value."
+        --#TYPE       "Threshold - Daily Percent Channel Availability"
+        --#SUMMARY    "DSUDP 875: Daily percent channel availability threshold exceeded for "
+        --#SUMMARY    "Unit Id: %x"
+        --#ARGUMENTS  {0}
+        --#SEVERITY   WARNING
+        --#GENERIC    6
+        --#CATEGORY   "Threshold Events"
+        --#SOURCE_ID  "A"
+        --#TIMEINDEX  0
+        ::= 875
+                                             
+        END

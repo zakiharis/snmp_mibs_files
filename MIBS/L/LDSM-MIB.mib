@@ -1,0 +1,127 @@
+-- Intel Corporation
+-- LANDesk(r) Server Manager 3.0 MIB
+
+-- Author:		Patrick S. Morrow
+-- Modified:	September 19, 1997
+
+
+LDSM-MIB DEFINITIONS ::= BEGIN
+
+
+IMPORTS
+	enterprises, Counter, TimeTicks
+		FROM RFC1155-SMI
+
+	DisplayString
+		FROM RFC1213-MIB
+
+	TRAP-TYPE
+		FROM RFC-1215
+
+	OBJECT-TYPE
+		FROM RFC-1212;
+
+
+-- Intel OIDs
+
+intel	          		OBJECT IDENTIFIER ::= {enterprises 343}
+products				OBJECT IDENTIFIER ::= {intel 2}
+network-products		OBJECT IDENTIFIER ::= {products 5}
+lanDesk 				OBJECT IDENTIFIER ::= {network-products 1}
+ldsm					OBJECT IDENTIFIER ::= {lanDesk 3}
+
+
+-- Get Information
+
+version					OBJECT-TYPE
+							SYNTAX			DisplayString(SIZE(0..10))
+							ACCESS			read-only
+							STATUS			mandatory
+							DESCRIPTION		"Intel LANDesk(r) Server Manager's version."
+							::= {ldsm 1}
+
+status					OBJECT-TYPE
+							SYNTAX			INTEGER { ok(0), informational(1), warning(2), critical(3) }
+							ACCESS			read-only
+							STATUS			mandatory
+							DESCRIPTION		"Intel LANDesk(r) Server Manager's current status."
+							::= {ldsm 2}
+
+
+-- Trap Information
+
+computerName			OBJECT-TYPE
+							SYNTAX			DisplayString(SIZE(0..20))
+							ACCESS			not-accessible
+							STATUS			mandatory
+							DESCRIPTION		"The source computer that generated the SNMP Trap."
+							::= {ldsm 101}
+
+eventTime				OBJECT-TYPE
+							SYNTAX			DisplayString(SIZE(0..255))
+							ACCESS			not-accessible
+							STATUS			mandatory
+							DESCRIPTION		"The date and time the trap was sent on the source computer."
+							::= {ldsm 102}
+
+eventStatus				OBJECT-TYPE
+							SYNTAX			INTEGER { ok(0), informational(1), warning(2), critical(3) }
+							ACCESS			not-accessible
+							STATUS			mandatory
+							DESCRIPTION		"Intel LANDesk(r) Server Manager's status of the source computer."
+							::= {ldsm 103}
+
+
+-- Trap Macros
+-- Category is for HP OpenView Network Node Manager
+
+ldsmOKTrap				TRAP-TYPE
+							ENTERPRISE	ldsm
+							VARIABLES  	{computerName, eventTime, eventStatus}
+							DESCRIPTION	"Intel LANDesk(R) Server Manager has reported a status OK event."
+								--#SUMMARY "Intel LANDesk(R) Server Manager has reported: The computer's status is %s."
+								--#ARGUMENTS {2}
+								--#SEVERITY NORMAL
+								--#TIMEINDEX 1
+								--#STATE OPERATIONAL
+								--#CATEGORY "Status Events"
+							::= 1
+
+ldsmInformationalTrap	TRAP-TYPE
+							ENTERPRISE	ldsm
+							VARIABLES  	{computerName, eventTime, eventStatus}
+							DESCRIPTION	"Intel LANDesk(R) Server Manager has reported a status Informational event."
+								--#SUMMARY "Intel LANDesk(R) Server Manager has reported: The computer's status is %s."
+								--#ARGUMENTS {2}
+								--#SEVERITY NORMAL
+								--#TIMEINDEX 1
+								--#STATE OPERATIONAL
+								--#CATEGORY "Status Events"
+							::= 2
+
+ldsmWarningTrap			TRAP-TYPE
+							ENTERPRISE	ldsm
+							VARIABLES  	{computerName, eventTime, eventStatus}
+							DESCRIPTION	"Intel LANDesk(R) Server Manager has reported a status Warning event."
+								--#SUMMARY "Intel LANDesk(R) Server Manager has reported: The computer's status is %s."
+								--#ARGUMENTS {2}
+								--#SEVERITY MINOR
+								--#TIMEINDEX 1
+								--#STATE OPERATIONAL
+								--#CATEGORY "Status Events"
+							::= 3
+
+ldsmCriticalTrap		TRAP-TYPE
+							ENTERPRISE	ldsm
+							VARIABLES  	{computerName, eventTime, eventStatus}
+							DESCRIPTION	"Intel LANDesk(R) Server Manager has reported a status Critical event."
+								--#SUMMARY "Intel LANDesk(R) Server Manager has reported: The computer's status is %s."
+								--#ARGUMENTS {2}
+								--#SEVERITY CRITICAL
+								--#TIMEINDEX 1
+								--#STATE DEGRADED
+								--#CATEGORY "Status Events"
+							::= 4
+
+
+END

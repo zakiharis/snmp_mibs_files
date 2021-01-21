@@ -1,0 +1,161 @@
+-- Barix MIB Registration Authority
+-- This is the authority for defining MIB items under  barix  { enterprises 17491 }
+-- If new branches are needed then this file MUST be updated
+-- Version: 1.0
+-- Date: 22 May, 2008
+-- Copyright (c) 2008 Barix AG
+-- Changes:
+-- 20050322 Kevin Smyth created 
+-- As at 20050322 only the barionet and audio branches are used
+-- 20060116 streamer added 
+-- 20060306 KS unit, net, hostname added 
+-- 20071217 KS io added
+-- 20080602 KS product abcl and gpt (general purpose text strings) added
+-- 20080612 PK traps defined in a separate file BARIX-ABCL-TRAPS-MIB
+
+          BARIX-MIB DEFINITIONS ::= BEGIN
+          IMPORTS
+                  enterprises, IpAddress, Counter, TimeTicks
+                          FROM RFC1155-SMI
+                  OBJECT-TYPE
+                          FROM RFC-1212
+                  DisplayString
+                          FROM RFC1213-MIB;
+ 
+ 
+               barix          OBJECT IDENTIFIER ::= { enterprises 17491 }
+               products       OBJECT IDENTIFIER ::= { barix 1 }
+               systems        OBJECT IDENTIFIER ::= { barix 2 }
+               unit           OBJECT IDENTIFIER ::= { barix 3 }
+--             4-9 Spare
+               oem        OBJECT IDENTIFIER ::= { barix 10 }
+                
+               barionet       OBJECT IDENTIFIER ::= { products 1 }
+               exstreamer     OBJECT IDENTIFIER ::= { products 2 }
+               instreamer     OBJECT IDENTIFIER ::= { products 3 }
+               annuncicom     OBJECT IDENTIFIER ::= { products 4 } 
+               abcl           OBJECT IDENTIFIER ::= { products 5 }
+               streamer       OBJECT IDENTIFIER ::= { exstreamer 2 } 
+              
+               audio          OBJECT IDENTIFIER ::= { systems 1 }
+
+-- unit Group
+-- contains information common to all Barix units
+--               
+               net            OBJECT IDENTIFIER ::= { unit 1 } 
+               
+               netHostName    OBJECT-TYPE
+                              SYNTAX      DisplayString (SIZE (0..15))
+                              MAX-ACCESS  read-only
+                              STATUS      current
+                              DESCRIPTION
+                              "The bootP and DHCP host name"
+                              ::= { net 1 }  
+-- Io                               
+               io             OBJECT IDENTIFIER ::= { unit 2 }             
+                              
+-- The input table
+-- This is a general purpose table of IO values.
+-- In initial versions of the SNMP supported abcl values up to 600 addresses are supported
+-- The function of the various addresses is device dependant and documented in the
+-- ABCL Technical Documentation.
+
+		ioTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF IoEntry
+			ACCESS not-accessible
+			STATUS mandatory
+			DESCRIPTION 
+                  "A list of I/O variables, indexed 1..1000
+                   The function of the various addresses is device dependant"
+                        ::= { io 1 }
+
+		ioEntry OBJECT-TYPE
+			SYNTAX IoEntry
+			ACCESS not-accessible
+			STATUS mandatory
+			DESCRIPTION
+				"A specific digital input entry."
+			INDEX   { ioIndex }
+			::= { ioTable 1 }
+
+		IoEntry ::= 
+			SEQUENCE {
+                ioIndex     INTEGER (1..1000),
+				ioValue	   INTEGER (0..4294967295)
+			}
+
+		ioIndex OBJECT-TYPE
+            SYNTAX  INTEGER (1..1000)
+			ACCESS	read-only
+			STATUS	mandatory
+			DESCRIPTION
+				"The variable number. one to 1000"
+                        ::= { ioEntry 1 }
+		
+
+		ioValue OBJECT-TYPE
+			SYNTAX	INTEGER
+			ACCESS	read-write
+			STATUS	mandatory
+			DESCRIPTION
+				"The current value of the variable "
+                        ::= { ioEntry 2 }
+
+-- abcl Group
+-- contains information for abcl use
+--               
+-- general purpose text strings (gpt)
+                           
+		gpt	OBJECT IDENTIFIER ::= { abcl 1}  
+				
+-- The general purpose text string table.
+-- This table was created to provide some degree of flexibility to the BCL programmer.
+-- The table allows up to 64 OCTET STRINGS (maximum size 127 charactes) to be defined at will.
+-- These can then be used in Traps or can be polled directly by an SNMP Manager.
+		
+		gptTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF GptEntry
+			ACCESS not-accessible
+			STATUS mandatory
+			DESCRIPTION 
+                  "A Table of general purpose stings, indexed 1..64
+                   The meaning of the various strings is abcl application dependant"
+                        ::= { gpt 1 }
+
+		gptEntry OBJECT-TYPE
+			SYNTAX GptEntry
+			ACCESS not-accessible
+			STATUS mandatory
+			DESCRIPTION
+				"A specific string entry."
+			INDEX   { gptIndex }
+			::= { gptTable 1 }
+
+		GptEntry ::= 
+			SEQUENCE {
+                gptIndex    INTEGER (1..64),
+				gptValue	DisplayString (SIZE (0..127))
+			}
+
+		gptIndex OBJECT-TYPE
+            SYNTAX  INTEGER (1..64)
+			ACCESS	read-only
+			STATUS	mandatory
+			DESCRIPTION
+				"The string number"
+                        ::= { gptEntry 1 }
+		
+		gptValue OBJECT-TYPE
+			SYNTAX	DisplayString (SIZE (0..127))
+			ACCESS	read-write
+			STATUS	mandatory
+			DESCRIPTION
+				"The string text"
+                        ::= { gptEntry 2 }
+
+-- Traps
+-- Traps are defined in a separate MIB file BARIX-ABCL-TRAPS-MIB
+				
+                                                                    
+          END
+

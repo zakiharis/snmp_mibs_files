@@ -1,0 +1,489 @@
+-- GSWB MIB V02L01
+--
+--
+GSWB-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        enterprises, TimeTicks, Counter FROM RFC1155-SMI
+	OBJECT-TYPE                     FROM RFC-1212
+        DisplayString			FROM RFC1213-MIB
+        TRAP-TYPE			FROM RFC-1215
+        MacAddress			FROM BRIDGE-MIB
+        PortList			FROM Q-BRIDGE-MIB;
+
+    fujitsu             OBJECT IDENTIFIER ::= { enterprises 211 }
+    products            OBJECT IDENTIFIER ::= { fujitsu 1 }
+    iaServer            OBJECT IDENTIFIER ::= { products 31 }
+    primequest          OBJECT IDENTIFIER ::= { iaServer 1 }
+    switch              OBJECT IDENTIFIER ::= { primequest 3 }
+    gswb                OBJECT IDENTIFIER ::= { switch 1 }
+
+    fujitsu-gswbProd	OBJECT IDENTIFIER ::= { gswb 1 }
+    swProperty          OBJECT IDENTIFIER ::= { fujitsu-gswbProd 1 }
+    swModule            OBJECT IDENTIFIER ::= { swProperty 1 }
+
+    agentConfigInfo     OBJECT IDENTIFIER ::= { gswb 2 }
+
+    swDevPackage        OBJECT IDENTIFIER ::= { gswb 3 }
+    swPortPackage       OBJECT IDENTIFIER ::= { gswb 4 }
+--                      OBJECT IDENTIFIER ::= { gswb 5 }
+
+    swPortTrunkPackage  OBJECT IDENTIFIER ::= { gswb 6 }
+    swIGMPPackage       OBJECT IDENTIFIER ::= { gswb 7 }
+
+-- -------------------------------------------------------------
+-- Textual Conventions
+-- -------------------------------------------------------------
+    TruthValue    ::= INTEGER { true(1), false(2) }
+    TimeInterval  ::= INTEGER
+    EnabledStatus ::= INTEGER { enabled(1), disabled(2) }
+    VlanIndex     ::= INTEGER
+    VlanId        ::= INTEGER (1..4094)
+    TimeFilter    ::= INTEGER
+
+
+
+    -- ****************
+    -- agentBasicInfo *
+    -- ****************
+    agentBasicInfo          OBJECT IDENTIFIER ::= { agentConfigInfo 1 }
+
+    agentRuntimeSwVersion OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..12))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "This is a textual description of the runtime software version
+             and revision. If the version number is one and revision number
+             is zero agentRuntimeSwVersion would be 'Ver. 1.0'"
+        ::= { agentBasicInfo 1 }
+
+-- ********************************************************************
+--  swDevPackage            OBJECT IDENTIFIER ::= { gswb 3 }
+-- ********************************************************************
+    swDevInfo               OBJECT IDENTIFIER ::= { swDevPackage 1 }
+
+    swDevInfoSystemUpTime OBJECT-TYPE
+        SYNTAX TimeTicks
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The value of sysUpTime at the time the switch entered its
+             current operational state. If the current state was entered
+             prior to the last re-initialization, then this object contains
+             a zero value. This value is in units of seconds."
+        ::= { swDevInfo 1 }
+
+    swDevInfoSystemLedStatus OBJECT-TYPE
+        SYNTAX  OCTET STRING(SIZE(56))
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION
+            "	other(1),
+		Speed010M(2),
+		Speed100M(3),
+		Speed001G(4),
+		Speed010G(5),
+		NoExisting(129),
+		NotLink(130),
+		PortDisable(131),
+		Link(132),
+		Active(133)"
+        ::= { swDevInfo 2 }
+
+-- ********************************************************************
+--  swPortPackage           OBJECT IDENTIFIER ::= { gswb 4 }
+-- ********************************************************************
+
+    swPortInfoTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF SwPortInfoEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "A table that contains information about every port."
+        ::= { swPortPackage 1 }
+
+    swPortInfoEntry OBJECT-TYPE
+        SYNTAX  SwPortInfoEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+            "A list of information for each port of the device."
+        INDEX   { swPortInfoPortIndex }
+        ::= { swPortInfoTable 1 }
+
+    SwPortInfoEntry ::=
+        SEQUENCE {
+            swPortInfoPortIndex
+                INTEGER,
+            swPortInfoType
+                INTEGER,
+            swPortInfoLinkStatus
+                INTEGER,
+            swPortInfoNwayStatus
+                INTEGER,
+            swPortInfoFlowCtrlStatus
+                INTEGER
+        }
+
+    swPortInfoPortIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "This object indicates the module's port number.(1..Max port
+             number in the module)"
+        ::= { swPortInfoEntry 1 }
+
+    swPortInfoType OBJECT-TYPE
+        SYNTAX INTEGER {
+               other(1),
+               portType-100BASE-TX(2),
+               portType-1000BASE-T(3),
+               portType-10GBASE-LR(4)
+               }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "This object indicates the connector type of this port."
+        ::= { swPortInfoEntry 2 }
+
+    swPortInfoLinkStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+               other(1),
+               link-pass(2),
+               link-fail(3)
+               }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "This object indicates the port link status."
+        ::= { swPortInfoEntry 3 }
+
+    swPortInfoNwayStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+               other(1),
+               half-10Mbps(2),
+               full-10Mbps(3),
+               half-100Mbps(4),
+               full-100Mbps(5),
+               half-1Gigabps(6),
+               full-1Gigabps(7),
+               full-10Gigabps(9)
+               }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "This object indicates the port speed and duplex mode."
+        ::= { swPortInfoEntry 4 }
+
+    swPortInfoFlowCtrlStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+               other(1),
+               disabled(2),
+               enabled(3),
+               rx-Only(4),
+               tx-Only(5)
+               }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "This object indicates the port flow control status."
+        ::= { swPortInfoEntry 5 }
+
+    addressTableFull TRAP-TYPE
+              ENTERPRISE swModule
+              DESCRIPTION
+                      "The trap is sent whenever the address table is
+                       full."
+              --#TYPE        "Address table full"
+              --#SUMMARY     "GSWB: The trap is sent whenever the address table is full."
+              --#ARGUMENTS   { }
+              --#SEVERITY    MINOR
+                ::= 1
+
+-- ************************************************************************
+--  swPortTrunkPackage       OBJECT IDENTIFIER ::= {  gswb 6 }
+-- ************************************************************************
+    swPortTrunkTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF SwPortTrunkEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "This table specifys which ports group a set of ports(up to 8)
+             into a single logical link."
+        ::= { swPortTrunkPackage 1 }
+
+    swPortTrunkEntry OBJECT-TYPE
+        SYNTAX SwPortTrunkEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "A list of information specifies which ports group a set of
+             ports(up to 8) into a single logical link."
+        INDEX  { swPortTrunkIndex }
+        ::= { swPortTrunkTable 1 }
+
+    SwPortTrunkEntry ::=
+        SEQUENCE {
+            swPortTrunkIndex
+                INTEGER,
+            swPortTrunkName
+                DisplayString,
+            swPortTrunkLoadBalance
+                INTEGER,
+            swPortTrunkMemberPorts
+                PortList
+        }
+
+    swPortTrunkIndex OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "The index of logical port trunk.The device max support 7 trunk
+             groups. The trunk group number depend on the existence of
+             module."
+        ::= { swPortTrunkEntry 1 }
+
+    swPortTrunkName OBJECT-TYPE
+        SYNTAX DisplayString (SIZE (0..16))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The name of logical port trunk."
+        ::= { swPortTrunkEntry 2 }
+
+    swPortTrunkLoadBalance OBJECT-TYPE
+        SYNTAX INTEGER {
+            other(1),
+            src-mac(2),
+	    dst-mac(3),
+	    src-dst-mac(4),
+	    src-ip(5),
+	    dst-ip(6),
+	    src-dst-ip(7)
+	}
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "other(1)
+             src-mac(2)
+	     dst-mac(3)
+	     src-dst-mac(4)
+	     src-ip(5)
+	     dst-ip(6)
+	     src-dst-ip(7)
+             "
+        ::= { swPortTrunkEntry 3 }
+ 
+    swPortTrunkMemberPorts OBJECT-TYPE
+        SYNTAX PortList
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "The members of the port trunk."
+        ::= { swPortTrunkEntry 4 }
+
+-- **************************************************************************
+--  swIGMPPackage                  OBJECT IDENTIFIER ::= { gswb 7 }
+-- **************************************************************************
+
+	swIGMPStatus OBJECT-TYPE
+        SYNTAX INTEGER {
+               other(1),
+               disabled(2),
+               enabled(3)
+               }
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "This object indicates the status of this switch.
+
+            other(1)   - this switch is currently in use but the conditions
+            	under which it will remain so are different from each of the
+                following values.
+            disabled(2) - IGMP funtion is disabled for this switch.
+            enabled(3) -  IGMP funtion is enabled for this switch."
+        ::= { swIGMPPackage 1 }
+
+    swIGMPEnableVlanCount OBJECT-TYPE
+        SYNTAX INTEGER (0..110)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            ""
+        ::= { swIGMPPackage 2 }
+
+    swIGMPMulticastTableCount OBJECT-TYPE
+        SYNTAX INTEGER (0..256)
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            ""
+        ::= { swIGMPPackage 3 }
+
+    swIGMPInfoTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF SwIGMPInfoEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "The table contains the number current IGMP query packets which
+             is captured by this device, as well as the IGMP query packets
+             sent by the device."
+        ::= { swIGMPPackage 4 }
+
+    swIGMPInfoEntry OBJECT-TYPE
+        SYNTAX SwIGMPInfoEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "Information about current IGMP query information, provided that
+             swIGMPStatus and swIGMPQueryState of associated VLAN
+             entry are all enabled."
+        INDEX  { swIGMPInfoVid }
+        ::= { swIGMPInfoTable 1 }
+
+    SwIGMPInfoEntry ::=
+        SEQUENCE {
+            swIGMPInfoVid
+                VlanId,
+            swIGMPInfoGeneralQueryCount
+                Counter,
+            swIGMPInfoSpecificQueryCount
+                Counter,
+            swIGMPInfoLeaveGroupCount
+                Counter
+        }
+
+    swIGMPInfoVid OBJECT-TYPE
+        SYNTAX VlanId
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "This object indicates the Vid of associated IGMP info table
+             entry. It follows swIGMPCtrlVid in the associated entry of
+             IGMP control table (swIGMPCtrlTable)."
+        ::= { swIGMPInfoEntry 1 }
+
+    swIGMPInfoGeneralQueryCount OBJECT-TYPE
+        SYNTAX Counter
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "This object indicates the number of query packets received
+             since the IGMP function enabled, in per-VLAN basis."
+        ::= { swIGMPInfoEntry 2 }
+
+    swIGMPInfoSpecificQueryCount OBJECT-TYPE
+        SYNTAX Counter
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "This object indicates the send count of IGMP query messages, in
+             per-VLAN basis. In case of IGMP timer expiration, the switch
+             sends IGMP query packets to related VLAN member ports and
+             increment this object by 1."
+        ::= { swIGMPInfoEntry 3 }
+
+    swIGMPInfoLeaveGroupCount OBJECT-TYPE
+        SYNTAX Counter
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "This object indicates the send count of IGMP query messages, in
+             per-VLAN basis. In case of IGMP timer expiration, the switch
+             sends IGMP query packets to related VLAN member ports and
+             increment this object by 1."
+        ::= { swIGMPInfoEntry 4 }
+
+    swIGMPTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF SwIGMPEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "The table containing current IGMP information which captured
+             by this device, provided that swIGMPStatus and swIGMPQueryState
+             of associated VLAN entry are all enabled. Note that the
+             priority of IGMP table entries is lower than Filtering Table,
+             i.e. if there is a table hash collision between the entries of
+             IGMP Table and Filtering Table inside the switch H/W address
+             table, then Filtering Table entry overwrite the colliding
+             entry of IGMP Table. See swFdbFilterTable description also."
+        ::= { swIGMPPackage 5 }
+
+    swIGMPEntry OBJECT-TYPE
+        SYNTAX SwIGMPEntry
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "Information about current IGMP information which captured by
+             this device , provided that swIGMPStatus and swIGMPQueryState
+             of associated VLAN entry are all enabled."
+        INDEX  { swIGMPVid , swIGMPGroupMacAddr }
+        ::= { swIGMPTable 1 }
+
+    SwIGMPEntry ::=
+        SEQUENCE {
+            swIGMPVid
+                VlanId,
+            swIGMPGroupMacAddr
+                MacAddress,
+            swIGMPStaticFlag
+                INTEGER,
+            swIGMPPortMap
+                PortList,
+            swIGMPIpGroupReportCount
+                Counter
+        }
+
+    swIGMPVid OBJECT-TYPE
+        SYNTAX VlanId
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "This object indicates the Vid of individual IGMP table entry.
+             It shows the Vid of IGMP report information captured on
+             network."
+        ::= { swIGMPEntry 1 }
+
+    swIGMPGroupMacAddr OBJECT-TYPE
+        SYNTAX MacAddress
+        ACCESS not-accessible
+        STATUS mandatory
+        DESCRIPTION
+            "This object is identify group ip address which is captured
+             from IGMP packet, in per-Vlan basis."
+        ::= { swIGMPEntry 2 }
+
+    swIGMPStaticFlag OBJECT-TYPE
+        SYNTAX TruthValue
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            ""
+        ::= { swIGMPEntry 3 }
+
+    swIGMPPortMap OBJECT-TYPE
+        SYNTAX PortList
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "This object indicates which ports are belong to the same
+             multicast group, in per-Vlan basis. Each multicast group has a
+             octect string to indicate with port map. The most significant
+             bit represents the lowest numbered port, and the least
+             significant bit represents the highest numbered port."
+        ::= { swIGMPEntry 4 }
+
+    swIGMPIpGroupReportCount OBJECT-TYPE
+        SYNTAX Counter
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "This object indicate how much report packet was receive by our
+             device corresponding with this entry from IGMP function enabled,
+             in per-Vlan basis. ."
+        ::= { swIGMPEntry 5 }
+
+END

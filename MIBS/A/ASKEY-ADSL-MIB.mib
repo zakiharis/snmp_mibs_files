@@ -1,0 +1,1415 @@
+ASKEY-ADSL-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+      ifIndex                   FROM IF-MIB
+      MODULE-IDENTITY,
+      OBJECT-TYPE,
+      Unsigned32,
+      Counter32,
+      Integer32,
+      Gauge32                           FROM SNMPv2-SMI
+      Gauge                             FROM RFC1155-SMI
+      SnmpAdminString                   FROM SNMP-FRAMEWORK-MIB
+      PerfCurrentCount,
+      PerfIntervalCount                 FROM PerfHist-TC-MIB
+      AdslPerfCurrDayCount,
+      AdslPerfPrevDayCount              FROM ADSL-TC-MIB
+      adslLineConfProfileEntry,
+      adslLineAlarmConfProfileEntry,
+      adslAtucPerfDataEntry,
+      adslAturPerfDataEntry,
+      adslAtucIntervalEntry,
+      adslAturIntervalEntry,
+      adslLineEntry                     FROM ADSL-LINE-MIB
+      ipDslam                           FROM ASKEY-DSLAM-MIB
+      aeAlarmPhysicalIndex              FROM ASKEY-ENTITY-ALARM-MIB
+      PortList                          FROM Q-BRIDGE-MIB
+      ;
+
+      askeyADSLMib MODULE-IDENTITY
+          LAST-UPDATED    "200311260000Z"  -- november 26, 2003
+          ORGANIZATION    "ASKEY Inc."
+          CONTACT-INFO    "ASKEY Inc.
+                           E-mail: cwfu@askey.com.tw"
+
+          DESCRIPTION     "ASKEY ADSL MIB OID defines and documentation."
+
+      ::= { ipDslam 2 }
+
+      askeyADSLMibObjects  OBJECT IDENTIFIER ::= { askeyADSLMib 1 }
+
+      adslAlarmConfProfileExt2Table   OBJECT-TYPE
+          SYNTAX          SEQUENCE OF AdslAlarmConfProfileExt2Entry
+          MAX-ACCESS      not-accessible
+          STATUS          current
+          DESCRIPTION
+              "This table extends the
+               adslLineAlarmConfProfileTable and provides
+               threshold parameters for all the counters defined
+               in this MIB module."
+      ::= { askeyADSLMibObjects 1 }
+
+      adslAlarmConfProfileExt2Entry   OBJECT-TYPE
+          SYNTAX          AdslAlarmConfProfileExt2Entry
+          MAX-ACCESS      not-accessible
+
+          STATUS          current
+          DESCRIPTION
+              "An entry extends the adslLineAlarmConfProfileTable
+               defined in [RFC2662].  Each entry corresponds to
+               an ADSL alarm profile."
+          AUGMENTS { adslLineAlarmConfProfileEntry }
+      ::= { adslAlarmConfProfileExt2Table 1 }
+
+      AdslAlarmConfProfileExt2Entry ::=
+          SEQUENCE {
+          adslAtucThreshold1DayEsL            Integer32,
+          adslAtucThreshold1DaySesL           Integer32,
+          adslAtucThreshold1DayUasL           Integer32,
+          adslAturThreshold1DayEsL            Integer32,
+          adslAturThreshold1DaySesL           Integer32,
+          adslAturThreshold1DayUasL           Integer32
+      }
+
+      adslAtucThreshold1DayEsL OBJECT-TYPE
+          SYNTAX      Integer32(0..86400)
+          UNITS       "seconds"
+          MAX-ACCESS  read-create
+          STATUS      current
+          DESCRIPTION
+                 "The first time the value of the corresponding
+                  instance of adslAtucPerf1DayEsL reaches or
+                  exceeds this value within a given 1-day
+                  performance data collection period, an
+                  adslAtucEsLThreshTrap notification will be
+                  generated. The value '0' will disable the
+                  notification.  The default value of this
+                  object is '0'."
+          DEFVAL { 0 }
+      ::= { adslAlarmConfProfileExt2Entry 1 }
+
+      adslAtucThreshold1DaySesL OBJECT-TYPE
+          SYNTAX      Integer32(0..86400)
+          UNITS       "seconds"
+          MAX-ACCESS  read-create
+          STATUS      current
+          DESCRIPTION
+                 "The first time the value of the corresponding
+                  instance of adslAtucPerf1DaySesL reaches or
+                  exceeds this value within a given 1-day
+                  performance data collection period, an
+                  adslAtucSesLThreshTrap notification will be
+                  generated. The value '0' will disable the
+                  notification.  The default value of this
+                  object is '0'."
+          DEFVAL { 0 }
+      ::= { adslAlarmConfProfileExt2Entry 2 }
+
+      adslAtucThreshold1DayUasL OBJECT-TYPE
+          SYNTAX      Integer32(0..86400)
+          UNITS       "seconds"
+          MAX-ACCESS  read-create
+          STATUS      current
+          DESCRIPTION
+                 "The first time the value of the corresponding
+                  instance of adslAtucPerf1DayUasL reaches or
+                  exceeds this value within a given 1-day
+                  performance data collection period, an
+                  adslAtucUasLThreshTrap notification will be
+                  generated. The value '0' will disable the
+                  notification.  The default value of this
+                  object is '0'."
+          DEFVAL { 0 }
+      ::= { adslAlarmConfProfileExt2Entry 3 }
+
+      adslAturThreshold1DayEsL OBJECT-TYPE
+          SYNTAX      Integer32(0..86400)
+          UNITS       "seconds"
+          MAX-ACCESS  read-create
+          STATUS      current
+          DESCRIPTION
+                 "The first time the value of the corresponding
+                  instance of adslAturPerf1DayEsL reaches or
+                  exceeds this value within a given 1-day
+                  performance data collection period, an
+                  adslAturEsLThreshTrap notification will be
+                  generated. The value '0' will disable the
+                  notification.  The default value of this
+                  object is '0'."
+          DEFVAL { 0 }
+      ::= { adslAlarmConfProfileExt2Entry 4 }
+
+      adslAturThreshold1DaySesL OBJECT-TYPE
+          SYNTAX      Integer32(0..86400)
+          UNITS       "seconds"
+          MAX-ACCESS  read-create
+          STATUS      current
+          DESCRIPTION
+                 "The first time the value of the corresponding
+                  instance of adslAturPerf1DaySesL reaches or
+                  exceeds this value within a given 1-day
+                  performance data collection period, an
+                  adslAturSesLThreshTrap notification will be
+                  generated. The value '0' will disable the
+                  notification.  The default value of this
+                  object is '0'."
+          DEFVAL { 0 }
+      ::= { adslAlarmConfProfileExt2Entry 5 }
+
+      adslAturThreshold1DayUasL OBJECT-TYPE
+          SYNTAX      Integer32(0..86400)
+          UNITS       "seconds"
+          MAX-ACCESS  read-create
+          STATUS      current
+          DESCRIPTION
+                 "The first time the value of the corresponding
+                  instance of adslAturPerf1DayUasL reaches or
+                  exceeds this value within a given 1-day
+                  performance data collection period, an
+                  adslAturUasLThreshTrap notification will be
+                  generated. The value '0' will disable the
+                  notification.  The default value of this
+                  object is '0'."
+          DEFVAL { 0 }
+      ::= { adslAlarmConfProfileExt2Entry 6 }
+
+-- ATUC BitAllocation
+         adslAtucBitAllocationTable   OBJECT-TYPE
+             SYNTAX          SEQUENCE OF AdslAtucBitAllocationEntry
+             MAX-ACCESS      not-accessible
+             STATUS          current
+             DESCRIPTION
+                 "This table specify bit allocation table"
+         ::= { askeyADSLMibObjects 2 }
+
+
+--      adslConfProfileIndexTable   OBJECT-TYPE
+--          SYNTAX          SEQUENCE OF AdslConfProfileIndexEntry
+--          MAX-ACCESS      not-accessible
+--          STATUS          current
+--          DESCRIPTION
+--              ""
+--      ::= { askeyADSLMibObjects 2 }
+--
+--      adslConfProfileIndexEntry   OBJECT-TYPE
+--          SYNTAX          AdslConfProfileIndexEntry
+--          MAX-ACCESS      not-accessible
+--
+--          STATUS          current
+--          DESCRIPTION
+--              ""
+--          INDEX {adslConfProfileIndexNum}
+--
+--      ::= { adslConfProfileIndexTable 1 }
+--
+--      AdslConfProfileIndexEntry ::=
+--          SEQUENCE {
+--          adslConfProfileIndexNum             Integer32,
+--          adslConfProfileName                 SnmpAdminString
+--      }
+--
+--      adslConfProfileIndexNum OBJECT-TYPE
+--          SYNTAX      Integer32
+--          MAX-ACCESS  not-accessible
+--          STATUS      current
+--          DESCRIPTION
+--              ""
+--      ::= { adslConfProfileIndexEntry 1 }
+--
+--      adslConfProfileName OBJECT-TYPE
+--          SYNTAX      SnmpAdminString (SIZE (1..32))
+--          MAX-ACCESS  read-create
+--          STATUS      current
+--          DESCRIPTION
+--              ""
+--      ::= { adslConfProfileIndexEntry 2 }
+
+         adslAtucBitAllocationEntry   OBJECT-TYPE
+             SYNTAX          AdslAtucBitAllocationEntry
+             MAX-ACCESS      not-accessible
+             STATUS          current
+             DESCRIPTION     "An entry in the adslBitAllocationTable."
+             INDEX           { ifIndex }
+         ::= { adslAtucBitAllocationTable 1 }
+
+         AdslAtucBitAllocationEntry ::=
+             SEQUENCE {
+--             adslAtucBitAllocationIndex                   INTEGER,
+             adslAtucBitAllocationNumber                  OCTET STRING
+         }
+
+--         adslAtucBitAllocationIndex OBJECT-TYPE
+--             SYNTAX      INTEGER(1..512)
+--             MAX-ACCESS  not-accessible
+--             STATUS      current
+--             DESCRIPTION
+--                 "adslBitAllocationIndex,
+--                 1..256 for ADSL/ADSL2
+--                 1..512 for ADSL2+
+--                 "
+--         ::= { adslAtucBitAllocationEntry 1 }
+
+         adslAtucBitAllocationNumber OBJECT-TYPE
+             SYNTAX      OCTET STRING (SIZE (512))
+             MAX-ACCESS  read-only
+             STATUS      current
+             DESCRIPTION
+                 "Bit number for 1..512 tone. That is, the length must be 256"
+         ::= { adslAtucBitAllocationEntry 1 }
+
+-- ATUR BitAllocation
+         adslAturBitAllocationTable   OBJECT-TYPE
+             SYNTAX          SEQUENCE OF AdslAturBitAllocationEntry
+             MAX-ACCESS      not-accessible
+             STATUS          current
+             DESCRIPTION
+                 "This table specify bit allocation table"
+         ::= { askeyADSLMibObjects 3 }
+
+
+         adslAturBitAllocationEntry   OBJECT-TYPE
+             SYNTAX          AdslAturBitAllocationEntry
+             MAX-ACCESS      not-accessible
+             STATUS          current
+             DESCRIPTION     "An entry in the adslBitAllocationTable."
+             INDEX           { ifIndex }
+         ::= { adslAturBitAllocationTable 1 }
+
+         AdslAturBitAllocationEntry ::=
+             SEQUENCE {
+--             adslAturBitAllocationIndex                   INTEGER,
+             adslAturBitAllocationNumber                  OCTET STRING
+         }
+
+--         adslAturBitAllocationIndex OBJECT-TYPE
+--             SYNTAX      INTEGER(1..64)
+--             MAX-ACCESS  not-accessible
+--             STATUS      current
+--             DESCRIPTION
+--                 "adslBitAllocationIndex,
+--                 range is 1..64"
+--         ::= { adslAturBitAllocationEntry 1 }
+--
+         adslAturBitAllocationNumber OBJECT-TYPE
+             SYNTAX      OCTET STRING  (SIZE (64))
+             MAX-ACCESS  read-only
+             STATUS      current
+             DESCRIPTION
+                 "Bit number for 1..64 tone. That is, the length must be 64"
+         ::= { adslAturBitAllocationEntry 1 }
+
+-- ADSL2/ADSL2+ Loop diagnostics mib
+
+          adslLoopDiagObjects       OBJECT IDENTIFIER ::= { askeyADSLMibObjects 4 }
+
+          adslLoopDiagIfIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              MAX-ACCESS  read-write
+              STATUS      current
+              DESCRIPTION
+                      "The ifIndex of the target interface to do loop diagnostic"
+              ::= { adslLoopDiagObjects 1 }
+
+          adslLoopDiagProfileName OBJECT-TYPE
+              SYNTAX  SnmpAdminString (SIZE (1..32))
+              MAX-ACCESS  read-write
+              STATUS      current
+              DESCRIPTION
+                      "The profile used to do loop diagnostic"
+              ::= { adslLoopDiagObjects 2 }
+
+         adslLoopDiagAction OBJECT-TYPE
+             SYNTAX INTEGER {
+                 none (0),
+                 start (1),
+                 cancel (2)
+             }
+             MAX-ACCESS  read-write
+             STATUS      current
+             DESCRIPTION
+                 "Set to start to trigger ADSL2/ADSL2+ loop diagnostics.
+                  Once loop diagnostic is started, the status will reflect in
+                  adslLoopDiagCurrStatus.
+                  Set to cancel can allow user to cancel an ongoing loop
+                  diagnostics process.
+                  Reading this variable is meaningless, the result will always be 0."
+         ::= { adslLoopDiagObjects 3 }
+
+         adslLoopDiagLastStatus OBJECT-TYPE
+             SYNTAX INTEGER {
+                 noStatus (0), -- no loop diagnostics is triggered yet since system starts up.
+                 onProcess (1), -- loop diagnostics is started and not finished yet.
+                 success(2),  -- loop diagnostics is started and finished successfully.
+                 failed (3)  -- loop diagnostics is started and failed.
+             }
+             MAX-ACCESS  read-only
+             STATUS      current
+             DESCRIPTION
+                 "This variable indicats status of last loop diagnostic on this line."
+         ::= { adslLoopDiagObjects 4 }
+
+         adslLoopDiagFailReason OBJECT-TYPE
+             SYNTAX INTEGER
+             MAX-ACCESS  read-only
+             STATUS      current
+             DESCRIPTION
+                 "Fail reason if loop diagnostic is failed.
+                 no fail reason is reported                        (0)
+                 IfIndex is not invalid                            (1)
+                 used profile does not exist or is inactive        (2)
+                 line card does not exist                          (3)
+                 HWAPI return error                                (4)
+                 cancelled by user                                 (5)
+                 line initialization fail                          (6)
+                 no atu-r is detected                              (7)
+                 line doesn't enter show-time state                (8)
+                 timeout, result is not available                  (9)
+                 port monitoring is performing, loop diag can not perform at the same time (10)
+                 "
+         ::= { adslLoopDiagObjects 5 }
+
+         adslLoopDiagResultAtucAttainableRate OBJECT-TYPE
+             SYNTAX      Gauge32
+             UNITS       "bps"
+             MAX-ACCESS  read-only
+             STATUS      current
+             DESCRIPTION
+                 "Valid only while adslLoopDiagCurrStatus is success."
+         ::= { adslLoopDiagObjects 6 }
+
+         adslLoopDiagResultAtucLoopAttenuation OBJECT-TYPE
+             SYNTAX      Gauge32(0..630)
+             UNITS       "tenth dB"
+             MAX-ACCESS  read-only
+             STATUS      current
+             DESCRIPTION
+                 "Valid only while adslLoopDiagCurrStatus is success."
+         ::= { adslLoopDiagObjects 7 }
+
+         adslLoopDiagResultAtucSignalAttenuation OBJECT-TYPE
+             SYNTAX      Gauge32(0..630)
+             UNITS       "tenth dB"
+             MAX-ACCESS  read-only
+             STATUS      current
+             DESCRIPTION
+                 "Valid only while adslLoopDiagCurrStatus is success."
+         ::= { adslLoopDiagObjects 8 }
+
+         adslLoopDiagResultAtucSnrMargin OBJECT-TYPE
+          SYNTAX      INTEGER (-640..640)
+             UNITS       "tenth dB"
+             MAX-ACCESS  read-only
+             STATUS      current
+             DESCRIPTION
+                 "Valid only while adslLoopDiagCurrStatus is success."
+         ::= { adslLoopDiagObjects 9 }
+
+         adslLoopDiagResultAtucTxPower OBJECT-TYPE
+             SYNTAX      INTEGER (-310..310)
+             UNITS       "tenth dBm"
+             MAX-ACCESS  read-only
+             STATUS      current
+             DESCRIPTION
+                 "Valid only while adslLoopDiagCurrStatus is success."
+         ::= { adslLoopDiagObjects 10 }
+
+         ------ ATUR side
+         adslLoopDiagResultAturAttainableRate OBJECT-TYPE
+             SYNTAX      Gauge32
+             UNITS       "bps"
+             MAX-ACCESS  read-only
+             STATUS      current
+             DESCRIPTION
+                 "Valid only while adslLoopDiagCurrStatus is success."
+         ::= { adslLoopDiagObjects 11 }
+
+         adslLoopDiagResultAturLoopAttenuation OBJECT-TYPE
+             SYNTAX      Gauge32(0..630)
+             UNITS       "tenth dB"
+             MAX-ACCESS  read-only
+             STATUS      current
+             DESCRIPTION
+                 "Valid only while adslLoopDiagCurrStatus is success."
+         ::= { adslLoopDiagObjects 12 }
+
+         adslLoopDiagResultAturSignalAttenuation OBJECT-TYPE
+             SYNTAX      Gauge32(0..630)
+             UNITS       "tenth dB"
+             MAX-ACCESS  read-only
+             STATUS      current
+             DESCRIPTION
+                 "Valid only while adslLoopDiagCurrStatus is success."
+         ::= { adslLoopDiagObjects 13 }
+
+         adslLoopDiagResultAturSnrMargin OBJECT-TYPE
+             SYNTAX      INTEGER (-640..640)
+             UNITS       "tenth dB"
+             MAX-ACCESS  read-only
+             STATUS      current
+             DESCRIPTION
+                 "Valid only while adslLoopDiagCurrStatus is success."
+         ::= { adslLoopDiagObjects 14 }
+
+         adslLoopDiagResultAturTxPower OBJECT-TYPE
+             SYNTAX      INTEGER (-310..310)
+             UNITS       "tenth dBm"
+             MAX-ACCESS  read-only
+             STATUS      current
+             DESCRIPTION
+                 "Valid only while adslLoopDiagCurrStatus is success."
+         ::= { adslLoopDiagObjects 15 }
+
+         adslLoopDiagResultDsHlogM   OBJECT-TYPE
+             SYNTAX          OCTET STRING (SIZE (1024))
+             MAX-ACCESS      read-only
+             STATUS          current
+             DESCRIPTION
+                 "This object provides an array of downstream Hlog(f) m.
+                 The m of subcarrier(i) is 256*Octect(2i)+Octect(2i+1), i=0~511.
+                 To get real value of Hlog(f), it is caculated as (6-m(i)/10).
+                 A special value 1023 indicates that no measurement could be done for the
+                 subcarrier because it is out of the passband or that the attenuation is
+                 out of range to be represented."
+         ::= { adslLoopDiagObjects 16 }
+
+         adslLoopDiagResultUsHlogM   OBJECT-TYPE
+             SYNTAX          OCTET STRING (SIZE (128))
+             MAX-ACCESS      read-only
+             STATUS          current
+             DESCRIPTION
+                 "This object provides an array of upstream Hlog(f) m.
+                 The m of subcarrier(i) is 256*Octect(2i)+Octect(2i+1), i=0~63.
+                 To get real value of Hlog(f), it is caculated as (6-m(i)/10).
+                 A special value 1023 indicates that no measurement could be done for the
+                 subcarrier because it is out of the passband or that the attenuation is
+                 out of range to be represented."
+         ::= { adslLoopDiagObjects 17 }
+
+         adslLoopDiagResultDsQuietLinePsdN   OBJECT-TYPE
+             SYNTAX          OCTET STRING (SIZE (512))
+             MAX-ACCESS      read-only
+             STATUS          current
+             DESCRIPTION
+                 "This object provides an array of downstream quiet line noise PSD n.
+                 The n of subcarrier(i) is Octect(i), i=0~511.
+                 To get real value of QLN(f), it is caculated as (-23-n(i)/2).
+                 A special value 255 indicates that no measurement could be done for the
+                 subcarrier because it is out of the passband or that the noise PSD is
+                 out of range to be represented."
+         ::= { adslLoopDiagObjects 18 }
+
+         adslLoopDiagResultUsQuietLinePsdN   OBJECT-TYPE
+             SYNTAX          OCTET STRING (SIZE (64))
+             MAX-ACCESS      read-only
+             STATUS          current
+             DESCRIPTION
+                 "This object provides an array of upstream quiet line noise PSD n.
+                 The n of subcarrier(i) is Octect(i), i=0~63.
+                 To get real value of QLN(f), it is caculated as (-23-n(i)/2).
+                 A special value 255 indicates that no measurement could be done for the
+                 subcarrier because it is out of the passband or that the noise PSD is
+                 out of range to be represented."
+         ::= { adslLoopDiagObjects 19 }
+
+         adslLoopDiagResultDsSnrN   OBJECT-TYPE
+             SYNTAX          OCTET STRING (SIZE (512))
+             MAX-ACCESS      read-only
+             STATUS          current
+             DESCRIPTION
+                 "This table used for ADSL2/ADSL2+ downstream loop diagnostics SNR."
+         ::= { adslLoopDiagObjects 20 }
+
+         adslLoopDiagResultUsSnrN   OBJECT-TYPE
+             SYNTAX          OCTET STRING (SIZE (64))
+             MAX-ACCESS      read-only
+             STATUS          current
+             DESCRIPTION
+                 "This table used for ADSL2/ADSL2+ upstream loop
+                 diagnostics SNR.
+                 value of subcarrier(i) is Octect(i)"
+         ::= { adslLoopDiagObjects 21 }
+
+
+
+--askeyADSLConfProfileExtTable Mib
+
+
+         askeyADSLConfProfileExtTable   OBJECT-TYPE
+             SYNTAX          SEQUENCE OF AskeyADSLConfProfileExtEntry
+             MAX-ACCESS      not-accessible
+             STATUS          current
+             DESCRIPTION
+                 "This parameter represents the maximum nominal transmit PSD
+                 in the downstream direction during initialization and showtime (in dBm/Hz).
+                 It ranges from -60 to -40 dBm/Hz, with 0.1 dB steps."
+         ::= { askeyADSLMibObjects 5 }
+
+         askeyADSLConfProfileExtEntry   OBJECT-TYPE
+             SYNTAX          AskeyADSLConfProfileExtEntry
+             MAX-ACCESS      not-accessible
+             STATUS          current
+             DESCRIPTION     ""
+             AUGMENTS { adslLineConfProfileEntry }
+         ::= { askeyADSLConfProfileExtTable 1 }
+
+
+         AskeyADSLConfProfileExtEntry ::=
+             SEQUENCE {
+             adslAtucConfMaxNominalPSD              INTEGER,
+             adslAturConfMaxNominalPSD              INTEGER,
+             adslConfSRAModeEnabled                 INTEGER,
+             adslConfPwrMgtL2Mode                   INTEGER,
+             adslConfPwrMgtL2MinRate                Unsigned32,
+             adslConfPwrMgtL2MaxRate                Unsigned32,
+             adslConfPwrMgtLowerL2ContinuousTime    INTEGER,
+             adslConfPwrMgtL0Time                   INTEGER,
+             adslConfPwrMgtL3Accepted               INTEGER,
+             adslConfAtucMinINP                     INTEGER,
+             adslConfAturMinINP                     INTEGER
+         }
+
+
+         adslAtucConfMaxNominalPSD OBJECT-TYPE
+             SYNTAX      INTEGER(-400..40)
+             UNITS       "0.1 dBm per Hz"
+             MAX-ACCESS  read-write
+             STATUS      current
+             DESCRIPTION
+                 "atu-c max nominal power spectrum desity"
+         ::= { askeyADSLConfProfileExtEntry 1 }
+
+         adslAturConfMaxNominalPSD OBJECT-TYPE
+             SYNTAX      INTEGER(-400..40)
+             UNITS       "0.1 dBm per Hz"
+             MAX-ACCESS  read-write
+             STATUS      current
+             DESCRIPTION
+                 "atu-r max nominal power spectrum desity"
+         ::= { askeyADSLConfProfileExtEntry 2 }
+
+         adslConfSRAModeEnabled OBJECT-TYPE
+             SYNTAX       INTEGER { enabled(1), disabled(2) }
+             MAX-ACCESS  read-write
+             STATUS      current
+             DESCRIPTION
+                 "The seamless rate adaptive mode can force dynamic rate mode changing rate
+                  at runtime without retraining.
+                  This object is only applies to dynamic rate mode."
+             DEFVAL  { enabled }
+         ::= { askeyADSLConfProfileExtEntry 3 }
+
+         adslConfPwrMgtL2Mode OBJECT-TYPE
+             SYNTAX      INTEGER {
+                             manual(0),
+                             automatic(1)
+                         }
+             MAX-ACCESS  read-write
+             STATUS      current
+             DESCRIPTION
+                 "Line power management L2 mode."
+             DEFVAL  { manual }
+         ::= { askeyADSLConfProfileExtEntry 4 }
+
+         adslConfPwrMgtL2MinRate OBJECT-TYPE
+             SYNTAX      Unsigned32 (32000..29984000)
+             UNITS       "bps"
+             MAX-ACCESS  read-write
+             STATUS      current
+             DESCRIPTION
+                 "minimum rate and low-bound to data rate for power management L2 state."
+         ::= { askeyADSLConfProfileExtEntry 5 }
+
+         adslConfPwrMgtL2MaxRate OBJECT-TYPE
+             SYNTAX      Unsigned32 (32000..29984000)
+             UNITS       "bps"
+             MAX-ACCESS  read-write
+             STATUS      current
+             DESCRIPTION
+                 "maximum rate to data rate for power management L2 state."
+         ::= { askeyADSLConfProfileExtEntry 6 }
+
+         adslConfPwrMgtLowerL2ContinuousTime OBJECT-TYPE
+             SYNTAX      INTEGER (0..65535)
+             MAX-ACCESS  read-write
+             STATUS      current
+             DESCRIPTION
+                 "The continuous time of line rate lower than L2 low-bound.
+                 Line can start transferring into L2 after this time pass."
+             DEFVAL  { 300 }
+         ::= { askeyADSLConfProfileExtEntry 7 }
+
+         adslConfPwrMgtL0Time OBJECT-TYPE
+             SYNTAX      INTEGER (0..65535)
+             MAX-ACCESS  read-write
+             STATUS      current
+             DESCRIPTION
+                 "The minimum time in L0 state before line starts to check L2 criteria."
+             DEFVAL  { 900 }
+         ::= { askeyADSLConfProfileExtEntry 8 }
+
+         adslConfPwrMgtL3Accepted OBJECT-TYPE
+             SYNTAX      INTEGER {
+                             denied(0),
+                             accepted(1)
+                         }
+             MAX-ACCESS  read-write
+             STATUS      current
+             DESCRIPTION
+                 "This object indicates whether the ADSL lines accept CPE power
+                 management L3 request. If it is, the ADSL lines applied this
+                 profile will accept request from CPE and transfer their power
+                 management state into L3 by the CPE request."
+             DEFVAL  { denied }
+         ::= { askeyADSLConfProfileExtEntry 9 }
+
+         adslConfAtucMinINP OBJECT-TYPE
+             SYNTAX      INTEGER {
+                             times-0(0),
+                             times-half(1),
+                             times-1(2),
+                             times-2(3),
+                             times-4(4),
+                             times-8(5),
+                             times-16(6)
+                         }
+             MAX-ACCESS  read-write
+             STATUS      current
+             DESCRIPTION
+                 "ATUC(i.e. downstream) minimum INP(Impulse Noise Protect)
+                 capability.  The object value indicates the multiple of INP
+                 symbol. For example, 'time-4' means four times."
+             DEFVAL  { times-0 }
+         ::= { askeyADSLConfProfileExtEntry 10 }
+
+         adslConfAturMinINP OBJECT-TYPE
+             SYNTAX      INTEGER {
+                             times-0(0),
+                             times-half(1),
+                             times-1(2),
+                             times-2(3),
+                             times-4(4),
+                             times-8(5),
+                             times-16(6)
+                         }
+             MAX-ACCESS  read-write
+             STATUS      current
+             DESCRIPTION
+                 "ATUR(i.e. upstream) minimum INP(Impulse Noise Protect)
+                 capability.  The object value indicates the multiple of INP
+                 symbol. For example, 'time-4' means four times."
+             DEFVAL  { times-0 }
+         ::= { askeyADSLConfProfileExtEntry 11 }
+
+
+--end adslAturConfMaxNominalPSD MIB
+
+      askeyAdslAtucPerfExtTable OBJECT-TYPE
+          SYNTAX          SEQUENCE OF AskeyAdslAtucPerfExtEntry
+          MAX-ACCESS      not-accessible
+          STATUS          current
+          DESCRIPTION
+              "This table extends the adslAtucPerfDataTable to provide
+               received and transmitted user cell counters, code violation
+               and fail initialization counts."
+      ::= { askeyADSLMibObjects 10 }
+
+      askeyAdslAtucPerfExtEntry   OBJECT-TYPE
+          SYNTAX          AskeyAdslAtucPerfExtEntry
+          MAX-ACCESS      not-accessible
+          STATUS          current
+          DESCRIPTION
+              "An entry extends the adslAtucPerfDataEntry defined in [RFC2662].
+              Each entry corresponds to an ADSL interface."
+          AUGMENTS { adslAtucPerfDataEntry }
+      ::= { askeyAdslAtucPerfExtTable 1 }
+
+--      add the code violation and fail initialization to atuc curr
+
+
+      AskeyAdslAtucPerfExtEntry ::=
+       SEQUENCE {
+          aAdslAtucPerfCurr15MinReceivedCells               PerfCurrentCount,
+          aAdslAtucPerfCurr15MinTransmittedCells            PerfCurrentCount,
+          aAdslAtucPerfCurr15MinCodeViolation               PerfCurrentCount,
+          aAdslAtucPerfCurr15MinFailInits                   PerfCurrentCount,
+          aAdslAtucPerfCurr1DayReceivedCells                AdslPerfCurrDayCount,
+          aAdslAtucPerfCurr1DayTransmittedCells             AdslPerfCurrDayCount,
+          aAdslAtucPerfCurr1DayCodeViolation                AdslPerfCurrDayCount,
+          aAdslAtucPerfCurr1DayFailInits                    AdslPerfCurrDayCount,
+          aAdslAtucPerfPrev1DayReceivedCells                AdslPerfPrevDayCount,
+          aAdslAtucPerfPrev1DayTransmittedCells             AdslPerfPrevDayCount,
+          aAdslAtucPerfPerf1DayCodeViolation                AdslPerfPrevDayCount,
+          aAdslAtucPerfPerf1DayFailInits                    AdslPerfPrevDayCount
+      }
+
+      aAdslAtucPerfCurr15MinReceivedCells OBJECT-TYPE
+          SYNTAX      PerfCurrentCount
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "Count of all user cells received on this interface
+              within the current 15 minute interval."
+      ::= { askeyAdslAtucPerfExtEntry 1 }
+
+      aAdslAtucPerfCurr15MinTransmittedCells OBJECT-TYPE
+          SYNTAX      PerfCurrentCount
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "Count of all user cells transmitted on this
+              interface within the current 15 minute interval."
+      ::= { askeyAdslAtucPerfExtEntry 2 }
+
+      aAdslAtucPerfCurr15MinCodeViolation  OBJECT-TYPE
+          SYNTAX      PerfCurrentCount
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "Count of code violations on this
+              interface within the current 15 minute interval."
+      ::= { askeyAdslAtucPerfExtEntry 3 }
+
+      aAdslAtucPerfCurr15MinFailInits  OBJECT-TYPE
+          SYNTAX      PerfCurrentCount
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "Count of failed initializations on this
+              interface within the current 15 minute interval."
+      ::= { askeyAdslAtucPerfExtEntry 4 }
+
+      aAdslAtucPerfCurr1DayReceivedCells  OBJECT-TYPE
+          SYNTAX      AdslPerfCurrDayCount
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "Count of all user cells received on this
+              interface during the current day as measured by
+              adslAtucPerfCurr1DayTimeElapsed."
+
+      ::= { askeyAdslAtucPerfExtEntry 5 }
+
+      aAdslAtucPerfCurr1DayTransmittedCells  OBJECT-TYPE
+          SYNTAX      AdslPerfCurrDayCount
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "Count of all user cells transmitted on this
+              interface during the current day as measured by
+              adslAtucPerfCurr1DayTimeElapsed."
+
+      ::= { askeyAdslAtucPerfExtEntry 6 }
+
+      aAdslAtucPerfCurr1DayCodeViolation  OBJECT-TYPE
+          SYNTAX      AdslPerfCurrDayCount
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "Count of code violations on this
+              interface during the current day."
+      ::= { askeyAdslAtucPerfExtEntry 7 }
+
+
+      aAdslAtucPerfCurr1DayFailInits  OBJECT-TYPE
+          SYNTAX      AdslPerfCurrDayCount
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "Count of full initializations on this
+              interface during the current day."
+      ::= { askeyAdslAtucPerfExtEntry 8 }
+
+      aAdslAtucPerfPrev1DayReceivedCells  OBJECT-TYPE
+          SYNTAX      AdslPerfPrevDayCount
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "Count of all user cells received on this
+              interface within the most recent previous 1-day
+              period."
+      ::= { askeyAdslAtucPerfExtEntry 9 }
+
+
+      aAdslAtucPerfPrev1DayTransmittedCells  OBJECT-TYPE
+          SYNTAX      AdslPerfPrevDayCount
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "Count of all user cells transmitted on this
+              interface within the most recent previous 1-day
+              period."
+      ::= { askeyAdslAtucPerfExtEntry 10 }
+
+      aAdslAtucPerfPerf1DayCodeViolation  OBJECT-TYPE
+          SYNTAX      AdslPerfPrevDayCount
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "Count of code violations on this
+              interface within the most recent previous 1-day
+              period."
+      ::= { askeyAdslAtucPerfExtEntry 11 }
+
+      aAdslAtucPerfPerf1DayFailInits  OBJECT-TYPE
+          SYNTAX      AdslPerfPrevDayCount
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "Count of full initializations on this
+              interface within the most recent previous 1-day
+              period."
+      ::= { askeyAdslAtucPerfExtEntry 12 }
+
+
+      askeyAdslAturPerfExtTable OBJECT-TYPE
+          SYNTAX          SEQUENCE OF AskeyAdslAturPerfExtEntry
+          MAX-ACCESS      not-accessible
+          STATUS          current
+          DESCRIPTION
+              "This table extends the adslAturPerfDataTable to provide
+               more performance information."
+      ::= { askeyADSLMibObjects 11 }
+
+
+      askeyAdslAturPerfExtEntry   OBJECT-TYPE
+          SYNTAX          AskeyAdslAturPerfExtEntry
+          MAX-ACCESS      not-accessible
+          STATUS          current
+          DESCRIPTION
+              "An entry extends the adslAturPerfDataEntry defined in [RFC2662].
+              Each entry corresponds to an ADSL interface."
+          AUGMENTS { adslAturPerfDataEntry }
+      ::= { askeyAdslAturPerfExtTable 1 }
+
+      AskeyAdslAturPerfExtEntry ::=
+       SEQUENCE {
+          aAdslAturPerfCurr15MinCodeViolation           PerfCurrentCount,
+          aAdslAturPerfCurr1DayCodeViolation            AdslPerfCurrDayCount,
+          aAdslAturPerfPerf1DayCodeViolation            AdslPerfPrevDayCount
+      }
+
+      aAdslAturPerfCurr15MinCodeViolation OBJECT-TYPE
+          SYNTAX      PerfCurrentCount
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "Count of code violations on this interface
+              within the current 15 minute interval."
+      ::= { askeyAdslAturPerfExtEntry 1 }
+
+      aAdslAturPerfCurr1DayCodeViolation OBJECT-TYPE
+          SYNTAX      AdslPerfCurrDayCount
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "Count of code violations on this interface
+              within the current 1 day interval."
+      ::= { askeyAdslAturPerfExtEntry 2 }
+
+      aAdslAturPerfPerf1DayCodeViolation OBJECT-TYPE
+          SYNTAX      AdslPerfPrevDayCount
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "Count of code violations on this interface within
+              the most recent previous 1-day period."
+      ::= { askeyAdslAturPerfExtEntry 3 }
+
+      askeyAdslAtucIntervalExtTable OBJECT-TYPE
+          SYNTAX          SEQUENCE OF AskeyAdslAtucIntervalExtEntry
+          MAX-ACCESS      not-accessible
+          STATUS          current
+          DESCRIPTION
+              "This table extends the adslAtucIntervalTable to provide
+               more performance informations"
+      ::= { askeyADSLMibObjects 12}
+
+      askeyAdslAtucIntervalExtEntry   OBJECT-TYPE
+          SYNTAX          AskeyAdslAtucIntervalExtEntry
+          MAX-ACCESS      not-accessible
+          STATUS          current
+          DESCRIPTION
+              "An entry extends the adslAtucIntervalEntry defined in [RFC2662]."
+          AUGMENTS { adslAtucIntervalEntry }
+      ::= { askeyAdslAtucIntervalExtTable 1 }
+
+      AskeyAdslAtucIntervalExtEntry ::=
+       SEQUENCE {
+          aAdslAtucIntervalReceivedCells            PerfIntervalCount,
+          aAdslAtucIntervalTransmittedCells         PerfIntervalCount,
+          aAdslAtucIntervalCodeViolation            PerfIntervalCount,
+          aAdslAtucIntervalFailInits                PerfIntervalCount
+      }
+
+      aAdslAtucIntervalReceivedCells OBJECT-TYPE
+          SYNTAX      PerfIntervalCount
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "Count of all user cells received on this interface
+              during this interval."
+      ::= { askeyAdslAtucIntervalExtEntry 1 }
+
+      aAdslAtucIntervalTransmittedCells  OBJECT-TYPE
+          SYNTAX      PerfIntervalCount
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "Count of all user cells transmitted on this
+              interface during this interval."
+      ::= { askeyAdslAtucIntervalExtEntry 2 }
+
+
+      aAdslAtucIntervalCodeViolation  OBJECT-TYPE
+          SYNTAX      PerfIntervalCount
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "Count of code violations on this
+              interface during this interval."
+      ::= { askeyAdslAtucIntervalExtEntry 3 }
+
+       aAdslAtucIntervalFailInits  OBJECT-TYPE
+          SYNTAX      PerfIntervalCount
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "Count of full initializations on this
+              interface during this interval."
+      ::= { askeyAdslAtucIntervalExtEntry 4 }
+
+
+      askeyAdslAturIntervalExtTable OBJECT-TYPE
+          SYNTAX          SEQUENCE OF AskeyAdslAturIntervalExtEntry
+          MAX-ACCESS      not-accessible
+          STATUS          current
+          DESCRIPTION
+              "This table extends the adslAturIntervalTable to provide
+              more perfomance information."
+      ::= { askeyADSLMibObjects 13}
+
+      askeyAdslAturIntervalExtEntry   OBJECT-TYPE
+          SYNTAX          AskeyAdslAturIntervalExtEntry
+          MAX-ACCESS      not-accessible
+          STATUS          current
+          DESCRIPTION
+              "An entry extends the adslAturIntervalEntry defined in [RFC2662]."
+          AUGMENTS { adslAturIntervalEntry }
+      ::= { askeyAdslAturIntervalExtTable 1 }
+
+
+      AskeyAdslAturIntervalExtEntry ::=
+       SEQUENCE {
+          aAdslAturIntervalCodeViolation            PerfIntervalCount
+      }
+
+      aAdslAturIntervalCodeViolation  OBJECT-TYPE
+          SYNTAX      PerfIntervalCount
+          MAX-ACCESS  read-only
+          STATUS      current
+          DESCRIPTION
+              "Count of code violations on this interface during this interval."
+      ::= { askeyAdslAturIntervalExtEntry 1 }
+
+
+
+-- Begin of port monitor table
+         adslPortMonitorObjects       OBJECT IDENTIFIER ::= { askeyADSLMibObjects 14 }
+
+          adslPortMonitorIfIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              MAX-ACCESS  read-write
+              STATUS      current
+              DESCRIPTION
+                      "The ifIndex of target adsl port to do port monitor."
+              ::= { adslPortMonitorObjects 1 }
+
+         adslPortMonitorAction OBJECT-TYPE
+             SYNTAX INTEGER {
+                 none (0),
+                 start (1),
+                 cancel (2)
+             }
+             MAX-ACCESS  read-write
+             STATUS      current
+             DESCRIPTION
+                 "Set to start to port monitor.
+                  Once loop diagnostic is started, the status will reflect in
+                  adslPortMonitorCurrStatus.
+                  Set to cancel can allow user to cancel an ongoing loop
+                  diagnostics process.
+                  Reading this variable is meaningless, the result will always be 0."
+         ::= { adslPortMonitorObjects 2 }
+
+         adslPortMonitorLastStatus OBJECT-TYPE
+             SYNTAX INTEGER {
+                 noStatus (0), -- no port monitor is triggered yet since system starts up.
+                 onProcess (1), -- port monitor is started and not finished yet.
+                 success(2),  -- port monitor is started and finished successfully.
+                 failed (3)  -- port monitor is started and failed.
+             }
+             MAX-ACCESS  read-only
+             STATUS      current
+             DESCRIPTION
+                 "This variable indicats status of last time port monitor is performed.
+                  If adslPortMonitorIfIndex is changed, this value wil reset to noStatus."
+         ::= { adslPortMonitorObjects 3 }
+
+         adslPortMonitorFailReason OBJECT-TYPE
+             SYNTAX INTEGER
+             MAX-ACCESS  read-only
+             STATUS      current
+             DESCRIPTION
+                 "The fail reason of last time port monitor is failed."
+         ::= { adslPortMonitorObjects 4 }
+
+
+         adslPortMonitorResultDsHlogM   OBJECT-TYPE
+             SYNTAX          OCTET STRING (SIZE (1024))
+             MAX-ACCESS      read-only
+             STATUS          current
+             DESCRIPTION
+                 "This object provides an array of downstream Hlog(f) m.
+                 The m of subcarrier(i) is 256*Octect(2i)+Octect(2i+1), i=0~511.
+                 To get real value of Hlog(f), it is caculated as (6-m(i)/10).
+                 A special value 1023 indicates that no measurement could be done for the
+                 subcarrier because it is out of the passband or that the attenuation is
+                 out of range to be represented."
+         ::= { adslPortMonitorObjects 5 }
+
+         adslPortMonitorResultUsHlogM   OBJECT-TYPE
+             SYNTAX          OCTET STRING (SIZE (128))
+             MAX-ACCESS      read-only
+             STATUS          current
+             DESCRIPTION
+                 "This object provides an array of upstream Hlog(f) m.
+                 The m of subcarrier(i) is 256*Octect(2i)+Octect(2i+1), i=0~63.
+                 To get real value of Hlog(f), it is caculated as (6-m(i)/10).
+                 A special value 1023 indicates that no measurement could be done for the
+                 subcarrier because it is out of the passband or that the attenuation is
+                 out of range to be represented."
+         ::= { adslPortMonitorObjects 6 }
+
+         adslPortMonitorResultDsQuietLinePsdN   OBJECT-TYPE
+             SYNTAX          OCTET STRING (SIZE (512))
+             MAX-ACCESS      read-only
+             STATUS          current
+             DESCRIPTION
+                 "This object provides an array of downstream quiet line noise PSD n.
+                 The n of subcarrier(i) is Octect(i), i=0~511.
+                 To get real value of QLN(f), it is caculated as (-23-n(i)/2).
+                 A special value 255 indicates that no measurement could be done for the
+                 subcarrier because it is out of the passband or that the noise PSD is
+                 out of range to be represented."
+         ::= { adslPortMonitorObjects 7 }
+
+         adslPortMonitorResultUsQuietLinePsdN   OBJECT-TYPE
+             SYNTAX          OCTET STRING (SIZE (64))
+             MAX-ACCESS      read-only
+             STATUS          current
+             DESCRIPTION
+                 "This object provides an array of upstream quiet line noise PSD n.
+                 The n of subcarrier(i) is Octect(i), i=0~63.
+                 To get real value of QLN(f), it is caculated as (-23-n(i)/2).
+                 A special value 255 indicates that no measurement could be done for the
+                 subcarrier because it is out of the passband or that the noise PSD is
+                 out of range to be represented."
+         ::= { adslPortMonitorObjects 8 }
+
+-- End of port monitor table
+
+-- Begin of SELT table
+         adslSingleEndLoopTestObjects       OBJECT IDENTIFIER ::= { askeyADSLMibObjects 15 }
+
+          adslSingleEndLoopTestIfIndex OBJECT-TYPE
+              SYNTAX  INTEGER
+              MAX-ACCESS  read-write
+              STATUS      current
+              DESCRIPTION
+                      "The ifIndex of target adsl port to do SELT."
+              ::= { adslSingleEndLoopTestObjects 1 }
+
+         adslSingleEndLoopTestAction OBJECT-TYPE
+             SYNTAX INTEGER {
+                 none (0),
+                 start (1)
+             }
+             MAX-ACCESS  read-write
+             STATUS      current
+             DESCRIPTION
+                 "Set to start to SELT.
+                  Once loop diagnostic is started, the status will reflect in
+                  adslPortMonitorCurrStatus.
+                  Reading this variable is meaningless, the result will always be 0."
+         ::= { adslSingleEndLoopTestObjects 2 }
+
+         adslSingleEndLoopTestLastStatus OBJECT-TYPE
+             SYNTAX INTEGER {
+                 noStatus (0), -- no port monitor is triggered yet since system starts up.
+                 onProcess (1), -- port monitor is started and not finished yet.
+                 success(2),  -- port monitor is started and finished successfully.
+                 failed (3)  -- port monitor is started and failed.
+             }
+             MAX-ACCESS  read-only
+             STATUS      current
+             DESCRIPTION
+                 "This variable indicats status of last time SELT is performed.
+                  If adslSingleEndLoopTestIfIndex is changed, this value wil reset to noStatus."
+         ::= { adslSingleEndLoopTestObjects 3 }
+
+         adslSingleEndLoopTestFailReason OBJECT-TYPE
+             SYNTAX INTEGER
+             MAX-ACCESS  read-only
+             STATUS      current
+             DESCRIPTION
+                 "Fail reason if single end loop test is failed.
+                 no fail reason is reported                        (0)
+                 IfIndex is not invalid                            (1)
+                 line card does not exist                          (3)
+                 HWAPI return error                                (4)
+                 timeout, result is not available                  (9)
+                 port monitoring is performing, loop diag can not perform at the same time (10)
+                 "
+         ::= { adslSingleEndLoopTestObjects 4 }
+
+
+         adslSingleEndLoopTestResultCableType   OBJECT-TYPE
+             SYNTAX          INTEGER {
+                                unknown(0),
+                                cab24Awg(1),
+                                cab26Awg(2)}
+             MAX-ACCESS      read-only
+             STATUS          current
+             DESCRIPTION
+                 "This object provides an the line type."
+         ::= { adslSingleEndLoopTestObjects 5 }
+
+         adslSingleEndLoopTestResultLoopLength   OBJECT-TYPE
+             SYNTAX          INTEGER
+             UNITS           "ft."
+             MAX-ACCESS      read-only
+             STATUS          current
+             DESCRIPTION
+                 "This object provides line length."
+         ::= { adslSingleEndLoopTestObjects 6 }
+
+
+-- End of SELT table
+
+
+--
+--askeyADSLLineStatusExtTable
+--
+askeyADSLLineStatusExtTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AskeyADSLLineStatusExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "This table is a adslLineTable extended table for line status."
+    ::= { askeyADSLMibObjects 16 }
+
+askeyADSLLineStatusExtEntry OBJECT-TYPE
+    SYNTAX  AskeyADSLLineStatusExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "The entry into extended ADSL line status table."
+    INDEX { ifIndex }
+    ::= { askeyADSLLineStatusExtTable 1 }
+
+AskeyADSLLineStatusExtEntry ::= SEQUENCE {
+    askeyADSLLineStandard               INTEGER,
+    askeyADSLLinePwrMgtMode             INTEGER,
+    askeyADSLLinePwrMgtState            INTEGER,
+    askeyADSLLinePwrMgtTransManual      INTEGER,
+    askeyADSLLineAtucCurrINP            INTEGER,
+    askeyADSLLineAturCurrINP            INTEGER
+}
+
+askeyADSLLineStandard OBJECT-TYPE
+    SYNTAX  INTEGER {
+                g9912-annex-A(0),
+                g9912-annex-B(1),
+                vdsl-committee-t1-mcm(2),
+                vdsl-etsi-mcm(3),
+                g9921-annex-A(4),
+                g9921-annex-B(5),
+                g9921-annex-C(6),
+                g9921-annex-H(7),
+                g9921-annex-I(8),
+                g9922-annex-A(9),
+                g9922-annex-C(10),
+                g9923-annex-A(11),
+                g9923-annex-B(12),
+                g9923-annex-I(13),
+                g9923-annex-J(14),
+                g9923-annex-L-readsl(15),
+                g9924-annex-A(16),
+                g9924-annex-I(17),
+                g9925-annex-A(18),
+                g9925-annex-B(19),
+                g9925-annex-I(20),
+                sadsl(21),
+                ansi-t1-413(22),
+                etsi-ts-101-388(23),
+                reserved(24)
+            }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Current ADSL line standard."
+    ::= { askeyADSLLineStatusExtEntry 1 }
+
+askeyADSLLinePwrMgtMode OBJECT-TYPE
+    SYNTAX  INTEGER {
+                manual(0),
+                automatic(1)
+            }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Current power management mode."
+    ::= { askeyADSLLineStatusExtEntry 2 }
+
+askeyADSLLinePwrMgtState OBJECT-TYPE
+    SYNTAX  INTEGER {
+                pwrMgtStateL0(0),
+                pwrMgtStateL2(1),
+                pwrMgtStateL3ByCO(2),
+                pwrMgtStateL3ByCPE(3)
+            }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Current power management state."
+    ::= { askeyADSLLineStatusExtEntry 3 }
+
+askeyADSLLinePwrMgtTransManual OBJECT-TYPE
+    SYNTAX  INTEGER {
+                transToL0(0),
+                transToL2(1),
+                transToL3(2)
+            }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "Try to transit immediately into power management
+            L0, L2, or L3 by manual."
+    ::= { askeyADSLLineStatusExtEntry 4 }
+
+askeyADSLLineAtucCurrINP OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "This line ATU-C(down stream) current INP(Impulse Noise Protected)
+            value.  This value is 0.01 symbol times."
+    ::= { askeyADSLLineStatusExtEntry 5 }
+
+askeyADSLLineAturCurrINP OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "This line ATU-R(up stream) current INP(Impulse Noise Protected)
+            value.  This value is 0.01 symbol times."
+    ::= { askeyADSLLineStatusExtEntry 6 }
+
+
+--
+-- remoteAskeyCPE
+--
+remoteAskeyCPE OBJECT IDENTIFIER ::= { askeyADSLMibObjects 17 }
+
+-- <comment ref="temporarily_disable_CPE_wireless"/>
+--askeyCPEWirelessControl OBJECT-TYPE
+--    SYNTAX  INTEGER {
+--                enabled(1),
+--                disabled(2)
+--            }
+--    MAX-ACCESS  read-write
+--    STATUS  current
+--    DESCRIPTION
+--            "Enable or disable wireless control."
+--    ::= { remoteAskeyCPE 1 }
+
+askeyCPEWirelessTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AskeyCPEWirelessEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "A table indicates remote CPE wireless objects for each line."
+    ::= { remoteAskeyCPE 2 }
+
+askeyCPEWirelessEntry OBJECT-TYPE
+    SYNTAX  AskeyCPEWirelessEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "Remote CPE wireless objects."
+    INDEX { ifIndex }
+    ::= { askeyCPEWirelessTable 1 }
+
+AskeyCPEWirelessEntry ::= SEQUENCE {
+    askeyCPEWirelessAdminState      INTEGER,
+    askeyCPEWirelessOperState       INTEGER
+}
+
+askeyCPEWirelessAdminState OBJECT-TYPE
+    SYNTAX  INTEGER{
+                enabled(1),
+                disabled(2)
+            }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+            "Remote CPE wireless administrative state."
+    ::= { askeyCPEWirelessEntry 1 }
+
+askeyCPEWirelessOperState OBJECT-TYPE
+    SYNTAX  INTEGER{
+                enabled(1),
+                disabled(2)
+            }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Remote CPE wireless operational state."
+    ::= { askeyCPEWirelessEntry 2 }
+
+
+--
+-- askeyADSLCardFilterTable
+--
+askeyADSLCardFilterTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF AskeyADSLCardFilterEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "This table is a ADSL card(slot) filter status."
+    ::= { askeyADSLMibObjects 18 }
+
+askeyADSLCardFilterEntry OBJECT-TYPE
+    SYNTAX  AskeyADSLCardFilterEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "The entry indicates ADSL card filter status table."
+    INDEX { aeAlarmPhysicalIndex }
+    ::= { askeyADSLCardFilterTable 1 }
+
+AskeyADSLCardFilterEntry ::= SEQUENCE {
+    dsBroadcastFilterVLANID     PortList
+}
+
+dsBroadcastFilterVLANID OBJECT-TYPE
+    SYNTAX  PortList
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The object indicates the VLAN ID configuration for down stream
+            broadcast filters on the specifed ADSL card."
+    ::= { askeyADSLCardFilterEntry 1 }
+
+
+END

@@ -1,0 +1,1033 @@
+--MibName=wsaObjects
+-- #ident "@(#)$Header: wsatrap.mib,v 12.29 2005/11/02 $ SNI" 
+WSA-TRAP-MIB DEFINITIONS ::= BEGIN
+
+-- This MIB summarizes all traps used by PRIMEPOWER HW Monitoring
+-- This is a conversion of most PRIMEPOWER ServerView Suite events to SNMP-Traps
+-- Copyright (C) 2000-2005 by Fujitsu Siemens Computers GmbH
+--
+-- Author: Reinhard Kockmann / Dr. Ruediger Schuster / Peter Kalthoff
+-- Date of Changes:  2005-10-27
+-- Changes: New attributes for PRIMEPOWER ServerView Suite 2.2B10 included
+-- ******************************************************************* 
+ 
+IMPORTS
+	OBJECT-TYPE		FROM RFC-1212
+	DisplayString		FROM RFC1213-MIB
+	enterprises		FROM RFC1155-SMI;
+        -- OID: 1.3.6.1.4.1.
+
+-- SNI Server Management MIB nodes
+	sni		OBJECT IDENTIFIER ::= { enterprises    231 }
+	sniProductMibs	OBJECT IDENTIFIER ::= { sni              2 }
+	wsaObjects      OBJECT IDENTIFIER ::= { sniProductMibs  41 }
+	wsaInfo		OBJECT IDENTIFIER ::= { wsaObjects 1 }
+	-- OID: 1.3.6.1.4.1.231.2.41.1
+
+	wsaState	OBJECT IDENTIFIER ::= { wsaObjects 2 }
+	-- OID: 1.3.6.1.4.1.231.2.41.2
+
+	wsaTrapParams	OBJECT IDENTIFIER ::= { wsaObjects 3 }
+	-- OID: 1.3.6.1.4.1.231.2.41.3
+
+	-- in order to support testTrap
+	sniExtensions	OBJECT IDENTIFIER ::= { sniProductMibs  10 }
+	sniServerMgmt	OBJECT IDENTIFIER ::= { sniExtensions    2 }
+	sniCommon	OBJECT IDENTIFIER ::= { sniServerMgmt    2 }
+	sniServerControl OBJECT IDENTIFIER ::= { sniCommon       5 }
+	diagnostics	OBJECT IDENTIFIER ::= { sniServerControl 13 }
+	trapInfo	OBJECT IDENTIFIER ::= { sniServerControl 20 }
+
+-- textual conventions
+
+   -- a truth value
+   Boolean ::=   INTEGER { true(1), false(2) }
+   -- readable Server Type
+   ServerType ::=   INTEGER { partition(1), console(2), standalone(3) }
+   StateType ::=   INTEGER { ok(1), error(2), defect(3), unknown(99) }
+   ModeType ::=  INTEGER { oldmode(1), newmode(2) }
+   
+   
+-- The MIB objects
+
+--
+-- System information (WSA specific)							
+--
+ 
+wsaMachineType   OBJECT-TYPE
+     SYNTAX             DisplayString
+     ACCESS             read-only
+     STATUS             mandatory
+     DESCRIPTION        "Model Name"
+     ::= { wsaInfo 1 }
+	-- OID: 1.3.6.1.4.1.231.2.41.1.1
+
+wsaNumberOfCpu   OBJECT-TYPE
+     SYNTAX             INTEGER
+     ACCESS             read-only
+     STATUS             mandatory
+     DESCRIPTION        "Number of CPUs"
+     ::= { wsaInfo 2 }
+	-- OID: 1.3.6.1.4.1.231.2.41.1.2
+
+wsaMemory   OBJECT-TYPE
+     SYNTAX             INTEGER
+     ACCESS             read-only
+     STATUS             mandatory
+     DESCRIPTION        "Size of Memory in Megabyte"
+     ::= { wsaInfo 3 }
+	-- OID: 1.3.6.1.4.1.231.2.41.1.3
+
+wsaCpuType   OBJECT-TYPE
+     SYNTAX             DisplayString
+     ACCESS             read-only
+     STATUS             mandatory
+     DESCRIPTION        "Architecture of CPU"
+     ::= { wsaInfo 4 }
+	-- OID: 1.3.6.1.4.1.231.2.41.1.4
+
+wsaCpuFrequency   OBJECT-TYPE
+     SYNTAX             INTEGER
+     ACCESS             read-only
+     STATUS             mandatory
+     DESCRIPTION        "Frequency of CPU"
+     ::= { wsaInfo 5 }
+	-- OID: 1.3.6.1.4.1.231.2.41.1.5
+
+wsaServerUptime   OBJECT-TYPE
+     SYNTAX             DisplayString
+     ACCESS             read-only
+     STATUS             mandatory
+     DESCRIPTION        "Uptime of Server System"
+     ::= { wsaInfo 6 }
+	-- OID: 1.3.6.1.4.1.231.2.41.1.6
+
+wsaServerType    OBJECT-TYPE
+     SYNTAX		ServerType
+     ACCESS		read-only
+     STATUS		mandatory
+     DESCRIPTION	"Returns Type of Server: Console, partition, standalone"
+     ::= { wsaInfo 7 }
+	-- OID 1.3.6.1.4.1.231.2.41.1.7
+
+wsaSMCName        OBJECT-TYPE
+     SYNTAX		DisplayString
+     ACCESS		read-only
+     STATUS	        mandatory
+     DESCRIPTION	"If this node is a Partition, then SMC name, empty String else"
+     ::= {wsaInfo 8 }
+	-- OID 1.3.6.1.4.1.231.2.41.1.8
+
+wsaMachineName    OBJECT-TYPE
+     SYNTAX             DisplayString
+     ACCESS             read-only
+     STATUS             mandatory
+     DESCRIPTION        "If this node is a Partition, then Machine name, empty String else"
+     ::= {wsaInfo 9 }
+        -- OID 1.3.6.1.4.1.231.2.41.1.9
+
+wsaIsManagementServer OBJECT-TYPE
+     SYNTAX             Boolean
+     ACCESS             read-only
+     STATUS             mandatory
+     DESCRIPTION        "If this node is used by WSA as a Management Server: true, else false"
+     ::= {wsaInfo 10 }
+        -- OID 1.3.6.1.4.1.231.2.41.1.10
+
+wsaAgentVersion   OBJECT-TYPE
+     SYNTAX             DisplayString
+     ACCESS             read-only
+     STATUS             mandatory
+     DESCRIPTION        "Version string of the wsaagt: n.nAnn nn"
+     ::= {wsaInfo 11 }
+        -- OID 1.3.6.1.4.1.231.2.41.1.11
+
+wsaAgentMode   OBJECT-TYPE
+     SYNTAX             ModeType
+     ACCESS             read-only
+     STATUS             mandatory
+     DESCRIPTION        "Mode of Agent: 1: oldmode, 2: newmode"
+     ::= { wsaInfo 12 }
+	-- OID: 1.3.6.1.4.1.231.2.41.1.12
+
+wsaHostId   OBJECT-TYPE
+     SYNTAX             DisplayString
+     ACCESS             read-only
+     STATUS             mandatory
+     DESCRIPTION        "Hostid of node"
+     ::= { wsaInfo 13 }
+        -- OID: 1.3.6.1.4.1.231.2.41.1.13
+
+wsaProductName   OBJECT-TYPE
+     SYNTAX             DisplayString
+     ACCESS             read-only
+     STATUS             mandatory
+     DESCRIPTION        "Product name of this node (e.g. PRIMEPOWER PW450)"
+     ::= { wsaInfo 14 }
+        -- OID: 1.3.6.1.4.1.231.2.41.1.14
+
+wsaOSDetails   OBJECT-TYPE
+     SYNTAX             DisplayString
+     ACCESS             read-only
+     STATUS             mandatory
+     DESCRIPTION        "Details about the operating system"
+     ::= { wsaInfo 15 }
+        -- OID: 1.3.6.1.4.1.231.2.41.1.15
+
+wsaManagementServer   OBJECT-TYPE
+     SYNTAX             DisplayString
+     ACCESS             read-only
+     STATUS             mandatory
+     DESCRIPTION        "Contains the name of the management server for this node"
+     ::= { wsaInfo 16 }
+        -- OID: 1.3.6.1.4.1.231.2.41.1.16
+
+
+--
+-- Status information							
+--
+
+
+wsaLarStatus   OBJECT-TYPE
+        SYNTAX          DisplayString
+        ACCESS          read-only
+        STATUS          mandatory
+		DESCRIPTION		"Status of LAR events:
+					NoFlagSet : all components working properly, no failure
+					ErrorSet  : at least one component has a problem, but it can still work
+					DefectSet : at least one component is defect - it can't work any more
+"
+        ::= { wsaState 1 }
+        -- OID: 1.3.6.1.4.1.231.2.41.2.1
+
+-- wsaNodeStatus is legacy
+
+wsaNodeStatus   OBJECT-TYPE
+        SYNTAX          DisplayString
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION     "Node is in the cluster or not"
+        ::= { wsaState 2 }
+        -- OID: 1.3.6.1.4.1.231.2.41.2.2
+
+wsaRunning   OBJECT-TYPE
+        SYNTAX          DisplayString
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION     "WSA is running/not running"
+        ::= { wsaState 3 }
+        -- OID: 1.3.6.1.4.1.231.2.41.2.3
+
+-- New state variables start here
+
+wsaHwStateEnvironment   OBJECT-TYPE
+        SYNTAX          StateType
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION     "Indicates if Defect, Error or OK for power supplies and FANs"
+        ::= { wsaState 4 }
+        -- OID: 1.3.6.1.4.1.231.2.41.2.4
+
+wsaHwStateController   OBJECT-TYPE
+        SYNTAX          StateType
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION     "Indicates if Defect, Error or OK for controllers, cpu and memory dimms"
+        ::= { wsaState 5 }
+        -- OID: 1.3.6.1.4.1.231.2.41.2.5
+
+wsaHwStateStorage   OBJECT-TYPE
+        SYNTAX          StateType
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION     "Indicates if a disk or tape device is defect"
+        ::= { wsaState 6 }
+        -- OID: 1.3.6.1.4.1.231.2.41.2.6
+
+wsaHwStateGlobal   OBJECT-TYPE
+        SYNTAX          StateType
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION     "Indicates if a hardware component is defect"
+        ::= { wsaState 7 }
+        -- OID: 1.3.6.1.4.1.231.2.41.2.7
+
+--
+-- Trap parameters							
+--
+
+wsaServerName   OBJECT-TYPE
+     SYNTAX          	DisplayString
+     ACCESS          	read-only
+     STATUS          	mandatory
+     DESCRIPTION	""
+     ::= { wsaTrapParams 1 }
+	-- OID: 1.3.6.1.4.1.231.2.41.3.1
+ 
+wsaTrapTime   OBJECT-TYPE
+     SYNTAX          	DisplayString	
+     ACCESS          	read-only
+     STATUS          	mandatory
+     DESCRIPTION	""
+     ::= { wsaTrapParams 2 }
+	-- OID: 1.3.6.1.4.1.231.2.41.3.2
+
+wsaLarComment	OBJECT-TYPE
+	SYNTAX		DisplayString 
+	ACCESS		read-only
+	STATUS		mandatory 
+	DESCRIPTION	"Comment item provided by internal HW monitoring (LAR)" 
+	::= { wsaTrapParams 3 } 
+	-- OID: 1.3.6.1.4.1.231.2.41.3.3 
+
+
+wsaHWConfAddr OBJECT-TYPE
+        SYNTAX          DisplayString
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION     "Internal unique HW address of the component"
+        ::= { wsaTrapParams 4 }
+        -- OID: 1.3.6.1.4.1.231.2.41.3.4
+
+wsaModule   OBJECT-TYPE
+     SYNTAX          	DisplayString
+     ACCESS          	not-accessible
+     STATUS          	mandatory
+     DESCRIPTION	""
+     ::= { wsaTrapParams 5 }
+	-- OID: 1.3.6.1.4.1.231.2.41.3.5
+
+wsaSeverity   OBJECT-TYPE
+     SYNTAX          	DisplayString
+     ACCESS          	not-accessible
+     STATUS          	mandatory
+     DESCRIPTION	"Contains the severity of the related log messages (INFO, NOTICE, ...)"
+     ::= { wsaTrapParams 6 }
+	-- OID: 1.3.6.1.4.1.231.2.41.3.6
+
+wsaHwMessage   OBJECT-TYPE
+     SYNTAX          	DisplayString
+     ACCESS          	not-accessible
+     STATUS          	mandatory
+     DESCRIPTION	"Contains the driver message for HW events"
+     ::= { wsaTrapParams 7 }
+	-- OID: 1.3.6.1.4.1.231.2.41.3.7
+
+wsaEventType   OBJECT-TYPE
+     SYNTAX          	DisplayString
+     ACCESS          	not-accessible
+     STATUS          	mandatory
+     DESCRIPTION	""
+     ::= { wsaTrapParams 8 }
+	-- OID: 1.3.6.1.4.1.231.2.41.3.8
+
+wsaHw   OBJECT-TYPE
+     SYNTAX          	DisplayString
+     ACCESS          	not-accessible
+     STATUS          	mandatory
+     DESCRIPTION	""
+     ::= { wsaTrapParams 9 }
+	-- OID: 1.3.6.1.4.1.231.2.41.3.9
+
+wsaHwState   OBJECT-TYPE
+     SYNTAX          	DisplayString
+     ACCESS          	not-accessible
+     STATUS          	mandatory
+     DESCRIPTION	""
+     ::= { wsaTrapParams 10 }
+	-- OID: 1.3.6.1.4.1.231.2.41.3.10
+
+wsaRaidDriver   OBJECT-TYPE
+     SYNTAX          	DisplayString
+     ACCESS          	not-accessible
+     STATUS          	mandatory
+     DESCRIPTION	""
+     ::= { wsaTrapParams 11 }
+	-- OID: 1.3.6.1.4.1.231.2.41.3.11
+
+wsaFileMonComment   OBJECT-TYPE
+     SYNTAX          	DisplayString
+     ACCESS          	not-accessible
+     STATUS          	mandatory
+     DESCRIPTION	""
+     ::= { wsaTrapParams 12 }
+	-- OID: 1.3.6.1.4.1.231.2.41.3.12
+
+wsaFileMonValue   OBJECT-TYPE
+     SYNTAX          	DisplayString
+     ACCESS          	not-accessible
+     STATUS          	mandatory
+     DESCRIPTION	""
+     ::= { wsaTrapParams 13 }
+	-- OID: 1.3.6.1.4.1.231.2.41.3.13
+
+wsaRuleName   OBJECT-TYPE
+     SYNTAX          	DisplayString
+     ACCESS          	not-accessible
+     STATUS          	mandatory
+     DESCRIPTION	""
+     ::= { wsaTrapParams 14 }
+	-- OID: 1.3.6.1.4.1.231.2.41.3.14
+
+wsaResourceName   OBJECT-TYPE
+     SYNTAX          	DisplayString
+     ACCESS          	not-accessible
+     STATUS          	mandatory
+     DESCRIPTION	""
+     ::= { wsaTrapParams 15 }
+	-- OID: 1.3.6.1.4.1.231.2.41.3.15
+	
+wsaPerfValue   OBJECT-TYPE
+     SYNTAX          	DisplayString
+     ACCESS          	not-accessible
+     STATUS          	mandatory
+     DESCRIPTION	""
+     ::= { wsaTrapParams 16 }
+	-- OID: 1.3.6.1.4.1.231.2.41.3.16
+
+wsaRuleSetName   OBJECT-TYPE
+     SYNTAX             DisplayString
+     ACCESS             not-accessible
+     STATUS             mandatory
+     DESCRIPTION        ""
+     ::= { wsaTrapParams 17 }
+        -- OID: 1.3.6.1.4.1.231.2.41.3.17
+
+
+-- LAR-Format in file hwerrors
+-- TheLAR-Format describes the error, defect, activation or deactivation of
+-- HW components.
+-- <node>:<action>:<addr.type>:<address>:<flag>:<value>:<id>:<time>:<comment> 
+-- action := +1 = Defect-Flag wurde gesetzt 
+-- 		 +1 = Defect flag set
+-- 		 -1 = Defect flag deleted
+-- 		 +2 = Error flag set
+-- 		 -2 = Error flag deleted
+
+
+-- These are old Trap Types only included here for compatibility reasons.
+-- The agent sends these, if run in compatibility mode
+-- This is true for trap numer 1 - 26
+
+wsaLarHardwareDefectSet 	TRAP-TYPE
+     ENTERPRISE      	wsaObjects
+     VARIABLES       	{ wsaServerName, wsaLarComment, wsaTrapTime, wsaHWConfAddr }
+     DESCRIPTION	"Is sent if Hardware Defect Flag is set"
+     --#TYPE		"Hardware Defect Flag"
+     --#SUMMARY		"%s: Hardware Defect on %s: %s"
+     --#ARGUMENTS	{2, 0, 1}
+     --#SEVERITY	CRITICAL
+     --#TIMEINDEX	1
+     --#STATE		NONOPERATIONAL
+     ::= 1
+
+wsaLarHardwareDefectUnset 	TRAP-TYPE
+     ENTERPRISE      	wsaObjects 
+     VARIABLES       	{ wsaServerName, wsaLarComment, wsaTrapTime, wsaHWConfAddr }
+     DESCRIPTION	"Is sent if Hardware Defect Flag is deleted"
+     --#TYPE		"Hardware Defect Flag Deleted"
+     --#SUMMARY		"%s: Hardware Defect deleted on %s: %s"
+     --#ARGUMENTS	{2, 0, 1}
+     --#SEVERITY	INFORMATIONAL
+     --#TIMEINDEX	1
+     --#STATE		NONOPERATIONAL
+     ::= 2
+
+wsaLarHardwareErrorSet 	TRAP-TYPE
+     ENTERPRISE      	wsaObjects 
+     VARIABLES       	{ wsaServerName, wsaLarComment, wsaTrapTime, wsaHWConfAddr }
+     DESCRIPTION	"Is sent if Hardware Error Flag is set"
+     --#TYPE		"Hardware Error Flag Set"
+     --#SUMMARY		"%s: Hardware Error on %s: %s"
+     --#ARGUMENTS	{2, 0, 1}
+     --#SEVERITY	CRITICAL
+     --#TIMEINDEX	1
+     --#STATE		NONOPERATIONAL
+     ::= 3
+
+wsaLarHardwareErrorUnset 	TRAP-TYPE
+     ENTERPRISE      	wsaObjects 
+     VARIABLES       	{ wsaServerName, wsaLarComment, wsaTrapTime, wsaHWConfAddr }
+     DESCRIPTION	"Is sent if Hardware Error Flag is deleted"
+     --#TYPE		"Hardware Error Flag Deleted"
+     --#SUMMARY		"%s: Hardware Error deleted on %s: %s"
+     --#ARGUMENTS	{2, 0, 1}
+     --#SEVERITY	INFORMATIONAL
+     --#TIMEINDEX	1
+     --#STATE		NONOPERATIONAL
+     ::= 4
+
+wsaAgentStart		TRAP-TYPE
+     ENTERPRISE		wsaObjects
+     VARIABLES		{ wsaServerName }
+     DESCRIPTION	"Is sent when PRIMEPOWER ServerView suite agent starts"
+     --#TYPE		"HW Diagnosis Agent started"
+     --#SUMMARY		"WsaAgent started on %s"
+     --#ARGUMENTS	{0}
+     --#SEVERITY	INFORMATIONAL
+     --#TIMEINDEX	1
+     --#STATE		NONOPERATIONAL
+     ::= 5
+
+wsaErrorRepair          TRAP-TYPE
+     ENTERPRISE         wsaObjects
+     VARIABLES          { wsaServerName, wsaLarComment, wsaTrapTime, wsaHWConfAddr }
+     DESCRIPTION        "Is sent when some error condition is repaired"
+     --#TYPE		"Error Condition Repaired"
+     --#SUMMARY		"%s: Error repaired on %s: %s"
+     --#ARGUMENTS	{2, 0, 1}
+     --#SEVERITY	MINOR
+     --#TIMEINDEX	1
+     --#STATE		NONOPERATIONAL
+     ::= 6
+
+wsaDefectRepair         TRAP-TYPE
+     ENTERPRISE         wsaObjects
+     VARIABLES          { wsaServerName, wsaLarComment, wsaTrapTime, wsaHWConfAddr }
+     DESCRIPTION        "Is sent when some defect condition is repaired"
+     --#TYPE		"Defect Condition Repaired"
+     --#SUMMARY		"%s: Defect repaired on %s: %s"
+     --#ARGUMENTS	{2, 0, 1}
+     --#SEVERITY	MINOR
+     --#TIMEINDEX	1
+     --#STATE		NONOPERATIONAL
+     ::= 7
+
+wsaNodeStatusIntegrated		TRAP-TYPE
+     ENTERPRISE      	wsaObjects 
+     VARIABLES       	{ wsaServerName, wsaTrapTime, wsaNodeStatus }
+     DESCRIPTION	"Node is present or not"
+     --#TYPE		"Node Present"
+     --#SUMMARY		"%s: Node state on %s: %s"
+     --#ARGUMENTS	{1, 0, 2}
+     --#SEVERITY	INFORMATIONAL
+     --#TIMEINDEX	1
+     --#STATE		NONOPERATIONAL
+     ::= 24
+
+wsaNodeStatusNotavail		TRAP-TYPE
+     ENTERPRISE		wsaObjects
+     VARIABLES		{ wsaServerName, wsaTrapTime, wsaNodeStatus }
+     DESCRIPTION	"Node is not available"
+     --#TYPE		"Node Not Available"
+     --#SUMMARY		"%s: Node state on %s: %s"
+     --#ARGUMENTS	{1, 0, 2}
+     --#SEVERITY	CRITICAL
+     --#TIMEINDEX	1
+     --#STATE		NONOPERATIONAL
+     ::= 25
+
+wsaNodeStatusNotrunning		TRAP-TYPE
+     ENTERPRISE		wsaObjects
+     VARIABLES		{ wsaServerName, wsaTrapTime, wsaNodeStatus }
+     DESCRIPTION	"Node is not running"
+     --#TYPE		"Node Not Running"
+     --#SUMMARY		"%s: Node state on %s: %s"
+     --#ARGUMENTS	{1, 0, 2}
+     --#SEVERITY	CRITICAL
+     --#TIMEINDEX	1
+     --#STATE		NONOPERATIONAL
+     ::= 26
+
+wsaGenLogMessage         TRAP-TYPE
+     ENTERPRISE          wsaObjects
+     VARIABLES           { wsaServerName, wsaModule, wsaSeverity,  wsaHwMessage, wsaEventType, wsaTrapTime}
+     DESCRIPTION        "Is sent to display a log message"
+     --#TYPE            "Informational Log Message (old mode)"
+     --#SUMMARY         "%s: On server %s, Module %s, Severity %s: %s\n%s"
+     --#ARGUMENTS       {5, 0, 1, 2, 4, 3}
+     --#SEVERITY        INFORMATIONAL
+     --#TIMEINDEX       1
+     --#STATE           NONOPERATIONAL
+     ::= 900
+
+--
+-- traps used in "Newmode"
+--
+
+
+wsaGenLogMessageInfo     TRAP-TYPE
+     ENTERPRISE          wsaObjects
+     VARIABLES           { wsaServerName, wsaModule, wsaSeverity,  wsaHwMessage, wsaEventType, wsaTrapTime}
+     DESCRIPTION        "Is sent to display an informational log message"
+     --#TYPE            "Informational Log Message"
+     --#SUMMARY         "%s: On server %s, Module %s, Severity %s: %s\n%s"
+     --#ARGUMENTS       {5, 0, 1, 2, 4, 3}
+     --#SEVERITY        INFORMATIONAL
+     --#TIMEINDEX       1
+     --#STATE           NONOPERATIONAL
+     ::= 910
+
+wsaGenLogMessageMinor    TRAP-TYPE
+     ENTERPRISE          wsaObjects
+     VARIABLES           { wsaServerName, wsaModule, wsaSeverity,  wsaHwMessage, wsaEventType, wsaTrapTime}
+     DESCRIPTION        "Is sent to display a log message with severity NOTICE"
+     --#TYPE            "Notice Log Message"
+     --#SUMMARY         "%s: On server %s, Module %s, Severity %s: %s\n%s"
+     --#ARGUMENTS       {5, 0, 1, 2, 4, 3}
+     --#SEVERITY        MINOR
+     --#TIMEINDEX       1
+     --#STATE           NONOPERATIONAL
+     ::= 911
+
+wsaGenLogMessageMajor   TRAP-TYPE
+     ENTERPRISE          wsaObjects
+     VARIABLES           { wsaServerName, wsaModule, wsaSeverity,  wsaHwMessage, wsaEventType, wsaTrapTime}
+     DESCRIPTION        "Is sent to display a log message with severity WARNING or ERR"
+     --#TYPE            "Warning Log Message"
+     --#SUMMARY         "%s: On server %s, Module %s, Severity %s: %s\n%s"
+     --#ARGUMENTS       {5, 0, 1, 2, 4, 3}
+     --#SEVERITY        MAJOR
+     --#TIMEINDEX       1
+     --#STATE           NONOPERATIONAL
+     ::= 912
+
+wsaGenLogMessageCritical TRAP-TYPE
+     ENTERPRISE          wsaObjects
+     VARIABLES           { wsaServerName, wsaModule, wsaSeverity,  wsaHwMessage, wsaEventType, wsaTrapTime}
+     DESCRIPTION        "Is sent to display a log message with severity CRITICAL, ALERT or EMERG"
+     --#TYPE            "Critical Log Message"
+     --#SUMMARY         "%s: On server %s, Module %s, Severity %s: %s\n%s"
+     --#ARGUMENTS       {5, 0, 1, 2, 4, 3}
+     --#SEVERITY        CRITICAL
+     --#TIMEINDEX       1
+     --#STATE           NONOPERATIONAL
+     ::= 913
+
+wsaLUNStateChanged         TRAP-TYPE
+     ENTERPRISE         wsaObjects
+     VARIABLES          { wsaServerName, wsaHw, wsaHwState,  wsaHwMessage, wsaTrapTime}
+     DESCRIPTION        "Is sent if state of a LUN changed"
+     --#TYPE            "LUN State Changed"
+     --#SUMMARY         "%s: State changed on %s for LUN %s: %s\n%s"
+     --#ARGUMENTS       {4, 0, 1, 2, 3}
+     --#SEVERITY        CRITICAL
+     --#TIMEINDEX       1
+     --#STATE           NONOPERATIONAL
+     ::= 101
+
+wsaRAIDControllerDefect    TRAP-TYPE
+     ENTERPRISE         wsaObjects
+     VARIABLES          { wsaServerName, wsaHw, wsaRaidDriver,  wsaHwMessage, wsaTrapTime}
+     DESCRIPTION        "Is sent if RAID controller defect"
+     --#TYPE            "RAID Controller Defect"
+     --#SUMMARY         "%s: RAID Controller %s defect on %s: %s\n%s"
+     --#ARGUMENTS       {4, 1, 0, 2, 3}
+     --#SEVERITY        CRITICAL
+     --#TIMEINDEX       1
+     --#STATE           NONOPERATIONAL
+     ::= 102
+
+wsaRAIDDiskDefect    TRAP-TYPE
+     ENTERPRISE         wsaObjects
+     VARIABLES          { wsaServerName, wsaHw, wsaRaidDriver,  wsaHwMessage, wsaTrapTime}
+     DESCRIPTION        "Is sent if RAID disk defect"
+     --#TYPE            "RAID Disk Defect"
+     --#SUMMARY         "%s: RAID Disk %s defect on server %s: %s\n%s"
+     --#ARGUMENTS       {4, 1, 0, 2, 3}
+     --#SEVERITY        CRITICAL
+     --#TIMEINDEX       1
+     --#STATE           NONOPERATIONAL
+     ::= 103
+
+-- *****************************************************************
+-- New Traps send by new wsa agent
+-- *****************************************************************
+
+wsaEnvironmentHardwareDefectSet         TRAP-TYPE
+     ENTERPRISE         wsaObjects
+     VARIABLES          { wsaServerName, wsaLarComment, wsaTrapTime, wsaHWConfAddr }
+     DESCRIPTION        "Is sent if Hardware Defect Flag is set for FANs or power supplies"
+     --#TYPE            "Hardware Defect Flag"
+     --#SUMMARY         "%s: Environment Hardware Defect on %s: %s"
+     --#ARGUMENTS       {2, 0, 1}
+     --#SEVERITY        CRITICAL
+     --#TIMEINDEX       1
+     --#STATE           NONOPERATIONAL
+     ::= 301
+
+wsaEnvironmentHardwareErrorSet  TRAP-TYPE
+     ENTERPRISE         wsaObjects
+     VARIABLES          { wsaServerName, wsaLarComment, wsaTrapTime, wsaHWConfAddr }
+     DESCRIPTION        "Is sent if Hardware Error Flag is set for FANs or power supplies"
+     --#TYPE            "Hardware Error Flag Set"
+     --#SUMMARY         "%s: Environment Hardware Error on %s: %s"
+     --#ARGUMENTS       {2, 0, 1}
+     --#SEVERITY        CRITICAL
+     --#TIMEINDEX       1
+     --#STATE           NONOPERATIONAL
+     ::= 302
+
+wsaEnvironmentRepair          TRAP-TYPE
+     ENTERPRISE         wsaObjects
+     VARIABLES          { wsaServerName, wsaLarComment, wsaTrapTime, wsaHWConfAddr }
+     DESCRIPTION        "Is sent when some environment defect / error condition is repaired"
+     --#TYPE            "Environment Failure Condition Repaired"
+     --#SUMMARY         "%s: Environmental Component was repaired on %s: %s"
+     --#ARGUMENTS       {2, 0, 1}
+     --#SEVERITY        MINOR
+     --#TIMEINDEX       1
+     --#STATE           NONOPERATIONAL
+     ::= 303
+
+wsaStorageHardwareDefectSet         TRAP-TYPE
+     ENTERPRISE         wsaObjects
+     VARIABLES          { wsaServerName, wsaLarComment, wsaTrapTime, wsaHWConfAddr }
+     DESCRIPTION        "Is sent if Hardware Defect Flag is set for Storage Devices"
+     --#TYPE            "Storage Hardware Defect Flag"
+     --#SUMMARY         "%s: Hardware Defect on %s: %s"
+     --#ARGUMENTS       {2, 0, 1}
+     --#SEVERITY        CRITICAL
+     --#TIMEINDEX       1
+     --#STATE           NONOPERATIONAL
+     ::= 304
+
+wsaStorageHardwareErrorSet  TRAP-TYPE
+     ENTERPRISE         wsaObjects
+     VARIABLES          { wsaServerName, wsaLarComment, wsaTrapTime, wsaHWConfAddr }
+     DESCRIPTION        "Is sent if Hardware Error Flag is set for Storage Devices"
+     --#TYPE            "Storage Hardware Error Flag Set"
+     --#SUMMARY         "%s: Hardware Error on %s: %s"
+     --#ARGUMENTS       {2, 0, 1}
+     --#SEVERITY        CRITICAL
+     --#TIMEINDEX       1
+     --#STATE           NONOPERATIONAL
+     ::= 305
+
+wsaStorageRepair          TRAP-TYPE
+     ENTERPRISE         wsaObjects
+     VARIABLES          { wsaServerName, wsaLarComment, wsaTrapTime, wsaHWConfAddr }
+     DESCRIPTION        "Is sent when some storage defect / error condition is repaired"
+     --#TYPE            "Storage Failure Condition Repaired"
+     --#SUMMARY         "%s: Storage Component was repaired on %s: %s"
+     --#ARGUMENTS       {2, 0, 1}
+     --#SEVERITY        MINOR
+     --#TIMEINDEX       1
+     --#STATE           NONOPERATIONAL
+     ::= 306
+
+wsaControllerHardwareDefectSet         TRAP-TYPE
+     ENTERPRISE         wsaObjects
+     VARIABLES          { wsaServerName, wsaLarComment, wsaTrapTime, wsaHWConfAddr }
+     DESCRIPTION        "Is sent if Hardware Defect Flag is set for boards, controllers, cpu or memory components"
+     --#TYPE            "Controller Hardware Defect Flag"
+     --#SUMMARY         "%s: Hardware Defect on %s: %s"
+     --#ARGUMENTS       {2, 0, 1}
+     --#SEVERITY        CRITICAL
+     --#TIMEINDEX       1
+     --#STATE           NONOPERATIONAL
+     ::= 307
+
+wsaControllerHardwareErrorSet  TRAP-TYPE
+     ENTERPRISE         wsaObjects
+     VARIABLES          { wsaServerName, wsaLarComment, wsaTrapTime, wsaHWConfAddr }
+     DESCRIPTION        "Is sent if Hardware Error Flag is set for boards, controllers, cpu or memory components"
+     --#TYPE            "Controller Hardware Error Flag Set"
+     --#SUMMARY         "%s: Hardware Error on %s: %s"
+     --#ARGUMENTS       {2, 0, 1}
+     --#SEVERITY        CRITICAL
+     --#TIMEINDEX       1
+     --#STATE           NONOPERATIONAL
+     ::= 308
+
+wsaControllerRepair          TRAP-TYPE
+     ENTERPRISE         wsaObjects
+     VARIABLES          { wsaServerName, wsaLarComment, wsaTrapTime, wsaHWConfAddr }
+     DESCRIPTION        "Is sent when some defect / error condition is repaired boards, controllers, cpu or memory components"
+     --#TYPE            "Controller Failure Condition Repaired"
+     --#SUMMARY         "%s: Controller repaired on %s: %s"
+     --#ARGUMENTS       {2, 0, 1}
+     --#SEVERITY        MINOR
+     --#TIMEINDEX       1
+     --#STATE           NONOPERATIONAL
+     ::= 309
+
+wsaMonitoringRuleMatched    TRAP-TYPE
+     ENTERPRISE         wsaObjects
+     VARIABLES          { wsaServerName, wsaLarComment, wsaTrapTime, wsaHWConfAddr }
+     DESCRIPTION        "Is sent when a performance rule of EventAdmin matches the first time for a special resource"
+     --#TYPE            "Performance monitoring rule for a resource has matched"
+     --#SUMMARY         "%s: Performance rule has matched on %s: %s"
+     --#ARGUMENTS       {2, 0, 1}
+     --#SEVERITY        INFORMATIONAL
+     --#TIMEINDEX       1
+     --#STATE           NONOPERATIONAL
+     ::= 310
+
+wsaMonitoringRuleInitialized TRAP-TYPE
+     ENTERPRISE         wsaObjects
+     VARIABLES          { wsaServerName, wsaLarComment, wsaTrapTime, wsaHWConfAddr }
+     DESCRIPTION        "Is sent when performance monitoring indication is reset by the operator"
+     --#TYPE            "Performance monitoring indication is reset by operator"
+     --#SUMMARY         "%s: Performance monitoring indication has been reset by operator on %s: %s"
+     --#ARGUMENTS       {2, 0, 1}
+     --#SEVERITY        MINOR
+     --#TIMEINDEX       1
+     --#STATE           NONOPERATIONAL
+     ::= 311
+
+wsaDROperationStarted TRAP-TYPE
+     ENTERPRISE         wsaObjects
+     VARIABLES          { wsaServerName, wsaLarComment, wsaTrapTime, wsaHWConfAddr }
+     DESCRIPTION        "Is sent when a DR operation is started on a partition"
+     --#TYPE            "DR Operation was started"
+     --#SUMMARY         "%s: DR operation started on %s: %s"
+     --#ARGUMENTS       {2, 0, 1}
+     --#SEVERITY        INFORMATIONAL
+     --#TIMEINDEX       1
+     --#STATE           NONOPERATIONAL
+     ::= 312
+
+wsaDROperationFinished TRAP-TYPE
+     ENTERPRISE         wsaObjects
+     VARIABLES          { wsaServerName, wsaLarComment, wsaTrapTime, wsaHWConfAddr }
+     DESCRIPTION        "Is sent when a DR operation has finished on a partition"
+     --#TYPE            "DR operation has finished"
+     --#SUMMARY         "%s: DR operation finished on %s: %s"
+     --#ARGUMENTS       {2, 0, 1}
+     --#SEVERITY        INFORMATIONAL
+     --#TIMEINDEX       1
+     --#STATE           NONOPERATIONAL
+     ::= 313
+
+wsaHardwareDeactiveSet       TRAP-TYPE
+     ENTERPRISE         wsaObjects
+     VARIABLES          { wsaServerName, wsaLarComment, wsaTrapTime, wsaHWConfAddr }
+     DESCRIPTION        "Is sent if Hardware Deactive Flag is set for FANs or Powersupplies"
+     --#TYPE            "Hardware Deactive Flag"
+     --#SUMMARY         "%s: Hardware Deactive on %s: %s"
+     --#ARGUMENTS       {2, 0, 1}
+     --#SEVERITY        CRITICAL
+     --#TIMEINDEX       1
+     --#STATE           NONOPERATIONAL
+     ::= 314
+
+wsaHardwareActiveSet       TRAP-TYPE
+     ENTERPRISE         wsaObjects
+     VARIABLES          { wsaServerName, wsaLarComment, wsaTrapTime, wsaHWConfAddr }
+     DESCRIPTION        "Is sent if Hardware Deactive Flag is reset for FANs or Powersupplies"
+     --#TYPE            "Hardware Deactive Flag deleted"
+     --#SUMMARY         "%s: Hardware Active on %s: %s"
+     --#ARGUMENTS       {2, 0, 1}
+     --#SEVERITY        INFORMATIONAL
+     --#TIMEINDEX       1
+     --#STATE           NONOPERATIONAL
+     ::= 315
+
+wsaHWComponentAttached TRAP-TYPE
+     ENTERPRISE         wsaObjects
+     VARIABLES          { wsaServerName, wsaLarComment, wsaTrapTime, wsaHWConfAddr }
+     DESCRIPTION        "Is sent when a hardware component is attached"
+     --#TYPE            "Hardwarecomponent has been attached"
+     --#SUMMARY         "%s: Hardware component has been attached on %s: %s"
+     --#ARGUMENTS       {2, 0, 1}
+     --#SEVERITY        INFORMATIONAL
+     --#TIMEINDEX       1
+     --#STATE           NONOPERATIONAL
+     ::= 316
+
+wsaHWComponentDetached TRAP-TYPE
+     ENTERPRISE         wsaObjects
+     VARIABLES          { wsaServerName, wsaLarComment, wsaTrapTime, wsaHWConfAddr }
+     DESCRIPTION        "Is sent when a hardware component has been detached"
+     --#TYPE            "Hardware component has been detached"
+     --#SUMMARY         "%s: Hardware component has been detached on %s: %s"
+     --#ARGUMENTS       {2, 0, 1}
+     --#SEVERITY        INFORMATIONAL
+     --#TIMEINDEX       1
+     --#STATE           NONOPERATIONAL
+     ::= 317
+
+-- pk, 2005/09/22 new traps for version 2.2B10 inserted here ...
+wsaSMCDeactivated TRAP-TYPE
+     ENTERPRISE         wsaObjects
+     VARIABLES          { wsaServerName, wsaLarComment, wsaTrapTime }
+     DESCRIPTION        "Is sent when the SMC function of a console has been deactivated"
+     --#TYPE            "SMC function has been deactivated"
+     --#SUMMARY         "%s: SMC function has been deactivated on %s (probably by SMC switch-over): %s"
+     --#ARGUMENTS       {2, 0, 1}
+     --#SEVERITY        MINOR
+     --#TIMEINDEX       1
+     --#STATE           NONOPERATIONAL
+     ::= 318
+
+wsaSMCActivated TRAP-TYPE
+     ENTERPRISE         wsaObjects
+     VARIABLES          { wsaServerName, wsaLarComment, wsaTrapTime }
+     DESCRIPTION        "Is sent when the SMC function of a console has been activated"
+     --#TYPE            "SMC function has been activated"
+     --#SUMMARY         "%s: SMC function has been activated on %s (probably by SMC switch-over): %s"
+     --#ARGUMENTS       {2, 0, 1}
+     --#SEVERITY        INFORMATIONAL
+     --#TIMEINDEX       1
+     --#STATE           NONOPERATIONAL
+     ::= 319
+
+wsaSystemRestartAfterPanic TRAP-TYPE
+     ENTERPRISE         wsaObjects
+     VARIABLES          { wsaServerName, wsaTrapTime }
+     DESCRIPTION        "Is sent when a system restarts after it has been stopped by a PANIC"
+     --#TYPE            "System restart after PANIC"
+     --#SUMMARY         "%s: System %s has been restarted after PANIC"
+     --#ARGUMENTS       {1, 0}
+     --#SEVERITY        INFORMATIONAL
+     --#TIMEINDEX       1
+     --#STATE           NONOPERATIONAL
+     ::= 320
+
+wsaPerformanceMonitoringInfo TRAP-TYPE
+     ENTERPRISE         wsaObjects
+     VARIABLES          { wsaServerName, wsaTrapTime, wsaRuleName, wsaResourceName, wsaPerfValue, wsaRuleSetName, wsaLarComment }
+     DESCRIPTION        "Is sent when a performance monitoring rule matches"
+     --#TYPE            "Performance monitoring rule matches"
+     --#SUMMARY         "%s: Rule '%s' in rule set '%s' has matched on server '%s' for resource '%s', value '%s', comment: '%s'"
+     --#ARGUMENTS       {1, 2, 5, 0, 3, 4, 6}
+     --#SEVERITY        INFORMATIONAL
+     --#TIMEINDEX       1
+     --#STATE           NONOPERATIONAL
+     ::= 321
+
+wsaPerformanceMonitoringMinor TRAP-TYPE
+     ENTERPRISE         wsaObjects
+     VARIABLES          { wsaServerName, wsaTrapTime, wsaRuleName, wsaResourceName, wsaPerfValue, wsaRuleSetName, wsaLarComment }
+     DESCRIPTION        "Is sent when a performance monitoring rule matches"
+     --#TYPE            "Performance monitoring rule matches"
+     --#SUMMARY         "%s: Rule '%s' in rule set '%s' has matched on server '%s' for resource '%s', value '%s', comment: '%s'"
+     --#ARGUMENTS       {1, 2, 5, 0, 3, 4, 6}
+     --#SEVERITY        MINOR
+     --#TIMEINDEX       1
+     --#STATE           NONOPERATIONAL
+     ::= 322
+
+wsaPerformanceMonitoringMajor TRAP-TYPE
+     ENTERPRISE         wsaObjects
+     VARIABLES          { wsaServerName, wsaTrapTime, wsaRuleName, wsaResourceName, wsaPerfValue, wsaRuleSetName, wsaLarComment }
+     DESCRIPTION        "Is sent when a performance monitoring rule matches"
+     --#TYPE            "Performance monitoring rule matches"
+     --#SUMMARY         "%s: Rule '%s' in rule set '%s' has matched on server '%s' for resource '%s', value '%s', comment: '%s'"
+     --#ARGUMENTS       {1, 2, 5, 0, 3, 4, 6}
+     --#SEVERITY        MAJOR
+     --#TIMEINDEX       1
+     --#STATE           NONOPERATIONAL
+     ::= 323
+
+wsaPerformanceMonitoringCritical TRAP-TYPE
+     ENTERPRISE         wsaObjects
+     VARIABLES          { wsaServerName, wsaTrapTime, wsaRuleName, wsaResourceName, wsaPerfValue, wsaRuleSetName, wsaLarComment }
+     DESCRIPTION        "Is sent when a performance monitoring rule matches"
+     --#TYPE            "Performance monitoring rule matches"
+     --#SUMMARY         "%s: Rule '%s' in rule set '%s' has matched on server '%s' for resource '%s', value '%s', comment: '%s'"
+     --#ARGUMENTS       {1, 2, 5, 0, 3, 4, 6}
+     --#SEVERITY        CRITICAL
+     --#TIMEINDEX       1
+     --#STATE           NONOPERATIONAL
+     ::= 324
+
+wsaFileMonitoringInfo TRAP-TYPE
+     ENTERPRISE         wsaObjects
+     VARIABLES          { wsaServerName, wsaTrapTime, wsaFileMonComment, wsaFileMonValue }
+     DESCRIPTION        "Is sent when a file monitoring rule pattern matched to a new text in an observed file"
+     --#TYPE            "File monitoring rule matches"
+     --#SUMMARY         "%s: File monitoring rule '%s' has matched on server %s, text line: %s"
+     --#ARGUMENTS       {1, 2, 0, 3}
+     --#SEVERITY        INFORMATIONAL
+     --#TIMEINDEX       1
+     --#STATE           NONOPERATIONAL
+     ::= 325
+
+wsaFileMonitoringMinor TRAP-TYPE
+     ENTERPRISE         wsaObjects
+     VARIABLES          { wsaServerName, wsaTrapTime, wsaFileMonComment, wsaFileMonValue }
+     DESCRIPTION        "Is sent when a file monitoring rule pattern matched to a new text in an observed file"
+     --#TYPE            "File monitoring rule matches"
+     --#SUMMARY         "%s: File monitoring rule '%s' has matched on server %s, text line: %s"
+     --#ARGUMENTS       {1, 2, 0, 3}
+     --#SEVERITY        MINOR
+     --#TIMEINDEX       1
+     --#STATE           NONOPERATIONAL
+     ::= 326
+
+wsaFileMonitoringMajor TRAP-TYPE
+     ENTERPRISE         wsaObjects
+     VARIABLES          { wsaServerName, wsaTrapTime, wsaFileMonComment, wsaFileMonValue }
+     DESCRIPTION        "IIs sent when a file monitoring rule pattern matched to a new text in an observed file"
+     --#TYPE            "File monitoring rule matches"
+     --#SUMMARY         "%s: File monitoring rule '%s' has matched on server %s, text line: %s"
+     --#ARGUMENTS       {1, 2, 0, 3}
+     --#SEVERITY        MAJOR
+     --#TIMEINDEX       1
+     --#STATE           NONOPERATIONAL
+     ::= 327
+
+wsaFileMonitoringCritical TRAP-TYPE
+     ENTERPRISE         wsaObjects
+     VARIABLES          { wsaServerName, wsaTrapTime, wsaFileMonComment, wsaFileMonValue }
+     DESCRIPTION        "Is sent when a file monitoring rule pattern matched to a new text in an observed file"
+     --#TYPE            "File monitoring rule matches"
+     --#SUMMARY         "%s: File monitoring rule '%s' has matched on server %s, text line: %s"
+     --#ARGUMENTS       {1, 2, 0, 3}
+     --#SEVERITY        CRITICAL
+     --#TIMEINDEX       1
+     --#STATE           NONOPERATIONAL
+     ::= 328
+
+wsaPartitionPanic      TRAP-TYPE
+     ENTERPRISE         wsaObjects
+     VARIABLES          { wsaServerName }
+     DESCRIPTION        "Sent if a partition panics"
+     --#TYPE            "Partition Panic"
+     --#SUMMARY         "Partition %s has got a PANIC"
+     --#ARGUMENTS       {0}
+     --#SEVERITY        CRITICAL
+     --#TIMEINDEX       1
+     --#STATE           NONOPERATIONAL
+     ::= 329 
+
+trapServerName OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Name of server the trap occurred"
+	::= { trapInfo 1 }
+
+trapTime OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"Time the trap occurred (in seconds since 01/01/1970 00:00h)"
+	::= { trapInfo 2 }
+
+sendTestTrap OBJECT-TYPE
+        SYNTAX  INTEGER{
+                send-trap(1)
+        }
+
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION 
+	"Send a trap to the manager application(s) to test connection and 
+	trap configuration; trap cannot be disabled.  Reading this object 
+	just returns the value 0."
+        ::= { diagnostics 1 }
+
+testTrap TRAP-TYPE
+        ENTERPRISE sniServerMgmt
+        VARIABLES {
+                trapServerName,
+                trapTime
+        }
+        DESCRIPTION
+            "Test trap to verify trap connection."
+        --#TYPE         "Test trap"
+        --#SUMMARY      "Test trap from server %s (no error)."
+        --#ARGUMENTS    { 0 }
+        --#SEVERITY     INFORMATIONAL
+        --#TIMEINDEX    1
+        --#HELP        "Note: This is no error condition."   
+        --#HELPTAG              0
+        --#STATE        OPERATIONAL
+        ::= 600
+
+END

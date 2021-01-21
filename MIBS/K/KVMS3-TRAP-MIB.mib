@@ -1,0 +1,1492 @@
+--------------------------------------------------------------------------------
+--                           Fujitsu Siemens KVMS3 TRAP MIB
+--
+--                     Copyright 2001 - 2007 Avocent Corporation
+--
+--                                   Revision: 1.0.4
+--
+--                          Last Modified: June 6, 2007
+--
+--------------------------------------------------------------------------------
+
+KVMS3-TRAP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   Gauge,enterprises,TimeTicks,IpAddress,Counter,NetworkAddress
+      FROM RFC1155-SMI
+   OBJECT-TYPE
+      FROM RFC-1212
+   DisplayString,PhysAddress
+      FROM RFC1213-MIB
+   TRAP-TYPE
+      FROM RFC-1215;
+
+--------------------------------------------------------------------------------
+-- Object Groupings
+--------------------------------------------------------------------------------
+
+avocent        		OBJECT IDENTIFIER ::= { enterprises 10418 }
+ds             		OBJECT IDENTIFIER ::= { avocent 3 }
+dsManagement            OBJECT IDENTIFIER ::= { ds 2 }
+
+fscKvmS3TrapObject      OBJECT IDENTIFIER ::= { dsManagement 6 } -- 1.3.6.1.4.1.10418.3.2.6
+
+fscKvmS3Products        OBJECT IDENTIFIER ::= { ds 1 } -- Used as the ENTERPRISE ID
+
+--
+-- A UTF8String represents a series of UTF-8 encoded characters. UTF-8 encoding
+-- provides the ability to encode all characters defined in the Universal
+-- Multiple-Octet Coded Character Set (UCS) and all characters defined in the
+-- Unicode Standard. UCS is defined in international standard ISO 10646. Unicode
+-- encompasses a subset of UCS. See http://www.unicode.org for more information
+-- on Unicode. See RFC2279 for more information on UTF-8 encoding.
+--
+
+UTF8String ::= OCTET STRING
+
+ImageFileUpgradeResultsEnum ::= INTEGER
+{
+   imageUpgradeTftpNoSocket(1),         -- TFTP No Socket
+   imageUpgradeTftpConnectFailure(2),   -- TFTP server TFTP connect failed
+   imageUpgradeTftpRequestDenied(3),    -- TFTP server request denied
+   imageUpgradeTftpBadPacket(4),        -- TFTP err - non-data packet received
+   imageUpgradeTftpOOS(5),              -- TFTP err - too many packets out
+                                        --  of sequence
+   imageUpgradeTftpTooBig(6),           -- TFTP err - transferred data exceeds
+                                        --  file size
+   imageUpgradeTftpTimeout(7),          -- TFTP err - timeout during transfer,
+                                        --  retries exceeded
+   imageUpgradeAlreadyInProgress(8),    -- Update already in progress
+   imageUpgradeCannotStart(9),	        -- Update thread did not start
+   imageUpgradeMemoryError(10),         -- Update memory allocation error
+   imageUpgradeTftpProtocolError(11),   -- TFTP protocol error occurred could
+                                        --  not complete transfer
+   imageUpgradeBadType(12),             -- The Image type does not match the
+                                        --  region (BOOT or APP) to update
+   imageUpgradeInvalidAppDowngrade(13), -- Invalid downgrade version
+   imageUpgradeChecksumError(14),       -- Checksum Error
+   imageUpgradeFlashError(15),          -- Flash Error
+   imageUpgradeInternalError(16),       -- Internal error
+   imageUpgradeFileNotFound(17),        -- File not found
+   imageUpgradeBadHeader(18),           -- Invalid image header
+   imageUpgradeIncompatibleHeader(19),  -- Header is not compatible
+   imageUpgradeTftpXferFail(20),        -- TFTP transfer failed
+   imageUpgradeTftpSvrNoResponse(21),   -- No response from TFTP server
+   imageUpgradeNetworkUnreachable(22),  -- Network unreachable
+   imageUpgradeSuccess(9999)            -- Success
+}
+
+--
+-- An enumeration of KVM-IA upgrade results.
+--
+
+KvmIaUpgradeResultsEnum ::= INTEGER
+{
+   kvmIaUpgradeNoFirmwareImage(1),   -- No firmware image present
+   kvmIaUpgradeLostContact(2),       -- Lost communication with the KVM-IA
+   kvmIaUpgradeFailedRestart(3),     -- The KVM-IA did not restart after upgrade
+   kvmIaUpgradeFailedVerify(4),      -- The KVM-IA failed to upgrade to correct version
+   kvmIaUpgradeSuccess(9999)         -- Success
+}
+
+--------------------------------------------------------------------------------
+-- Trap Object Group (fscKvmS3TrapObject)              1.3.6.1.4.1.10418.3.2.6
+--
+-- The following objects are implemented only for the generation of
+-- TRAPs. The objects are sent in traps and are not accessible in
+-- any other way.
+--------------------------------------------------------------------------------
+
+fscKvmS3TrapObjectUserName OBJECT-TYPE
+      SYNTAX UTF8String ( SIZE (3..16) )
+      ACCESS not-accessible
+      STATUS mandatory
+  --% AVAILABILITY public
+      DESCRIPTION
+         "This object is sent in a trap to identify the name of the user
+         for which the trap condition occured. If the trap condition occurred
+         as a result of activity on the local port (OSD), then the value of this
+         object will be the following string:
+
+            local port
+         "
+      ::= { fscKvmS3TrapObject 1 }
+
+fscKvmS3TrapObjectTargetUserName OBJECT-TYPE
+      SYNTAX UTF8String ( SIZE (3..16) )
+      ACCESS not-accessible
+      STATUS mandatory
+  --% AVAILABILITY public
+      DESCRIPTION
+         "This object is sent in a trap to identify the name of the target
+         user for which a trap condition occurred.
+         "
+      ::= { fscKvmS3TrapObject 2 }
+
+fscKvmS3TrapObjectImageType OBJECT-TYPE
+      SYNTAX UTF8String ( SIZE (0..64) )
+      ACCESS not-accessible
+      STATUS mandatory
+  --% AVAILABILITY public
+      DESCRIPTION
+         "This object is sent in a trap to identify the type of software image
+         for which the trap condition occured.
+         "
+      ::= { fscKvmS3TrapObject 3 }
+
+fscKvmS3TrapObjectImageNewVersion OBJECT-TYPE
+      SYNTAX UTF8String ( SIZE (0..32) )
+      ACCESS not-accessible
+      STATUS mandatory
+  --% AVAILABILITY public
+      DESCRIPTION
+         "This object is sent in a trap to identify the version of the new
+         software image the appliance is being upgraded to.
+         "
+      ::= { fscKvmS3TrapObject 4 }
+
+fscKvmS3TrapObjectImageCurrentVersion OBJECT-TYPE
+      SYNTAX UTF8String ( SIZE (0..32) )
+      ACCESS not-accessible
+      STATUS mandatory
+  --% AVAILABILITY public
+      DESCRIPTION
+         "This object is sent in a trap to identify the version of the
+         software image that the appliance is currently running.
+         "
+      ::= { fscKvmS3TrapObject 5 }
+
+fscKvmS3TrapObjectImageUpgradeResults OBJECT-TYPE
+      SYNTAX UTF8String ( SIZE (0..64) )
+      ACCESS not-accessible
+      STATUS mandatory
+  --% AVAILABILITY public
+      DESCRIPTION
+         "This object is sent in a trap to report the results of a
+          TFTP image upgrade."
+      ::= { fscKvmS3TrapObject 6 }
+
+fscKvmS3TrapObjectSessionIdentifier OBJECT-TYPE
+      SYNTAX UTF8String ( SIZE (0..32) )
+      ACCESS not-accessible
+      STATUS mandatory
+  --% AVAILABILITY public
+      DESCRIPTION
+         "This object is sent in a trap to identify the session
+         for which the trap condition occurred. The value will be
+         the name of a server if the server name is known, otherwise
+         the value will be the connection path to a server.
+
+         If the value is a connection path it will have the following
+         format:
+
+            KVM-IA i:Channel c
+
+         Where i is the ID of the KVM-IA, and c is the cascade switch
+         channel number (0 if there is no switch in the path).
+         "
+      ::= { fscKvmS3TrapObject 7 }
+
+fscKvmS3TrapObjectKvmIaId OBJECT-TYPE
+      SYNTAX UTF8String ( SIZE (0..32) )
+      ACCESS not-accessible
+      STATUS mandatory
+  --% AVAILABILITY public
+      DESCRIPTION
+         "This object is sent in a trap to identify the KVM-IA 
+         for which the trap condition occurred.
+         "
+      ::= { fscKvmS3TrapObject 8 }
+
+fscKvmS3TrapObjectCascadeSwitchName OBJECT-TYPE
+      SYNTAX UTF8String ( SIZE (0..15) )
+      ACCESS not-accessible
+      STATUS mandatory
+  --% AVAILABILITY public
+      DESCRIPTION
+         "This object is sent in a trap to identify the cascade switch for
+         which the trap condition occurred.
+         "
+      ::= { fscKvmS3TrapObject 9 }
+
+fscKvmS3TrapObjectOldCascadeSwitchName OBJECT-TYPE
+      SYNTAX UTF8String ( SIZE (0..15) )
+      ACCESS not-accessible
+      STATUS mandatory
+  --% AVAILABILITY public
+      DESCRIPTION
+         "This object is sent in a trap to identify the old name of a cascade
+         switch whose name was changed.
+         "
+      ::= { fscKvmS3TrapObject 10 }
+
+fscKvmS3TrapObjectServerName OBJECT-TYPE
+      SYNTAX UTF8String ( SIZE (0..15) )
+      ACCESS not-accessible
+      STATUS mandatory
+  --% AVAILABILITY public
+      DESCRIPTION
+         "This object is sent in a trap to identify the server for
+         which the trap condition occurred.
+         "
+      ::= { fscKvmS3TrapObject 11 }
+
+fscKvmS3TrapObjectOldServerName OBJECT-TYPE
+      SYNTAX UTF8String ( SIZE (0..15) )
+      ACCESS not-accessible
+      STATUS mandatory
+  --% AVAILABILITY public
+      DESCRIPTION
+         "This object is sent in a trap to identify the old name of a server
+         whose name was changed.
+         "
+      ::= { fscKvmS3TrapObject 12 }
+
+fscKvmS3TrapObjectFileName OBJECT-TYPE
+      SYNTAX DisplayString ( SIZE (0..12) )
+      ACCESS not-accessible
+      STATUS mandatory
+  --% AVAILABILITY public
+      DESCRIPTION
+         "This object is sent in a trap to identify the name of a file
+         for which the trap condition occurred.
+         "
+      ::= { fscKvmS3TrapObject 13 }
+
+fscKvmS3TrapObjectFirmwareCondition OBJECT-TYPE
+      SYNTAX OCTET STRING ( SIZE (0..64) )
+      ACCESS not-accessible
+      STATUS mandatory
+  --% AVAILABILITY public
+      DESCRIPTION
+         "This trap message will contain data for application specific
+         diagnostics.  It is designed in provision for diagnostic help
+         for installation-specific problems, would require the operator
+         to install firmware provided to isolate their particular problems
+         and to enable the trap to report conditions.
+
+         The contents will be an Avocent Application Message Packet with
+         the address, size, and command header removed.  The parameters
+         of the message will depend on the specific problem the firmware
+         is designed to detect and report.
+         "
+      ::= { fscKvmS3TrapObject 14 }
+
+fscKvmS3TrapObjectDeviceId OBJECT-TYPE
+      SYNTAX UTF8String ( SIZE (0..32) )
+      ACCESS not-accessible
+      STATUS mandatory
+  --% AVAILABILITY public
+      DESCRIPTION
+         "This object is sent in a trap to identify the device for which
+         the trap condition occurred.
+         "
+      ::= { fscKvmS3TrapObject 15 }
+
+fscKvmS3TrapObjectAlarmCondition OBJECT-TYPE
+      SYNTAX INTEGER {
+                        alarm(1),
+                        ok(2)
+                     }
+      ACCESS not-accessible
+      STATUS mandatory
+  --% AVAILABILITY public
+      DESCRIPTION
+         "This object is sent in a trap to identify Warning/Alarm activity for
+         the device on which the trap condition occurred.
+         Alarm sets the alarm, OK indicates the condition has cleared up.
+          "
+      ::= { fscKvmS3TrapObject 16 }
+
+fscKvmS3TrapObjectAlarmDescription OBJECT-TYPE
+      SYNTAX UTF8String ( SIZE (0..64) )
+      ACCESS not-accessible
+      STATUS mandatory
+  --% AVAILABILITY public
+      DESCRIPTION
+         "This object is sent in a trap to explain the Warning/Alarm condition
+         for which the trap condition occurred.  This is intended for display
+         or logging.
+         "
+      ::= { fscKvmS3TrapObject 17 }
+
+fscKvmS3TrapObjectLockReason OBJECT-TYPE
+      SYNTAX UTF8String( SIZE (0..64) )
+      ACCESS not-accessible
+      STATUS mandatory
+  --% AVAILABILITY public
+      DESCRIPTION
+         "This object is sent in a trap to explain the reason for which a
+         user account has been locked.
+         "
+      ::= { fscKvmS3TrapObject 18 }
+
+fscKvmS3TrapObjectUnlockReason OBJECT-TYPE
+      SYNTAX UTF8String( SIZE (0..64) )
+      ACCESS not-accessible
+      STATUS mandatory
+  --% AVAILABILITY public
+      DESCRIPTION
+         "This object is sent in a trap to explain the reason for which a
+         user account has been unlocked.
+         "
+      ::= { fscKvmS3TrapObject 19 }
+
+fscKvmS3TrapObjectIPAddress OBJECT-TYPE
+      SYNTAX DisplayString( SIZE (0..32) )
+      ACCESS not-accessible
+      STATUS mandatory
+  --% AVAILABILITY public
+      DESCRIPTION
+         "This object is sent in a trap to identify the IP address for
+         which a trap condition occurred.
+         "
+      ::= { fscKvmS3TrapObject 20 }
+
+fscKvmS3TrapObjectKvmIaImageUpgradeResult OBJECT-TYPE
+      SYNTAX KvmIaUpgradeResultsEnum
+      ACCESS not-accessible
+      STATUS mandatory
+  --% AVAILABILITY public
+      DESCRIPTION
+         "This object is sent in a trap to report the result of an KVM-IA
+         image upgrade.
+         "
+      ::= { fscKvmS3TrapObject 21 }
+
+fscKvmS3TrapObjectTypeOfImage OBJECT-TYPE
+      SYNTAX INTEGER {
+                        boot(1),
+                        app(2)
+                     }
+      ACCESS not-accessible
+      STATUS mandatory
+  --% AVAILABILITY public
+      DESCRIPTION
+         "This object is sent in a trap to report the type of software
+         image for which the trap condition occurred.
+         "
+      ::= { fscKvmS3TrapObject 22 }
+
+
+fscKvmS3TrapObjectVirtualMediaDriveAccessMode OBJECT-TYPE
+      SYNTAX INTEGER {
+                        readonly(1),
+                        readwrite(2)
+                     }
+      ACCESS not-accessible
+      STATUS mandatory
+  --% AVAILABILITY public
+      DESCRIPTION
+         "This object is sent in a trap to report the access mode
+          associated with a remote virtual drive for which
+          the trap condition occurred.
+         "
+      ::= { fscKvmS3TrapObject 23 }
+
+fscKvmS3TrapObjectVirtualMediaDriveType OBJECT-TYPE
+      SYNTAX INTEGER {
+                        floppy-memorykey(1),
+                        cd-dvd-rom(2),
+                        generic(3)
+                     }
+      ACCESS not-accessible
+      STATUS mandatory
+  --% AVAILABILITY public
+      DESCRIPTION
+         "This object is sent in a trap to report the type associated
+          with a remote virtual drive for which the trap condition
+          occurred.
+         "
+      ::= { fscKvmS3TrapObject 24 }
+
+fscKvmS3TrapObjectImageUpgradeResultsCode OBJECT-TYPE
+      SYNTAX ImageFileUpgradeResultsEnum
+      ACCESS not-accessible
+      STATUS mandatory
+  --% AVAILABILITY public
+      DESCRIPTION
+         "This object is sent in a trap to report the results of a
+          TFTP or ASMP image upgrade."
+      ::= { fscKvmS3TrapObject 25 }
+
+--------------------------------------------------------------------------------
+-- Enterprise Traps
+--------------------------------------------------------------------------------
+
+fscKvmS3RebootStartedTrap TRAP-TYPE
+      ENTERPRISE  fscKvmS3Products
+      VARIABLES   { fscKvmS3TrapObjectUserName }
+      DESCRIPTION
+         "The appliance is in the process of rebooting.
+
+         The name of the user who initiated the reboot
+         is contained in fscKvmS3TrapObjectUserName.
+         "
+
+      --#SUMMARY     "The appliance is rebooting. Command issued by user: %s."
+      --#ARGUMENTS   { 0 }
+      --#SEVERITY    INFORMATIONAL
+      ::= 1
+
+fscKvmS3UserLoginTrap TRAP-TYPE
+      ENTERPRISE  fscKvmS3Products
+      VARIABLES   { fscKvmS3TrapObjectUserName }
+      DESCRIPTION
+         "A user logged into the appliance.
+
+         The name of the user who logged in
+         is contained in fscKvmS3TrapObjectUserName.
+         "
+
+      --#SUMMARY     "User logged into the appliance. User: %s."
+      --#ARGUMENTS   { 0 }
+      --#SEVERITY    INFORMATIONAL
+      ::= 2
+
+fscKvmS3UserLogoutTrap TRAP-TYPE
+      ENTERPRISE  fscKvmS3Products
+      VARIABLES   { fscKvmS3TrapObjectUserName }
+      DESCRIPTION
+         "A user logged out of the appliance.
+
+         The name of the user who logged out is contained
+         in fscKvmS3TrapObjectUserName.
+         "
+
+      --#SUMMARY     "User logged out of the appliance. User: %s."
+      --#ARGUMENTS   { 0 }
+      --#SEVERITY    INFORMATIONAL
+      ::= 3
+
+fscKvmS3VideoSessionStartedTrap TRAP-TYPE
+      ENTERPRISE  fscKvmS3Products
+      VARIABLES   {
+                     fscKvmS3TrapObjectUserName,
+                     fscKvmS3TrapObjectSessionIdentifier
+                  }
+      DESCRIPTION
+         "A video session has started.
+
+         The name of the user who is connected to the session
+         is contained in fscKvmS3TrapObjectUserName.
+
+         The session identifier is contained in fscKvmS3TrapObjectSessionIdentifier.
+         "
+
+      --#SUMMARY     "Video session started. User: %s. Server: %s."
+      --#ARGUMENTS   { 0, 1 }
+      --#SEVERITY    INFORMATIONAL
+      ::= 4
+
+fscKvmS3VideoSessionStoppedTrap TRAP-TYPE
+      ENTERPRISE  fscKvmS3Products
+      VARIABLES   {
+                     fscKvmS3TrapObjectUserName,
+                     fscKvmS3TrapObjectSessionIdentifier
+                  }
+      DESCRIPTION
+         "A video session has stoppped.
+
+         The name of the user who was connected to the session
+         is contained in fscKvmS3TrapObjectUserName.
+
+         The session identifier is contained in fscKvmS3TrapObjectSessionIdentifier.
+         "
+
+      --#SUMMARY     "Video session stopped. User: %s. Server: %s"
+      --#ARGUMENTS   { 0, 1 }
+      --#SEVERITY    INFORMATIONAL
+      ::= 5
+
+fscKvmS3VideoSessionTerminatedTrap TRAP-TYPE
+      ENTERPRISE  fscKvmS3Products
+      VARIABLES   {
+                     fscKvmS3TrapObjectUserName,
+                     fscKvmS3TrapObjectTargetUserName,
+                     fscKvmS3TrapObjectSessionIdentifier
+                  }
+      DESCRIPTION
+         "A video session has been terminated by another
+         user.
+
+         The name of the user who terminated the session is
+         contained in fscKvmS3TrapObjectUserName.
+
+         The name of the user who was terminated from the session
+         is contained in fscKvmS3TrapObjectTargetUserName.
+
+         The session identifier is contained in fscKvmS3TrapObjectSessionIdentifier.
+         "
+
+      --#SUMMARY     "Video session terminated. Command issued by user: %s. Terminated user: %s. Server: %s."
+      --#ARGUMENTS   { 0, 1, 2 }
+      --#SEVERITY    INFORMATIONAL
+      ::= 6
+
+fscKvmS3LocalPortViewingStartedTrap TRAP-TYPE
+      ENTERPRISE  fscKvmS3Products
+      VARIABLES   { fscKvmS3TrapObjectSessionIdentifier }
+      DESCRIPTION
+         "A user on the local port has started viewing a server.
+
+         The session identifier is contained in fscKvmS3TrapObjectSessionIdentifier.
+         "
+
+      --#SUMMARY     "Viewing started on the local port. Server: %s."
+      --#ARGUMENTS   { 0 }
+      --#SEVERITY    INFORMATIONAL
+      ::= 7
+
+fscKvmS3LocalPortViewingStoppedTrap TRAP-TYPE
+      ENTERPRISE  fscKvmS3Products
+      VARIABLES   { fscKvmS3TrapObjectSessionIdentifier }
+      DESCRIPTION
+         "A user on the local port has stopped viewing a server.
+
+         The session identifier is contained in fscKvmS3TrapObjectSessionIdentifier.
+         "
+
+      --#SUMMARY     "Viewing stopped on the local port. Server: %s."
+      --#ARGUMENTS   { 0 }
+      --#SEVERITY    INFORMATIONAL
+      ::= 8
+
+fscKvmS3ImageUpgradeStarted TRAP-TYPE
+      ENTERPRISE  fscKvmS3Products
+      VARIABLES   {
+                     fscKvmS3TrapObjectUserName,
+                     fscKvmS3TrapObjectImageType,
+                     fscKvmS3TrapObjectImageNewVersion,
+                     fscKvmS3TrapObjectImageCurrentVersion
+                  }
+      DESCRIPTION
+         "The appliance has started a TFTP or ASMP upgrade of an image.
+
+         The name of the user who initiated the TFTP or ASMP image upgrade is
+         contained in fscKvmS3TrapObjectUserName.
+
+         The type of image that is being upgraded is contained
+         in fscKvmS3TrapObjectImageType.
+
+         The version of the image that the appliance is upgrading to is
+         contained in fscKvmS3TrapObjectImageNewVersion.
+
+         The version of the image that the appliance is currently running
+         is contained in fscKvmS3TrapObjectImageCurrentVersion.
+         "
+
+      --#SUMMARY     "TFTP image upgrade started. Command issued by user: %s. Image type: %s. New version: %s. Current version: %s"
+      --#ARGUMENTS   { 0, 1, 2, 3 }
+      --#SEVERITY    INFORMATIONAL
+      ::= 9
+
+fscKvmS3ImageUpgradeResultsTrap TRAP-TYPE
+      ENTERPRISE  fscKvmS3Products
+      VARIABLES   { fscKvmS3TrapObjectImageUpgradeResults,
+                    fscKvmS3TrapObjectImageUpgradeResultsCode }
+      DESCRIPTION
+         "The results of a TFTP or ASMP image upgrade."
+
+      --#SUMMARY     "Result text: %s. Results code: %d."
+      --#ARGUMENTS   { 0, 1 }
+      --#SEVERITY    INFORMATIONAL
+      ::= 10
+
+fscKvmS3UserAddedTrap TRAP-TYPE
+      ENTERPRISE  fscKvmS3Products
+      VARIABLES   {
+                     fscKvmS3TrapObjectUserName,
+                     fscKvmS3TrapObjectTargetUserName
+                  }
+      DESCRIPTION
+         "A new user has been added to the local user database.
+
+         The name of the user who added the new user is contained
+         in fscKvmS3TrapObjectUserName.
+
+         The name of the new user is contained in fscKvmS3TrapObjectTargetUserName.
+         "
+
+      --#SUMMARY     "New user added to local user database. Command issued by user: %s. New user: %s."
+      --#ARGUMENTS   { 0, 1 }
+      --#SEVERITY    INFORMATIONAL
+      ::= 11
+
+fscKvmS3UserDeletedTrap TRAP-TYPE
+      ENTERPRISE  fscKvmS3Products
+      VARIABLES   {
+                     fscKvmS3TrapObjectUserName,
+                     fscKvmS3TrapObjectTargetUserName
+                  }
+      DESCRIPTION
+         "A user has been deleted from the local user database.
+
+         The name of the user who deleted the user is contained
+         in fscKvmS3TrapObjectUserName.
+
+         The name of the user who was deleted is contained
+         in fscKvmS3TrapObjectTargetUserName.
+         "
+
+      --#SUMMARY     "User deleted from local user database. Command issued by user: %s. Deleted user: %s."
+      --#ARGUMENTS   { 0, 1 }
+      --#SEVERITY    INFORMATIONAL
+      ::= 12
+
+fscKvmS3UserModifiedTrap TRAP-TYPE
+      ENTERPRISE  fscKvmS3Products
+      VARIABLES   {
+                     fscKvmS3TrapObjectUserName,
+                     fscKvmS3TrapObjectTargetUserName
+                  }
+      DESCRIPTION
+         "A user was modified.
+
+         The name of the user who modified the user is contain
+         in fscKvmS3TrapObjectUserName.
+
+         The name of the user who was modified is contained
+         in fscKvmS3TrapObjectTargetUserName.
+         "
+
+      --#SUMMARY     "User modified in local user database. Command issued by user: %s. Modified user: %s."
+      --#ARGUMENTS   { 0, 1 }
+      --#SEVERITY    INFORMATIONAL
+      ::= 13
+
+fscKvmS3UserAuthenticationFailureTrap TRAP-TYPE
+      ENTERPRISE  fscKvmS3Products
+      VARIABLES   { fscKvmS3TrapObjectUserName }
+      DESCRIPTION
+         "A user failed to authenticate with the appliance.
+
+         The name of the user who failed to authenticate
+         is contained in fscKvmS3TrapObjectUserName.
+         "
+
+      --#SUMMARY     "User authentication failed with the appliance. User: %s."
+      --#ARGUMENTS   { 0 }
+      --#SEVERITY    INFORMATIONAL
+      ::= 14
+
+fscKvmS3KvmIaAddedTrap TRAP-TYPE
+      ENTERPRISE  fscKvmS3Products
+      VARIABLES   { fscKvmS3TrapObjectKvmIaId }
+      DESCRIPTION
+         "An KVM-IA was added. The ID of the KVM-IA which was added is
+         contained in fscKvmS3TrapObjectKvmIaId.
+         "
+
+      --#SUMMARY     "KVM-IA added. KVM-IA ID: %s."
+      --#ARGUMENTS   { 0 }
+      --#SEVERITY    INFORMATIONAL
+      ::= 15
+
+fscKvmS3KvmIaRemovedTrap TRAP-TYPE
+      ENTERPRISE  fscKvmS3Products
+      VARIABLES   { fscKvmS3TrapObjectKvmIaId }
+      DESCRIPTION
+         "A KVM-IA was removed. The ID of the KVM-IA which was removed is
+         contained in fscKvmS3TrapObjectKvmIaId.
+         "
+
+      --#SUMMARY     "KVM-IA removed. KVM-IA ID: %s."
+      --#ARGUMENTS   { 0 }
+      --#SEVERITY    INFORMATIONAL
+      ::= 16
+
+fscKvmS3ServerNameChangedTrap TRAP-TYPE
+      ENTERPRISE  fscKvmS3Products
+      VARIABLES   {
+                     fscKvmS3TrapObjectOldServerName,
+                     fscKvmS3TrapObjectServerName,
+                     fscKvmS3TrapObjectKvmIaId
+                  }
+      DESCRIPTION
+         "The name of a server has changed.
+
+         The previous name of the server is contained in
+         fscKvmS3TrapObjectOldServerName.
+
+         The new name of the server is contained in
+         fscKvmS3TrapObjectServerName.
+
+         The ID of the KVM-IA the server is attached to is
+         contained in fscKvmS3TrapObjectKvmIaId.
+         "
+
+      --#SUMMARY     "Server name changed. Old name: %s. New name: %s. Attached to KVM-IA: %s."
+      --#ARGUMENTS   { 0, 1, 2 }
+      --#SEVERITY    INFORMATIONAL
+      ::= 17
+
+fscKvmS3CascadeSwitchAddedTrap TRAP-TYPE
+      ENTERPRISE  fscKvmS3Products
+      VARIABLES   {
+                    fscKvmS3TrapObjectCascadeSwitchName,
+                    fscKvmS3TrapObjectKvmIaId
+                  }
+      DESCRIPTION
+         "A cascade switch was added. The name of the switch
+         which was added is contained in fscKvmS3TrapObjectCascadeSwitchName.
+
+         The ID of the KVM-IA the switch was added to is contained
+         in fscKvmS3TrapObjectKvmIaId.
+         "
+
+      --#SUMMARY     "Cascade switch added. Cascade switch name: %s. Attached to KVM-IA: %s."
+      --#ARGUMENTS   { 0, 1 }
+      --#SEVERITY    INFORMATIONAL
+      ::= 18
+
+fscKvmS3CascadeSwitchRemovedTrap TRAP-TYPE
+      ENTERPRISE  fscKvmS3Products
+      VARIABLES   {
+                    fscKvmS3TrapObjectCascadeSwitchName,
+                    fscKvmS3TrapObjectKvmIaId
+                  }
+      DESCRIPTION
+         "A cascade switch was removed. The name of the switch
+         which was removed is contained in fscKvmS3TrapObjectCascadeSwitchName.
+
+         The ID of the KVM-IA the switch was attached to is contained
+         in fscKvmS3TrapObjectKvmIaId.
+         "
+
+      --#SUMMARY     "Cascade switch removed. Cascade switch name: %s. Was attached to KVM-IA: %s."
+      --#ARGUMENTS   { 0, 1 }
+      --#SEVERITY    INFORMATIONAL
+      ::= 19
+
+fscKvmS3CascadeSwitchNameChangedTrap TRAP-TYPE
+      ENTERPRISE  fscKvmS3Products
+      VARIABLES   {
+                     fscKvmS3TrapObjectOldCascadeSwitchName,
+                     fscKvmS3TrapObjectCascadeSwitchName,
+                     fscKvmS3TrapObjectKvmIaId
+                  }
+      DESCRIPTION
+         "The name of a cascade switch has changed.
+
+         The previous name of the cascade switch is contained in
+         fscKvmS3TrapObjectOldCascadeSwitchName.
+
+         The new name of the cascade switch is contained in
+         fscKvmS3TrapObjectCascadeSwitchName.
+
+         The ID of the KVM-IA the switch is attached to is contained
+         in fscKvmS3TrapObjectKvmIaId.
+         "
+
+      --#SUMMARY     "Cascade switch name changed. Old name: %s. New name: %s. Attached to KVM-IA: %s."
+      --#ARGUMENTS   { 0, 1, 2 }
+      --#SEVERITY    INFORMATIONAL
+      ::= 20
+
+fscKvmS3ConfigurationFileLoadedTrap TRAP-TYPE
+      ENTERPRISE  fscKvmS3Products
+      VARIABLES   {
+                     fscKvmS3TrapObjectUserName,
+                     fscKvmS3TrapObjectFileName
+                  }
+      DESCRIPTION
+         "The appliance has loaded a configuration file.
+
+         The name of the user who commanded the appliance to
+         load the configuration file is contained in
+         fscKvmS3TrapObjectUserName.
+
+         The name of the file that was loaded is contained in
+         fscKvmS3TrapObjectFileName.
+         "
+
+      --#SUMMARY     "Configuration file loaded in the appliance. Command issued by user: %s. Name of file loaded: %s."
+      --#ARGUMENTS   { 0, 1 }
+      --#SEVERITY    INFORMATIONAL
+      ::= 21
+
+fscKvmS3UserDatabaseFileLoadedTrap TRAP-TYPE
+      ENTERPRISE  fscKvmS3Products
+      VARIABLES   {
+                     fscKvmS3TrapObjectUserName,
+                     fscKvmS3TrapObjectFileName
+                  }
+      DESCRIPTION
+         "The appliance has loaded a user database file.
+
+         The name of the user who commanded the appliance to
+         load the user database file is contained in
+         fscKvmS3TrapObjectUserName.
+
+         The name of the file that was loaded is contained in
+         fscKvmS3TrapObjectFileName.
+         "
+
+      --#SUMMARY     "User database file loaded in the appliance. Command issued by user: %s. Name of file loaded: %s."
+      --#ARGUMENTS   { 0, 1 }
+      --#SEVERITY    INFORMATIONAL
+      ::= 22
+
+fscKvmS3InvalidHookupDetectedTrap TRAP-TYPE
+      ENTERPRISE  fscKvmS3Products
+      VARIABLES   {
+                     fscKvmS3TrapObjectDeviceId,
+                     fscKvmS3TrapObjectFirmwareCondition
+                  }
+      DESCRIPTION
+         "The appliance has detected an invalid connection.
+
+         This can include two KVM-IA devices on a port where one or more
+         have a legacy KVM Switch, or some other illegal setup condition.
+
+         Information about the nature of the failure is stored in the
+         fscKvmS3TrapObjectFirmwareCondition object.
+
+         Note: this trap is deprecated and will not longer be sent.
+         "
+
+      --#SUMMARY     "Invalid connection detected. Device ID: %s."
+      --#ARGUMENTS   { 0 }
+      --#SEVERITY    MAJOR
+      ::= 23
+
+fscKvmS3SubsystemUpgradeStartedTrap TRAP-TYPE
+      ENTERPRISE  fscKvmS3Products
+      VARIABLES   {
+                     fscKvmS3TrapObjectDeviceId,
+                     fscKvmS3TrapObjectFirmwareCondition
+                  }
+      DESCRIPTION
+         "The appliance has started a Subsystem Upgrade.
+
+         This can be a download from the DModule to the Main Board, or
+         a KVM-IA or other subsystem download from the Main Board...
+
+         Information about the subsystem being updated is stored in the
+         fscKvmS3TrapObjectFirmwareCondition object.
+
+          Note: this trap is deprecated and will not longer be sent.
+         "
+
+      --#SUMMARY     "Subsystem Upgrade started. Device ID: %s."
+      --#ARGUMENTS   { 0 }
+      --#SEVERITY    INFORMATIONAL
+      ::= 24
+
+fscKvmS3SubsystemRestartTrap TRAP-TYPE
+      ENTERPRISE  fscKvmS3Products
+      VARIABLES   {
+                     fscKvmS3TrapObjectDeviceId,
+                     fscKvmS3TrapObjectFirmwareCondition
+                  }
+      DESCRIPTION
+         "The appliance has completed a download and is restarting the
+         subsystem specified in the fscKvmS3TrapObjectFirmwareCondition object.
+
+          Note: this trap is deprecated and will not longer be sent.
+         "
+
+      --#SUMMARY     "Subsystem restarting. Device ID: %s."
+      --#ARGUMENTS   { 0 }
+      --#SEVERITY    INFORMATIONAL
+      ::= 25
+
+fscKvmS3FirmwareCommunicationsTrap TRAP-TYPE
+      ENTERPRISE  fscKvmS3Products
+      VARIABLES   {
+                     fscKvmS3TrapObjectDeviceId,
+                     fscKvmS3TrapObjectFirmwareCondition
+                  }
+      DESCRIPTION
+         "The appliance has detected communication problems in the system
+         configuration.  This can be used to indicate install problems that
+         might result in percieved problems with the switch.
+         "
+
+      --#SUMMARY     "Communication problems in the system configuration. Device ID: %s."
+      --#ARGUMENTS   { 0 }
+      --#SEVERITY    MAJOR
+      ::= 26
+
+fscKvmS3NVMemoryFailureTrap TRAP-TYPE
+      ENTERPRISE  fscKvmS3Products
+      VARIABLES   {
+                     fscKvmS3TrapObjectDeviceId,
+                     fscKvmS3TrapObjectFirmwareCondition
+                  }
+      DESCRIPTION
+         "The Appliance has detected a memory problem, the nature of which
+          has been described in the fscKvmS3TrapObjectFirmwareCondition object.
+         "
+
+      --#SUMMARY     "Memory problem. Device ID: %s"
+      --#ARGUMENTS   { 0 }
+      --#SEVERITY    CRITICAL
+      ::= 27
+
+fscKvmS3WatchdogResetTrap TRAP-TYPE
+      ENTERPRISE  fscKvmS3Products
+      VARIABLES   {
+                     fscKvmS3TrapObjectDeviceId,
+                     fscKvmS3TrapObjectFirmwareCondition
+                  }
+      DESCRIPTION
+         "The appliance has detected a watchdog reset condition.
+
+         This indicates a catastrophic failure in the Firmware/Hardware
+         preventing normal operation of the appliance.
+         "
+
+      --#SUMMARY     "Watchdog reset. Device ID: %s."
+      --#ARGUMENTS   { 0 }
+      --#SEVERITY    CRITICAL
+      ::= 28
+
+fscKvmS3DiagnosticConditionTrap TRAP-TYPE
+      ENTERPRISE  fscKvmS3Products
+      VARIABLES   {
+                     fscKvmS3TrapObjectDeviceId,
+                     fscKvmS3TrapObjectFirmwareCondition
+                  }
+      DESCRIPTION
+         "The Appliance has detected a special condition to be trapped
+          for diagnostics.  The condition has been recorded is stored
+          in the fscKvmS3TrapObjectFirmwareCondition object.
+         "
+
+      --#SUMMARY     "Special condition was trapped. Device ID: %s."
+      --#ARGUMENTS   { 0 }
+      --#SEVERITY    INFORMATIONAL
+      ::= 29
+
+fscKvmS3SubsystemUpgradeFailureTrap TRAP-TYPE
+      ENTERPRISE  fscKvmS3Products
+      VARIABLES   {
+                     fscKvmS3TrapObjectDeviceId,
+                     fscKvmS3TrapObjectFirmwareCondition
+                  }
+      DESCRIPTION
+         "The Appliance has detected a special condition resulting in a
+          failed subsystem update.  The condition has been recorded is stored
+         in the fscKvmS3TrapObjectFirmwareCondition object.
+
+          Note: this trap is deprecated and will not longer be sent.
+         "
+
+      --#SUMMARY     "Subsystem upgrade failed. Device ID: %s."
+      --#ARGUMENTS   { 0 }
+      --#SEVERITY    INFORMATIONAL
+      ::= 30
+
+fscKvmS3WarningConditionTrap TRAP-TYPE
+      ENTERPRISE  fscKvmS3Products
+      VARIABLES   {
+                     fscKvmS3TrapObjectDeviceId,
+                     fscKvmS3TrapObjectAlarmCondition,
+                     fscKvmS3TrapObjectAlarmDescription
+                  }
+      DESCRIPTION
+         "The Appliance has detected a special condition to be trapped
+         for warning the operator.  The condition indicates some parameter
+         outside of normal operation, such as over temperature range.
+         These are not expected to result in unusual behavior, but may
+         be precursor to a subsequent urgent condition.
+         "
+
+      --#SUMMARY     "Warning condition. Device ID: %s. Alarm condition: %d. Alarm description: %s."
+      --#ARGUMENTS   { 0, 1, 2 }
+      --#SEVERITY    MINOR
+      ::= 31
+
+fscKvmS3UrgentConditionTrap TRAP-TYPE
+      ENTERPRISE  fscKvmS3Products
+      VARIABLES   {
+                     fscKvmS3TrapObjectDeviceId,
+                     fscKvmS3TrapObjectAlarmCondition,
+                     fscKvmS3TrapObjectAlarmDescription
+                  }
+      DESCRIPTION
+         "The Appliance has detected a special condition to be trapped
+         for alerting the operator.  The condition indicates some parameter
+         outside of normal operation that is expected to result in
+         unpredictable system behavior.
+         "
+
+      --#SUMMARY     "Urgent condition. Device ID: %s. Alarm condition: %d. Alarm description: %s."
+      --#ARGUMENTS   { 0, 1, 2 }
+      --#SEVERITY    CRITICAL
+      ::= 32
+
+fscKvmS3UserLockedTrap TRAP-TYPE
+      ENTERPRISE  fscKvmS3Products
+      VARIABLES   {
+                     fscKvmS3TrapObjectIPAddress,
+                     fscKvmS3TrapObjectTargetUserName,
+                     fscKvmS3TrapObjectLockReason
+                  }
+      DESCRIPTION
+         "A user account has been locked.
+
+         The IP address of the client is contained in fscKvmS3TrapObjectIPAddress.
+
+         The name of the user who was locked is contained
+         in fscKvmS3TrapObjectTargetUserName.
+
+         The reason for which the user account has been locked is contained
+         in fscKvmS3TrapObjectLockReason.
+         "
+
+      --#SUMMARY     "User account has been locked. Client IP Address: %s. Locked user: %s. Reason: %s"
+      --#ARGUMENTS   { 0, 1, 2 }
+      --#SEVERITY    MINOR
+      ::= 33
+
+fscKvmS3UserUnlockedTrap TRAP-TYPE
+      ENTERPRISE  fscKvmS3Products
+      VARIABLES   {
+                     fscKvmS3TrapObjectIPAddress,
+                     fscKvmS3TrapObjectUserName,
+                     fscKvmS3TrapObjectTargetUserName,
+                     fscKvmS3TrapObjectUnlockReason
+                  }
+      DESCRIPTION
+         "A user account has been unlocked.
+
+         The IP address of the client that originated the unlock request
+         is contained in fscKvmS3TrapObjectIPAddress. When the user 
+         account is unlocked by an appliance reboot or by the expiration
+         of the lockout period (as specified in the
+         fscKvmS3TrapObjectUnlockReason object), the IP address 
+         will be blank.
+
+         The name of the user who unlocked the user is contained
+         in fscKvmS3TrapObjectUserName. When the user account is unlocked 
+         by an appliance reboot or by the expiration of the lockout period
+         (as specified in the fscKvmS3TrapObjectUnlockReason object), the
+         name of the user will be blank.
+
+         The name of the user who was unlocked is contained
+         in fscKvmS3TrapObjectTargetUserName.
+
+         The reason for which the user account has been unlocked is contained
+         in fscKvmS3TrapObjectUnlockReason.
+         "
+
+      --#SUMMARY     "User account has been unlocked. Client IP Address: %s. Command issued by user: %s. Unlocked user: %s. Reason: %s"
+      --#ARGUMENTS   { 0, 1, 2, 3 }
+      --#SEVERITY    MINOR
+      ::= 34
+
+--
+--  KVM-IA Update Traps
+--
+
+fscKvmS3KvmIaImageUpgradeStarted TRAP-TYPE
+      ENTERPRISE  fscKvmS3Products
+      VARIABLES   {
+                     fscKvmS3TrapObjectUserName,
+                     fscKvmS3TrapObjectTypeOfImage,
+                     fscKvmS3TrapObjectImageNewVersion,
+                     fscKvmS3TrapObjectImageCurrentVersion,
+                     fscKvmS3TrapObjectServerName,
+                     fscKvmS3TrapObjectKvmIaId
+                  }
+      DESCRIPTION
+         "A software image upgrade has started on an KVM-IA.
+
+         The name of the user who initiated the KVM-IA upgrade is
+         contained in fscKvmS3TrapObjectUserName.
+
+          The type of software image being upgraded is contained in
+          fscKvmS3TrapObjectTypeOfImage.
+
+          The software image version the KVM-IA is upgrading to is
+          contained in fscKvmS3TrapObjectImageNewVersion.
+
+          The software image version the KVM-IA is currently running
+          is contained in fscKvmS3TrapObjectImageCurrentVersion.
+
+          The name of the server connected to the KVM-IA being upgraded is
+          contained in fscKvmS3TrapObjectServerName.
+
+          The ID of the KVM-IA being upgraded is contained in
+          fscKvmS3TrapObjectKvmIaId
+         "
+      --#SUMMARY     "KVM-IA image upgrade started. Command issued by user: %s. Image type: %s. New version: %s. Current version: %s. Server: %s. KVM-IA ID: %s."
+      --#ARGUMENTS   { 0, 1, 2, 3, 4, 5 }
+      --#SEVERITY    INFORMATIONAL
+      --#CATEGORY    "Status Events"
+      --% TrapTypeEnum=40
+      ::= 35
+
+fscKvmS3KvmIaImageUpgradeResultTrap  TRAP-TYPE
+      ENTERPRISE  fscKvmS3Products
+      VARIABLES   {
+                     fscKvmS3TrapObjectKvmIaImageUpgradeResult,
+                     fscKvmS3TrapObjectUserName,
+                     fscKvmS3TrapObjectTypeOfImage,
+                     fscKvmS3TrapObjectImageNewVersion,
+                     fscKvmS3TrapObjectImageCurrentVersion,
+                     fscKvmS3TrapObjectServerName,
+                     fscKvmS3TrapObjectKvmIaId
+                  }
+      DESCRIPTION
+         "The result of an KVM-IA software image upgrade.
+
+         The image upgrade result is contained in
+         fscKvmS3TrapObjectKVM-IAImageUpgradeResult.
+
+         The name of the user who initiated the KVM-IA upgrade is
+         contained in fscKvmS3TrapObjectUserName.
+
+         The type of software image the upgrade result is for is contained in
+         fscKvmS3TrapObjectTypeOfImage.
+
+         The software image version the KVM-IA attempted to upgrade to
+         is contained in fscKvmS3TrapObjectImageNewVersion.
+
+         The software image version the KVM-IA is running is contained
+         in fscKvmS3TrapObjectImageCurrentVersion. If the software image
+         upgrade was successful then this version will match the version
+         reported in fscKvmS3TrapObjectImageNewVersion.
+
+         The name of the server connected to the KVM-IA is
+         contained in fscKvmS3TrapObjectServerName.
+
+         The ID of the KVM-IA the result is for is contained in
+         fscKvmS3TrapObjectKvmIaId.
+
+         "
+      --#SUMMARY     "KVM-IA image upgrade result. Result: %d. Upgrade was started by user: %s. Upgrade image type: %d. Upgrade version: %s. Running version: %s. Server: %s. KVM-IA ID: %s."
+      --#ARGUMENTS   { 0, 1, 2, 3, 4, 5, 6 }
+      --#SEVERITY    INFORMATIONAL
+      --#CATEGORY    "Status Events"
+      --% TrapTypeEnum=41
+      ::= 36
+
+fscKvmS3KvmIaRestartedTrap  TRAP-TYPE
+      ENTERPRISE  fscKvmS3Products
+      VARIABLES   {
+                     fscKvmS3TrapObjectServerName,
+                     fscKvmS3TrapObjectKvmIaId
+                  }
+      DESCRIPTION
+         "An KVM-IA  has restarted. An KVM-IA will restart after
+          an KVM-IA image upgrade completes.
+
+          The name of the server connected to the KVM-IA is
+          contained in fscKvmS3TrapObjectServerName.
+
+          The ID of the KVM-IA that restarted is for is contained in
+          fscKvmS3TrapObjectKvmIaId.
+         "
+      --#SUMMARY     "KVM-IA restarted. Server: %s. KVM-IA ID: %s."
+      --#ARGUMENTS   { 0, 1 }
+      --#SEVERITY    INFORMATIONAL
+      --#CATEGORY    "Status Events"
+      --% TrapTypeEnum=42
+      ::= 37
+
+--
+--  Virtual Media Traps
+--
+
+fscKvmS3VirtualMediaSessionStartedTrap TRAP-TYPE
+      ENTERPRISE  fscKvmS3Products
+      VARIABLES   {
+                     fscKvmS3TrapObjectUserName,
+                     fscKvmS3TrapObjectServerName,
+                     fscKvmS3TrapObjectKvmIaId
+                  }
+      DESCRIPTION
+         "A remote Virtual Media session to a server has started. A video
+          session to the server must have been established by the same user
+          prior to starting the VM session.
+
+          The name of the user who connected to the VM session
+          is contained in fscKvmS3TrapObjectUserName.
+
+          The name of the server the user connected to is contained in
+          fscKvmS3TrapObjectServerName.
+
+          The ID of the KVM-IA the video session is using is contained in
+          fscKvmS3TrapObjectKvmIaId.
+        "
+      --#SUMMARY     "Remote virtual media session started. User: %s. Server: %s. KVM-IA: %s."
+      --#ARGUMENTS   { 0, 1, 2 }
+      --#SEVERITY    INFORMATIONAL
+      --#CATEGORY    "Status Events"
+      --% TrapTypeEnum=43
+      ::= 38
+
+fscKvmS3VirtualMediaSessionStoppedTrap TRAP-TYPE
+      ENTERPRISE  fscKvmS3Products
+      VARIABLES   {
+                     fscKvmS3TrapObjectUserName,
+                     fscKvmS3TrapObjectServerName
+                  }
+      DESCRIPTION
+         "A remote virtual media session to a server has stopped.
+
+          The name of the user who was connected to the VM session
+          is contained in fscKvmS3TrapObjectUserName.
+
+          The name of the server the user was connected to is contained in
+          fscKvmS3TrapObjectServerName.
+         "
+      --#SUMMARY     "Remote virtual media session stopped. User: %s. Server: %s."
+      --#ARGUMENTS   { 0, 1 }
+      --#SEVERITY    INFORMATIONAL
+      --#CATEGORY    "Status Events"
+      --% TrapTypeEnum=44
+      ::= 39
+
+fscKvmS3VirtualMediaSessionTerminatedTrap TRAP-TYPE
+      ENTERPRISE  fscKvmS3Products
+      VARIABLES   {
+                     fscKvmS3TrapObjectUserName,
+                     fscKvmS3TrapObjectTargetUserName,
+                     fscKvmS3TrapObjectServerName
+                  }
+      DESCRIPTION
+         "A remote virtual media session has been terminated or preempted
+          by another user.
+
+          The name of the user who terminated or preempted the VM session is
+          contained in fscKvmS3TrapObjectUserName if available. An empty
+          string is reported if a user name is not available. A user
+          name will not be available if the remote session was terminated
+          or preempted from the OSCAR interface and OSCAR authentication is
+          disabled.
+
+          The name of the user who was terminated or preempted from the VM
+          session is contained in fscKvmS3TrapObjectTargetUserName.
+
+          The name of the server the user was connected to contained in
+          fscKvmS3TrapObjectServerName.
+         "
+      --#SUMMARY     "Remote video session terminated. Command issued by user: %s. Terminated user: %s. Server: %s."
+      --#ARGUMENTS   { 0, 1, 2 }
+      --#SEVERITY    INFORMATIONAL
+      --#CATEGORY    "Status Events"
+      --% TrapTypeEnum=45
+      ::= 40
+
+fscKvmS3VirtualMediaSessionReservedTrap TRAP-TYPE
+      ENTERPRISE  fscKvmS3Products
+      VARIABLES   {
+                     fscKvmS3TrapObjectUserName,
+                     fscKvmS3TrapObjectServerName
+                  }
+      DESCRIPTION
+         "A user established a reserved remote virtual media session.
+
+         The name of the user who has established a reserved virtual media session
+         is contained in fscKvmS3TrapObjectUserName.
+
+         The name of the server the user was connected to is contained in
+         fscKvmS3TrapObjectServerName.
+         "
+      --#SUMMARY     "Remote virtual media session has been reserved. User: %s. Server: %s."
+      --#ARGUMENTS   { 0, 1 }
+      --#SEVERITY    INFORMATIONAL
+      --#CATEGORY    "Status Events"
+      --% TrapTypeEnum=46
+      ::= 41
+
+fscKvmS3VirtualMediaSessionUnreservedTrap TRAP-TYPE
+      ENTERPRISE  fscKvmS3Products
+      VARIABLES   {
+                     fscKvmS3TrapObjectUserName,
+                     fscKvmS3TrapObjectServerName
+                  }
+      DESCRIPTION
+         "A user established a non-reserved remote virtual media session.
+
+         The name of the user who has established a non-reserved virtual media session
+         is contained in fscKvmS3TrapObjectUserName.
+
+         The name of the server the user was connected to is contained in
+         fscKvmS3TrapObjectServerName.
+         "
+      --#SUMMARY     "User has established a non-reserved virtual media session to server. User: %s. Server: %s."
+      --#ARGUMENTS   { 0, 1 }
+      --#SEVERITY    INFORMATIONAL
+      --#CATEGORY    "Status Events"
+      --% TrapTypeEnum=47
+      ::= 42
+
+fscKvmS3VirtualMediaDriveMapped TRAP-TYPE
+      ENTERPRISE  fscKvmS3Products
+      VARIABLES   {
+                     fscKvmS3TrapObjectUserName,
+                     fscKvmS3TrapObjectServerName,
+                     fscKvmS3TrapObjectVirtualMediaDriveType,
+                     fscKvmS3TrapObjectVirtualMediaDriveAccessMode
+                  }
+      DESCRIPTION
+         "A remote virtual media drive has been mapped.
+
+         The name of the user who has established the virtual media session
+         is contained in fscKvmS3TrapObjectUserName.
+
+         The name of the server the user was connected to is contained in
+         fscKvmS3TrapObjectServerName.
+
+         The type of drive that has been mapped is contained in
+         fscKvmS3TrapObjectVirtualMediaDriveType.
+
+         The access mode for the drive that has been mapped is contained in
+         fscKvmS3TrapObjectVirtualMediaDriveAccessMode.
+         "
+      --#SUMMARY     "Remote virtual media drive has been mapped. User: %s. Server: %s Drive Type: %s. Drive Access Mode: %s."
+      --#ARGUMENTS   { 0, 1, 2, 3 }
+      --#SEVERITY    INFORMATIONAL
+      --#CATEGORY    "Status Events"
+      --% TrapTypeEnum=48
+      ::= 43
+
+fscKvmS3VirtualMediaDriveUnmapped TRAP-TYPE
+      ENTERPRISE  fscKvmS3Products
+      VARIABLES   {
+                     fscKvmS3TrapObjectUserName,
+                     fscKvmS3TrapObjectServerName,
+                     fscKvmS3TrapObjectVirtualMediaDriveType,
+                     fscKvmS3TrapObjectVirtualMediaDriveAccessMode
+                  }
+      DESCRIPTION
+         "A remote virtual media drive has been unmapped.
+
+         The name of the user who has established the virtual media session
+         is contained in fscKvmS3TrapObjectUserName.
+
+         The name of the server the user was connected to is contained in
+         fscKvmS3TrapObjectServerName.
+
+         The type of drive that has been unmapped is contained in
+         fscKvmS3TrapObjectVirtualMediaDriveType.
+
+         The access mode for the drive that has been unmapped is contained in
+         fscKvmS3TrapObjectVirtualMediaDriveAccessMode.
+         "
+      --#SUMMARY     "Remote virtual media drive has been unmapped. User: %s. Server: %s Drive Type: %s. Drive Access Mode: %s."
+      --#ARGUMENTS   { 0, 1, 2, 3 }
+      --#SEVERITY    INFORMATIONAL
+      --#CATEGORY    "Status Events"
+      --% TrapTypeEnum=49
+      ::= 44
+
+fscKvmS3LocalPortVirtualMediaStartedTrap TRAP-TYPE
+      ENTERPRISE  fscKvmS3Products
+      VARIABLES   { fscKvmS3TrapObjectSessionIdentifier }
+      DESCRIPTION
+         "A user on the local port has started a virtual media session to a server.
+
+         The session identifier is contained in fscKvmS3TrapObjectSessionIdentifier.
+         "
+
+      --#SUMMARY     "Virtual Media session started on the local port. Server: %s."
+      --#ARGUMENTS   { 0 }
+      --#SEVERITY    INFORMATIONAL
+      ::= 45
+
+fscKvmS3LocalPortVirtualMediaStoppedTrap TRAP-TYPE
+      ENTERPRISE  fscKvmS3Products
+      VARIABLES   { fscKvmS3TrapObjectSessionIdentifier }
+      DESCRIPTION
+         "A user on the local port has stopped a virtual media session to a server.
+
+         The session identifier is contained in fscKvmS3TrapObjectSessionIdentifier.
+         "
+
+      --#SUMMARY     "Virtual Media session stopped on the local port. Server: %s."
+      --#ARGUMENTS   { 0 }
+      --#SEVERITY    INFORMATIONAL
+      ::= 46
+
+fscKvmS3LocalPortVirtualMediaSessionTerminatedTrap TRAP-TYPE
+      ENTERPRISE  fscKvmS3Products
+      VARIABLES   {
+                     fscKvmS3TrapObjectUserName,
+                     fscKvmS3TrapObjectServerName
+                  }
+      DESCRIPTION
+         "A local user virtual media session has been terminated or preempted
+          by another user.
+
+          The name of the user who terminated or preempted the VM session is
+          contained in fscKvmS3TrapObjectUserName if available. An empty
+          string is reported if a user name is not available. A user
+          name will not be available if the remote session was terminated
+          or preempted from the OSCAR interface and OSCAR authentication is
+          disabled.
+
+          The name of the server the local user was connected to contained in
+          fscKvmS3TrapObjectServerName.
+         "
+      --#TYPE        "Local Port Virtual Media Session Terminated"
+      --#SUMMARY     "Local Port Virtual Media Session terminated. Command issued by user: %s. Server: %s."
+      --#ARGUMENTS   { 0, 1 }
+      --#SEVERITY    INFORMATIONAL
+      ::= 47
+
+fscKvmS3LocalPortVirtualMediaSessionReservedTrap TRAP-TYPE
+      ENTERPRISE  fscKvmS3Products
+      VARIABLES   {
+                     fscKvmS3TrapObjectServerName
+                  }
+      DESCRIPTION
+         "A local user has reserved a local virtual media session.
+
+         The name of the server the user was connected to is contained in
+         fscKvmS3TrapObjectServerName.
+         "
+      --#TYPE        "Local Port Virtual Media Session Reserved"
+      --#SUMMARY     "Local Port virtual media session has been reserved. Server: %s."
+      --#ARGUMENTS   { 0 }
+      --#SEVERITY    INFORMATIONAL
+      ::= 48
+
+fscKvmS3LocalPortVirtualMediaSessionUnreservedTrap TRAP-TYPE
+      ENTERPRISE  fscKvmS3Products
+      VARIABLES   {
+                     fscKvmS3TrapObjectServerName
+                  }
+      DESCRIPTION
+         "A local user has unreserved a local virtual media session.
+
+         The name of the server the user was connected to is contained in
+         fscKvmS3TrapObjectServerName.
+         "
+      --#TYPE        "Local Port Virtual Media Session Unreserved"
+      --#SUMMARY     "Local Port virtual media session has been unreserved. Server: %s."
+      --#ARGUMENTS   { 0 }
+      --#SEVERITY    INFORMATIONAL
+      ::= 49
+
+
+fscKvmS3LocalPortVideoSessionTerminatedTrap TRAP-TYPE
+      ENTERPRISE  fscKvmS3Products
+      VARIABLES   {
+                     fscKvmS3TrapObjectUserName,
+                     fscKvmS3TrapObjectSessionIdentifier
+                  }
+      DESCRIPTION
+         "A local user video session has been terminated by another
+          user.
+
+          The name of the user who terminated the session is
+          contained in fscKvmS3TrapObjectUserName.
+
+
+          The session identifier is contained in
+          fscKvmS3TrapObjectSessionIdentifier.
+         "
+
+      --#SUMMARY     "Local Port Video session terminated. Command issued by user: %s. Server: %s."
+      --#ARGUMENTS   { 0, 1 }
+      --#SEVERITY    INFORMATIONAL
+      ::= 50
+
+END

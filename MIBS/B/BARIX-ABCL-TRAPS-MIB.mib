@@ -1,0 +1,250 @@
+-- Barix MIB Registration Authority
+-- This is the authority for defining MIB items under  barix.products.abcl  { enterprises 17491 1 5 }
+-- If new branches are needed then this file MUST be updated
+-- Version: 1.0
+-- Date: 12 June, 2008
+-- Copyright (c) 2008 Barix AG
+-- Changes:
+-- 20080612 Petr Kulhavy created 
+
+	BARIX-ABCL-TRAPS-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+		sysUpTime
+			FROM RFC1213-MIB
+		abcl, gptIndex, gptValue
+			FROM BARIX-MIB
+		TRAP-TYPE
+			FROM RFC-1215;
+ 
+-- General Traps
+-- Traps in the range 0 to 999 are allocated for general purpose use. 
+
+		keepalive TRAP-TYPE
+			ENTERPRISE abcl
+			VARIABLES { sysUpTime }
+			DESCRIPTION 
+				"A keepalive trap signalises that the system is
+				still alive."
+			::=1
+-- OEM specific traps
+-- Traps starting from number 1000 are reserved for OEM specific projects. 
+
+-- Audio Bridge for public transport
+-- Allocated range 1000 to 1099
+ 		
+		amplifier1AlarmCleared TRAP-TYPE
+			ENTERPRISE abcl
+			VARIABLES { sysUptime,
+				    gptIndex,
+				    gptValue,
+				    gptIndex,
+				    gptValue,
+				    gptIndex,
+				    gptValue,
+				    gptIndex,
+				    gptValue
+			}
+			DESCRIPTION 
+				"An amplifier1AlarmCleared trap signalises end of
+				error condition 'Amplifier 1 Alarm' and is sent
+				when the amplifier error of the first amplifier
+				is resolved (the respective digital input is
+				inactive). 
+
+				The details of the alert are sent as general
+				purpose text strings that contain the following
+				information in the given order: Human readable
+				timestamp of the alarm, alarm severity, textual
+				host name and a textual alarm description."
+
+			::=1000
+
+		amplifier1Alarm TRAP-TYPE
+			ENTERPRISE abcl
+			VARIABLES { sysUptime,
+				    gptIndex,
+				    gptValue,
+				    gptIndex,
+				    gptValue,
+				    gptIndex,
+				    gptValue,
+				    gptIndex,
+				    gptValue
+			}
+			DESCRIPTION 
+				"An amplifier1Alarm trap signalises an alarm
+				condition on the first amplifier. The trap
+				is triggered by activity on the respective
+				digital input.
+
+				The details of the alert are sent as general
+				purpose text strings that contain the following
+				information in the given order: Human readable
+				timestamp of the alarm, alarm severity, textual
+				host name and a textual alarm description."
+
+			::=1001
+
+		amplifier2AlarmCleared TRAP-TYPE
+			ENTERPRISE abcl
+			VARIABLES { sysUptime,
+				    gptIndex,
+				    gptValue,
+				    gptIndex,
+				    gptValue,
+				    gptIndex,
+				    gptValue,
+				    gptIndex,
+				    gptValue
+			}
+			DESCRIPTION 
+				"An amplifier2AlarmCleared trap signalises end of
+				error condition 'Amplifier 2 Alarm' and is sent
+				when the amplifier error of the second
+				amplifier is resolved (the respective digital
+				input is inactive). 
+
+				The details of the alert are sent as general
+				purpose text strings that contain the following
+				information in the given order: Human readable
+				timestamp of the alarm, alarm severity, textual
+				host name and a textual alarm description."
+
+			::=1002
+
+		amplifier2Alarm TRAP-TYPE
+			ENTERPRISE abcl
+			VARIABLES { sysUptime,
+				    gptIndex,
+				    gptValue,
+				    gptIndex,
+				    gptValue,
+				    gptIndex,
+				    gptValue,
+				    gptIndex,
+				    gptValue
+			}
+			DESCRIPTION 
+				"An amplifier2Alarm trap signalises an alarm
+				condition on the second amplifier. The trap
+				is triggered by activity on the respective
+				digital input.
+
+				The details of the alert are sent as general
+				purpose text strings that contain the following
+				information in the given order: Human readable
+				timestamp of the alarm, alarm severity, textual
+				host name and a textual alarm description."
+
+			::=1003
+
+		partnerMissingCleared TRAP-TYPE
+			ENTERPRISE abcl
+			VARIABLES { sysUptime,
+				    gptIndex,
+				    gptValue,
+				    gptIndex,
+				    gptValue,
+				    gptIndex,
+				    gptValue,
+				    gptIndex,
+				    gptValue
+			}
+			DESCRIPTION 
+				"A partnerMissingCleared trap signalises end of
+				error condition 'Partner Missing' and is sent
+				when the respective partner comes on-line. 
+
+				The details of the alert are sent as general
+				purpose text strings that contain the following
+				information in the given order: Human readable
+				timestamp of the alarm, alarm severity, textual
+				host name and a textual alarm description."
+
+			::=1004
+
+		partnerMissing TRAP-TYPE
+			ENTERPRISE abcl
+			VARIABLES { sysUptime,
+				    gptIndex,
+				    gptValue,
+				    gptIndex,
+				    gptValue,
+				    gptIndex,
+				    gptValue,
+				    gptIndex,
+				    gptValue
+			}
+			DESCRIPTION 
+				"A partnerMissing trap signalises a loss of
+				the communication partner. The trap is sent
+				only once when the partner is not responding
+				for more than 60 seconds.
+
+				The details of the alert are sent as general
+				purpose text strings that contain the following
+				information in the given order: Human readable
+				timestamp of the alarm, alarm severity, textual
+				host name and a textual alarm description."
+
+			::=1005
+ 
+				
+		noAudioCleared TRAP-TYPE
+			ENTERPRISE abcl
+			VARIABLES { sysUptime,
+				    gptIndex,
+				    gptValue,
+				    gptIndex,
+				    gptValue,
+				    gptIndex,
+				    gptValue,
+				    gptIndex,
+				    gptValue
+			}
+			DESCRIPTION 
+				"A noAudioCleared trap signalises end of
+				error condition 'No Audio' and is sent
+				when the output audio level raises above the
+				minimum level. 
+
+				The details of the alert are sent as general
+				purpose text strings that contain the following
+				information in the given order: Human readable
+				timestamp of the alarm, alarm severity, textual
+				host name and a textual alarm description."
+
+			::=1006
+
+		noAudio TRAP-TYPE
+			ENTERPRISE abcl
+			VARIABLES { sysUptime,
+				    gptIndex,
+				    gptValue,
+				    gptIndex,
+				    gptValue,
+				    gptIndex,
+				    gptValue,
+				    gptIndex,
+				    gptValue
+			}
+			DESCRIPTION 
+				"A noAudio trap is sent if the audio output
+				peak level is too low for a certain
+				(configured) period of time while a valid audio
+				stream is being received. This condition
+				signalises a potential error in analog
+				circuitry. 
+
+				The details of the alert are sent as general
+				purpose text strings that contain the following
+				information in the given order: Human readable
+				timestamp of the alarm, alarm severity, textual
+				host name and a textual alarm description."
+
+			::=1007
+ 
+				
+                                                                    
+          END
+

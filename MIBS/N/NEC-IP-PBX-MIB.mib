@@ -1,0 +1,102 @@
+NEC-IP-PBX-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+
+      MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE
+         FROM SNMPv2-SMI  
+         
+      DisplayString, RowPointer, TEXTUAL-CONVENTION, DateAndTime
+         FROM SNMPv2-TC;          
+
+--
+-- NEC.1:  NEC PBX Products
+--
+   necPbxMIB MODULE-IDENTITY
+      LAST-UPDATED  "0110170000Z"
+      ORGANIZATION  "NEC Corp."
+      CONTACT-INFO  "TEL NO"
+      DESCRIPTION   "IPS MIB"
+      ::= { iso(1) org(3) dod(6) internet(1) private(4) enterprises(1) 119 1 76 }
+
+
+-- NEC IPS Products
+   pbxSmall OBJECT IDENTIFIER ::= { necPbxMIB 3 }
+
+--
+-- NEC.2:  NEC IPS MIBs
+--
+   pbxSmallMib OBJECT IDENTIFIER ::= { iso(1) org(3) dod(6) internet(1) private(4) enterprises(1) 119 2 3 76 3 }
+
+-- IPS Alarm Lamp GROUP.
+
+   ipsAlarm OBJECT IDENTIFIER ::= { pbxSmallMib 1 }
+
+   ipsLampStatusClear    OBJECT-TYPE 
+      SYNTAX      INTEGER { non(1) , exist(2) }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION  "IPS Lamp Statas /Status Clear"
+      ::= { ipsAlarm 1 }
+
+   ipsMajorLampStatus    OBJECT-TYPE
+      SYNTAX      INTEGER { non(1) , exist(2) }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION  "IPS Major Lamp Status"
+      ::= { ipsAlarm 2 }
+
+   ipsMinorLampStatus    OBJECT-TYPE
+      SYNTAX      INTEGER { non(1) , exist(2) }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION  "IPS Minor Lamp Status"
+      ::= { ipsAlarm 3 }
+ 
+-- IPS SYSTEM MESSAGE GROUP.
+
+   ipsSysMsg OBJECT IDENTIFIER ::= { pbxSmallMib 2 }
+
+   ipsSystemMessageData  OBJECT-TYPE
+      SYNTAX      DisplayString( SIZE (0..255) )
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION  "IPS System Message Trap Data"
+      ::= { ipsSysMsg 1 }
+
+   ipsSystemMessage      NOTIFICATION-TYPE
+      OBJECTS     { ipsSystemMessageData }
+      STATUS      current
+      DESCRIPTION "IPS System Message Trap"
+      ::= { ipsSysMsg 2 }
+
+
+   ipsSystemMessageMajor OBJECT-TYPE
+      SYNTAX      DisplayString (SIZE (0..255))
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "IPS System Message Major Trap"
+      ::= {  ipsSysMsg 3 }
+
+   ipsSystemMessageMinor OBJECT-TYPE
+      SYNTAX      DisplayString (SIZE (0..255))
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "IPS System Message Minor Trap"
+      ::= {  ipsSysMsg 4 }
+
+   ipsSystemMessageSupervisor OBJECT-TYPE
+      SYNTAX      DisplayString (SIZE (0..255))
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "IPS System Message Supervisor Trap"
+      ::= {  ipsSysMsg 5 }
+
+   ipsSystemMessageNotifiation OBJECT-TYPE
+      SYNTAX      DisplayString (SIZE (0..255))
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION "IPS System Message Notification Trap"
+      ::= {  ipsSysMsg 6 }
+
+END
+

@@ -1,0 +1,156 @@
+LPO-ROUVIERE-MIB DEFINITIONS ::= BEGIN
+
+-- MIB of the LPO Rouviere (Technical High School, Toulon, France)
+
+-- IMPORTS: Include definitions from other mibs here, which is always
+-- the first item in a MIB file.
+
+IMPORTS
+        enterprises, Integer32                           FROM SNMPv2-SMI
+        MODULE-IDENTITY                       FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, OBJECT-GROUP       FROM SNMPv2-CONF;
+
+--
+-- A brief description and update information about this mib.
+--
+lpoRouviereMIB MODULE-IDENTITY
+    LAST-UPDATED "201810300000Z"            -- 30 October 2018, midnight
+    ORGANIZATION "LPO Rouviere"
+    CONTACT-INFO "postal:   rue Henri Sainte-Claire Deville
+                            83100 Toulon
+                            France
+
+                  email:    0831616f@ac-nice.fr
+                 "
+    DESCRIPTION  "MIB for remote control by SNMP.
+                 "
+    ::= { enterprises 52900 }
+
+-- Define typical mib nodes, like where the objects are going to lie.
+-- we'll prefix everything in this mib with lpr (LPO Rouviere)
+lprMIBObjects     OBJECT IDENTIFIER ::= { lpoRouviereMIB 1 }
+lprMIBConformance OBJECT IDENTIFIER ::= { lpoRouviereMIB 2 }
+
+
+-- Define the list of projects
+lprSnmpTutorial   OBJECT IDENTIFIER ::= { lprMIBObjects 1 }
+lprPointCast   OBJECT IDENTIFIER ::= { lprMIBObjects 2 }
+
+-- lprSnmpTutorial Module
+lprSnmpTutorialLeds   OBJECT IDENTIFIER ::= { lprSnmpTutorial 1 }
+lprSnmpTutorialButtons   OBJECT IDENTIFIER ::= { lprSnmpTutorial 2 }
+
+--
+-- 3 LEDs connected to the GPIO
+--
+
+--
+-- LED 0 connected to GPIO
+--
+led1            OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+  "Led 1 connected to the GPIO."
+    DEFVAL { 0 }
+    ::= { lprSnmpTutorialLeds 1 }
+
+--
+-- LED 1 connected to GPIO
+--
+led2            OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+  "Led 2 connected to the GPIO."
+    DEFVAL { 0 }
+    ::= { lprSnmpTutorialLeds 2 }
+
+--
+-- LED 2 connected to GPIO
+--
+led3            OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+  "Led 3 connected to the GPIO."
+    DEFVAL { 0 }
+    ::= { lprSnmpTutorialLeds 3 }
+
+--
+-- 3 buttons connected to the GPIO
+--
+
+--
+-- BUTTON 1 connected to GPIO
+--
+sw1            OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+  "Button 1 connected to the GPIO."
+    DEFVAL { 0 }
+    ::= { lprSnmpTutorialButtons 1 }
+
+--
+-- BUTTON 2 connected to GPIO
+--
+sw2            OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+  "Button 2 connected to the GPIO."
+    DEFVAL { 0 }
+    ::= { lprSnmpTutorialButtons 2 }
+
+--
+-- BUTTON 3 connected to GPIO
+--
+sw3            OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+  "Button 3 connected to the GPIO."
+    DEFVAL { 0 }
+    ::= { lprSnmpTutorialButtons 3 }
+
+-- lprPointCast Module
+lprPointCastCoils   OBJECT IDENTIFIER ::= { lprPointCast 1 }
+lprPointCastDiscreteInputs   OBJECT IDENTIFIER ::= { lprPointCast 2 }
+lprPointCastInputRegisters   OBJECT IDENTIFIER ::= { lprPointCast 3 }
+
+coil1            OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+  "Coil that drives the first device."
+    DEFVAL { 0 }
+    ::= { lprPointCastCoils 1 }
+
+coil2            OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+  "Coil that drives the second device."
+    DEFVAL { 0 }
+    ::= { lprPointCastCoils 2 }
+
+coil3            OBJECT-TYPE
+    SYNTAX      Integer32 (0..1)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+  "Coil that drives the third device."
+    DEFVAL { 0 }
+    ::= { lprPointCastCoils 3 }
+
+-- END:  Don't forget this!
+END

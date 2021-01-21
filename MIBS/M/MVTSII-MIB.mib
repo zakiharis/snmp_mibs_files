@@ -1,0 +1,276 @@
+-- Mera SNMP parameters
+
+
+MVTSII-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        OBJECT-TYPE          FROM RFC-1212
+        enterprises          FROM RFC1155-SMI
+        TRAP-TYPE            FROM RFC-1215;
+
+
+mera    OBJECT IDENTIFIER ::= { enterprises 28029 }
+
+mvtsii  OBJECT IDENTIFIER ::= { mera 11 }
+
+  nodes            OBJECT-TYPE
+    SYNTAX         OCTET STRING
+    ACCESS         read-only
+    STATUS         mandatory
+    DESCRIPTION    "Full node list"
+  ::= { mvtsii 1}
+
+  -- Counters for all nodes
+  commonTable      OBJECT-TYPE
+    SYNTAX         CommonTable
+    ACCESS         read-only
+    STATUS         mandatory
+    DESCRIPTION    "Common mvtsii counters table root"
+  ::= {mvtsii 2}
+
+  CommonTable ::= SEQUENCE
+    {
+      common       CommonCounters
+    }
+
+  common           OBJECT-TYPE
+    SYNTAX         CommonCounters
+    ACCESS         read-only
+    STATUS         mandatory
+    DESCRIPTION    "Common mvtsii counters"
+	INDEX   { nodeNameCommon }
+  ::= { commonTable 1 }
+
+  CommonCounters  ::= SEQUENCE
+    {
+      nodeNameCommon       OCTET STRING,
+      phoenixRestartcount  INTEGER
+    }
+
+  nodeNameCommon   OBJECT-TYPE
+    SYNTAX         OCTET STRING
+    ACCESS         read-only
+    STATUS         mandatory
+    DESCRIPTION    "Index for conters - node name"
+  ::= { common 1 }
+
+  phoenixRestartcount OBJECT-TYPE
+    SYNTAX         INTEGER
+    ACCESS         read-only
+    STATUS         mandatory
+    DESCRIPTION    "phoenix.restartcount"
+  ::= { common 2 }
+
+  -- Signaling node counters
+  signalingTable   OBJECT-TYPE
+    SYNTAX         SignalingTable
+    ACCESS         read-only
+    STATUS         mandatory
+    DESCRIPTION    "Signaling node counters table root"
+  ::= { mvtsii 3 }
+
+  SignalingTable   ::= SEQUENCE
+    {
+      signaling    SignalingCounters
+    }
+
+  signaling        OBJECT-TYPE
+    SYNTAX         SignalingCounters
+    ACCESS         read-only
+    STATUS         mandatory
+    DESCRIPTION    "Signaling node counters"
+	INDEX   { nodeNameSignaling }
+  ::= { signalingTable 1 }
+
+  SignalingCounters ::= SEQUENCE
+    {
+      nodeNameSignaling    OCTET STRING,
+      legsActiveCurrent    INTEGER,
+      legsActivePeak       INTEGER,
+      legsStarted          INTEGER,
+      legsTerminated       INTEGER,
+      callsRateCurrent     INTEGER,
+      callsRatePeak        INTEGER
+    }
+
+  nodeNameSignaling  OBJECT-TYPE
+    SYNTAX           OCTET STRING
+    ACCESS           read-only
+    STATUS           mandatory
+    DESCRIPTION     "Index for conters - node name"
+  ::= { signaling 1 }
+
+  legsActiveCurrent  OBJECT-TYPE
+    SYNTAX           INTEGER
+    ACCESS           read-only
+    STATUS           mandatory
+    DESCRIPTION      "node.legs.active.current"
+  ::= { signaling 2 }
+
+  legsActivePeak     OBJECT-TYPE
+    SYNTAX           INTEGER
+    ACCESS           read-only
+    STATUS           mandatory
+    DESCRIPTION      "node.legs.active.peak"
+  ::= { signaling 3 }
+
+  legsStarted        OBJECT-TYPE
+    SYNTAX           INTEGER
+    ACCESS           read-only
+    STATUS           mandatory
+    DESCRIPTION      "node.legs.started"
+  ::= { signaling 4 }
+
+  legsTerminated     OBJECT-TYPE
+    SYNTAX           INTEGER
+    ACCESS           read-only
+    STATUS           mandatory
+    DESCRIPTION      "node.legs.terminated"
+  ::= { signaling 5 }
+
+  callsRateCurrent   OBJECT-TYPE
+    SYNTAX           INTEGER
+    ACCESS           read-only
+    STATUS           mandatory
+    DESCRIPTION      "node.calls.rate.current"
+  ::= { signaling 6 }
+
+  callsRatePeak      OBJECT-TYPE
+    SYNTAX           INTEGER
+    ACCESS           read-only
+    STATUS           mandatory
+    DESCRIPTION      "node.calls.rate.peak"
+  ::= { signaling 7 }
+
+  -- Media node counters
+  mediaTable       OBJECT-TYPE
+    SYNTAX         MediaTable
+    ACCESS         read-only
+    STATUS         mandatory
+    DESCRIPTION    "Media node counters table root"
+  ::= { mvtsii 4 }
+
+  MediaTable       ::= SEQUENCE
+    {
+      media        MediaCounters
+    }
+
+  media            OBJECT-TYPE
+    SYNTAX         MediaCounters
+    ACCESS         read-only
+    STATUS         mandatory
+    DESCRIPTION    "Media node counters"
+	INDEX   { nodeNameMedia }
+  ::= { mediaTable 1 }
+
+  MediaCounters ::= SEQUENCE
+    {
+      nodeNameMedia        OCTET STRING,
+      mediaChannels        INTEGER
+    }
+
+  nodeNameMedia      OBJECT-TYPE
+    SYNTAX           OCTET STRING
+    ACCESS           read-only
+    STATUS           mandatory
+    DESCRIPTION     "Index for conters - node name"
+  ::= { media 1 }
+
+  mediaChannels      OBJECT-TYPE
+    SYNTAX           INTEGER
+    ACCESS           read-only
+    STATUS           mandatory
+    DESCRIPTION      "media.channels"
+  ::= { media 2 }
+
+  -- Trafficmanager node counters
+  trafficmanagerTable   OBJECT-TYPE
+    SYNTAX              TrafficmanagerTable
+    ACCESS              read-only
+    STATUS              mandatory
+    DESCRIPTION         "Trafficmanager node counters table root"
+  ::= {mvtsii 5}
+
+  TrafficmanagerTable   ::= SEQUENCE
+    {
+      trafficmanager    TrafficmanagerCounters
+    }
+
+  trafficmanager        OBJECT-TYPE
+    SYNTAX              TrafficmanagerCounters
+    ACCESS              read-only
+    STATUS              mandatory
+    DESCRIPTION         "Trafficmanager node counters"
+	INDEX   { nodeNameTrafficmanager }
+  ::= {trafficmanagerTable 1}
+
+  TrafficmanagerCounters ::= SEQUENCE
+    {
+      nodeNameTrafficmanager        OCTET STRING,
+      dbmsclientQueriesAnswered     INTEGER,
+      dbmsclientQueriesOutgoing     INTEGER,
+      queryQueueSelectLength        INTEGER,
+      queryQueueUpdateLength        INTEGER,
+      sentCallBegin                 INTEGER,
+      sentStartCall                 INTEGER,
+      sentStopCall                  INTEGER
+    }
+
+  nodeNameTrafficmanager      OBJECT-TYPE
+    SYNTAX                    OCTET STRING
+    ACCESS                    read-only
+    STATUS                    mandatory
+    DESCRIPTION               "Index for conters - node name"
+  ::= { trafficmanager 1 }
+
+  dbmsclientQueriesAnswered   OBJECT-TYPE
+    SYNTAX           INTEGER
+    ACCESS           read-only
+    STATUS           mandatory
+    DESCRIPTION      "rsappng.dbmsclient.queries.answered"
+  ::= { trafficmanager 2 }
+
+  dbmsclientQueriesOutgoing   OBJECT-TYPE
+    SYNTAX           INTEGER
+    ACCESS           read-only
+    STATUS           mandatory
+    DESCRIPTION      "rsappng.dbmsclient.queries.outgoing"
+  ::= { trafficmanager 3 }
+
+  queryQueueSelectLength   OBJECT-TYPE
+    SYNTAX           INTEGER
+    ACCESS           read-only
+    STATUS           mandatory
+    DESCRIPTION      "rsappng.query_queue.select.length"
+  ::= { trafficmanager 4 }
+
+  queryQueueUpdateLength   OBJECT-TYPE
+    SYNTAX           INTEGER
+    ACCESS           read-only
+    STATUS           mandatory
+    DESCRIPTION      "rsappng.query_queue.update.length"
+  ::= { trafficmanager 5 }
+
+  sentCallBegin   OBJECT-TYPE
+    SYNTAX           INTEGER
+    ACCESS           read-only
+    STATUS           mandatory
+    DESCRIPTION      "rsappng.sent.call_begin"
+  ::= { trafficmanager 6 }
+
+  sentStartCall   OBJECT-TYPE
+    SYNTAX           INTEGER
+    ACCESS           read-only
+    STATUS           mandatory
+    DESCRIPTION      "rsappng.sent.start_call"
+  ::= { trafficmanager 7 }
+
+  sentStopCall   OBJECT-TYPE
+    SYNTAX           INTEGER
+    ACCESS           read-only
+    STATUS           mandatory
+    DESCRIPTION      "rsappng.sent.stop_call"
+  ::= { trafficmanager 8 }
+
+END
+

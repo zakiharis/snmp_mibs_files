@@ -1,0 +1,164 @@
+--$Id: iTouchHub.txt,v 1.2 2001/08/15 14:33:15 sse Exp $
+--                                 Definition of SNMP Agent
+--                                for InReach BRHubs and Hubs
+--
+--                                      15 August 2001
+--
+--                                  ITouch Communications, Inc.
+--                                  295 Foster Street
+--                                  Littleton, MA 01460
+--                                     (800) 435-7997 U.S.
+--                                     (978) 952-4888 International
+--
+--                                   support@itouchcom.com
+--
+--
+--            This document is submitted to ITouch users as a ITouch
+--            private extension to the SNMP MIB.  Distribution of this
+--            memo is unlimited.  Please express comments to ITouch.
+--
+--            This document defines the SNMP MIB objects available from a
+--            ITouch InReach manager, Access Server or Hub.
+--
+--            The following ASN.1 definition is according to the
+--            conventions in RFC 1303, "A Convention for Describing
+--            SNMP-based Agents" by K. McCloghrie and M. Rose.
+--
+--
+            -- ITouch Agent Definitions
+
+            -- Copyright 2000 iTouch Communications, Inc. All Rights Reserved.
+            -- Reproduction of this document is authorized on
+            -- condition that this copyright notice is included.
+            -- This MIB document embodies iTouch Communications, Inc.'s 
+            -- proprietary intellectual property.  iTouch Communications, Inc.
+            -- retains all title and ownership in this MIB, including any
+            -- revisions.
+            --
+            -- It is iTouch Communications, Inc.'s intent to encourage the
+            -- widespread use of this MIB in connection with the management of
+            -- iTouch Communications, Inc. products. iTouch Communications,
+            -- Inc. grants vendors,end-users, and other interested parties a
+            -- non-exclusive license to use this MIB in connection with the
+            -- management of iTouch Communications, Inc. products.
+            --
+            -- This MIB document is supplied "AS IS," and iTouch 
+            -- Communications, Inc. makes no warranty, either express or
+            -- implied, as to the use operation, condition, or performance of
+            -- the MIB.
+
+
+
+            ITOUCH-AGENT DEFINITIONS ::= BEGIN
+            
+            IMPORTS
+                MODULE-CONFORMANCE
+                    FROM RFC-1303
+				iTouch FROM ITOUCHHUB;
+            
+            iTouch-support MODULE-CONFORMANCE
+                LAST-UPDATED         "010725"
+                PRODUCT-RELEASE      "ITouch Hub V5-2"
+                DESCRIPTION          "ITouch Hub and BRHub software.
+                                      This file generates a 
+                                      concatenated MIB which contains all
+                                      of the ITouch proprietary object
+                                      definitions used by these agents."
+
+            
+-- The following standard MIBs and the groups included are needed
+-- because their children are referenced in ITouch MIBs.  For example,
+-- some ITouch tables are indexed by ifIndex, so we need to include
+-- interfaces.
+
+   SUPPORTS       RFC1155-SMI
+      INCLUDES    { ccitt, null, iso,
+                    org, dod, internet,
+                    directory, mgmt, experimental,
+                    private, enterprises }
+
+   SUPPORTS       ITOUCH-MIB
+      INCLUDES    { iTouch }               
+            
+   SUPPORTS       RFC1213-MIB
+      INCLUDES    { mib-2, interfaces, ip }
+
+   SUPPORTS       RFC1315-MIB
+      INCLUDES    { frame-relay }
+
+   SUPPORTS             RFC1271-MIB
+     INCLUDES         { statistics, alarm, event }
+            
+   SUPPORTS             BRIDGE-MIB
+      INCLUDES    { dot1dBridge }
+
+   SUPPORTS       RFC1316-MIB
+      INCLUDES    { char }
+
+   SUPPORTS       RFC1289-phivMIB
+      INCLUDES    { circuit }
+
+   SUPPORTS       RFC1382-MIB
+      INCLUDES    { x25 }
+            
+   SUPPORTS       RFC1516-MIB
+      INCLUDES    { snmpDot3RptrMgt }
+
+	SUPPORTS       ITOUCH-APPLETALK-MIB
+      INCLUDES    { xApple }
+
+	SUPPORTS       ITOUCH-BOOT-SERVER-MIB
+      INCLUDES    { xBootServer }
+
+	SUPPORTS ITOUCH-BRIDGE-MIB
+      INCLUDES    { xBridge }
+
+	SUPPORTS ITOUCH-CHASSIS-MIB
+      INCLUDES    { xChassis }
+
+        SUPPORTS ITOUCH-CONCENTRATOR-MIB
+      INCLUDES    { xConcentrator }
+
+	SUPPORTS ITOUCH-DECNET-MIB
+      INCLUDES    { xDecnet }
+
+	SUPPORTS ITOUCH-ETHERNET-MIB
+      INCLUDES    { xEthernet }
+
+	SUPPORTS ITOUCH-FRAME-RELAY-MIB
+      INCLUDES    { xFrameRelay }
+
+	SUPPORTS ITOUCH-INTERNET-MIB
+      INCLUDES    { xInternet }
+
+	SUPPORTS ITOUCH-IPX-MIB
+      INCLUDES    { xIpx }
+
+        SUPPORTS ITOUCH-ISIS-MIB
+      INCLUDES    { xIsisSystem, xIsisCirc, xIsisISAdj,
+                    xIsisESAdj, xIsisReachAddr,
+                    xIsisCLNPDest }
+
+	SUPPORTS ITOUCH-LINK-MIB
+      INCLUDES    { xLink }
+
+	SUPPORTS ITOUCH-PARAM-CLIENT-MIB
+      INCLUDES    { xParamClient }
+
+	SUPPORTS ITOUCH-REPEATER-MIB
+      INCLUDES    { xRepeater }
+
+        SUPPORTS ITOUCH-RMON-MIB
+      INCLUDES    { xRmon }
+
+	SUPPORTS ITOUCH-SYSTEM-MIB
+      INCLUDES    { xSystem }
+
+	SUPPORTS ITOUCH-X25-MIB
+      INCLUDES    { xX25 }
+
+                ::= { iTouch 1 }
+            
+            END
+            
+

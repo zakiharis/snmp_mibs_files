@@ -1,0 +1,605 @@
+-- *****************************************************************
+-- MILESTONE-RECORDER-MIB.mib:  Recording Server MIB file
+--
+-- Copyright (c) 2009 by Milestone Systems A/S.
+-- All rights reserved.
+-- 
+-- *****************************************************************
+MILESTONESYS-RECORDER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	enterprises
+			FROM RFC1155-SMI
+	OBJECT-TYPE
+			FROM RFC-1212
+	TRAP-TYPE
+			FROM RFC-1215;
+   
+milestone                           OBJECT IDENTIFIER ::= { enterprises 24149 }
+surveillance                        OBJECT IDENTIFIER ::= { milestone 1 }
+recordingServers                    OBJECT IDENTIFIER ::= { surveillance 2 }
+recordingServerNotificationPrefix   OBJECT IDENTIFIER ::= { recordingServers 1 }
+
+-- Types
+
+-- To facilitate internationalization, this type
+-- represents information taken from the ISO/IEC IS
+-- 10646-1 character set, encoded as an octet string
+-- using the UTF-8 character encoding scheme described
+-- in RFC 2044 [10].  For strings in 7-bit US-ASCII,
+-- there is no impact since the UTF-8 representation
+-- is identical to the US-ASCII encoding.
+LongUtf8String ::= OCTET STRING (SIZE(0..1024))
+		
+rsTrapDescr OBJECT-TYPE
+	SYNTAX LongUtf8String
+	ACCESS not-accessible
+	STATUS mandatory
+	DESCRIPTION
+		   "Extra information for traps. Example: For trap 
+		   motionStarted, rsTrapDescr might be 'Source type: 
+		   Device; Source name: Camera 1'"
+	::= { recordingServers 2 }
+
+-- Not accessible yet
+rsNumber OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		  "The number of recording server instances (regardless of
+		  their current state) present on this system."
+	::= { recordingServers 3 }
+	
+rsTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF RsInstance
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		  "A list of recording server instances."
+	::= { recordingServers 4 }
+
+rsInstance OBJECT-TYPE
+	SYNTAX  RsInstance
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		  "A recording server instance will in the future
+		  contain objects for a particular recording server
+		  instance."
+	INDEX   { rsIndex }
+	::= { rsTable 1 }
+
+-- RsInstance not implemented yet
+RsInstance ::=
+	SEQUENCE {
+		rsIndex
+			INTEGER
+	}
+
+-- Not accessible yet
+rsIndex OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION
+		  "A unique value for each recording server 
+		  instance. Its value ranges between 1 and the 
+		  value of rsNumber. The value for each 
+		  recording server instance must remain constant."
+	::= { rsInstance 1 }
+	
+-- Traps
+
+userDefinedEvent TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 1
+
+motionStarted TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 2
+
+motionStopped TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 3
+
+inputActivated TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 4
+	
+inputChanged TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 5
+	
+inputDeactivated TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 6
+	
+motionStartedHW TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 7
+	
+motionStoppedHW TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 8
+	
+communicationError TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 9
+	
+communicationStarted TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 10
+	
+communicationStopped TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 11
+	
+feedOverflowStarted TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 12
+	
+feedOverflowStopped TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 13
+	
+liveClientFeedRequested TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 14
+	
+liveClientFeedTerminated TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 15
+	
+outputActivated TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 16
+	
+outputChanged TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 17
+	
+outputDeactivated TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 18
+	
+ptzManuelSessionStarted TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 19
+	
+ptzManuelSessionStopped TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 20
+	
+recordingStarted TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 21
+	
+recordingStopped TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 22
+	
+settingsChanged TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 23
+
+settingsChangedError TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 24
+
+databaseRepair TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 25
+
+archiveAvailable TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 26
+
+archiveUnavailable TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 27
+
+archiveFull TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 28
+
+storageAreaFull TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 29
+
+storageAreaAvailable TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 30
+
+storageAreaUnavailable TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 31
+
+hardwareConfigurableEvent TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 32
+
+failoverStarted TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 33
+
+failoverStopped TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 34
+
+bookmarkReferenceRequested TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 35
+
+databaseFullAutoArchive TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 36
+
+archiveNotFinished TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 37
+
+communicationErrorHardware TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 38
+
+communicationStartedHardware TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 39
+
+communicationStoppedHardware TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 40
+
+diskSpaceLowRemote TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 41
+
+databaseDiskAvailableRemote TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 42
+
+databaseDiskUnavailableRemote TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 43
+
+archiveDiskAvailableRemote TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 44
+
+archiveDiskUnavailableRemote TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 45
+
+databaseDiskFullRemote TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 46
+
+databaseFullAutoArchiveRemote TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 47
+
+archivingFailedRemote TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 48
+
+deviceWriteFailedRemote TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 49
+
+feedOverflowStartedRemote TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 50
+
+feedOverflowStoppedRemote TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 51
+
+deviceSettingsChangedRemote TRAP-TYPE
+	ENTERPRISE recordingServerNotificationPrefix
+	VARIABLES {
+		rsIndex, rsTrapDescr }
+	DESCRIPTION
+		""
+	::= 52
+
+markedDataReferenceRequested TRAP-TYPE
+    ENTERPRISE recordingServerNotificationPrefix
+    VARIABLES {
+        rsIndex, rsTrapDescr }
+    DESCRIPTION
+        ""
+    ::= 53
+
+recordingsEvidenceLocked TRAP-TYPE
+    ENTERPRISE recordingServerNotificationPrefix
+    VARIABLES {
+        rsIndex, rsTrapDescr }
+    DESCRIPTION
+        ""
+    ::= 54
+
+recordingsEvidenceUnlocked TRAP-TYPE
+    ENTERPRISE recordingServerNotificationPrefix
+    VARIABLES {
+        rsIndex, rsTrapDescr }
+    DESCRIPTION
+        ""
+    ::= 55
+
+evidenceLockChanged TRAP-TYPE
+    ENTERPRISE recordingServerNotificationPrefix
+    VARIABLES {
+        rsIndex, rsTrapDescr }
+    DESCRIPTION
+        ""
+    ::= 56
+	
+manualRecordingStarted TRAP-TYPE
+    ENTERPRISE recordingServerNotificationPrefix
+    VARIABLES {
+        rsIndex, rsTrapDescr }
+    DESCRIPTION
+        ""
+    ::= 57
+	
+manualRecordingStopped TRAP-TYPE
+    ENTERPRISE recordingServerNotificationPrefix
+    VARIABLES {
+        rsIndex, rsTrapDescr }
+    DESCRIPTION
+        ""
+    ::= 58
+
+databaseDeleteBeforeSetRetentionSize TRAP-TYPE
+    ENTERPRISE recordingServerNotificationPrefix
+    VARIABLES {
+        rsIndex, rsTrapDescr }
+    DESCRIPTION
+        ""
+    ::= 59
+
+databaseDeleteBeforeSetRetentionTime TRAP-TYPE
+    ENTERPRISE recordingServerNotificationPrefix
+    VARIABLES {
+        rsIndex, rsTrapDescr }
+    DESCRIPTION
+        ""
+    ::= 60
+
+databaseDiskFullAutoArchive TRAP-TYPE
+    ENTERPRISE recordingServerNotificationPrefix
+    VARIABLES {
+        rsIndex, rsTrapDescr }
+    DESCRIPTION
+        ""
+    ::= 61
+
+databaseDeleteBeforeSetRetentionSizeRemote TRAP-TYPE
+    ENTERPRISE recordingServerNotificationPrefix
+    VARIABLES {
+        rsIndex, rsTrapDescr }
+    DESCRIPTION
+        ""
+    ::= 62
+
+databaseDeleteBeforeSetRetentionTimeRemote TRAP-TYPE
+    ENTERPRISE recordingServerNotificationPrefix
+    VARIABLES {
+        rsIndex, rsTrapDescr }
+    DESCRIPTION
+        ""
+    ::= 63
+
+databaseDiskFullAutoArchiveRemote TRAP-TYPE
+    ENTERPRISE recordingServerNotificationPrefix
+    VARIABLES {
+        rsIndex, rsTrapDescr }
+    DESCRIPTION
+        ""
+    ::= 64
+END

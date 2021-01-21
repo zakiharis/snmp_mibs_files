@@ -1,0 +1,851 @@
+BEROFIX-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	enterprises
+		FROM RFC1155-SMI
+	MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, ObjectName, Integer32, Counter32, snmpModules
+		FROM SNMPv2-SMI
+	system, ifIndex
+		FROM RFC1213-MIB
+	DisplayString
+		FROM SNMPv2-TC;
+
+berofix			OBJECT IDENTIFIER ::= { enterprises 29886 }
+
+berofixDeviceInfo	OBJECT IDENTIFIER ::= { berofix 0 }
+
+berofixManufacturer OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (1..32))
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The manufacturers name of this berofix-device."
+	::= {berofixDeviceInfo 1}
+
+berofixSerial OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (16))
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The serial number of this berofix-device."
+	::= {berofixDeviceInfo 2}
+
+berofixRevision OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (5))
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The hardware-revision of this berofix-device."
+	::= {berofixDeviceInfo 3}
+
+berofixRootVersion OBJECT-TYPE
+	SYNTAX		INTEGER
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The firmware-version (RootFS) of this berofix-device."
+	::= {berofixDeviceInfo 4}
+
+berofixAppVersion OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE (1..32))
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The firmware-version (AppFS) of this berofix-device."
+	::= {berofixDeviceInfo 5}
+
+berofixFPGAVersion OBJECT-TYPE
+	SYNTAX		INTEGER
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The FPGA-version of this berofix-device."
+	::= {berofixDeviceInfo 6}
+
+berofixLineInterfaceGroup OBJECT IDENTIFIER ::= { berofixDeviceInfo 7 }
+
+berofixLineInterfaceTable OBJECT-TYPE
+	SYNTAX			SEQUENCE OF BerofixLineInterfaceEntry
+	ACCESS			not-accessible
+	STATUS			current
+	DESCRIPTION		"Table of LineInterfaces of this berofix-device."
+	::= {berofixLineInterfaceGroup 1}
+
+berofixLineInterfaceEntry	OBJECT-TYPE
+	SYNTAX			BerofixLineInterfaceEntry
+	ACCESS			read-only
+	STATUS			current
+	DESCRIPTION		"LineInterface entry of this berofix-device."
+	INDEX { ifIndex }
+	::= {berofixLineInterfaceTable 1}
+
+berofixLineInterfaceType	OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			current
+	DESCRIPTION		"Type of LineInterface."
+	::= {berofixLineInterfaceEntry 1}
+
+BerofixLineInterfaceEntry ::=
+	SEQUENCE {
+		berofixLineInterfaceType	DisplayString
+	}
+
+berofixNetworkGroup OBJECT IDENTIFIER ::= { berofixDeviceInfo 8 }
+
+berofixNetworkTable OBJECT-TYPE
+	SYNTAX			SEQUENCE OF BerofixNetworkEntry
+	ACCESS			not-accessible
+	STATUS			current
+	DESCRIPTION		"Table of network-interfaces of this berofix-device."
+	::= {berofixNetworkGroup 1}
+
+berofixNetworkEntry	OBJECT-TYPE
+	SYNTAX			BerofixNetworkEntry
+	ACCESS			read-only
+	STATUS			current
+	DESCRIPTION		"LineInterface entry of this berofix-device."
+	INDEX { ifIndex }
+	::= {berofixNetworkTable 1}
+
+BerofixNetworkEntry ::=
+	SEQUENCE {
+		berofixMACAddress	DisplayString,
+		berofixIPAddress	DisplayString,
+		berofixIPNetmask	DisplayString,
+		berofixIPGateway	DisplayString,
+		berofixIPNameserver	DisplayString
+	}
+
+berofixMACAddress OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The MAC-address of this berofix-device."
+	::= {berofixNetworkEntry 1}
+
+berofixIPAddress OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The IP-address of this berofix-device."
+	::= {berofixNetworkEntry 2}
+
+berofixIPNetmask OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The netmask configured on this berofix-device."
+	::= {berofixNetworkEntry 3}
+
+berofixIPGateway OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The IP-address of the gateway configured on this berofix-device."
+	::= {berofixNetworkEntry 4}
+
+berofixIPNameserver OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The IP-address of the DNS-server configured on this berofix-device."
+	::= {berofixNetworkEntry 5}
+
+
+berofixDeviceInfoUptimeGroup OBJECT IDENTIFIER ::= { berofixDeviceInfo 9 }
+
+berofixSystemUptime OBJECT-TYPE
+	SYNTAX		Counter32
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The uptime of this berofix-device."
+	::= {berofixDeviceInfoUptimeGroup 1}
+
+berofixISGWUptime OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The uptime of ISGW on this berofix-device."
+	::= {berofixDeviceInfoUptimeGroup 2}
+
+berofixStatisticsGroup OBJECT IDENTIFIER ::= { berofixDeviceInfo 10 }
+
+berofixStatisticsCallsGroup OBJECT IDENTIFIER ::= { berofixStatisticsGroup 1 }
+
+berofixStatisticsCallsTable OBJECT-TYPE
+	SYNTAX			SEQUENCE OF BerofixStatisticsCallsEntry
+	ACCESS			not-accessible
+	STATUS			current
+	DESCRIPTION		"Table of call statistics of this berofix-device."
+	::= {berofixStatisticsCallsGroup 1}
+
+berofixStatisticsCallsEntry	OBJECT-TYPE
+	SYNTAX			BerofixStatisticsCallsEntry
+	ACCESS			read-only
+	STATUS			current
+	DESCRIPTION		"Entry of call statistics of this berofix-device."
+	INDEX { ifIndex }
+	::= {berofixStatisticsCallsTable 1}
+
+BerofixStatisticsCallsEntry ::=
+	SEQUENCE {
+		berofixCallsType	DisplayString,
+		berofixCallsCurrent	Counter32,
+		berofixCallsCompleted	Counter32,
+		berofixCallsAverageTime	DisplayString
+	}
+
+berofixCallsType OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Type of calls."
+	::= {berofixStatisticsCallsEntry 1}
+
+berofixCallsCurrent OBJECT-TYPE
+	SYNTAX		Counter32
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Current calls."
+	::= {berofixStatisticsCallsEntry 2}
+
+berofixCallsCompleted OBJECT-TYPE
+	SYNTAX		Counter32
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Completed calls."
+	::= {berofixStatisticsCallsEntry 3}
+
+berofixCallsAverageTime OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Average Time of completed calls."
+	::= {berofixStatisticsCallsEntry 4}
+
+
+berofixStatisticsL1ErrorGroup OBJECT IDENTIFIER ::= { berofixStatisticsGroup 2 }
+
+berofixStatisticsL1ErrorTable OBJECT-TYPE
+	SYNTAX			SEQUENCE OF BerofixStatisticsL1ErrorEntry
+	ACCESS			not-accessible
+	STATUS			current
+	DESCRIPTION		"Table of layer1 error statistics of this berofix-device."
+	::= {berofixStatisticsL1ErrorGroup 1}
+
+berofixStatisticsL1ErrorEntry	OBJECT-TYPE
+	SYNTAX			BerofixStatisticsL1ErrorEntry
+	ACCESS			read-only
+	STATUS			current
+	DESCRIPTION		"Entry of layer 1 errro statistics of this berofix-device."
+	INDEX { ifIndex }
+	::= {berofixStatisticsL1ErrorTable 1}
+
+BerofixStatisticsL1ErrorEntry ::=
+	SEQUENCE {
+		berofixL1Port		INTEGER,
+		berofixL1PhySwitch	Counter32,
+		berofixL1Clock		Counter32,
+		berofixL1CRC		Counter32,
+		berofixL1FrameResend	Counter32,
+		berofixL1FrameSync	Counter32,
+		berofixL1LossOfSignal	Counter32
+	}
+
+berofixL1Port OBJECT-TYPE
+	SYNTAX		INTEGER
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Layer 1 Port."
+	::= {berofixStatisticsL1ErrorEntry 1}
+
+berofixL1PhySwitch OBJECT-TYPE
+	SYNTAX		Counter32
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Layer 1 cable connected counter."
+	::= {berofixStatisticsL1ErrorEntry 2}
+
+berofixL1Clock OBJECT-TYPE
+	SYNTAX		Counter32
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Layer 1 Clock error counter."
+	::= {berofixStatisticsL1ErrorEntry 3}
+
+berofixL1CRC OBJECT-TYPE
+	SYNTAX		Counter32
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Layer 1 CRC error counter."
+	::= {berofixStatisticsL1ErrorEntry 4}
+
+berofixL1FrameResend OBJECT-TYPE
+	SYNTAX		Counter32
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Layer 1 Frame Resend counter."
+	::= {berofixStatisticsL1ErrorEntry 5}
+
+berofixL1FrameSync OBJECT-TYPE
+	SYNTAX		Counter32
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Layer 1 FrameSync counter."
+	::= {berofixStatisticsL1ErrorEntry 6}
+
+berofixL1LossOfSignal OBJECT-TYPE
+	SYNTAX		Counter32
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Layer 1 Loss of Signal Error counter."
+	::= {berofixStatisticsL1ErrorEntry 7}
+
+
+berofixStatisticsL2ErrorGroup OBJECT IDENTIFIER ::= { berofixStatisticsGroup 3 }
+
+berofixStatisticsL2ErrorTable OBJECT-TYPE
+	SYNTAX			SEQUENCE OF BerofixStatisticsL2ErrorEntry
+	ACCESS			not-accessible
+	STATUS			current
+	DESCRIPTION		"Table of layer2 error statistics of this berofix-device."
+	::= {berofixStatisticsL2ErrorGroup 1}
+
+berofixStatisticsL2ErrorEntry	OBJECT-TYPE
+	SYNTAX			BerofixStatisticsL2ErrorEntry
+	ACCESS			read-only
+	STATUS			current
+	DESCRIPTION		"Entry of layer 2 errro statistics of this berofix-device."
+	INDEX { ifIndex }
+	::= {berofixStatisticsL2ErrorTable 1}
+
+BerofixStatisticsL2ErrorEntry ::=
+	SEQUENCE {
+		berofixL2Port		INTEGER,
+		berofixL2FrameError	Counter32,
+		berofixL2mdlA		Counter32,
+		berofixL2mdlB		Counter32,
+		berofixL2mdlC		Counter32,
+		berofixL2mdlD		Counter32,
+		berofixL2mdlE		Counter32,
+		berofixL2mdlF		Counter32,
+		berofixL2mdlG		Counter32,
+		berofixL2mdlH		Counter32,
+		berofixL2mdlI		Counter32,
+		berofixL2mdlJ		Counter32,
+		berofixL2mdlK		Counter32
+	}
+
+berofixL2Port OBJECT-TYPE
+	SYNTAX		INTEGER
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Layer 2 port index."
+	::= {berofixStatisticsL2ErrorEntry 1}
+
+berofixL2FrameError OBJECT-TYPE
+	SYNTAX		Counter32
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Layer 2 frame error counter."
+	::= {berofixStatisticsL2ErrorEntry 2}
+
+berofixL2mdlA OBJECT-TYPE
+	SYNTAX		Counter32
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Layer 2 MDL A error counter."
+	::= {berofixStatisticsL2ErrorEntry 3}
+
+berofixL2mdlB OBJECT-TYPE
+	SYNTAX		Counter32
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Layer 2 MDL B error counter."
+	::= {berofixStatisticsL2ErrorEntry 4}
+
+berofixL2mdlC OBJECT-TYPE
+	SYNTAX		Counter32
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Layer 2 MDL C error counter."
+	::= {berofixStatisticsL2ErrorEntry 5}
+
+berofixL2mdlD OBJECT-TYPE
+	SYNTAX		Counter32
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Layer 2 MDL D error counter."
+	::= {berofixStatisticsL2ErrorEntry 6}
+
+berofixL2mdlE OBJECT-TYPE
+	SYNTAX		Counter32
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Layer 2 MDL E error counter."
+	::= {berofixStatisticsL2ErrorEntry 7}
+
+berofixL2mdlF OBJECT-TYPE
+	SYNTAX		Counter32
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Layer 2 MDL F error counter."
+	::= {berofixStatisticsL2ErrorEntry 8}
+
+berofixL2mdlG OBJECT-TYPE
+	SYNTAX		Counter32
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Layer 2 MDL G error counter."
+	::= {berofixStatisticsL2ErrorEntry 9}
+
+berofixL2mdlH OBJECT-TYPE
+	SYNTAX		Counter32
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Layer 2 MDL H error counter."
+	::= {berofixStatisticsL2ErrorEntry 10}
+
+berofixL2mdlI OBJECT-TYPE
+	SYNTAX		Counter32
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Layer 2 MDL I error counter."
+	::= {berofixStatisticsL2ErrorEntry 11}
+
+berofixL2mdlJ OBJECT-TYPE
+	SYNTAX		Counter32
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Layer 2 MDL J error counter."
+	::= {berofixStatisticsL2ErrorEntry 12}
+
+berofixL2mdlK OBJECT-TYPE
+	SYNTAX		Counter32
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Layer 2 MDL K error counter."
+	::= {berofixStatisticsL2ErrorEntry 13}
+
+
+berofixStatisticsISDNStateGroup OBJECT IDENTIFIER ::= { berofixStatisticsGroup 4 }
+
+berofixStatisticsISDNStateTable OBJECT-TYPE
+	SYNTAX			SEQUENCE OF BerofixStatisticsISDNStateEntry
+	ACCESS			not-accessible
+	STATUS			current
+	DESCRIPTION		"Table of layer2 error statistics of this berofix-device."
+	::= {berofixStatisticsISDNStateGroup 1}
+
+berofixStatisticsISDNStateEntry	OBJECT-TYPE
+	SYNTAX			BerofixStatisticsISDNStateEntry
+	ACCESS			read-only
+	STATUS			current
+	DESCRIPTION		"Entry of layer 2 error statistics of this berofix-device."
+	INDEX { ifIndex }
+	::= {berofixStatisticsISDNStateTable 1}
+
+BerofixStatisticsISDNStateEntry ::=
+	SEQUENCE {
+		berofixISDNStateType	DisplayString,
+		berofixISDNStateProt	DisplayString,
+		berofixISDNStateL1Link	DisplayString,
+		berofixISDNStateL2Link	DisplayString,
+		berofixISDNStateBlocked	DisplayString
+	}
+
+berofixISDNStateType OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Type of port."
+	::= {berofixStatisticsISDNStateEntry 1}
+
+berofixISDNStateProt OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Protocol of port."
+	::= {berofixStatisticsISDNStateEntry 2}
+
+berofixISDNStateL2Link OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"State of Layer 2 link."
+	::= {berofixStatisticsISDNStateEntry 3}
+
+berofixISDNStateL1Link OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"State of Layer 1 Link"
+	::= {berofixStatisticsISDNStateEntry 4}
+
+berofixISDNStateBlocked OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Port blocked?"
+	::= {berofixStatisticsISDNStateEntry 5}
+
+
+berofixStatisticsPortStatGroup OBJECT IDENTIFIER ::= { berofixStatisticsGroup 5 }
+
+berofixStatisticsPortStatTable OBJECT-TYPE
+	SYNTAX			SEQUENCE OF BerofixStatisticsPortStatEntry
+	ACCESS			not-accessible
+	STATUS			current
+	DESCRIPTION		"Table of layer2 error statistics of this berofix-device."
+	::= {berofixStatisticsPortStatGroup 1}
+
+berofixStatisticsPortStatEntry	OBJECT-TYPE
+	SYNTAX			BerofixStatisticsPortStatEntry
+	ACCESS			read-only
+	STATUS			current
+	DESCRIPTION		"Entry of layer 2 error statistics of this berofix-device."
+	INDEX { ifIndex }
+	::= {berofixStatisticsPortStatTable 1}
+
+BerofixStatisticsPortStatEntry ::=
+	SEQUENCE {
+		berofixPortStatPortType		DisplayString,
+		berofixPortStatCallsType	DisplayString,
+		berofixPortStatCallsCompleted	Counter32,
+		berofixPortStatCallsCurrent	Counter32,
+		berofixPortStatCallsAverageTime	DisplayString
+	}
+
+berofixPortStatPortType OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Type of port."
+	::= {berofixStatisticsPortStatEntry 1}
+
+berofixPortStatCallsType OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Type of calls."
+	::= {berofixStatisticsPortStatEntry 2}
+
+berofixPortStatCallsCompleted OBJECT-TYPE
+	SYNTAX		Counter32
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Count of completed calls."
+	::= {berofixStatisticsPortStatEntry 3}
+
+berofixPortStatCallsCurrent OBJECT-TYPE
+	SYNTAX		Counter32
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Count of running calls."
+	::= {berofixStatisticsPortStatEntry 4}
+
+berofixPortStatCallsAverageTime OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Average time of calls."
+	::= {berofixStatisticsPortStatEntry 5}
+
+berofixStatisticsSIPRegGroup OBJECT IDENTIFIER ::= { berofixStatisticsGroup 6 }
+
+berofixStatisticsSIPRegTable OBJECT-TYPE
+	SYNTAX			SEQUENCE OF BerofixStatisticsSIPRegEntry
+	ACCESS			not-accessible
+	STATUS			current
+	DESCRIPTION		"Table of SIP-Registrations on this berofix-device."
+	::= {berofixStatisticsSIPRegGroup 1}
+
+berofixStatisticsSIPRegEntry	OBJECT-TYPE
+	SYNTAX			BerofixStatisticsSIPRegEntry
+	ACCESS			read-only
+	STATUS			current
+	DESCRIPTION		"Entry of SIP-Registrations on this berofix-device."
+	INDEX { ifIndex }
+	::= {berofixStatisticsSIPRegTable 1}
+
+BerofixStatisticsSIPRegEntry ::=
+	SEQUENCE {
+		berofixSIPRegAccountName	DisplayString,
+		berofixSIPRegRegistrar		DisplayString,
+		berofixSIPRegUsername		DisplayString,
+		berofixSIPRegStatus		DisplayString,
+		berofixSIPRegResponse		DisplayString,
+		berofixSIPRegRefreshInterval	Counter32,
+		berofixSIPRegRefreshIntFailed	Counter32,
+		berofixSIPRegRefreshNext	Counter32
+	}
+
+berofixSIPRegAccountName OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Name of SIP-Account."
+	::= {berofixStatisticsSIPRegEntry 1}
+
+berofixSIPRegRegistrar OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"DNS-name / IP-address of registrar."
+	::= {berofixStatisticsSIPRegEntry 2}
+
+berofixSIPRegUsername OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Username."
+	::= {berofixStatisticsSIPRegEntry 3}
+
+berofixSIPRegStatus OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Status of registration."
+	::= {berofixStatisticsSIPRegEntry 4}
+
+berofixSIPRegResponse OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Responsecode."
+	::= {berofixStatisticsSIPRegEntry 5}
+
+berofixSIPRegRefreshInterval OBJECT-TYPE
+	SYNTAX		Counter32
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Refresh interval (normal)."
+	::= {berofixStatisticsSIPRegEntry 6}
+
+berofixSIPRegRefreshIntFailed OBJECT-TYPE
+	SYNTAX		Counter32
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Refresh interval (after failure)."
+	::= {berofixStatisticsSIPRegEntry 7}
+
+berofixSIPRegRefreshNext OBJECT-TYPE
+	SYNTAX		Counter32
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Next refresh."
+	::= {berofixStatisticsSIPRegEntry 8}
+
+berofixStatisticsPOTSRegGroup OBJECT IDENTIFIER ::= { berofixStatisticsGroup 7 }
+
+berofixStatisticsPOTSRegTable OBJECT-TYPE
+	SYNTAX			SEQUENCE OF BerofixStatisticsPOTSRegEntry
+	ACCESS			not-accessible
+	STATUS			current
+	DESCRIPTION		"Table of POTS-Ports on this berofix-device."
+	::= {berofixStatisticsPOTSRegGroup 1}
+
+berofixStatisticsPOTSRegEntry OBJECT-TYPE
+	SYNTAX			BerofixStatisticsPOTSRegEntry
+	ACCESS			read-only
+	STATUS			current
+	DESCRIPTION		"Entry of POTS-Ports on this berofix-device."
+	INDEX {ifIndex}
+	::= {berofixStatisticsPOTSRegTable 1}
+
+BerofixStatisticsPOTSRegEntry ::=
+	SEQUENCE {
+		berofixPOTSRegPort		DisplayString,
+		berofixPOTSRegVoltage		DisplayString
+	}
+
+berofixPOTSRegPort OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Index of Analog-Port."
+	::= {berofixStatisticsPOTSRegEntry 1}
+
+berofixPOTSRegVoltage OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Line-Voltage of Analog-Port."
+	::= {berofixStatisticsPOTSRegEntry 2}
+
+berofixStatisticsGSMRegGroup OBJECT IDENTIFIER ::= { berofixStatisticsGroup 8 }
+
+berofixStatisticsGSMRegTable OBJECT-TYPE
+	SYNTAX			SEQUENCE OF BerofixStatisticsGSMRegEntry
+	ACCESS			not-accessible
+	STATUS			current
+	DESCRIPTION		"Table of GSM-Registrations on this berofix-device."
+	::= {berofixStatisticsGSMRegGroup 1}
+
+berofixStatisticsGSMRegEntry OBJECT-TYPE
+	SYNTAX			BerofixStatisticsGSMRegEntry
+	ACCESS			read-only
+	STATUS			current
+	DESCRIPTION		"Entry of GSM-Registrations on this berofix-device."
+	INDEX {ifIndex}
+	::= {berofixStatisticsGSMRegTable 1}
+
+BerofixStatisticsGSMRegEntry ::=
+	SEQUENCE {
+		berofixGSMRegPort		DisplayString,
+		berofixGSMRegStatus		DisplayString,
+		berofixGSMRegRSSI		DisplayString,
+		berofixGSMRegBER		DisplayString,
+		berofixGSMRegProvName		DisplayString
+	}
+
+berofixGSMRegPort OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Port-Index of GSM-Module."
+	::= {berofixStatisticsGSMRegEntry 1}
+
+berofixGSMRegStatus OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Registration status of GSM-Module."
+	::= {berofixStatisticsGSMRegEntry 2}
+
+berofixGSMRegRSSI OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"RSSI-Value of GSM-Module."
+	::= {berofixStatisticsGSMRegEntry 3}
+
+berofixGSMRegBER OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"BER-Value of GSM-Module."
+	::= {berofixStatisticsGSMRegEntry 4}
+
+berofixGSMRegProvName OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Provider GSM-Module is registered to."
+	::= {berofixStatisticsGSMRegEntry 5}
+
+berofixCPUusageGroup OBJECT IDENTIFIER ::= { berofixDeviceInfo 11 }
+
+berofixCPUusageTable OBJECT-TYPE
+	SYNTAX			SEQUENCE OF BerofixCPUusageEntry
+	ACCESS			not-accessible
+	STATUS			current
+	DESCRIPTION		"Table of CPU usage of this berofix-device."
+	::= {berofixCPUusageGroup 1}
+
+berofixCPUusageEntry	OBJECT-TYPE
+	SYNTAX			BerofixCPUusageEntry
+	ACCESS			read-only
+	STATUS			current
+	DESCRIPTION		"Entry of CPU usage of this berofix-device."
+	INDEX { ifIndex }
+	::= {berofixCPUusageTable 1}
+
+BerofixCPUusageEntry ::=
+	SEQUENCE {
+		berofixCPUusage1	INTEGER,
+		berofixCPUusage5	INTEGER,
+		berofixCPUusage15	INTEGER
+	}
+
+berofixCPUusage1 OBJECT-TYPE
+	SYNTAX		INTEGER
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"CPU usage of this berofix-device (last minute)."
+	::= {berofixCPUusageEntry 1}
+
+berofixCPUusage5 OBJECT-TYPE
+	SYNTAX		INTEGER
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"CPU usage of this berofix-device (last 5 minutes)."
+	::= {berofixCPUusageEntry 2}
+
+berofixCPUusage15 OBJECT-TYPE
+	SYNTAX		INTEGER
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"CPU usage of this berofix-device (last 15 minutes)."
+	::= {berofixCPUusageEntry 3}
+
+berofixRAMusageGroup OBJECT IDENTIFIER ::= { berofixDeviceInfo 12 }
+
+berofixRAMusageTable OBJECT-TYPE
+	SYNTAX			SEQUENCE OF BerofixRAMusageEntry
+	ACCESS			not-accessible
+	STATUS			current
+	DESCRIPTION		"Table of RAM usage of this berofix-device."
+	::= {berofixRAMusageGroup 1}
+
+berofixRAMusageEntry	OBJECT-TYPE
+	SYNTAX			BerofixRAMusageEntry
+	ACCESS			read-only
+	STATUS			current
+	DESCRIPTION		"Entry of RAM usage of this berofix-device."
+	INDEX { ifIndex }
+	::= {berofixRAMusageTable 1}
+
+BerofixRAMusageEntry ::=
+	SEQUENCE {
+		berofixRAMtotal		Counter32,
+		berofixRAMfree		Counter32,
+		berofixRAMisgw		Counter32
+	}
+
+berofixRAMtotal OBJECT-TYPE
+	SYNTAX		Counter32
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Total RAM of this berofix-device."
+	::= {berofixRAMusageEntry 1}
+
+berofixRAMfree OBJECT-TYPE
+	SYNTAX		Counter32
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Free RAM of this berofix-device."
+	::= {berofixRAMusageEntry 2}
+
+berofixRAMisgw OBJECT-TYPE
+	SYNTAX		Counter32
+	ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"RAM usage of this berofix-device isgw."
+	::= {berofixRAMusageEntry 3}
+
+
+berofixDeviceControl	OBJECT IDENTIFIER ::= { berofix 1 }
+
+berofixReboot OBJECT-TYPE
+	SYNTAX		INTEGER
+	ACCESS		read-write
+	STATUS		current
+	DESCRIPTION	"Reboot this berofix-device."
+	::= {berofixDeviceControl 1}
+
+berofixNotifications    OBJECT IDENTIFIER ::= { berofix 2 }
+
+berofixNotificationsGroupIsdnL2 OBJECT IDENTIFIER ::= { berofixNotifications 0 }
+
+isdn-L2Port NOTIFICATION-TYPE
+	STATUS		current
+	DESCRIPTION     "Notification for L2 State changes (Port-Index)"
+	::= {berofixNotificationsGroupIsdnL2 0}
+
+isdn-L2Up NOTIFICATION-TYPE
+	STATUS		current
+	DESCRIPTION     "Notification for L2 State change to UP"
+	::= {berofixNotificationsGroupIsdnL2 1}
+
+isdn-L2Down NOTIFICATION-TYPE
+	STATUS		current
+	DESCRIPTION     "Notification for L2 State change to DOWN"
+	::= {berofixNotificationsGroupIsdnL2 2}
+
+END

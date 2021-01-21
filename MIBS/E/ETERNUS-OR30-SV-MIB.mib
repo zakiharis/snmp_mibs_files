@@ -1,0 +1,207 @@
+-------------------------------------------------------------------------------
+-- ETERNUS2000 extended-MIB definition for ServerView                        --
+-- All Rights Reserved, Copyright FUJITSU LIMITED 2006-2008.                 --
+--                                                                           --
+-- Modification History :                                                    --
+--  v1.0 Initial version                                                     --
+--  v1.1 Added traps 22,25 and 26.                                           --
+-------------------------------------------------------------------------------
+ETERNUS-OR30-SV-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    enterprises
+        FROM RFC1155-SMI
+    DisplayString
+        FROM RFC1213-MIB
+    OBJECT-TYPE
+        FROM RFC-1212
+    TRAP-TYPE
+        FROM RFC-1215;
+
+fujitsu          OBJECT IDENTIFIER ::= { enterprises 211 }
+product          OBJECT IDENTIFIER ::= { fujitsu 1 }
+storage          OBJECT IDENTIFIER ::= { product 21 }
+
+nsp              OBJECT IDENTIFIER ::= { storage 1 }
+eternusorj       OBJECT IDENTIFIER ::= { nsp 30 }
+ssp              OBJECT IDENTIFIER ::= { eternusorj 1 }
+
+application      OBJECT IDENTIFIER ::= { fujitsu 4 }
+aplNetwork       OBJECT IDENTIFIER ::= { application 1 }
+aplNetDevice     OBJECT IDENTIFIER ::= { aplNetwork 1 }
+aplNetStorage    OBJECT IDENTIFIER ::= { aplNetDevice 126 }
+aplNetNsp        OBJECT IDENTIFIER ::= { aplNetStorage 1 }
+aplNetEternusorj OBJECT IDENTIFIER ::= { aplNetNsp 30 }
+
+--
+-- Object Definitions
+--
+    trapItemId OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "This object is used to store the identification number
+             of parts for which maintenance is necessary when trap
+             is transmitted."
+        ::= { eternusorj 7 }
+
+    trapSensorInfo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "This object is used to store detail information of sensor
+             when trap is transmitted."
+        ::= { eternusorj 8 }
+
+    trapMaintenanceInfo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "This object is used to store detail information of
+             maintenance when trap is transmitted."
+        ::= { eternusorj 9 }
+
+    trapWarningInfo OBJECT-TYPE
+        SYNTAX INTEGER
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "This object is used to store detail messages when trap
+             is transmitted."
+        ::= { eternusorj 10 }
+
+    trapMessage OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "This object is used to store detail information of
+             warning when trap is transmitted."
+        ::= { eternusorj 11 }
+
+    sspMachineId OBJECT-TYPE
+        SYNTAX OCTET STRING(SIZE(40))
+        ACCESS read-only
+        STATUS mandatory
+        DESCRIPTION
+            "This value indicates the identification number of
+             this system."
+        ::= { ssp 1 }
+
+--
+-- Trap Definitions
+--
+    etOrjConfigChange TRAP-TYPE
+        ENTERPRISE      aplNetEternusorj
+        VARIABLES       { sspMachineId,trapMessage }
+        DESCRIPTION
+            "A configChange trap signifies that the sending protocol entity
+             recognizes the change in configuration information."
+        --#SUMMARY "Configuration changed"
+        --#SEVERITY INFORMATIONAL
+        ::= 0
+
+    etOrjFirmChange TRAP-TYPE
+        ENTERPRISE      aplNetEternusorj
+        VARIABLES       { sspMachineId,trapMessage }
+        DESCRIPTION
+            "A firmChange trap signifies that the exchange of
+             the firmware was executed."
+        --#SUMMARY "Firmware changed"
+        --#SEVERITY INFORMATIONAL
+        ::= 1
+
+    etOrjItemFault TRAP-TYPE
+        ENTERPRISE      aplNetEternusorj
+        VARIABLES       { trapItemId,sspMachineId,trapMessage }
+        DESCRIPTION
+            "A itemFault trap signifies that device was failed."
+        --#SUMMARY "Item fault"
+        --#SEVERITY CRITICAL
+        ::= 2
+
+    etOrjBatteryExpiration TRAP-TYPE
+        ENTERPRISE      aplNetEternusorj
+        VARIABLES       { trapItemId,sspMachineId,trapMessage }
+        DESCRIPTION
+            "A batteryExpiration trap signifies that the exchange time
+             of the battery comes."
+        --#SUMMARY "Battery expiration"
+        --#SEVERITY CRITICAL
+        ::= 3
+
+    etOrjRebuildNotStart TRAP-TYPE
+        ENTERPRISE      aplNetEternusorj
+        VARIABLES       { sspMachineId,trapMessage }
+        DESCRIPTION
+            "A rebuildNotStart trap signifies that not to be able to
+             begin to execute the rebuild because there is no spare disk.
+             This trap is not supported."
+        --#SUMMARY "Rebuild not started"
+        --#SEVERITY CRITICAL
+        ::= 4
+
+    etOrjPartBroken TRAP-TYPE
+        ENTERPRISE      aplNetEternusorj
+        VARIABLES       { trapItemId,sspMachineId,trapMessage,trapWarningInfo }
+        DESCRIPTION
+            "A partBroken trap signifies that device was partially Broken."
+        --#SUMMARY "Partially broken"
+        --#SEVERITY CRITICAL
+        ::= 5
+
+    etOrjSensorStatusChange TRAP-TYPE
+        ENTERPRISE      aplNetEternusorj
+        VARIABLES       { trapItemId,sspMachineId,trapSensorInfo,trapMessage }
+        DESCRIPTION
+            "A sensorStatusChange trap signifies that environment sensor 
+             status changes."
+        --#SUMMARY "Sensor status changed"
+        --#SEVERITY CRITICAL
+        ::= 6
+
+    etOrjMaintenanceInfo TRAP-TYPE
+        ENTERPRISE      aplNetEternusorj
+        VARIABLES       { sspMachineId,trapMaintenanceInfo,trapMessage }
+        DESCRIPTION
+            "A maintenanceInfo trap signifies that maintenance
+             information."
+        --#SUMMARY "Maintenance required"
+        --#SEVERITY CRITICAL
+        ::= 7
+
+    etOrjItemFaultToNormal TRAP-TYPE
+        ENTERPRISE      aplNetEternusorj
+        VARIABLES       { trapItemId,sspMachineId,trapMessage }
+        DESCRIPTION
+            "A itemFaultToNormal trap signifies that the device state has
+             changed to normal after sending itemFault trap."
+        --#SUMMARY "Item fault to normal"
+        --#SEVERITY INFORMATIONAL
+        ::= 22
+
+    etOrjPartBrokenToNormal TRAP-TYPE
+        ENTERPRISE      aplNetEternusorj
+        VARIABLES       { trapItemId,sspMachineId,trapMessage,trapWarningInfo }
+        DESCRIPTION
+            "A partBrokenToNormal trap signifies that the device state has
+             changed to normal after sending PartBroken trap."
+        --#SUMMARY "Partially broken to normal"
+        --#SEVERITY INFORMATIONAL
+        ::= 25
+
+    etOrjSensorStatusChangeToNormal TRAP-TYPE
+        ENTERPRISE      aplNetEternusorj
+        VARIABLES       { trapItemId,sspMachineId,trapSensorInfo,trapMessage }
+        DESCRIPTION
+            "A sensorStatusChangeToNormal trap signifies that the error or 
+             warning state detected by the environment sensor has returned 
+             to normal after sending SensorStatusChange trap."
+        --#SUMMARY "Sensor status changed to normal"
+        --#SEVERITY INFORMATIONAL
+        ::= 26
+
+END

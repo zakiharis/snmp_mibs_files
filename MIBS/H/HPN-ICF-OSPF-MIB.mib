@@ -1,0 +1,94 @@
+-- =================================================================
+-- Copyright (c) 2010-2015 Hewlett-Packard Development Company, L.P.
+--
+-- Description: OSPF (Open Shortest Path First) MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+-- V1.0 2014-12-17 Created by Xu Jing
+-- =================================================================
+HPN-ICF-OSPF-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    IpAddress, Integer32, OBJECT-TYPE, MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    hpnicfCommon
+        FROM HPN-ICF-OID-MIB;
+
+
+hpnicfOspf MODULE-IDENTITY
+    LAST-UPDATED "201412171700Z"
+    ORGANIZATION
+        ""
+    CONTACT-INFO
+        ""
+    DESCRIPTION
+        "This MIB file provides information about OSPF."
+    REVISION "201412171700Z"
+    DESCRIPTION
+        "The initial version of this MIB file."
+    ::= { hpnicfCommon 161 }
+
+hpnicfOspfNetworkTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF HpnicfOspfNetworkEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table provides the configured parameters of OSPF networks."
+    ::= { hpnicfOspf 1 }
+
+hpnicfOspfNetworkEntry OBJECT-TYPE
+    SYNTAX HpnicfOspfNetworkEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains information of each configured network."
+    INDEX { hpnicfOspfProcessId, hpnicfOspfAreaId, hpnicfOspfNetworkIpAddr }
+    ::= { hpnicfOspfNetworkTable 1 }
+
+HpnicfOspfNetworkEntry ::=
+    SEQUENCE {
+        hpnicfOspfProcessId
+            Integer32,
+        hpnicfOspfAreaId
+            IpAddress,
+        hpnicfOspfNetworkIpAddr
+            IpAddress,
+        hpnicfOspfNetworkIpMask
+            IpAddress
+     }
+
+hpnicfOspfProcessId OBJECT-TYPE
+    SYNTAX Integer32 (1..65535)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The process ID field indicates the OSPF process number."
+    ::= { hpnicfOspfNetworkEntry 1 }
+
+hpnicfOspfAreaId OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A 32-bit integer uniquely identifying an area.
+        Area ID 0.0.0.0 is used for the OSPF backbone."
+    ::= { hpnicfOspfNetworkEntry 2 }
+
+hpnicfOspfNetworkIpAddr OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This field is the address of the network."
+    ::= { hpnicfOspfNetworkEntry 3 }
+
+hpnicfOspfNetworkIpMask OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "This field is the wildcard mask of the network."
+    ::= { hpnicfOspfNetworkEntry 4 }
+
+END

@@ -1,0 +1,265 @@
+-- $Id: it-trap-mib.mib,v 1.4 2001/05/18 17:30:36 sse Exp $
+                    ITOUCH-TRAP-MIB DEFINITIONS ::= BEGIN
+            
+                    IMPORTS
+                        TRAP-TYPE
+                            FROM RFC-1215
+                        sysObjectID
+                            FROM RFC1213-MIB
+			basicContactClosureOrScanPointValue, 
+			basicContactClosureOrScanPointName,
+         		basicPowerStatusFuseA, basicPowerStatusFuseB,
+         		basicPowerSupplyStatusA, basicPowerSupplyStatusB
+                            FROM ITOUCH-CHARACTER-MIB
+                        rs232InSigState, rs232OutSigState
+                            FROM RFC1317-MIB
+			iTouch
+                            FROM ITOUCH-MIB;
+            
+            xTrap        OBJECT IDENTIFIER ::= { iTouch 48 }
+
+            -- This is a MIB module for all iTouch Communications systems.
+
+            -- Copyright 2000 iTouch Communications, Inc. All Rights Reserved.
+            -- Reproduction of this document is authorized on
+            -- condition that this copyright notice is included.
+            -- This MIB document embodies iTouch Communications, Inc.'s 
+            -- proprietary intellectual property.  iTouch Communications, Inc.
+            -- retains all title and ownership in this MIB, including any
+            -- revisions.
+            --
+            -- It is iTouch Communications, Inc.'s intent to encourage the
+            -- widespread use of this MIB in connection with the management of
+            -- iTouch Communications, Inc. products. iTouch Communications,
+            -- Inc. grants vendors,end-users, and other interested parties a
+            -- non-exclusive license to use this MIB in connection with the
+            -- management of iTouch Communications, Inc. products.
+            --
+            -- This MIB document is supplied "AS IS," and iTouch 
+            -- Communications, Inc. makes no warranty, either express or
+            -- implied, as to the use operation, condition, or performance of
+            -- the MIB.
+
+
+            -- In addition to the traps defined in this MIB, ITouch supports 
+            -- the generic traps:
+            -- coldStart, linkDown, linkUp, authenticationFailure FROM RFC1215
+            -- ITouch supports the following enterprise traps which are defined
+            -- in standard MIBs:
+            -- frameRelayDLCIStatusChange FROM RFC1315-MIB 
+            -- rptrHealth, rptrGroupChange FROM RFC1368-MIB 
+            -- newRoot, topologyChange FROM RFC1493-MIB
+            -- bgpEstablished, bgpBackwardTransition FROM RFC1657-MIB 
+            -- rmon FROM RFC1757-MIB
+
+            -- ITouch System trap
+
+            resourceLacks TRAP-TYPE
+                ENTERPRISE sysObjectID
+--              VARIABLES { resType }
+                DESCRIPTION
+                    "Indication that the system incremented the
+                    corresponding value of resLacks. The variable is resType
+                    FROM ITOUCH-SYSTEM-MIB."
+                ::= 9
+
+            -- ITouch Repeater traps
+         
+            repeaterRedundancy TRAP-TYPE
+                ENTERPRISE sysObjectID
+--              VARIABLES { repeaterRedundancyGroupGroupIndex, repeaterRedundancyGroupOperPath }
+                DESCRIPTION
+                    "A new path becomes active within a redundancy group. The
+                     variables are repeaterRedundancyGroupGroupIndex, 
+                     repeaterRedundancyGroupOperPath FROM ITOUCH-REPEATER-MIB."
+                ::= 12
+
+            accessViolated TRAP-TYPE
+                ENTERPRISE sysObjectID
+--              VARIABLES { repeaterPortIndex }
+                DESCRIPTION
+                    "Access violation by connected system with Ethernet
+                    address not allowed by repeaterPortAccessTable and
+                    repeaterPortAccessAction. The variable is repeaterPortIndex
+                    FROM ITOUCH-REPEATER-MIB."
+                ::= 14
+
+            portIntegrityLoss TRAP-TYPE
+                ENTERPRISE sysObjectID
+--              VARIABLES { repeaterPortIndex, repeaterPortGroupIndex }
+                DESCRIPTION
+                    "This port has lost link integrity. The variables are 
+                     repeaterPortIndex, repeaterPortGroupIndex 
+                    FROM ITOUCH-REPEATER-MIB."
+                ::= 15
+
+            -- ITouch Rmon trap
+																	
+            iTouchRmonAlarm TRAP-TYPE
+                ENTERPRISE sysObjectID
+--              VARIABLES { mbLogDescription }
+                DESCRIPTION
+                    "The SNMP trap that is generated when xRmonTrapType
+                    is set to iTouchFormat(2).  These traps, like the
+                    RMON standardFormat(1) traps, occur when an alarm
+                    variable crosses its rising or falling threshold
+                    and generates an event configured to send SNMP traps.
+
+                    The format of the DisplayString embodied by the
+                    trap PDU is identical to that of mbLogDescription.
+                    The actual object identifier is not significant.
+                    The variable is mbLogDescription FROM ITOUCH-RMON-MIB."
+                ::= 17
+
+            -- ITouch Boot Server trap
+
+            memoryCardSlotChange TRAP-TYPE
+                ENTERPRISE sysObjectID
+                DESCRIPTION
+                    "Indication that the card has been added or removed. The
+                     deviceIndex from ITOUCH-BOOT-SERVER-MIB may be included
+                     as a variable in the trap."
+                ::= 18
+
+            -- ITouch Chassis trap
+
+            lb2ChassisCardSlotChange TRAP-TYPE
+                ENTERPRISE sysObjectID
+--              VARIABLES { slotIndex }
+                DESCRIPTION
+                    "Indication that the card has been added or removed. The
+                    variable is slotIndex FROM ITOUCH-CHASSIS-MIB."
+                ::= 19
+
+            -- ITouch Circuit traps
+
+            circuitDialTime TRAP-TYPE
+                ENTERPRISE sysObjectID
+--              VARIABLES { ifIndex }
+                DESCRIPTION
+                    "Indication that a dialed circuit has reached a threshhold
+                     for the maximum number of minutes that a dialed call may 
+                     remain active. The variable is ifIndex FROM RFC1213-MIB."
+                ::= 20
+
+            circuitPerDialTime TRAP-TYPE
+                ENTERPRISE sysObjectID
+--              VARIABLES { ifIndex }
+                DESCRIPTION
+                    "Indication that a dialed circuit has reached a threshhold 
+                     for the maximum number of minutes that a circuit may be
+                     active with dialed calls within a given period.
+                     The variable is ifIndex FROM RFC1213-MIB."
+                ::= 21
+
+            circuitPerDialAttempt TRAP-TYPE
+                ENTERPRISE sysObjectID
+--              VARIABLES { ifIndex }
+                DESCRIPTION
+                    "Indication that a dialed circuit has reached a threshhold
+                     for the maximum number of dial attempts that a circuit 
+                     may make for a given period.
+                     The variable is ifIndex FROM RFC1213-MIB."
+                ::= 22
+          
+            -- ITouch FDDI traps
+
+            fddiPcmStatusChange TRAP-TYPE
+                ENTERPRISE sysObjectID
+--              VARIABLES { fddimibPORTPCMState }
+                DESCRIPTION
+                    "A fddi port status has changed.
+                     The variable is fddimibPORTPCMState FROM FDDI-SMT73-MIB."
+                ::= 23
+
+            fddiSMTCFStateFailure TRAP-TYPE
+                ENTERPRISE sysObjectID
+--              VARIABLES { fddimibSMTCFState }
+                DESCRIPTION
+                    "A fddi station detects that the link is disabled or broken.
+                     The variable is fddimibSMTCFState FROM FDDI-SMT73-MIB."
+                ::= 26
+            -- ITouch System trap
+
+            sysLoginAuthenticationFailed TRAP-TYPE
+                ENTERPRISE sysObjectID
+--              VARIABLES { sysLoginAuthFailureTrapType, sysLoginAuthTrapIdentity }
+                DESCRIPTION
+                    "Indicates when and where a user attempted and failed to
+                     access the system. The variables are sysLoginAuthFailureTrapType,
+                     sysLoginAuthTrapIdentity FROM ITOUCH-SYSTEM-MIB."
+                ::= 28
+ 
+            -- ITouch InReach traps are valid through agent software V2.3.1.
+            -- Refer to the ITouch-Character-MIB for InReach Traps V2.4 and beyond.
+
+           sensorThresholdExceeded TRAP-TYPE
+           ENTERPRISE sysObjectID
+           DESCRIPTION
+               "Indication that the temperature or humidity exceeded a threshhold and
+                the value of the currrent temperature or humidity. Either the 
+                basicTemperatureValue or basicHumidityValue is included
+                as a variable in the trap to indicate which sensor exceeded its
+                threshold.  These variables are FROM ITOUCH-CHARACTER-MIB."
+           ::= 29
+	
+           contactClosureChange TRAP-TYPE
+           ENTERPRISE sysObjectID
+         VARIABLES { basicContactClosureOrScanPointValue, basicContactClosureOrScanPointName }
+           DESCRIPTION
+               "Indication that the contact closure transitioned to open or closed."
+           ::= 30
+
+           powerAlarmFuseA TRAP-TYPE
+           ENTERPRISE sysObjectID
+           VARIABLES  { basicPowerStatusFuseA }
+           DESCRIPTION
+               "Indicates that a fuse from bank A tripped its breaker, or that
+                it went operational. However, it is unlikely that a trap would
+                be issued when the fuse starts working. "
+           ::= 31
+
+ 	   powerAlarmFuseB TRAP-TYPE
+           ENTERPRISE sysObjectID
+           VARIABLES  { basicPowerStatusFuseB }
+           DESCRIPTION
+               "Indicates that a fuse from bank B tripped its breaker, or that
+                it went operational. However, it is unlikely that a trap would
+                be issued when the fuse starts working."
+           ::= 32
+
+ 	   powerAlarmSupplyA TRAP-TYPE
+           ENTERPRISE sysObjectID
+           VARIABLES  { basicPowerSupplyStatusA }
+           DESCRIPTION
+               "Indicates that power supply A lost or regained power.
+                However, it is unlikely that a trap would be issued when the
+                power comes on."
+           ::= 33
+
+ 	   powerAlarmSupplyB TRAP-TYPE
+           ENTERPRISE sysObjectID
+           VARIABLES  { basicPowerSupplyStatusB }
+           DESCRIPTION
+               "Indicates that power supply B lost or regained power.
+                However, it is unlikely that a trap would be issued when the
+                power comes on."
+           ::= 34
+
+           portInputSignalChanged TRAP-TYPE
+           ENTERPRISE sysObjectID
+           VARIABLES { rs232InSigState }
+           DESCRIPTION
+              "Indicates that an input signal on a port has transitioned to
+               the state indicated in the variable rs232InSigState."
+           ::= 35
+
+           portOutputSignalChanged TRAP-TYPE
+           ENTERPRISE sysObjectID
+           VARIABLES { rs232OutSigState }
+           DESCRIPTION
+              "Indicates that an output signal on a port has transitioned to
+               the state indicated in the variable rs232OutSigState."
+           ::= 36
+
+END

@@ -1,0 +1,114 @@
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+--
+--  File         : askeyIpoa.mib
+--  Description  : Askey defined to record all managed objects for ip over ATM
+--  Version      : 1.0
+--  Date         : Aug. 25, 2004 by Dennis Tseng   
+--
+--  Copyright (c) 1999-2004 Askey International, Corp.  All Rights Reserved.
+--
+--  -   ipDslam                 FROM ASKEY-DSLAM-MIB
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+
+ASKEY-DSLAM-IP-OVER-ATM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    ifIndex   		        FROM IF-MIB
+    OBJECT-TYPE,
+    Integer32,
+    MODULE-IDENTITY,
+    IpAddress               FROM SNMPv2-SMI
+    RowStatus               FROM  SNMPv2-TC
+    ipDslam                 FROM ASKEY-DSLAM-MIB
+    ;
+
+askeyIpoaMib MODULE-IDENTITY
+        LAST-UPDATED    "200404260000Z"  -- april 26, 2004
+        ORGANIZATION    "ASKEY Inc."
+        CONTACT-INFO    "ASKEY Inc.
+                         E-mail: cwfu@askey.com.tw"
+
+        DESCRIPTION     "ASKEY MULTICAST PROFILE MIB OID defines and documentation."
+
+    ::= { ipDslam 6 }
+
+
+ipoaTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IpoaEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { askeyIpoaMib 1 }
+
+
+ipoaEntry OBJECT-TYPE
+    SYNTAX      IpoaEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    ""
+    INDEX { IMPLIED ispName }
+    ::= { ipoaTable 1 }
+    
+IpoaEntry ::=
+    SEQUENCE {
+        ispName
+            OCTET STRING,
+        ispIp     
+            IpAddress,
+        ispMac
+            OCTET STRING,    
+        ispVid
+            Integer32,
+        ispRowStatus
+            RowStatus
+    }
+                            
+ispName OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(1..32))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    ""
+    ::= { ipoaEntry 1 }        
+                            
+ispIp OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    ""
+    ::= { ipoaEntry 2 }        
+
+ispMac OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(6))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    ""
+    ::= { ipoaEntry 3 }        
+
+ispVid OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    ""
+    ::= { ipoaEntry 4 }        
+
+ispRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+    ""
+    ::= { ipoaEntry 5 }        
+    
+--
+-- END of ASKEY-IPOA-MIB                
+--
+
+END
+    

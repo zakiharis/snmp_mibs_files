@@ -1,0 +1,2069 @@
+ADTRAN-DSUIQ-MIB   DEFINITIONS ::= BEGIN
+
+-- TITLE:       ADTRAN DSUIQ MIB
+-- PRODUCT:     1200.212L1
+-- VERSION:     4.0
+-- DATE:        98/09/22
+
+IMPORTS
+	    enterprises, Counter, IpAddress, Gauge
+	FROM RFC1155-SMI
+	 OBJECT-TYPE
+	FROM RFC-1212
+	 DisplayString, ifIndex
+	FROM RFC1213-MIB
+	 TRAP-TYPE
+	FROM RFC-1215
+	 adProdPhysAddress, adProducts, adMgmt
+	FROM ADTRAN-MIB;
+
+-- OBJECT IDENTIFIERS
+
+-- adtran            OBJECT IDENTIFIER ::= { enterprises 664 }
+-- adProducts        OBJECT IDENTIFIER ::= { adtran 1 }
+adDSUIQ              OBJECT IDENTIFIER ::= { adProducts 141 }
+-- adMgmt            OBJECT IDENTIFIER ::= { adtran 2 }
+adDSUIQmg                OBJECT IDENTIFIER ::= { adMgmt 141 }
+adDSUIQSystemConfig      OBJECT IDENTIFIER ::= { adDSUIQmg 1 }
+adDSUIQNetPortConfig     OBJECT IDENTIFIER ::= { adDSUIQmg 2 }
+adDSUIQDtePortConfig     OBJECT IDENTIFIER ::= { adDSUIQmg 3 }
+adDSUIQPvcConfig         OBJECT IDENTIFIER ::= { adDSUIQmg 4 }
+adDSUIQCurrentStatus	 OBJECT IDENTIFIER ::= { adDSUIQmg 5 }
+adDSUIQIntDDSStatus      OBJECT IDENTIFIER ::= { adDSUIQmg 6 }
+adDSUIQDayDDSStatus      OBJECT IDENTIFIER ::= { adDSUIQmg 7 }
+adDSUIQDiagnostic	 OBJECT IDENTIFIER ::= { adDSUIQmg 8 }
+adDSUIQDBUConfig 	OBJECT IDENTIFIER ::= { adDSUIQmg 9 }
+adDSUIQIntDBUStatus       OBJECT IDENTIFIER ::= { adDSUIQmg 10 }
+adDSUIQDayDBUStatus       OBJECT IDENTIFIER ::= { adDSUIQmg 11 }
+adDSUIQTrapManager 		OBJECT IDENTIFIER ::= { adDSUIQmg 12 }
+
+--
+--The DSUIQ System Config Group
+--
+
+adDSUIQPassword OBJECT-TYPE
+	 SYNTAX      DisplayString
+	 ACCESS      read-write
+	 STATUS      mandatory
+	 DESCRIPTION
+	"Sets the Telnet and Vt100 Terminal Control Password (10 characters maximum)."
+	 ::= { adDSUIQSystemConfig 1 } 
+
+adDSUIQTOD OBJECT-TYPE
+	 SYNTAX      DisplayString
+	 ACCESS      read-write
+	 STATUS      mandatory
+	 DESCRIPTION
+	"Sets the Time of Day with the format hh:mm."
+	 ::= { adDSUIQSystemConfig 2 } 
+
+adDSUIQDate OBJECT-TYPE
+	 SYNTAX      DisplayString
+	 ACCESS      read-write
+	 STATUS      mandatory
+	 DESCRIPTION
+	"Sets the Date with format MM-DD-YY."
+	 ::= { adDSUIQSystemConfig 3 }
+
+adDSUIQIpAddress    OBJECT-TYPE
+	 SYNTAX      IpAddress
+	 ACCESS      read-write
+	 STATUS      mandatory
+	 DESCRIPTION
+	"Sets the unit's IP Address."
+	 ::= { adDSUIQSystemConfig 4 }
+
+adDSUIQIpAddressMask    OBJECT-TYPE
+	 SYNTAX      IpAddress
+	 ACCESS      read-write
+	 STATUS      mandatory
+	 DESCRIPTION
+	"Sets the unit's Subnet Mask."
+	 ::= { adDSUIQSystemConfig 5 }
+
+adDSUIQGatewayIpAddress    OBJECT-TYPE
+	 SYNTAX      IpAddress
+	 ACCESS      read-write
+	 STATUS      mandatory
+	 DESCRIPTION
+	"Sets the Network's Gateway IP Address."
+	 ::= { adDSUIQSystemConfig 6 }
+
+adDSUIQTrapManagerIpAddress    OBJECT-TYPE
+	 SYNTAX      IpAddress
+	 ACCESS      read-write
+	 STATUS      mandatory
+	 DESCRIPTION
+	"Sets the IP Address of the Trap Host Manager."
+	 ::= { adDSUIQSystemConfig 7 }
+
+adDSUIQTrapManagerDLCI    OBJECT-TYPE
+	 SYNTAX      INTEGER (16..1007)
+	 ACCESS      read-write
+	 STATUS      mandatory
+	 DESCRIPTION
+	"Sets the DLCI of the Trap Host Manager. (Range 16 - 1007)."
+	 ::= { adDSUIQSystemConfig 8 }
+
+adDSUIQTrapManagerPort    OBJECT-TYPE
+	 SYNTAX      INTEGER {
+      none(1),
+      dtePort(2),
+      networkPort(3),
+      controlPort(4),
+      ethernetPort(5)
+   }
+	 ACCESS      read-write
+	 STATUS      mandatory
+	 DESCRIPTION
+	"Selects the Trap Manager Port."
+	 ::= { adDSUIQSystemConfig 9 }
+
+adDSUIQControPortBaud    OBJECT-TYPE
+	 SYNTAX      INTEGER {
+      bps9600(1),
+      bps19200(2),
+      bps38400(3)
+   }
+	 ACCESS      read-write
+	 STATUS      mandatory
+	 DESCRIPTION
+	"Selects the Control Port baud rate."
+	 ::= { adDSUIQSystemConfig 10 }
+
+adDSUIQControPortMode    OBJECT-TYPE
+	 SYNTAX      INTEGER {
+	 terminal(1),
+	 slip(2),
+	 ppp(3)
+   }
+	 ACCESS      read-write
+	 STATUS      mandatory
+	 DESCRIPTION
+	"Selects the Control Port protocol."
+	 ::= { adDSUIQSystemConfig 11 }
+
+adDSUIQEnableTraps OBJECT-TYPE
+	SYNTAX	INTEGER {
+			disabled (1),
+			enabled (2)
+	}
+	ACCESS	read-write
+	STATUS	mandatory
+	DESCRIPTION
+	"Overall trap enable/disable."
+	::= { adDSUIQSystemConfig 12 }
+
+adDSUIQAlarmState OBJECT-TYPE
+       SYNTAX      INTEGER(0..15)
+	ACCESS      read-only
+	STATUS      mandatory
+	DESCRIPTION
+		"This bit map variable indicates alarm conditions which
+		are currently set.  When an alarm condition occurs, the
+		corresponding event bit is set in this variable.  If
+		armed, setting the event will generate an Alarm Trap.
+
+		The various alarm event bit positions are:
+			1 = Network physical link up.
+			2 = Network physical link down.
+			4 = Network signal state up.
+			8 = Network signal state down. "
+
+	::= { adDSUIQSystemConfig 13 }
+
+adDSUIQArmAlarm		OBJECT-TYPE
+	SYNTAX      INTEGER(0..15)
+	ACCESS      read-write
+	STATUS      mandatory
+	DESCRIPTION
+		"This bit map variable arms or disarms an individual or
+		group of events identified in adFradAlarmState as a source
+		for generation of an Alarm Trap.
+
+		The various arm event bit positions are :
+			1 = Network physical link up.
+			2 = Network physical link down.
+			4 = Network signal state up.
+			8 = Network signal state down.  "
+
+	::= { adDSUIQSystemConfig 14 }
+
+adDSUIQAbortConfig   OBJECT-TYPE
+	 SYNTAX      INTEGER {
+		abortConfig(1)
+	}
+	 ACCESS      read-write
+	 STATUS      mandatory
+	 DESCRIPTION
+	"A Set will cancel the current selections and revert to the last Saved configuration."
+	 ::= { adDSUIQSystemConfig 15 }
+
+adDSUIQSaveConfig   OBJECT-TYPE
+	 SYNTAX      INTEGER {
+		saveConfig(1)
+	}
+	 ACCESS      read-write
+	 STATUS      mandatory
+	 DESCRIPTION
+	"A Set operation will reset the unit and save current selections."
+	 ::= { adDSUIQSystemConfig 16 }
+
+
+
+--
+--The DSUIQ Network Port Config Group
+--
+
+
+adDSUIQNetPortLoopRate    OBJECT-TYPE
+	 SYNTAX      INTEGER {
+		bps56000(1),
+		bps64000(2),
+		auto(3)
+
+	}
+	 ACCESS      read-write
+	 STATUS      mandatory
+	 DESCRIPTION
+	"Selects the Rate for the DDS interface."
+	 ::= { adDSUIQNetPortConfig 1 }
+
+adDSUIQNetPortClockSource OBJECT-TYPE
+	 SYNTAX      INTEGER {
+		master(1),
+		fromNetwork(2)
+	}
+	 ACCESS      read-write
+	 STATUS      mandatory
+	 DESCRIPTION
+	"Selects the Timing source for the DDS interface."
+	 ::= { adDSUIQNetPortConfig 2 }
+
+adDSUIQNetPortSignaling    OBJECT-TYPE
+		SYNTAX      INTEGER {
+	    none(1),
+	    conLMI(2),
+	    ansiT1617D(3),
+	    ituTQ933A(4),
+	    auto(5)
+		}
+		ACCESS      read-write
+		STATUS      mandatory
+		DESCRIPTION
+		"Signaling type for the frame relay management interface."
+		::= { adDSUIQNetPortConfig 3 }
+
+adDSUIQNetPortt391    OBJECT-TYPE
+		SYNTAX      INTEGER (5..30)
+		ACCESS      read-write
+		STATUS      mandatory
+		DESCRIPTION
+		"Sets the polling interval in seconds for the frame relay management interface. 
+                 (Range 5 - 30)."
+		 ::= { adDSUIQNetPortConfig 4 }
+
+
+adDSUIQNetPortn391    OBJECT-TYPE
+		SYNTAX      INTEGER (1..255)
+		ACCESS      read-write
+		STATUS      mandatory
+		DESCRIPTION
+		"Sets the interval between full status polls for the frame relay management 
+                 interface. (Range 1 - 255)."
+		::= { adDSUIQNetPortConfig 5 }
+
+adDSUIQNetPortn392    OBJECT-TYPE
+		SYNTAX      INTEGER (1..10)
+		ACCESS      read-write
+		STATUS      mandatory
+		DESCRIPTION
+		"Sets the error count for the frame relay management interface. (Range 1 - 10)."
+		::= { adDSUIQNetPortConfig 6 }
+
+adDSUIQNetPortn393    OBJECT-TYPE
+		SYNTAX      INTEGER (1..10)
+		ACCESS      read-write
+		STATUS      mandatory
+		DESCRIPTION
+		"Sets the error window (number of polling events)for the frame relay management 
+		interface. (Range 1 - 10)."
+		::= { adDSUIQNetPortConfig 7 }
+
+adDSUIQNetPortMgmtDlci1Mode    OBJECT-TYPE
+	 SYNTAX      INTEGER {
+		shared(1),
+		dedicated(2)
+	 }
+	 ACCESS      read-write
+	 STATUS      mandatory
+	 DESCRIPTION
+	"Sets the mode for the managent DLCI 1.  If set for shared, management DLCI 1 is used for customer data and
+	IQ management data.  If set for dedicated,  management DLCI 1 is used only for IQ management data and is
+	not passed to the attached frame relay DTE device."
+	 ::= { adDSUIQNetPortConfig 8 }
+
+adDSUIQNetPortMgmtDlci2Mode    OBJECT-TYPE
+	 SYNTAX      INTEGER  {
+		shared(1),
+		dedicated(2)
+	 }
+	 ACCESS      read-write
+	 STATUS      mandatory
+	 DESCRIPTION
+	"Sets the mode for the managent DLCI 2.  If set for shared, management DLCI 2 is used for customer data and
+	IQ management data.  If set for dedicated,  management DLCI 2 is used only for IQ management data and is
+	not passed to the attached frame relay DTE device."
+	 ::= { adDSUIQNetPortConfig 9 }
+
+
+adDSUIQNetMgmtDlci1    OBJECT-TYPE
+	 SYNTAX      INTEGER (16..1007)
+	 ACCESS      read-write
+	 STATUS      mandatory
+	 DESCRIPTION
+	"Sets the DLCI for management PVC 1. (Range 16 - 1007)."
+	 ::= { adDSUIQNetPortConfig 10 }
+
+adDSUIQNetMgmtDlci2    OBJECT-TYPE
+	 SYNTAX      INTEGER (16..1007)
+	 ACCESS      read-write
+	 STATUS      mandatory
+	 DESCRIPTION
+	"Sets the DLCI for management PVC 2. (Range 16 - 1007)."
+	 ::= { adDSUIQNetPortConfig 11 }
+
+adDSUIQNetPortMaxPVCs    OBJECT-TYPE
+	 SYNTAX      INTEGER (1..100)
+	 ACCESS      read-write
+	 STATUS      mandatory
+	 DESCRIPTION
+	"Sets the maxium PVCs supported by the IQ unit. (Range 1 - 100)."
+	 ::= { adDSUIQNetPortConfig 12 }
+
+adDSUIQNetPortHistIntervals    OBJECT-TYPE
+	 SYNTAX      INTEGER
+	 ACCESS      read-write
+	 STATUS      mandatory
+	 DESCRIPTION
+	"Sets  the number of history intervals for storage."
+	 ::= { adDSUIQNetPortConfig 13 }
+
+adDSUIQNetPortHistIntervalsAvailable    OBJECT-TYPE
+	 SYNTAX      INTEGER
+	 ACCESS      read-only
+	 STATUS      mandatory
+	 DESCRIPTION
+	"Returns the number of history intervals allowed based on the maxium number of PVCs selected."
+	 ::= { adDSUIQNetPortConfig 14 }
+
+--
+--The DSUIQ Dte Port Config Group
+--
+
+
+adDSUIQDtePortInterface    OBJECT-TYPE
+	 SYNTAX      INTEGER {
+		rs232(1),
+		v35(2)
+	}
+	 ACCESS      read-write
+	 STATUS      mandatory
+	 DESCRIPTION
+	"Selects the DTE Port Interface type."
+	 ::= { adDSUIQDtePortConfig 1 }
+
+adDSUIQDtePortRate    OBJECT-TYPE
+	 SYNTAX      INTEGER {
+		bps56000(1),
+		bps64000(2)
+	}
+	 ACCESS      read-write
+	 STATUS      mandatory
+	 DESCRIPTION
+	"Selects the DTE Port Rate."
+	 ::= { adDSUIQDtePortConfig 2 }
+
+adDSUIQDteCTSOption    OBJECT-TYPE
+	 SYNTAX      INTEGER {
+		forcedOn(1),
+		followRTS(2)
+	}
+	 ACCESS      read-write
+	 STATUS      mandatory
+	 DESCRIPTION
+	"Selects the Clear to Send (CTS) option."
+	 ::= { adDSUIQDtePortConfig 3 }
+
+adDSUIQDteCDOption    OBJECT-TYPE
+	 SYNTAX      INTEGER {
+		forcedOn(1),
+		normal(2)
+	}
+	 ACCESS      read-write
+	 STATUS      mandatory
+	 DESCRIPTION
+	"Selects the Carrier Detect (CD) option."
+	 ::= { adDSUIQDtePortConfig 4 }
+
+adDSUIQDteDSROption    OBJECT-TYPE
+	 SYNTAX      INTEGER {
+		forcedOn(1),
+		normal(2)
+	}
+	 ACCESS      read-write
+	 STATUS      mandatory
+	 DESCRIPTION
+	"Selects the Data Set Ready (DSR) option."
+	 ::= { adDSUIQDtePortConfig 5 }
+
+
+adDSUIQDtePortMgmtDLCI    OBJECT-TYPE
+	 SYNTAX      INTEGER (16..1007)
+	 ACCESS      read-write
+	 STATUS      mandatory
+	 DESCRIPTION
+	"Sets the DTE Port Management DLCI. (Range 16 - 1007)."
+	 ::= { adDSUIQDtePortConfig 6 }
+
+
+adDSUIQDtePortt392    OBJECT-TYPE
+		SYNTAX      INTEGER (5..30)
+	ACCESS      read-write
+		STATUS      mandatory
+		DESCRIPTION
+		"Sets the timeout in seconds between polling intervals. (Range 5 - 30)."
+		 ::= { adDSUIQDtePortConfig 7 }
+
+adDSUIQDtePortn392    OBJECT-TYPE
+		SYNTAX      INTEGER (1..10)
+		ACCESS      read-write
+		STATUS      mandatory
+		DESCRIPTION
+		"Sets the number of error events for the frame relay management. 
+                  (Range 1 - 10)."
+		::= { adDSUIQDtePortConfig 8 }
+
+adDSUIQDtePortn393    OBJECT-TYPE
+		SYNTAX      INTEGER (1..10)
+		ACCESS      read-write
+		STATUS      mandatory
+		DESCRIPTION
+		"Sets the error window (polling events) for the frame relay management
+		(Range 1 - 10)."
+		::= { adDSUIQDtePortConfig 9 }
+
+adDSUIQDteManagementPvcOption    OBJECT-TYPE
+	 SYNTAX      INTEGER {
+		enabled(1),
+		disabled(2)
+	}
+	 ACCESS      read-write
+	 STATUS      mandatory
+	 DESCRIPTION
+	"Controls the presence of the DTE management PVC in a full status response to the DTE device."
+	 ::= { adDSUIQDtePortConfig 10 }
+
+adDSUIQDteSignalingResponsesOption    OBJECT-TYPE
+	 SYNTAX      INTEGER {
+		alwaysOn(1),
+		followsNetwork(2)
+	}
+	 ACCESS      read-write
+	 STATUS      mandatory
+	 DESCRIPTION
+	"Determines how the IQ device will respond to polls from the DTE device during a network failure.
+	If set to always on, the IQ will respond to polls during a network failure.  If set to follow network, the IQ
+	will not respond thus emulating a failure to the DTE device.  If the IQ is responsible for
+	dial backup, this option should be set to always on."
+	 ::= { adDSUIQDtePortConfig 11 }
+
+adDSUIQDteFlowControlOption    OBJECT-TYPE
+	 SYNTAX      INTEGER {
+		none(1),
+		hardware(2),
+		fECNBECN(3)
+	}
+	 ACCESS      read-write
+	 STATUS      mandatory
+	 DESCRIPTION
+	"Determines how the IQ device will respond to congestion during DBU operation.
+	If set for none, the IQ will drop frames during DBU operation when severe congestion occurs.
+	If set for hardware, the IQ will vary the DTE TC clock in order to control the amount of data
+	offered to the IQ when severe congestion occurs.  FECN/BECN mode will set the FECN bit in outbound frames
+	and set BECN bit for inbound frames leaving flow control up to the DTE devices."
+	 ::= { adDSUIQDtePortConfig 12 }
+	 
+--
+--The DSUIQ PVC config table
+--
+
+adDSUIQPvcConfigTable OBJECT-TYPE
+	 SYNTAX      SEQUENCE OF AdDSUIQPvcConfigEntry
+	 ACCESS      not-accessible
+	 STATUS      mandatory
+	 DESCRIPTION
+	   "n/a."
+	 ::= { adDSUIQPvcConfig 1 }
+
+adDSUIQPvcConfigEntry OBJECT-TYPE
+	 SYNTAX      AdDSUIQPvcConfigEntry
+	 ACCESS      not-accessible
+	 STATUS      mandatory
+	 DESCRIPTION
+	   "n/a"
+	 INDEX { adDSUIQPvcConfigIndex }
+	 ::={ adDSUIQPvcConfigTable 1 }
+
+
+AdDSUIQPvcConfigEntry ::=
+	SEQUENCE {
+	adDSUIQPvcConfigIndex
+	INTEGER,
+	adDSUIQPvcDLCI
+	INTEGER,
+	adDSUIQPvcCIR
+	INTEGER,
+	adDSUIQPvcSequenceOption
+	INTEGER,
+	adDSUIQPvcDelayPacketOption
+	INTEGER,
+	adDSUIQPvcDBUDLCI
+	INTEGER,
+	adDSUIQPvcStatsControl
+	INTEGER
+	}
+
+adDSUIQPvcConfigIndex OBJECT-TYPE
+	 SYNTAX  INTEGER
+	 ACCESS  read-only
+	 STATUS  mandatory
+	 DESCRIPTION
+	   "n/a."
+	 ::= { adDSUIQPvcConfigEntry 1 }
+
+adDSUIQPvcDLCI OBJECT-TYPE
+	 SYNTAX  INTEGER (16..1007)
+	 ACCESS  read-write
+	 STATUS  mandatory
+	 DESCRIPTION
+	   "Address for this PVC entry. (Range 16 - 1007)."
+	 ::= { adDSUIQPvcConfigEntry 2 }
+
+adDSUIQPvcCIR OBJECT-TYPE
+	 SYNTAX  INTEGER (0..1536)
+	 ACCESS  read-write
+	 STATUS  mandatory
+	 DESCRIPTION
+	   "Commited Information Rate for this PVC in Kbps."
+	 ::= { adDSUIQPvcConfigEntry 3 }
+
+adDSUIQPvcSequenceOption OBJECT-TYPE
+	 SYNTAX  INTEGER {
+		disabled(1),
+		enabled(2)
+	}
+	 ACCESS  read-write
+	 STATUS  mandatory
+	 DESCRIPTION
+	   "Sequence number allows the IQ to detect lost frames across the frame relay
+	   service.  This option should be disabled for PVCs that do not have IQ
+	   on both ends."
+	 ::= { adDSUIQPvcConfigEntry 4 }
+
+adDSUIQPvcDelayPacketOption OBJECT-TYPE
+	 SYNTAX  INTEGER {
+		disabled(1),
+		enabled(2)
+	}
+	 ACCESS  read-write
+	 STATUS  mandatory
+	 DESCRIPTION
+	   "Delay packet option for this PVC allows the IQ to sample round trip delay
+	   across the frame relay service.  This option should be disabled for PVCs that do not have IQ
+	   on both ends."
+	 ::= { adDSUIQPvcConfigEntry 5 }
+
+adDSUIQPvcDBUDLCI OBJECT-TYPE
+	 SYNTAX  INTEGER (16..1007)
+	 ACCESS  read-write
+	 STATUS  mandatory
+	 DESCRIPTION
+	   "Used when this PVC entry is used for dial backup.  This value should contain the PVC address
+	   as seen on the far end of the PVC."
+	 ::= { adDSUIQPvcConfigEntry 6 }
+	 
+adDSUIQPvcStatsControl OBJECT-TYPE
+	 SYNTAX  INTEGER {
+		auto(1),
+		enabled(2),
+		disabled(3)
+	}
+	 ACCESS  read-write
+	 STATUS  mandatory
+	 DESCRIPTION
+	   "Stats Control option determines how the IQ will track statistics for this PVC entry.  Auto will
+	   allow the IQ to track statistics for a PVC if enough memory is available."
+	 ::= { adDSUIQPvcConfigEntry 7 }
+--
+--The DSUIQ Current status Group
+--
+
+adDSUIQDDSState    OBJECT-TYPE
+	 SYNTAX      INTEGER {
+		normal56K(1),
+		normal64K(2),
+		openLoop(3),
+		outOfService-Frame(4),
+		noFrameSync(5),
+		dSUInTest(6),
+		scanning(7),
+		noRXSignal(8),
+		checkTelcoCable(9)
+	}
+	 ACCESS      read-only
+	 STATUS      mandatory
+	 DESCRIPTION
+	"Current status of the DDS interface"
+	 ::= { adDSUIQCurrentStatus 1 }
+
+adDSUIQDteControlLeads    OBJECT-TYPE
+	 SYNTAX      INTEGER (0..31)
+	 ACCESS      read-only
+	 STATUS      mandatory
+	 DESCRIPTION
+	"This bit map integer reflects the current state of the DTE control leads as follows:
+	bit      meaning
+	0        CTS
+	1        RTS
+	2        DSR
+	3        DTR
+	4        DCD
+
+	A 1 means the lead is on."
+	 ::= { adDSUIQCurrentStatus 2 }
+
+adDSUIQDBUPortType    OBJECT-TYPE
+	 SYNTAX      INTEGER {
+	 empty(1),
+	 v34modem(2),
+	 dce(3),
+	 sw564wire(4),
+	 sw562wire(5),
+	 isdn(6)
+	 }
+	 ACCESS      read-only
+	 STATUS      mandatory
+	 DESCRIPTION
+	"Returns the DBU card type installed."
+	 ::= { adDSUIQCurrentStatus 3 }
+
+adDSUIQLANPortStatus    OBJECT-TYPE
+	 SYNTAX      INTEGER {
+	 empty(1),
+	 ethernet(2)
+	 }
+	 ACCESS      read-only
+	 STATUS      mandatory
+	 DESCRIPTION
+	"Returns the LAN card type installed."
+	 ::= { adDSUIQCurrentStatus 4 }
+
+adDSUIQLEDstatus    OBJECT-TYPE
+	 SYNTAX      INTEGER (0..127)
+	 ACCESS      read-only
+	 STATUS      mandatory
+	 DESCRIPTION
+	"This bit map integer reflects DSUIQ front panel LED state as follows:
+		bit		meaning
+		0		TEST
+		1		ALARM
+		2		DCD
+		3		RD
+		4		TD
+		5		CTS
+		6		RTS
+		"
+
+	 ::= { adDSUIQCurrentStatus 5 }
+
+adDSUIQDTESignalingState    OBJECT-TYPE
+	 SYNTAX      INTEGER {
+	 up(1),
+	 down(2)
+	 }
+	 ACCESS      read-only
+	 STATUS      mandatory
+	 DESCRIPTION
+	"Current state of the PVC signaling between the DSUIQ and the attached frame relay dte."
+	 ::= { adDSUIQCurrentStatus 6 }
+
+adDSUIQNETSignalingState    OBJECT-TYPE
+	 SYNTAX      INTEGER {
+	 up(1),
+	 down(2)
+	 }
+	 ACCESS      read-only
+	 STATUS      mandatory
+	 DESCRIPTION
+	"Current state of the PVC signaling between the DSUIQ and the frame relay service."
+	 ::= { adDSUIQCurrentStatus 7 }
+
+adDSUIQNETPVCCount    OBJECT-TYPE
+	 SYNTAX      INTEGER
+	 ACCESS      read-only
+	 STATUS      mandatory
+	 DESCRIPTION
+	"Current count of network pvcs."
+	 ::= { adDSUIQCurrentStatus 8 }
+
+adDSUIQNETPVCConfigTableSize    OBJECT-TYPE
+	 SYNTAX      INTEGER
+	 ACCESS      read-only
+	 STATUS      mandatory
+	 DESCRIPTION
+	"Current count of rows in the PVC config table."
+	 ::= { adDSUIQCurrentStatus 9 }
+
+adDSUIQDBUState    OBJECT-TYPE
+	 SYNTAX      INTEGER {
+	 emptySlot(1),
+	 openLoop(2),
+	 gettingTEI(3),
+	 tEIOK(4),
+	 sPIDOK(5),
+	 idle(6),
+	 inDBU(7),
+	 waitingForCall(8),
+	 noSealingCurrent(9),
+	 outOfService(10),
+	 noRXSignal(11),
+	 ringing(12),
+	 dialing(13),
+	 dialingNumber1(14),
+	 dialingNumber2(15),
+	 dialingNumber3(16),
+	 dialingNumber4(17),
+	 dialingNumber5(18),
+	 anserwingCall(19),
+	 noDialTone(20),
+	 noAnswer(21),
+	 busy(22),
+	 waitingToDial(23),
+	 connect(24),
+	 connect33d6(25),
+	 connect31d2(26),
+	 connect115d2R(27),
+	 connect115d2(28),
+	 connect28d8(29),
+	 connect26d4(30),
+	 connect24d0(31),
+	 connect21d6(32),
+	 connect57d6R(33),
+	 connect38d4R(34),
+	 connect19d2R(35),
+	 connect9d6R(36),
+	 connect4d8R(37),
+	 connect2d4R(38),
+	 connect16d8(39),
+	 connect14d4(40),
+	 connect12d0(41),
+	 connect7d2(42),
+	 connect57d6(43),
+	 connect38d4(44),
+	 connect19d2(45),
+	 connect9d6(46),
+	 connect4d8(47),
+	 connect2d4(48),
+	 sendingPasscode(49),
+	 waitingPasscode(50),
+	 invalidPasscode(51),
+	 validPasscode(52),
+	 error(53)
+	 }
+	 ACCESS      read-only
+	 STATUS      mandatory
+	 DESCRIPTION
+	"Current state of the DBU interface."
+	 ::= { adDSUIQCurrentStatus 10 }
+--
+--The DSUIQ interval DDS status table
+--
+
+adDSUIQIntDDSStatusTable OBJECT-TYPE
+	 SYNTAX      SEQUENCE OF AdDSUIQIntDDSStatusEntry
+	 ACCESS      not-accessible
+	 STATUS      mandatory
+	 DESCRIPTION
+	   "n/a."
+	 ::={ adDSUIQIntDDSStatus 1 }
+
+adDSUIQIntDDSStatusEntry OBJECT-TYPE
+	 SYNTAX      AdDSUIQIntDDSStatusEntry
+	 ACCESS      not-accessible
+	 STATUS      mandatory
+	 DESCRIPTION
+	   "n/a"
+	 INDEX { adDSUIQIntDDSSlotIndex }
+	 ::= { adDSUIQIntDDSStatusTable 1 }
+
+
+AdDSUIQIntDDSStatusEntry ::=
+	SEQUENCE {
+	adDSUIQIntDDSSlotIndex
+	INTEGER,
+	adDSUIQIntDDSUnavailableTime
+	Counter,
+	adDSUIQIntDDSStateChange
+	Counter,
+	adDSUIQIntDDSBPVFrameError
+	Counter
+	}
+
+adDSUIQIntDDSSlotIndex OBJECT-TYPE
+	 SYNTAX  INTEGER
+	 ACCESS  read-only
+	 STATUS  mandatory
+	 DESCRIPTION
+	 "n/a."
+	 ::= { adDSUIQIntDDSStatusEntry 1 }
+
+adDSUIQIntDDSUnavailableTime OBJECT-TYPE
+	 SYNTAX  Counter
+	 ACCESS  read-only
+	 STATUS  mandatory
+	 DESCRIPTION
+	   "Amount of time in seconds the DDS port is unavailable due to test
+	   or in an inactive state."
+	 ::= { adDSUIQIntDDSStatusEntry 2 }
+
+adDSUIQIntDDSStateChange OBJECT-TYPE
+	 SYNTAX  Counter
+	 ACCESS  read-only
+	 STATUS  mandatory
+	 DESCRIPTION
+	   "Number of changes in the DDS port state.  This includes all normal, inactive, and test
+	   state transitions."
+	 ::= { adDSUIQIntDDSStatusEntry 3 }
+
+adDSUIQIntDDSBPVFrameError OBJECT-TYPE
+	 SYNTAX  Counter
+	 ACCESS  read-only
+	 STATUS  mandatory
+	 DESCRIPTION
+	   "Number of BPVs received when the DDS is set for 56K mode or the number of
+	   DDS framing errors when the DDS is set for 64K mode."
+	 ::= { adDSUIQIntDDSStatusEntry 4 }
+
+
+
+--
+--The DSUIQ day DDS status table
+--
+
+adDSUIQDayDDSStatusTable OBJECT-TYPE
+	 SYNTAX      SEQUENCE OF AdDSUIQDayDDSStatusEntry
+	 ACCESS      not-accessible
+	 STATUS      mandatory
+	 DESCRIPTION
+	   "n/a."
+	 ::={ adDSUIQDayDDSStatus 1 }
+
+adDSUIQDayDDSStatusEntry OBJECT-TYPE
+	 SYNTAX      AdDSUIQDayDDSStatusEntry
+	 ACCESS      not-accessible
+	 STATUS      mandatory
+	 DESCRIPTION
+	   "n/a"
+	 INDEX { adDSUIQDayDDSSlotIndex }
+	 ::={ adDSUIQDayDDSStatusTable 1 }
+
+
+AdDSUIQDayDDSStatusEntry ::=
+	SEQUENCE {
+	adDSUIQDayDDSSlotIndex
+	INTEGER,
+	adDSUIQDayDDSUnavailableTime
+	Counter,
+	adDSUIQDayDDSStateChange
+	Counter,
+	adDSUIQDayDDSBPVFrameError
+	Counter
+	}
+
+adDSUIQDayDDSSlotIndex OBJECT-TYPE
+	 SYNTAX  INTEGER
+	 ACCESS  read-only
+	 STATUS  mandatory
+	 DESCRIPTION
+	   "n/a."
+	 ::= { adDSUIQDayDDSStatusEntry 1 }
+
+adDSUIQDayDDSUnavailableTime OBJECT-TYPE
+	 SYNTAX  Counter
+	 ACCESS  read-only
+	 STATUS  mandatory
+	 DESCRIPTION
+	   "Amount of time in seconds the DDS port is unavailable due to test
+	   or in an inactive state."
+	 ::= { adDSUIQDayDDSStatusEntry 2 }
+
+adDSUIQDayDDSStateChange OBJECT-TYPE
+	 SYNTAX  Counter
+	 ACCESS  read-only
+	 STATUS  mandatory
+	 DESCRIPTION
+	   "Number of changes in the DDS port state.  This includes all normal, inactive, and test
+	   state transitions."
+	 ::= { adDSUIQDayDDSStatusEntry 3 }
+
+adDSUIQDayDDSBPVFrameError OBJECT-TYPE
+	 SYNTAX  Counter
+	 ACCESS  read-only
+	 STATUS  mandatory
+	 DESCRIPTION
+	   "Number of BPVs received when the DDS is set for 56K mode or the number of
+	   DDS framing errors when the DDS is set for 64K mode."
+	 ::= { adDSUIQDayDDSStatusEntry 4 }
+
+--
+--The DSUIQ Diagnostic table
+--
+
+adDSUIQDiagnosticTable OBJECT-TYPE
+	 SYNTAX      SEQUENCE OF AdDSUIQDiagnosticEntry
+	 ACCESS      not-accessible
+	 STATUS      mandatory
+	 DESCRIPTION
+	   "n/a."
+	 ::={ adDSUIQDiagnostic 1 }
+
+adDSUIQDiagnosticEntry OBJECT-TYPE
+	 SYNTAX      AdDSUIQDiagnosticEntry
+	 ACCESS      not-accessible
+	 STATUS      mandatory
+	 DESCRIPTION
+        "n/a"
+	 INDEX { adDSUIQDiagnosticIndex }
+	 ::={ adDSUIQDiagnosticTable 1 }
+
+AdDSUIQDiagnosticEntry ::=
+	 SEQUENCE {
+	adDSUIQDiagnosticIndex
+	INTEGER,
+	adDSUIQDiagnosticDlci
+	INTEGER,
+	adDSUIQDiagnosticControl
+	INTEGER,
+	adDSUIQDiagnosticDuration
+	INTEGER,
+	adDSUIQDiagnosticStatus
+	INTEGER,
+	adDSUIQDiagnosticSecondsRemaining
+	INTEGER,
+	adDSUIQDiagnosticFramesTx
+	Counter,
+	adDSUIQDiagnosticFramesRx
+	Counter,
+	adDSUIQDiagnosticLostFrames
+	Counter,
+	adDSUIQDiagnosticMaxDelay
+	Gauge,
+	adDSUIQDiagnosticMinDelay
+	Gauge,
+	adDSUIQDiagnosticAvgDelay
+	Gauge
+	}
+
+	adDSUIQDiagnosticIndex OBJECT-TYPE
+	 SYNTAX  INTEGER
+	 ACCESS  read-only
+	 STATUS  mandatory
+	 DESCRIPTION
+	   "n/a."
+	 ::= { adDSUIQDiagnosticEntry 1 }
+
+	 adDSUIQDiagnosticDlci OBJECT-TYPE
+	 SYNTAX  INTEGER (16..1007)
+	 ACCESS  read-only
+	 STATUS  mandatory
+	 DESCRIPTION
+	   "Sets the DLCI for PVC Loopback. (Range 16 - 1007)."
+	 ::= { adDSUIQDiagnosticEntry 2 }
+
+	 adDSUIQDiagnosticControl OBJECT-TYPE
+	 SYNTAX  INTEGER {
+		control(1)
+		}
+	 ACCESS  read-write
+	 STATUS  mandatory
+	 DESCRIPTION
+	   "Starts or Stops PVC Loopback Test."
+	 ::= { adDSUIQDiagnosticEntry 3 }
+
+	 adDSUIQDiagnosticDuration OBJECT-TYPE
+	 SYNTAX  INTEGER
+	 ACCESS  read-write
+	 STATUS  mandatory
+	 DESCRIPTION
+	   "Sets the Length of the PVC Loopback in minutes."
+	 ::= { adDSUIQDiagnosticEntry 4 }
+
+	 adDSUIQDiagnosticStatus OBJECT-TYPE
+	 SYNTAX  INTEGER {
+		diagnosticOff(1),
+		diagnosticOn(2)
+		}
+	 ACCESS  read-write
+	 STATUS  mandatory
+	 DESCRIPTION
+	   "PVC Loopback Test Status. (Active/Inactive)."
+	 ::= { adDSUIQDiagnosticEntry 5 }
+
+	 adDSUIQDiagnosticSecondsRemaining OBJECT-TYPE
+	 SYNTAX  INTEGER
+	 ACCESS  read-only
+	 STATUS  mandatory
+	 DESCRIPTION
+	   "PVC Loopback Test time remaining in seconds."
+	 ::= { adDSUIQDiagnosticEntry 6 }
+
+	 adDSUIQDiagnosticFramesTx OBJECT-TYPE
+	 SYNTAX  Counter
+	 ACCESS  read-only
+	 STATUS  mandatory
+	 DESCRIPTION
+	   "Diagnostic Frames transmitted."
+	 ::= { adDSUIQDiagnosticEntry 7 }
+
+	 adDSUIQDiagnosticFramesRx OBJECT-TYPE
+	 SYNTAX  Counter
+	 ACCESS  read-only
+	 STATUS  mandatory
+	 DESCRIPTION
+	   "Diagnostic Frames received."
+	 ::= { adDSUIQDiagnosticEntry 8 }
+
+	 adDSUIQDiagnosticLostFrames OBJECT-TYPE
+	 SYNTAX  Counter
+	 ACCESS  read-only
+	 STATUS  mandatory
+	 DESCRIPTION
+	   "Diagnostic Frames Lost."
+	 ::= { adDSUIQDiagnosticEntry 9 }
+
+	 adDSUIQDiagnosticMaxDelay OBJECT-TYPE
+	 SYNTAX  Gauge
+	 ACCESS  read-only
+	 STATUS  mandatory
+	 DESCRIPTION
+	   "Diagnostic Maximum Delay measurement."
+	 ::= { adDSUIQDiagnosticEntry 10 }
+
+	 adDSUIQDiagnosticMinDelay OBJECT-TYPE
+	 SYNTAX  Gauge
+	 ACCESS  read-only
+	 STATUS  mandatory
+	 DESCRIPTION
+	   "Diagnostic Minimum Delay measurement."
+	 ::= { adDSUIQDiagnosticEntry 11 }
+
+	 adDSUIQDiagnosticAvgDelay OBJECT-TYPE
+	 SYNTAX  Gauge
+	 ACCESS  read-only
+	 STATUS  mandatory
+	 DESCRIPTION
+	   "Diagnostic Average Delay measurement."
+	 ::= { adDSUIQDiagnosticEntry 12 }
+
+--
+--The DSUIQ Dial Backup Config Group
+--
+
+adDSUIQDBUOption   OBJECT-TYPE
+        SYNTAX         INTEGER {
+                               disable(1),
+                               enable(2)
+                               }
+        ACCESS         read-write
+        STATUS         mandatory
+        DESCRIPTION
+            "This option specifies whether the unit automatically
+            enters dial backup mode or waits for manual setup."
+	   ::= { adDSUIQDBUConfig 1 }
+
+adDSUIQDBUStartLockout  OBJECT-TYPE
+	   SYNTAX         INTEGER (0..23)
+        ACCESS         read-write
+        STATUS         mandatory
+        DESCRIPTION
+            "This option selects the hour to begin disabling
+            dial backup operation when daily or weekend
+            lockout mode is active."
+	   ::= { adDSUIQDBUConfig 2 }
+
+adDSUIQDBUEndLockout  OBJECT-TYPE
+        SYNTAX         INTEGER (0..23)
+        ACCESS         read-write
+        STATUS         mandatory
+        DESCRIPTION
+            "This option selects the hour to end dial backup lockout
+            when daily or weekend lockout mode is active."
+	   ::= { adDSUIQDBUConfig 3 }
+
+adDSUIQDBUMode    OBJECT-TYPE
+	   SYNTAX         INTEGER {
+						answer(1),
+						 originate(2)
+                               }
+        ACCESS         read-write
+        STATUS         mandatory
+        DESCRIPTION
+            "This option specifies the dial backup operating mode for the
+            unit as orginate or answer.  One end must be set to originate
+            and the other end to answer."
+	   ::= { adDSUIQDBUConfig 4 }
+
+adDSUIQDBUOOS    OBJECT-TYPE
+        SYNTAX         INTEGER {
+                               disable(1),
+                               enable(2)
+                               }
+        ACCESS         read-write
+        STATUS         mandatory
+        DESCRIPTION
+            "This option enables the unit to enter backup mode if an
+            out-of-service condition is detected from the network."
+	   ::= { adDSUIQDBUConfig 5 }
+
+adDSUIQDBUNoRx    OBJECT-TYPE
+        SYNTAX         INTEGER {
+                               disable(1),
+                               enable(2)
+                               }
+        ACCESS         read-write
+        STATUS         mandatory
+        DESCRIPTION
+            "This option enables the unit to enter backup mode when
+            a loss of receive signal is detected from the network."
+	   ::= { adDSUIQDBUConfig 6 }
+
+adDSUIQDBUNoSealCurr    OBJECT-TYPE
+        SYNTAX         INTEGER {
+                               disable(1),
+                               enable(2)
+                               }
+        ACCESS         read-write
+        STATUS         mandatory
+        DESCRIPTION
+		  "This option enables the unit to enter backup mode when
+		  a loss of sealing current is detected from the network."
+	   ::= { adDSUIQDBUConfig 7 }
+
+adDSUIQDBUNoLMI    OBJECT-TYPE
+        SYNTAX         INTEGER {
+                               disable(1),
+                               enable(2)
+                               }
+        ACCESS         read-write
+        STATUS         mandatory
+        DESCRIPTION
+		  "This option enables the unit to enter backup mode when
+		  network PVC signaling state goes down."
+	   ::= { adDSUIQDBUConfig 8 }
+
+adDSUIQAutoRestoreTimer    OBJECT-TYPE
+	   SYNTAX         INTEGER (0..60)
+        ACCESS         read-write
+        STATUS         mandatory
+        DESCRIPTION
+            "This option selects the amount of time that the DSUIQ
+            circuit must be active before the unit switches from
+            backup to normal mode of operation. The timer value is
+		  in minutes from 0 to 60. A zero value disables automatic
+            restore, DSUIQ operation must be restored manually."
+	   ::= { adDSUIQDBUConfig 9 }
+
+adDSUIQRedialCount    OBJECT-TYPE
+	   SYNTAX         INTEGER (0..60)
+        ACCESS         read-write
+        STATUS         mandatory
+        DESCRIPTION
+            "This option allows the selection of the number of times the
+            unit will redial the Far End unit when attempting to go to
+            backup and a busy or reorder condition occurs.  Redial count
+		  can be set for a maximum of 60."
+	   ::= { adDSUIQDBUConfig 10 }
+
+adDSUIQDBUFailTimeout    OBJECT-TYPE
+	   SYNTAX         INTEGER (0..60)
+        ACCESS         read-write
+        STATUS         mandatory
+        DESCRIPTION
+            "This option allows the selection of the amount of time that
+            the dedicated circuit failure condition is active before
+            attempting to enter dial backup mode.  The Fail Timeout
+		  value is in increments of 10 seconds up to a maximum of 600 seconds."
+	   ::= { adDSUIQDBUConfig 11 }
+
+adDSUIQDBURedialTimer    OBJECT-TYPE
+	   SYNTAX         INTEGER (0..60)
+        ACCESS         read-write
+        STATUS         mandatory
+        DESCRIPTION
+            "This option works in conjunction with the Redial Counter option.
+            The Redial Timer specifies the amount of time between redial
+            attempts.  The Redial Timer value is seconds, up to a maximum
+		  of 60 seconds."
+	   ::= { adDSUIQDBUConfig 12 }
+
+adDSUIQDBUPassCheck  OBJECT-TYPE
+        SYNTAX         INTEGER {
+                               disable(1),
+                               enable(2)
+                               }
+        ACCESS         read-write
+        STATUS         mandatory
+        DESCRIPTION
+            "This option allows the unit to send and verify a dial backup
+            passcode for an additional level of security.  When enabled, the
+            originate unit sends the passcode and the answer unit checks the
+            passcode before the backup connection is considered valid."
+	   ::= { adDSUIQDBUConfig 13 }
+
+adDSUIQDBUPassCode    OBJECT-TYPE
+	   SYNTAX         DisplayString
+        ACCESS         read-write
+        STATUS         mandatory
+        DESCRIPTION
+            "This option sets the dial backup passcode used to provide an
+            additional level of security. A passcode of one to ten digit
+            characters can be set.  If enabled, the originate unit sends
+            the passcode and the answer unit checks the passcode to verify
+            the connection."
+	   ::= { adDSUIQDBUConfig 14 }
+
+adDSUIQWeekendLockout   OBJECT-TYPE
+        SYNTAX         INTEGER {
+                               disable(1),
+                               enable(2)
+                               }
+        ACCESS         read-write
+        STATUS         mandatory
+        DESCRIPTION
+            "This option enables or disables Weekend Lockout for Dial
+            Backup operation.  If enabled, no backup will occur from
+            midnight Friday to midnight Sunday."
+	   ::= { adDSUIQDBUConfig 15 }
+
+adDSUIQDailyLockout   OBJECT-TYPE
+        SYNTAX         INTEGER {
+                               disable(1),
+                               enable(2)
+                               }
+        ACCESS         read-write
+        STATUS         mandatory
+        DESCRIPTION
+            "This option enables or disables Daily Lockout for Dial
+            Backup operation.  If enabled, no backup will occur between
+            Lockout Start hour and Lockout End hour."
+	   ::= { adDSUIQDBUConfig 16 }
+
+adDSUIQAnswerAlways  OBJECT-TYPE
+	   SYNTAX         INTEGER {
+						 disable(1),
+						 enable(2)
+						 }
+	   ACCESS         read-write
+	   STATUS         mandatory
+	   DESCRIPTION
+		  "This option enables or disables Answer Always for Dial
+		  Backup operation.  If enabled, the answer unit answers
+		  any incoming call regardless of failed conditions."
+	   ::= { adDSUIQDBUConfig 17 }
+
+adDSUIQBeeperOption  OBJECT-TYPE
+	   SYNTAX         INTEGER {
+						 disable(1),
+						 enable(2)
+						 }
+	   ACCESS         read-write
+	   STATUS         mandatory
+	   DESCRIPTION
+		  "This option enables or disables the audible alarm
+		  when the IQ unit goes into dial backup mode."
+	   ::= { adDSUIQDBUConfig 18 }
+
+adDSUIQDBUPhoneNumber1   OBJECT-TYPE
+	   SYNTAX         DisplayString
+	   ACCESS         read-write
+	   STATUS         mandatory
+	   DESCRIPTION
+		  "This option is used to set a phone number to place a DBU call."
+	   ::= { adDSUIQDBUConfig  19 }
+
+adDSUIQDBUPhoneNumber2   OBJECT-TYPE
+	   SYNTAX         DisplayString
+	   ACCESS         read-write
+	   STATUS         mandatory
+	   DESCRIPTION
+		  "This option is used to set a phone number to place a DBU call."
+	   ::= { adDSUIQDBUConfig  20 }
+
+adDSUIQDBUPhoneNumber3   OBJECT-TYPE
+	   SYNTAX         DisplayString
+	   ACCESS         read-write
+	   STATUS         mandatory
+	   DESCRIPTION
+		  "This option is used to set a phone number to place a DBU call."
+	   ::= { adDSUIQDBUConfig  21 }
+
+adDSUIQDBUPhoneNumber4   OBJECT-TYPE
+	   SYNTAX         DisplayString
+	   ACCESS         read-write
+	   STATUS         mandatory
+	   DESCRIPTION
+		  "This option is used to set a phone number to place a DBU call."
+	   ::= { adDSUIQDBUConfig  22 }
+
+adDSUIQDBUPhoneNumber5   OBJECT-TYPE
+	   SYNTAX         DisplayString
+	   ACCESS         read-write
+	   STATUS         mandatory
+	   DESCRIPTION
+		  "This option is used to set a phone number to place a DBU call."
+	   ::= { adDSUIQDBUConfig  23 }
+
+--
+-- ISDN Dial Backup Options
+--
+
+adDSUIQDBUISDNSwitch   OBJECT-TYPE
+	   SYNTAX         INTEGER {
+						 att-5ess(1),
+						 nt-dms-100(2),
+						 national-isdn1(3)
+						 }
+	   ACCESS         read-write
+	   STATUS         mandatory
+	   DESCRIPTION
+		  "This option is used to select the ISDN switch type."
+	   ::= { adDSUIQDBUConfig  24 }
+
+adDSUIQDBUISDNBChannelRate   OBJECT-TYPE
+	   SYNTAX         INTEGER {
+		 bps56000(1),
+		bps64000(2)
+			}
+	   ACCESS         read-write
+	   STATUS         mandatory
+	   DESCRIPTION
+		  "This option is used to select the ISDN channel rate."
+	   ::= { adDSUIQDBUConfig  25 }
+
+adDSUIQDBUISDNSPID   OBJECT-TYPE
+	   SYNTAX         DisplayString
+	   ACCESS         read-write
+	   STATUS         mandatory
+	   DESCRIPTION
+		  "This option is used to set the SPID for the ISDN interface."
+	   ::= { adDSUIQDBUConfig  26 }
+
+adDSUIQDBUISDNLDN   OBJECT-TYPE
+	   SYNTAX         DisplayString
+	   ACCESS         read-write
+	   STATUS         mandatory
+	   DESCRIPTION
+		  "This option is used to set LDN for the ISDN interface."
+	   ::= { adDSUIQDBUConfig  27 }
+
+--
+-- V34 Dial Backup Options
+--
+
+adDSUIQV34LineType  OBJECT-TYPE
+	   SYNTAX         INTEGER
+					 {
+					 tone(1),
+					pulse(2)
+					 }
+	   ACCESS         read-write
+	   STATUS         mandatory
+	   DESCRIPTION
+		  "This option selects the type of analog phone line."
+	   ::= { adDSUIQDBUConfig 28 }
+	   
+--
+-- External DCE Dial Backup Options
+--
+
+adDSUIQDCEInterfaceType  OBJECT-TYPE
+	   SYNTAX         INTEGER
+					 {
+					 rs232(1),
+					v35(2)
+					 }
+	   ACCESS         read-write
+	   STATUS         mandatory
+	   DESCRIPTION
+		  "This option enables or disables Answer Always for Dial
+		  Backup operation.  If enabled, the answer unit answers
+		  any incoming call regardless of failed conditions."
+	   ::= { adDSUIQDBUConfig 29 }
+
+adDSUIQDCEBitRate  OBJECT-TYPE
+	   SYNTAX         INTEGER (0..1536)
+	   ACCESS         read-write
+	   STATUS         mandatory
+	   DESCRIPTION
+		  "This option is uses for utilization measurement of the DBU port when
+		  an external DCE device is used.  Set this parameter in KBPS close to the
+		  connection rate."
+	   ::= { adDSUIQDBUConfig 30 }
+
+--
+--The DSUIQ interval DBU Port status table
+--
+
+adDSUIQIntDBUStatusTable OBJECT-TYPE
+	 SYNTAX      SEQUENCE OF AdDSUIQIntDBUStatusEntry
+	 ACCESS      not-accessible
+	 STATUS      mandatory
+	 DESCRIPTION
+	   "n/a."
+	 ::= { adDSUIQIntDBUStatus 1 }
+
+adDSUIQIntDBUStatusEntry OBJECT-TYPE
+	 SYNTAX      AdDSUIQIntDBUStatusEntry
+	 ACCESS      not-accessible
+	 STATUS      mandatory
+	 DESCRIPTION
+	   "n/a"
+	 INDEX { adDSUIQIntDBUSlotIndex }
+	 ::= { adDSUIQIntDBUStatusTable 1 }
+
+AdDSUIQIntDBUStatusEntry ::=
+	SEQUENCE {
+	adDSUIQIntDBUSlotIndex
+	INTEGER,
+	adDSUIQIntDBUFramesRx
+	Counter,
+	adDSUIQIntDBUFramesTx
+	Counter,
+	adDSUIQIntDBUBytesRx
+	Counter,
+	adDSUIQIntDBUBytesTx
+	Counter,
+	adDSUIQIntDBUAvgThruputTx
+	Gauge,
+	adDSUIQIntDBUAvgThruputRx
+	Gauge,
+	adDSUIQIntDBUMaxThruputTx
+	Counter,
+	adDSUIQIntDBUMaxThruputRx
+	Counter,
+	adDSUIQIntDBUAvgUtilizationTx
+	Gauge,
+	adDSUIQIntDBUAvgUtilizationRx
+	Gauge,
+	adDSUIQIntDBUMaxUtilizationTx
+	Counter,
+	adDSUIQIntDBUMaxUtilizationRx
+	Counter,
+	adDSUIQIntTimeInDBU
+	Counter,
+     adDSUIQIntDBUCrcErrors
+	Counter,
+	adDSUIQIntDBUAbortFrames
+	Counter,
+	adDSUIQIntDBUOctectViolations
+	Counter,
+	adDSUIQIntDBUDiscardFrames
+	Counter,
+	adDSUIQIntDBULengthErrors
+	Counter,
+	adDSUIQIntDBUEncapsulationErrors
+	Counter,
+	adDSUIQIntDBUUnroutable
+	Counter
+	}
+
+adDSUIQIntDBUSlotIndex OBJECT-TYPE
+	 SYNTAX  INTEGER
+	    ACCESS  read-only
+	 STATUS  mandatory
+	 DESCRIPTION
+	   "n/a."
+	 ::= { adDSUIQIntDBUStatusEntry 1 }
+
+adDSUIQIntDBUFramesRx OBJECT-TYPE
+	SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	   "The number of Frames the Port received for the interval."
+    ::= { adDSUIQIntDBUStatusEntry 2 }
+
+adDSUIQIntDBUFramesTx OBJECT-TYPE
+	SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	   "The number of Frames the Port transmitted for the interval."
+    ::= { adDSUIQIntDBUStatusEntry 3 }
+
+adDSUIQIntDBUBytesRx OBJECT-TYPE
+	SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	   "The number of Bytes the Port received for the interval."
+    ::= { adDSUIQIntDBUStatusEntry 4 }
+
+adDSUIQIntDBUBytesTx OBJECT-TYPE
+	SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	   "The number of Bytes the Port transmitted for the interval."
+    ::= { adDSUIQIntDBUStatusEntry 5 }
+
+adDSUIQIntDBUAvgThruputTx OBJECT-TYPE
+	SYNTAX  Gauge
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	   "The Average Throughput the Port transmitted for the interval."
+    ::= { adDSUIQIntDBUStatusEntry 6 }
+
+adDSUIQIntDBUAvgThruputRx OBJECT-TYPE
+	SYNTAX  Gauge
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	   "The Average Throughput the Port received for the interval."
+    ::= { adDSUIQIntDBUStatusEntry 7 }
+
+adDSUIQIntDBUMaxThruputTx OBJECT-TYPE
+	SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	   "The Maximum Throughput the Port transmitted for the interval."
+    ::= { adDSUIQIntDBUStatusEntry 8 }
+
+adDSUIQIntDBUMaxThruputRx OBJECT-TYPE
+	SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	   "The Maximum Throughput the Port received for the interval."
+    ::= { adDSUIQIntDBUStatusEntry 9 }
+
+adDSUIQIntDBUAvgUtilizationTx OBJECT-TYPE
+	SYNTAX  Gauge
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	   "The Average Utilization the Port transmitted for the interval."
+    ::= { adDSUIQIntDBUStatusEntry 10 }
+
+adDSUIQIntDBUAvgUtilizationRx OBJECT-TYPE
+	SYNTAX  Gauge
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	   "The Average Utilization the Port received for the interval."
+    ::= { adDSUIQIntDBUStatusEntry 11 }
+
+adDSUIQIntDBUMaxUtilizationTx OBJECT-TYPE
+	SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	   "The Maximum Utilization the Port transmitted for the interval."
+    ::= { adDSUIQIntDBUStatusEntry 12 }
+
+adDSUIQIntDBUMaxUtilizationRx OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	   "The Maximum Utilization the Port received for the interval."
+    ::= { adDSUIQIntDBUStatusEntry 13 }
+
+adDSUIQIntTimeInDBU OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	   "Time in seconds the DBU port was active."
+    ::= { adDSUIQIntDBUStatusEntry 14 }
+
+adDSUIQIntDBUCrcErrors OBJECT-TYPE
+	SYNTAX  Counter
+    	ACCESS  read-only
+    	STATUS  mandatory
+    	DESCRIPTION
+	   "Number of frames received with CRC errors."
+	::= { adDSUIQIntDBUStatusEntry 15 }
+
+adDSUIQIntDBUAbortFrames OBJECT-TYPE
+	SYNTAX  Counter
+    	ACCESS  read-only
+    	STATUS  mandatory
+    	DESCRIPTION
+	   "Number of frames received without proper flag termination."
+	::= { adDSUIQIntDBUStatusEntry 16 }
+
+adDSUIQIntDBUOctectViolations OBJECT-TYPE
+	SYNTAX  Counter
+    	ACCESS  read-only
+    	STATUS  mandatory
+    	DESCRIPTION
+	   "Number of frames received with a bit count not divisible by eigth."
+	::= { adDSUIQIntDBUStatusEntry 17 }
+
+adDSUIQIntDBUDiscardFrames OBJECT-TYPE
+	SYNTAX  Counter
+    	ACCESS  read-only
+    	STATUS  mandatory
+    	DESCRIPTION
+	   "Number of frames discarded by the IQ unit"
+	::= { adDSUIQIntDBUStatusEntry 18 }
+
+adDSUIQIntDBULengthErrors OBJECT-TYPE
+	SYNTAX  Counter
+    	ACCESS  read-only
+    	STATUS  mandatory
+    	DESCRIPTION
+	   "Number of frames received that is less than 5 bytes or greater than 4500 bytes."
+	::= { adDSUIQIntDBUStatusEntry 19 }
+
+adDSUIQIntDBUEncapsulationErrors OBJECT-TYPE
+	SYNTAX  Counter
+    	ACCESS  read-only
+    	STATUS  mandatory
+	DESCRIPTION
+	   "Number of frames destined for the IQ IP stack with that does not meet
+	   the FRF.3 IA."
+	::= { adDSUIQIntDBUStatusEntry 20 }
+
+adDSUIQIntDBUUnroutable OBJECT-TYPE
+	SYNTAX  Counter
+    	ACCESS  read-only
+    	STATUS  mandatory
+    	DESCRIPTION
+	   "Number of frames received on a management DLCI destined for the IQ unit
+	   and have the wrong IP address."
+	::= { adDSUIQIntDBUStatusEntry 21 }
+
+--
+--The DSUIQ day DBU Port status table
+--
+
+adDSUIQDayDBUStatusTable OBJECT-TYPE
+	 SYNTAX      SEQUENCE OF AdDSUIQDayDBUStatusEntry
+	 ACCESS      not-accessible
+	 STATUS      mandatory
+	 DESCRIPTION
+	   "n/a."
+	 ::= { adDSUIQDayDBUStatus 1 }
+
+adDSUIQDayDBUStatusEntry OBJECT-TYPE
+	 SYNTAX      AdDSUIQDayDBUStatusEntry
+	 ACCESS      not-accessible
+	 STATUS      mandatory
+	 DESCRIPTION
+	   "n/a"
+	 INDEX { adDSUIQDayDBUSlotIndex }
+	 ::= { adDSUIQDayDBUStatusTable 1 }
+
+AdDSUIQDayDBUStatusEntry ::=
+	SEQUENCE {
+	adDSUIQDayDBUSlotIndex
+	INTEGER,
+	adDSUIQDayDBUFramesRx
+	Counter,
+	adDSUIQDayDBUFramesTx
+	Counter,
+	adDSUIQDayDBUBytesRx
+	Counter,
+	adDSUIQDayDBUBytesTx
+	Counter,
+	adDSUIQDayDBUAvgThruputTx
+	Gauge,
+	adDSUIQDayDBUAvgThruputRx
+	Gauge,
+	adDSUIQDayDBUMaxThruputTx
+	Counter,
+	adDSUIQDayDBUMaxThruputRx
+	Counter,
+	adDSUIQDayDBUAvgUtilizationTx
+	Gauge,
+	adDSUIQDayDBUAvgUtilizationRx
+	Gauge,
+	adDSUIQDayDBUMaxUtilizationTx
+	Counter,
+	adDSUIQDayDBUMaxUtilizationRx
+	Counter,
+	adDSUIQDayTimeInDBU
+	Counter,
+     adDSUIQDayDBUCrcErrors
+	Counter,
+	adDSUIQDayDBUAbortFrames
+	Counter,
+	adDSUIQDayDBUOctectViolations
+	Counter,
+	adDSUIQDayDBUDiscardFrames
+	Counter,
+	adDSUIQDayDBULengthErrors
+	Counter,
+	adDSUIQDayDBUEncapsulationErrors
+	Counter,
+	adDSUIQDayDBUUnroutable
+	Counter
+	}
+
+adDSUIQDayDBUSlotIndex OBJECT-TYPE
+	 SYNTAX  INTEGER
+	    ACCESS  read-only
+	 STATUS  mandatory
+	 DESCRIPTION
+	   "n/a."
+	 ::= { adDSUIQDayDBUStatusEntry 1 }
+
+adDSUIQDayDBUFramesRx OBJECT-TYPE
+	SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	   "The number of Frames the Port received for the interval."
+    ::= { adDSUIQDayDBUStatusEntry 2 }
+
+adDSUIQDayDBUFramesTx OBJECT-TYPE
+	SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	   "The number of Frames the Port transmitted for the interval."
+    ::= { adDSUIQDayDBUStatusEntry 3 }
+
+adDSUIQDayDBUBytesRx OBJECT-TYPE
+	SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	   "The number of Bytes the Port received for the interval."
+    ::= { adDSUIQDayDBUStatusEntry 4 }
+
+adDSUIQDayDBUBytesTx OBJECT-TYPE
+	SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	   "The number of Bytes the Port transmitted for the interval."
+    ::= { adDSUIQDayDBUStatusEntry 5 }
+
+adDSUIQDayDBUAvgThruputTx OBJECT-TYPE
+	SYNTAX  Gauge
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	   "The Average Throughput the Port transmitted for the interval."
+    ::= { adDSUIQDayDBUStatusEntry 6 }
+
+adDSUIQDayDBUAvgThruputRx OBJECT-TYPE
+	SYNTAX  Gauge
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	   "The Average Throughput the Port received for the interval."
+    ::= { adDSUIQDayDBUStatusEntry 7 }
+
+adDSUIQDayDBUMaxThruputTx OBJECT-TYPE
+	SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	   "The Maximum Throughput the Port transmitted for the interval."
+    ::= { adDSUIQDayDBUStatusEntry 8 }
+
+adDSUIQDayDBUMaxThruputRx OBJECT-TYPE
+	SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	   "The Maximum Throughput the Port received for the interval."
+    ::= { adDSUIQDayDBUStatusEntry 9 }
+
+adDSUIQDayDBUAvgUtilizationTx OBJECT-TYPE
+	SYNTAX  Gauge
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	   "The Average Utilization the Port transmitted for the interval."
+    ::= { adDSUIQDayDBUStatusEntry 10 }
+
+adDSUIQDayDBUAvgUtilizationRx OBJECT-TYPE
+	SYNTAX  Gauge
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	   "The Average Utilization the Port received for the interval."
+    ::= { adDSUIQDayDBUStatusEntry 11 }
+
+adDSUIQDayDBUMaxUtilizationTx OBJECT-TYPE
+	SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	   "The Maximum Utilization the Port transmitted for the interval."
+    ::= { adDSUIQDayDBUStatusEntry 12 }
+
+adDSUIQDayDBUMaxUtilizationRx OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	   "The Maximum Utilization the Port received for the interval."
+    ::= { adDSUIQDayDBUStatusEntry 13 }
+
+adDSUIQDayTimeInDBU OBJECT-TYPE
+    SYNTAX  Counter
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	   "Time in seconds the DBU port was active."
+    ::= { adDSUIQDayDBUStatusEntry 14 }
+
+adDSUIQDayDBUCrcErrors OBJECT-TYPE
+	SYNTAX  Counter
+    	ACCESS  read-only
+    	STATUS  mandatory
+    	DESCRIPTION
+	   "Number of frames received with CRC errors."
+	::= { adDSUIQDayDBUStatusEntry 15 }
+
+adDSUIQDayDBUAbortFrames OBJECT-TYPE
+	SYNTAX  Counter
+    	ACCESS  read-only
+    	STATUS  mandatory
+    	DESCRIPTION
+	   "Number of frames received without proper flag termination."
+	::= { adDSUIQDayDBUStatusEntry 16 }
+
+adDSUIQDayDBUOctectViolations OBJECT-TYPE
+	SYNTAX  Counter
+    	ACCESS  read-only
+    	STATUS  mandatory
+    	DESCRIPTION
+	   "Number of frames received with a bit count not divisible by eigth."
+	::= { adDSUIQDayDBUStatusEntry 17 }
+
+adDSUIQDayDBUDiscardFrames OBJECT-TYPE
+	SYNTAX  Counter
+    	ACCESS  read-only
+    	STATUS  mandatory
+    	DESCRIPTION
+	   "Number of frames discarded by the IQ unit"
+	::= { adDSUIQDayDBUStatusEntry 18 }
+
+adDSUIQDayDBULengthErrors OBJECT-TYPE
+	SYNTAX  Counter
+    	ACCESS  read-only
+    	STATUS  mandatory
+    	DESCRIPTION
+	   "Number of frames received that is less than 5 bytes or greater than 4500 bytes."
+	::= { adDSUIQDayDBUStatusEntry 19 }
+
+adDSUIQDayDBUEncapsulationErrors OBJECT-TYPE
+	SYNTAX  Counter
+    	ACCESS  read-only
+    	STATUS  mandatory
+	DESCRIPTION
+	   "Number of frames destined for the IQ IP stack with that does not meet
+	   the FRF.3 IA."
+	::= { adDSUIQDayDBUStatusEntry 20 }
+
+adDSUIQDayDBUUnroutable OBJECT-TYPE
+	SYNTAX  Counter
+    	ACCESS  read-only
+    	STATUS  mandatory
+    	DESCRIPTION
+	   "Number of frames received on a management DLCI destined for the IQ unit
+	   and have the wrong IP address."
+	::= { adDSUIQDayDBUStatusEntry 21 }
+
+--
+-- Trap manager route table
+--
+
+adDSUIQTrapManagerTable OBJECT-TYPE
+	   SYNTAX  SEQUENCE OF AdDSUIQTrapManagerEntry
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION
+		  "The trap manger route table."
+	   ::= { adDSUIQTrapManager 1 }
+
+adDSUIQTrapManagerEntry OBJECT-TYPE
+	 SYNTAX      AdDSUIQTrapManagerEntry
+	 ACCESS      not-accessible
+	 STATUS      mandatory
+	 DESCRIPTION
+	   "n/a"
+	 INDEX { adDSUIQTrapManagerRouteIndex }
+	 ::= { adDSUIQTrapManagerTable 1 }
+
+AdDSUIQTrapManagerEntry ::=
+	SEQUENCE {
+	adDSUIQTrapManagerRouteIndex
+	INTEGER,
+	adDSUIQTrapManagerRouteIPAddress
+	IpAddress,
+	adDSUIQTrapManagerRouteDLCI
+	INTEGER,
+	adDSUIQTrapManagerRoutePort
+	INTEGER
+	}
+
+adDSUIQTrapManagerRouteIndex OBJECT-TYPE
+	 SYNTAX  INTEGER
+	 ACCESS  read-only
+	 STATUS  mandatory
+	 DESCRIPTION
+	   "n/a."
+	 ::= { adDSUIQTrapManagerEntry 1 }
+
+adDSUIQTrapManagerRouteIPAddress    OBJECT-TYPE
+	 SYNTAX      IpAddress
+	 ACCESS      read-write
+	 STATUS      mandatory
+	 DESCRIPTION
+	"Sets the Trap Manager IP Address."
+	 ::= { adDSUIQTrapManagerEntry 2 }
+
+adDSUIQTrapManagerRouteDLCI    OBJECT-TYPE
+	 SYNTAX      INTEGER (16..1007)
+	 ACCESS      read-write
+	 STATUS      mandatory
+	 DESCRIPTION
+	"Sets the Trap Manager DLCI. (Range 16 - 1007)."
+	 ::= { adDSUIQTrapManagerEntry 3 }
+
+adDSUIQTrapManagerRoutePort    OBJECT-TYPE
+	 SYNTAX      INTEGER {
+	 none(1),
+	 dtePort(2),
+      networkPort(3),
+      controlPort(4),
+	 ethernetPort(5)
+   }
+	 ACCESS      read-write
+	 STATUS      mandatory
+	 DESCRIPTION
+	"Selects the Trap Manager Port."
+	 ::= { adDSUIQTrapManagerEntry 4 }
+
+---------------------------------------
+-- DSUIQ Enterprise Specific Traps
+---------------------------------------
+
+adDSUIQNetworkPhysUp TRAP-TYPE
+	ENTERPRISE adDSUIQ
+	VARIABLES {
+		ifIndex,           -- integer from interfaces table, indexed by ifIndex
+		adProdPhysAddress -- octet string, single instance (not in table)
+	}
+	DESCRIPTION
+		"This trap indicates that the physical
+		layer of the network is now up."
+        --#TYPE      "Alarm - Physical layer of network is now up."
+        --#SUMMARY   "DSUIQ 14101: Network Physical Layer is Up. "
+        --#ARGUMENTS {}
+        --#SEVERITY  MAJOR
+        --#GENERIC   6
+        --#CATEGORY  "Error Events"
+        --#SOURCE_ID "A"
+        --#TIMEINDEX 0
+ 	::= 14101
+
+adDSUIQNetworkPhysDown TRAP-TYPE
+	ENTERPRISE adDSUIQ
+	VARIABLES {
+		ifIndex,           -- integer from interfaces table, indexed by ifIndex
+		adProdPhysAddress -- octet string, single instance (not in table)
+	}
+	DESCRIPTION
+		"This trap indicates that the physical
+		layer of the network is now down."
+        --#TYPE      "Alarm - Physical layer of network is now down."
+        --#SUMMARY   "DSUIQ 14102: Network Physical Layer is Down. "
+        --#ARGUMENTS {}
+        --#SEVERITY  MAJOR
+        --#GENERIC   6
+        --#CATEGORY  "Error Events"
+        --#SOURCE_ID "A"
+        --#TIMEINDEX 0    
+	::= 14102
+
+adDSUIQNetworkLMIUp TRAP-TYPE
+	ENTERPRISE adDSUIQ
+	VARIABLES {
+		ifIndex,           -- integer from interfaces table, indexed by ifIndex
+		adProdPhysAddress -- octet string, single instance (not in table)
+	}
+	DESCRIPTION
+		"This trap indicates that the LMI state
+		of the network is now up."
+        --#TYPE      "Alarm - LMI state now up."
+        --#SUMMARY   "DSUIQ 14103: LMI State now UP. "
+        --#ARGUMENTS {}
+        --#SEVERITY  MAJOR
+        --#GENERIC   6
+        --#CATEGORY  "Error Events"
+        --#SOURCE_ID "A"
+        --#TIMEINDEX 0
+	::= 14103
+
+adDSUIQNetworkLMIDown TRAP-TYPE
+	ENTERPRISE adDSUIQ
+	VARIABLES {
+		ifIndex,           -- integer from interfaces table, indexed by ifIndex
+		adProdPhysAddress -- octet string, single instance (not in table)
+	}
+	DESCRIPTION
+		"This trap indicates that the LMI state
+		of the network is now down."
+        --#TYPE      "Alarm - LMI state now DOWN."
+        --#SUMMARY   "DSUIQ 14104: LMI State now DOWN. "
+        --#ARGUMENTS {}
+        --#SEVERITY  MAJOR
+        --#GENERIC   6
+        --#CATEGORY  "Error Events"
+        --#SOURCE_ID "A"
+        --#TIMEINDEX 0
+	::= 14104
+
+adDSUIQColdStart TRAP-TYPE
+	ENTERPRISE adDSUIQ
+	VARIABLES {
+		ifIndex,           -- integer from interfaces table, indexed by ifIndex
+		adProdPhysAddress  -- octet string, single instance (not in table)
+	}
+	DESCRIPTION
+		"This trap indicates that a cold start has occurred."
+        --#TYPE      "Status - TSUIQ Cold Start"
+        --#SUMMARY   "DSUIQ 14105: Cold start. "
+        --#ARGUMENTS {}
+        --#SEVERITY  INFORMATIONAL
+        --#GENERIC   6
+        --#CATEGORY  "Status Events"
+        --#SOURCE_ID "A"
+        --#TIMEINDEX 0
+	::= 14105
+
+  END
+
+  

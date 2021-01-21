@@ -1,0 +1,179 @@
+KENTIX-ROOT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	Counter32, Gauge32, Opaque, Integer32, OBJECT-TYPE, TimeTicks, enterprises, MODULE-IDENTITY, OBJECT-IDENTITY
+		FROM SNMPv2-SMI
+	TEXTUAL-CONVENTION, DisplayString, TruthValue
+		FROM SNMPv2-TC;
+
+kentix MODULE-IDENTITY
+	LAST-UPDATED "201702020000Z"
+	ORGANIZATION "Kentix GmbH"
+	CONTACT-INFO "info@kentix.de"
+	DESCRIPTION  "This is an example MIB"
+
+	REVISION "201702020000Z"
+	DESCRIPTION
+		"Minor improvements/adjustments"
+
+	REVISION "201702010000Z"
+	DESCRIPTION
+		"This is the original version of a simple example/demonstration
+		MIB file for Kentix Gmbh. By: Luciano Lingnau, Paessler AG."
+
+	::= { enterprises 37954 }
+
+universal OBJECT IDENTIFIER
+	::= { kentix 10 }
+
+hardware OBJECT IDENTIFIER
+	::= { universal 1 }
+
+
+-- Status definition referenced by all "status" entries
+-- The stati are ordered from best to worse
+AlarmStatusEnumeration		::= INTEGER {
+	ok(1),				-- NMS Alert: Working/Operational/Ok
+	notApplicable(2),	-- NMS Alert: Unknown/Not Applicable/Irrelevant 
+	other(3),			-- NMS Alert: Other (Warning/Low Level Alert)
+	nonCritical(4),		-- NMS Alert: Non-Critical (Iminent Failure, failure covered by redundancy or not critical)
+	critical(5)			-- NMS Alert: Critical Error, highest alert level
+}
+
+--Start of Objects
+--
+
+ambientInfoTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF AmbientInfoEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"This table holds the information about Ambient Sensors,
+		Temperature/Humidity"
+	::= { universal 1 }
+
+ambientInfoEntry OBJECT-TYPE
+	SYNTAX		AmbientInfoEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"An entry in the ambientInfoTable for each of the sensors"
+	INDEX		{ ambientInfoIndex }
+	::= { ambientInfoTable 1 }
+
+AmbientInfoEntry ::= SEQUENCE {
+	ambientInfoIndex			Integer32,
+	ambientInfoName				DisplayString,
+	ambientInfoTemperatureValue	Integer32,
+	ambientInfoHumidityValue	Gauge32,
+	ambientInfoDewPointValue	Integer32,
+	ambientInfoState			INTEGER
+}
+
+ambientInfoIndex OBJECT-TYPE
+	SYNTAX		Integer32 (1..2147483647)
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"A unique value, greater than zero, to identify an entry."
+	::= { ambientInfoEntry 1 }
+
+ambientInfoName OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The name of the sensor (Probe1, ProbeExt, etc) - Should be unique
+		to guarantee the integrity of the Table" 
+	::= { ambientInfoEntry 2 }
+	
+ambientInfoTemperatureValue OBJECT-TYPE
+	SYNTAX		Integer32 (-2000..2000)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Current Temperature Reading in tenths of degrees Celsius." 
+	::= { ambientInfoEntry 3 }
+	
+ambientInfoHumidityValue OBJECT-TYPE
+	SYNTAX		Gauge32 (0..100)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Current Humidity (In percent) Reading" 
+	::= { ambientInfoEntry 4 }
+
+ambientInfoDewPointValue OBJECT-TYPE
+	SYNTAX		Integer32 (-2000..2000)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Current DewPoint Reading in tenths." 
+	::= { ambientInfoEntry 5 }
+	
+ambientInfoState OBJECT-TYPE
+	SYNTAX		AlarmStatusEnumeration
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Overall Status as reported by this AmbientInfoEntry" 
+	::= { ambientInfoEntry 6 }
+	
+co2InfoTable OBJECT-TYPE
+	SYNTAX		SEQUENCE OF Co2InfoEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"This table holds the information about all the Co2 Sensors."
+	::= { universal 2 }
+
+co2InfoEntry OBJECT-TYPE
+	SYNTAX		Co2InfoEntry
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"An entry in the co2InfoTable for each of the sensors"
+	INDEX		   { co2InfoIndex } 
+	::= { co2InfoTable 1 }
+
+Co2InfoEntry ::= SEQUENCE {
+	co2InfoIndex			Integer32,
+	co2InfoName				DisplayString,
+	co2InfoValue			Integer32,
+	co2InfoState			INTEGER
+}
+
+co2InfoIndex OBJECT-TYPE
+	SYNTAX		Integer32 (1..2147483647)
+	MAX-ACCESS	not-accessible
+	STATUS		current
+	DESCRIPTION
+		"A unique value, greater than zero, to identify an entry." 
+	::= { co2InfoEntry 1 }
+	
+co2InfoName OBJECT-TYPE
+	SYNTAX		DisplayString
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"The name of the sensor (Probe1, ProbeExt, etc) - Should be unique
+		to guarantee the integrity of the Table" 
+	::= { co2InfoEntry 2 }
+
+co2InfoValue OBJECT-TYPE
+	SYNTAX		Integer32 (-100..100)
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Current CO Reading." 
+	::= { co2InfoEntry 3 }
+	
+co2InfoState OBJECT-TYPE
+	SYNTAX		AlarmStatusEnumeration
+	MAX-ACCESS	read-only
+	STATUS		current
+	DESCRIPTION
+		"Overall Status as reported by this AmbientInfoEntry" 
+	::= { co2InfoEntry 4 }
+
+END -- end of KENTIX-ROOT-MIB

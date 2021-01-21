@@ -1,0 +1,341 @@
+Trend-MIB DEFINITIONS	::= BEGIN
+
+
+
+IMPORTS		
+	
+	OBJECT-TYPE					FROM RFC-1212
+
+	enterprises, Unsigned32, Integer32					FROM RFC1155-SMI
+
+	DisplayString, DateAndTime			FROM SNMPv2-TC ;
+
+	
+tREND				OBJECT IDENTIFIER ::= {enterprises 6101}
+
+	antiVirus			
+OBJECT IDENTIFIER ::= {tREND 1}
+	trendMicroSmartProtectionServer				
+OBJECT IDENTIFIER ::= {antiVirus 2}
+
+	componentVersion 	
+OBJECT IDENTIFIER ::= {trendMicroSmartProtectionServer 1}
+
+	healthStatus 		
+OBJECT IDENTIFIER ::= {trendMicroSmartProtectionServer 2}
+
+
+
+tBLVersion OBJECT-TYPE
+    
+	SYNTAX      Unsigned32
+    
+	MAX-ACCESS  read-only
+    
+	STATUS      current
+    
+	DESCRIPTION "icrc$tbl version"
+    
+
+DEFVAL { 0 }
+    ::= { componentVersion 1 }
+    
+
+
+tBLLastSuccessfulUpdate OBJECT-TYPE
+
+    SYNTAX      DateAndTime
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION "icrc$tbl Last Update time"
+    
+
+DEFVAL { 0 }
+    ::= { componentVersion 2 }
+    
+
+
+lastUpdateError OBJECT-TYPE
+
+    SYNTAX      Unsigned32
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION "Last pattern update (AU.exe) execution result. 0 means the last update was successful, others are error codes."
+    
+
+DEFVAL { 0 }
+    ::= { componentVersion 3 }
+
+
+
+lastUpdateErrorMessage OBJECT-TYPE
+
+	SYNTAX      DisplayString
+
+	MAX-ACCESS  read-only
+
+	STATUS      current
+
+	DESCRIPTION "An error message describing the latest pattern update error value."
+	
+
+::= { componentVersion 4 }
+    
+
+
+wCSVersion OBJECT-TYPE
+
+    SYNTAX      Unsigned32
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION "Web Blocking Pattern version"
+
+
+DEFVAL { 0 }
+    ::= { componentVersion 5 }
+    
+
+
+wCSLastSuccessfulUpdate OBJECT-TYPE
+
+    SYNTAX      DateAndTime
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION "Web Blocking Pattern Last Update time"
+    
+
+DEFVAL { 0 }
+    ::= { componentVersion 6 }
+    
+
+
+wCSLastUpdateError OBJECT-TYPE
+
+    SYNTAX      Unsigned32
+
+    MAX-ACCESS  read-only
+    STATUS      current
+
+    DESCRIPTION "Last Web Blocking Pattern update (AU.exe) execution result. 0 means the last update was successful, others are error codes."
+    
+
+DEFVAL { 0 }
+    ::= { componentVersion 7 }
+    
+
+
+wCSLastUpdateErrorMessage OBJECT-TYPE
+
+	SYNTAX      DisplayString
+
+	MAX-ACCESS  read-only
+
+	STATUS      current
+
+	DESCRIPTION "An error message describing the latest Web Blocking Pattern update error value."
+	
+
+::= { componentVersion 8 }
+
+
+    
+wCSSafetyVersion OBJECT-TYPE
+
+    SYNTAX      Unsigned32
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION "Web Safety Pattern version"
+    
+
+DEFVAL { 0 }
+    ::= { componentVersion 9 }
+    
+
+wCSSafetyLastSuccessfulUpdate OBJECT-TYPE
+
+    SYNTAX      DateAndTime
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION "Web Safety Pattern Last Update time"
+    
+
+DEFVAL { 0 }
+    ::= { componentVersion 10 }
+    
+
+
+wCSSafetyLastUpdateError OBJECT-TYPE
+    
+SYNTAX      Unsigned32
+    
+MAX-ACCESS  read-only
+    
+STATUS      current
+    
+DESCRIPTION "Last Web Safety Pattern update (AU.exe) execution result. 0 means the last update was successful, others are error codes."
+    
+
+DEFVAL { 0 }
+    ::= { componentVersion 11 }
+    
+
+
+wCSSafetyLastUpdateErrorMessage OBJECT-TYPE
+
+	SYNTAX      DisplayString
+
+	MAX-ACCESS  read-only
+
+	STATUS      current
+
+	DESCRIPTION "An error message describing the latest Web Safety Pattern update error value."
+	
+
+::= { componentVersion 12 }
+    
+
+
+wCSNewDomainVersion OBJECT-TYPE
+
+    SYNTAX      Unsigned32
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION "New Web Domain Pattern version"
+    
+
+DEFVAL { 0 }
+    ::= { componentVersion 13 }
+    
+
+
+wCSNewDomainLastSuccessfulUpdate OBJECT-TYPE
+
+    SYNTAX      DateAndTime
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION "New Web Domain Pattern Last Update time"
+    
+
+DEFVAL { 0 }
+    ::= { componentVersion 14 }
+    
+
+
+wCSNewDomainLastUpdateError OBJECT-TYPE
+
+
+    SYNTAX      Unsigned32
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION "Last New Web Domain Pattern update (AU.exe) execution result. 0 means the last update was successful, others are error codes."
+    
+
+DEFVAL { 0 }
+    ::= { componentVersion 15 }
+    
+
+
+wCSNewDomainLastUpdateErrorMessage OBJECT-TYPE
+
+	SYNTAX      DisplayString
+
+	MAX-ACCESS  read-only
+
+	STATUS      current
+
+	DESCRIPTION "An error message describing the latest New Web Domain Pattern update error value."
+	
+
+::= { componentVersion 16 }
+
+
+
+lastVerifyError OBJECT-TYPE
+
+    SYNTAX      Integer32
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION "Last health status query. 0 means the health status is normal , others are error codes."
+    
+
+DEFVAL { 0 }
+    ::= { healthStatus 2 }
+    
+
+
+wCSLastVerifyError OBJECT-TYPE
+
+    SYNTAX      Integer32
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION "Last health status query. 0 means the health status is normal , others are error codes."
+    
+
+DEFVAL { 0 }
+    ::= { healthStatus 3 }
+
+
+
+lastVerifyErrorMessage OBJECT-TYPE
+
+    SYNTAX      DisplayString
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION "The latest File Reputation errors appear in the accompanying list"
+    
+
+DEFVAL { 0 }
+    ::= { healthStatus 4 }
+
+wCSLastVerifyErrorMessage OBJECT-TYPE
+
+    SYNTAX      DisplayString
+
+    MAX-ACCESS  read-only
+
+    STATUS      current
+
+    DESCRIPTION "The latest Web Reputation error appear in the accompanying list"
+    
+
+DEFVAL { 0 }
+    ::= { healthStatus 5 }
+
+
+END

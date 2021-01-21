@@ -1,0 +1,705 @@
+    ADTRAN-HSU600-MIB  DEFINITIONS ::= BEGIN
+
+    -- TITLE:       HSU600 MUX Product MIB (1200.098L1)
+    -- FILENAME:    HSU600.MIB
+    -- PARTNUMBER:  9950.017L1-21A
+    -- AUTHOR:      Richard Walker
+    -- DATE:        95/05/10
+
+    -- This MIB defines the HSU600 MUX product information.
+
+    IMPORTS
+           enterprises
+                  FROM RFC1155-SMI
+           OBJECT-TYPE
+                  FROM RFC-1212
+           DisplayString, ifIndex
+                  FROM RFC1213-MIB
+           TRAP-TYPE
+                  FROM RFC-1215
+           dsx1LineStatus
+                  FROM RFC1406-MIB    
+           adProdPhysAddress
+                  FROM ADTRAN-MIB;
+
+    -- OBJECT IDENTIFIERS
+    
+    adtran      OBJECT IDENTIFIER ::= { enterprises 664 }
+    adProducts  OBJECT IDENTIFIER ::= { adtran 1 }
+    adMgmt      OBJECT IDENTIFIER ::= { adtran 2 }
+
+------------------------------------------------------------------------------
+-- The HSU-600 Management Group
+--
+-- The HSU-600 is a HDSL CSU/DSU designed to accomodate a variety of option
+-- modules in 6 option slots.
+------------------------------------------------------------------------------
+
+adHSU600       OBJECT IDENTIFIER ::= { adProducts 33 }
+adHSU600mg          OBJECT IDENTIFIER ::= { adMgmt 33 }
+adHSU600config OBJECT IDENTIFIER ::= { adHSU600mg 1 }
+
+
+-- The HSU600 Configuration Group
+adHSU600passcode  OBJECT-TYPE
+        SYNTAX         DisplayString
+        ACCESS         read-only
+        STATUS         mandatory
+        DESCRIPTION
+                "The password string used for authentication of SNMP
+                messages between proxy agent and the HSU600."
+        ::= { adHSU600config 1 }
+
+adHSU600time  OBJECT-TYPE
+        SYNTAX         DisplayString
+        ACCESS         read-write
+        STATUS         mandatory
+        DESCRIPTION
+                "The current HSU600 time value.  A sequence of ASCII
+                characters encoded as HHMMSS."
+        ::= { adHSU600config 2 }
+
+adHSU600date  OBJECT-TYPE
+        SYNTAX         DisplayString
+        ACCESS         read-write
+        STATUS         mandatory
+        DESCRIPTION
+                "The current HSU600 date value.  A sequence of ASCII
+                characters encoded as MMDDYY."
+        ::= { adHSU600config 3 }
+
+adHSU600resetPM  OBJECT-TYPE
+        SYNTAX         INTEGER
+        ACCESS         read-write
+        STATUS         mandatory
+        DESCRIPTION
+                "A set will reset Performance Monitoring DS1 statistic
+                counters in the HSU600."
+        ::= { adHSU600config 4 }
+
+adHSU600phone  OBJECT-TYPE
+        SYNTAX         DisplayString
+        ACCESS         read-write
+        STATUS         mandatory
+        DESCRIPTION
+                "The dial string (phone number) to reach the network
+                manager."
+        ::= { adHSU600config 5 }
+
+adHSU600init  OBJECT-TYPE
+        SYNTAX         DisplayString
+        ACCESS         read-write
+        STATUS         mandatory
+        DESCRIPTION
+                "The modem init string used by the HSU600."
+        ::= { adHSU600config 6 }
+
+adHSU600reboot  OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-write
+        STATUS    mandatory
+        DESCRIPTION
+                "A set will reboot the HSU-600."
+        ::= { adHSU600config 7 }
+
+adHSU600CancelTests OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-write
+        STATUS    mandatory
+        DESCRIPTION
+                "A set will cancel all tests modes on the HSU-600."
+        ::= { adHSU600config 8 }
+
+adHSU600T1Map OBJECT-TYPE
+        SYNTAX    INTEGER {
+                        mapA (1),
+                        mapB (2)
+        }
+        ACCESS    read-write
+        STATUS    mandatory
+        DESCRIPTION
+                "The currently active T1 Map."
+        ::= { adHSU600config 9 }
+
+adHSU600id OBJECT-TYPE
+        SYNTAX    INTEGER
+        ACCESS    read-only
+        STATUS    mandatory
+        DESCRIPTION
+                "The unit identification number for the HSU600."
+        ::= { adHSU600config 10 }
+
+adHSU600Trap OBJECT-TYPE
+        SYNTAX    INTEGER {
+                        disabled (1),
+                        enabled (2)
+        }
+        ACCESS    read-write
+        STATUS    mandatory
+        DESCRIPTION
+                "Overall trap enable/disable."
+        ::= { adHSU600config 11 }
+
+adHSU600Access OBJECT-TYPE
+        SYNTAX    INTEGER {
+                        dial (1),
+                        direct (2)
+        }
+        ACCESS    read-write
+        STATUS    mandatory
+        DESCRIPTION
+                "Method by which unit sends traps."
+        ::= { adHSU600config 12 }
+
+
+
+---------------------------------------
+-- HSU-600 Enterprise Specific Traps
+---------------------------------------
+adHSU600NoAlarm  TRAP-TYPE
+        ENTERPRISE     adHSU600
+        VARIABLES {
+                         ifIndex,                          
+                         adProdPhysAddress,     
+                         dsx1LineStatus        
+        }
+        DESCRIPTION
+                "This trap indicates that a change in the alarm state
+                has occurred."
+           --#TYPE         "Status - Alarm State"
+           --#SUMMARY      "HSU600 3301: Change in alarm state has occurred for "
+           --#SUMMARY      "Line %d, Unit Id: %x, Line Status: %d"
+           --#ARGUMENTS    {0,1,2}
+           --#SEVERITY     WARNING
+           --#GENERIC      6
+           --#CATEGORY     "Error Events"
+           --#SOURCE_ID    "A"
+           --#TIMEINDEX    0
+        ::= 3301
+
+adHSU600RxYellow  TRAP-TYPE
+        ENTERPRISE     adHSU600
+        VARIABLES {
+                         ifIndex,                           
+                         adProdPhysAddress,      
+                         dsx1LineStatus          
+        }
+        DESCRIPTION
+                "This trap indicates that a change in the received yellow
+                alarm state has occurred."
+           --#TYPE         "Error - RX Yellow Alarm"
+           --#SUMMARY      "HSU600 3302: Change in the received yellow alarm state has occurred for "
+           --#SUMMARY      "Line %d, Unit Id: %x, Line Status: %d"
+           --#ARGUMENTS    {0,1,2}
+           --#SEVERITY     MINOR
+           --#GENERIC      6
+           --#CATEGORY     "Error Events"
+           --#SOURCE_ID    "A"
+           --#TIMEINDEX    0
+        ::= 3302
+
+adHSU600TxYellow  TRAP-TYPE
+        ENTERPRISE     adHSU600
+        VARIABLES {
+                         ifIndex,                            
+                         adProdPhysAddress,     
+                         dsx1LineStatus         
+        }
+        DESCRIPTION
+                "This trap indicates that a change in the transmit yellow
+                alarm state has occurred."
+           --#TYPE         "Error - TX Yellow Alarm"
+           --#SUMMARY      "HSU600 3303: Change in the transmit yellow alarm state has occurred for "
+           --#SUMMARY      "Line %d, Unit Id: %x, Line Status: %d"
+           --#ARGUMENTS    {0,1,2}
+           --#SEVERITY     WARNING
+           --#GENERIC      6
+           --#CATEGORY     "Error Events"
+           --#SOURCE_ID    "A"
+           --#TIMEINDEX    0
+        ::= 3303
+
+adHSU600RxAIS  TRAP-TYPE
+        ENTERPRISE     adHSU600
+        VARIABLES {
+                         ifIndex,                         
+                         adProdPhysAddress,      
+                         dsx1LineStatus       
+        }
+        DESCRIPTION
+                "This trap indicates that a change in the received alarm
+                indication signal (AIS) state has occurred."
+           --#TYPE         "Error - RX AIS Alarm"
+           --#SUMMARY      "HSU600 3304: Change in the receive Alarm Indication Signal state has occurred for "
+           --#SUMMARY      "Line %d, Unit Id: %x, Line Status: %d"
+           --#ARGUMENTS    {0,1,2}
+           --#SEVERITY     MINOR
+           --#GENERIC      6
+           --#CATEGORY     "Error Events"
+           --#SOURCE_ID    "A"
+           --#TIMEINDEX    0
+        ::= 3304
+
+adHSU600TxAIS  TRAP-TYPE
+        ENTERPRISE     adHSU600
+        VARIABLES {
+                         ifIndex,                               
+                         adProdPhysAddress,     
+                         dsx1LineStatus          
+        }
+        DESCRIPTION
+                "This trap indicates that a change in the transmit alarm
+                indication signal (AIS) state has occurred."
+           --#TYPE         "Error - TX AIS Alarm"
+           --#SUMMARY      "HSU600 3305: Change in the transmit Alarm Indication Signal state has occurred for "
+           --#SUMMARY      "Line %d, Unit Id: %x, Line Status: %d"
+           --#ARGUMENTS    {0,1,2}
+           --#SEVERITY     WARNING
+           --#GENERIC      6
+           --#CATEGORY     "Error Events"
+           --#SOURCE_ID    "A"
+           --#TIMEINDEX    0
+        ::= 3305
+
+adHSU600RedAlarm  TRAP-TYPE
+        ENTERPRISE     adHSU600
+        VARIABLES {
+                         ifIndex,                             
+                         adProdPhysAddress,      
+                         dsx1LineStatus          
+        }
+        DESCRIPTION
+                "This trap indicates that a change in the red alarm state
+                has occurred."
+           --#TYPE         "Error - RED Alarm"
+           --#SUMMARY      "HSU600 3306: Change in the red alarm state has occurred for "
+           --#SUMMARY      "Line %d, Unit Id: %x, Line Status: %d"
+           --#ARGUMENTS    {0,1,2}
+           --#SEVERITY     MAJOR
+           --#GENERIC      6
+           --#CATEGORY     "Error Events"
+           --#SOURCE_ID    "A"
+           --#TIMEINDEX    0
+        ::= 3306
+
+adHSU600LOS  TRAP-TYPE
+        ENTERPRISE     adHSU600
+        VARIABLES {
+                         ifIndex,                          
+                         adProdPhysAddress,      
+                         dsx1LineStatus        
+        }
+        DESCRIPTION
+                "This trap indicates that a change in the loss of signal
+                state has occurred."
+           --#TYPE         "Error - Loss of Signal"
+           --#SUMMARY      "HSU600 3307: Change in the loss of signal state has occurred for "
+           --#SUMMARY      "Line %d, Unit Id: %x, Line Status: %d"
+           --#ARGUMENTS    {0,1,2}
+           --#SEVERITY     MAJOR
+           --#GENERIC      6
+           --#CATEGORY     "Error Events"
+           --#SOURCE_ID    "A"
+           --#TIMEINDEX    0
+        ::= 3307
+
+adHSU600Loopback  TRAP-TYPE
+        ENTERPRISE     adHSU600
+        VARIABLES {
+                         ifIndex,                           
+                         adProdPhysAddress,     
+                         dsx1LineStatus       
+        }
+        DESCRIPTION
+                "This trap indicates that a change in the loopback
+                state has occurred."
+           --#TYPE         "Status - Loopback State"
+           --#SUMMARY      "HSU600 3308: Change in the loopback state has occurred for "
+           --#SUMMARY      "Line %d, Unit Id: %x, Line Status: %d"
+           --#ARGUMENTS    {0,1,2}
+           --#SEVERITY     WARNING
+           --#GENERIC      6
+           --#CATEGORY     "Status Events"
+           --#SOURCE_ID    "A"
+           --#TIMEINDEX    0
+        ::= 3308
+
+adHSU600CurrentES  TRAP-TYPE
+        ENTERPRISE     adHSU600
+        VARIABLES {
+                         ifIndex,                            
+                         adProdPhysAddress,      
+                         dsx1LineStatus      
+        }
+        DESCRIPTION
+                "This trap indicates that the current interval errored second
+                threshold has been exceeded."
+           --#TYPE         "Threshold - Current Errored Seconds"
+           --#SUMMARY      "HSU600 3317: Current interval errored second threshold exceeded for "
+           --#SUMMARY      "Line %d, Unit Id: %x, Line Status: %d"
+           --#ARGUMENTS    {0,1,2}
+           --#SEVERITY     WARNING
+           --#GENERIC      6
+           --#CATEGORY     "Threshold Events"
+           --#SOURCE_ID    "A"
+           --#TIMEINDEX    0
+        ::= 3317
+
+adHSU600CurrentSES  TRAP-TYPE
+        ENTERPRISE     adHSU600
+        VARIABLES {
+                         ifIndex,                              
+                         adProdPhysAddress,    
+                         dsx1LineStatus          
+        }
+        DESCRIPTION
+                "This trap indicates that the current interval severely errored second
+                threshold has been exceeded."
+           --#TYPE         "Threshold - Current Severely Errored Seconds"
+           --#SUMMARY      "HSU600 3318: Current interval severely errored second threshold exceeded for "
+           --#SUMMARY      "Line %d, Unit Id: %x, Line Status: %d"
+           --#ARGUMENTS    {0,1,2}
+           --#SEVERITY     WARNING
+           --#GENERIC      6
+           --#CATEGORY     "Threshold Events"
+           --#SOURCE_ID    "A"
+           --#TIMEINDEX    0
+        ::= 3318
+
+adHSU600CurrentSEFS  TRAP-TYPE
+        ENTERPRISE     adHSU600
+        VARIABLES {
+                         ifIndex,                            
+                         adProdPhysAddress,      
+                         dsx1LineStatus      
+        }
+        DESCRIPTION
+                "This trap indicates that the current interval severely errored
+                framing second threshold has been exceeded."
+           --#TYPE         "Threshold - Current Severely Errored Framing Seconds"
+           --#SUMMARY      "HSU600 3319: Current interval severely errored framing second threshold exceeded for "
+           --#SUMMARY      "Line %d, Unit Id: %x, Line Status: %d"
+           --#ARGUMENTS    {0,1,2}
+           --#SEVERITY     WARNING
+           --#GENERIC      6
+           --#CATEGORY     "Threshold Events"
+           --#SOURCE_ID    "A"
+           --#TIMEINDEX    0
+        ::= 3319
+
+adHSU600CurrentUAS  TRAP-TYPE
+        ENTERPRISE     adHSU600
+        VARIABLES {
+                         ifIndex,                             
+                         adProdPhysAddress,     
+                         dsx1LineStatus          
+        }
+        DESCRIPTION
+                "This trap indicates that the current interval unavailable
+                second threshold has been exceeded."
+           --#TYPE         "Threshold - Current Unavailable Seconds"
+           --#SUMMARY      "HSU600 3320: Current unavailable second threshold exceeded for "
+           --#SUMMARY      "Line %d, Unit Id: %x, Line Status: %d"
+           --#ARGUMENTS    {0,1,2}
+           --#SEVERITY     MAJOR
+           --#GENERIC      6
+           --#CATEGORY     "Threshold Events"
+           --#SOURCE_ID    "A"
+           --#TIMEINDEX    0
+        ::= 3320
+
+adHSU600CurrentCSS  TRAP-TYPE
+        ENTERPRISE     adHSU600
+        VARIABLES {
+                         ifIndex,                              
+                         adProdPhysAddress,    
+                         dsx1LineStatus      
+        }
+        DESCRIPTION
+                "This trap indicates that the current interval controlled slip
+                second threshold has been exceeded."
+           --#TYPE         "Threshold - Current Controlled Slip Seconds"
+           --#SUMMARY      "HSU600 3321: Current interval controlled slip second threshold exceeded for "
+           --#SUMMARY      "Line %d, Unit Id: %x, Line Status: %d"
+           --#ARGUMENTS    {0,1,2}
+           --#SEVERITY     WARNING
+           --#GENERIC      6
+           --#CATEGORY     "Threshold Events"
+           --#SOURCE_ID    "A"
+           --#TIMEINDEX    0
+        ::= 3321
+
+adHSU600CurrentPCV  TRAP-TYPE
+        ENTERPRISE     adHSU600
+        VARIABLES {
+                         ifIndex,                           
+                         adProdPhysAddress,     
+                         dsx1LineStatus         
+        }
+        DESCRIPTION
+                "This trap indicates that the current interval path coding violations
+                threshold has been exceeded."
+           --#TYPE         "Threshold - Current Path Coding Violation"
+           --#SUMMARY      "HSU600 3322: Current interval path coding violations threshold exceeded for "
+           --#SUMMARY      "Line %d, Unit Id: %x, Line Status: %d"
+           --#ARGUMENTS    {0,1,2}
+           --#SEVERITY     WARNING
+           --#GENERIC      6
+           --#CATEGORY     "Threshold Events"
+           --#SOURCE_ID    "A"
+           --#TIMEINDEX    0
+        ::= 3322
+
+adHSU600CurrentLES  TRAP-TYPE
+        ENTERPRISE     adHSU600
+        VARIABLES {
+                         ifIndex,                              
+                         adProdPhysAddress,    
+                         dsx1LineStatus         
+        }
+        DESCRIPTION
+                "This trap indicates that the current interval line errored
+                second threshold has been exceeded."
+           --#TYPE         "Threshold - Current Line Errored Seconds"
+           --#SUMMARY      "HSU600 3323: Current interval line errored second threshold exceeded for "
+           --#SUMMARY      "Line %d, Unit Id: %x, Line Status: %d"
+           --#ARGUMENTS    {0,1,2}
+           --#SEVERITY     WARNING
+           --#GENERIC      6
+           --#CATEGORY     "Threshold Events"
+           --#SOURCE_ID    "A"
+           --#TIMEINDEX    0
+        ::= 3323
+
+adHSU600CurrentLCV  TRAP-TYPE
+        ENTERPRISE     adHSU600
+        VARIABLES {
+                         ifIndex,                              
+                         adProdPhysAddress,    
+                         dsx1LineStatus          
+        }
+        DESCRIPTION
+                "This trap indicates that the current interval line code
+                violations threshold has been exceeded."
+           --#TYPE         "Threshold - Current Line Code Violation"
+           --#SUMMARY      "HSU600 3326: Current interval line code violations threshold exceeded for "
+           --#SUMMARY      "Line %d, Unit Id: %x, Line Status: %d"
+           --#ARGUMENTS    {0,1,2}
+           --#SEVERITY     WARNING
+           --#GENERIC      6
+           --#CATEGORY     "Threshold Events"
+           --#SOURCE_ID    "A"
+           --#TIMEINDEX    0
+        ::= 3326
+
+adHSU600TotalES  TRAP-TYPE
+        ENTERPRISE     adHSU600
+        VARIABLES {
+                         ifIndex,                             
+                         adProdPhysAddress,     
+                         dsx1LineStatus        
+        }
+        DESCRIPTION
+                "This trap indicates that the total errored second
+                threshold has been exceeded."
+           --#TYPE         "Threshold - Total Errored Seconds"
+           --#SUMMARY      "HSU600 3333: Total errored second threshold exceeded for "
+           --#SUMMARY      "Line %d, Unit Id: %x, Line Status: %d"
+           --#ARGUMENTS    {0,1,2}
+           --#SEVERITY     WARNING
+           --#GENERIC      6
+           --#CATEGORY     "Threshold Events"
+           --#SOURCE_ID    "A"
+           --#TIMEINDEX    0
+        ::= 3333
+
+adHSU600TotalSES  TRAP-TYPE
+        ENTERPRISE     adHSU600
+        VARIABLES {
+                         ifIndex,                            
+                         adProdPhysAddress,    
+                         dsx1LineStatus         
+        }
+        DESCRIPTION
+                "This trap indicates that the total severely errored second
+                threshold has been exceeded."
+           --#TYPE         "Threshold - Total Severely Errored Seconds"
+           --#SUMMARY      "HSU600 3334: Total severely errored second threshold exceeded for "
+           --#SUMMARY      "Line %d, Unit Id: %x, Line Status: %d"
+           --#ARGUMENTS    {0,1,2}
+           --#SEVERITY     WARNING
+           --#GENERIC      6
+           --#CATEGORY     "Threshold Events"
+           --#SOURCE_ID    "A"
+           --#TIMEINDEX    0
+        ::= 3334
+
+adHSU600TotalSEFS  TRAP-TYPE
+        ENTERPRISE     adHSU600
+        VARIABLES {
+                         ifIndex,                        
+                         adProdPhysAddress,  
+                         dsx1LineStatus         
+        }
+        DESCRIPTION
+                "This trap indicates that the total severely errored
+                framing second threshold has been exceeded."
+           --#TYPE         "Threshold - Total Severely Errored Framing Seconds"
+           --#SUMMARY      "HSU600 3335: Total severely errored framing second threshold exceeded for "
+           --#SUMMARY      "Line %d, Unit Id: %x, Line Status: %d"
+           --#ARGUMENTS    {0,1,2}
+           --#SEVERITY     WARNING
+           --#GENERIC      6
+           --#CATEGORY     "Threshold Events"
+           --#SOURCE_ID    "A"
+           --#TIMEINDEX    0
+        ::= 3335
+
+adHSU600TotalUAS  TRAP-TYPE
+        ENTERPRISE     adHSU600
+        VARIABLES {
+                         ifIndex,                           
+                         adProdPhysAddress,      
+                         dsx1LineStatus         
+        }
+        DESCRIPTION
+                "This trap indicates that the total unavailable
+                second threshold has been exceeded."
+           --#TYPE         "Threshold - Total Unavailable Seconds"
+           --#SUMMARY      "HSU600 3336: Total unavailable second threshold exceeded for "
+           --#SUMMARY      "Line %d, Unit Id: %x, Line Status: %d"
+           --#ARGUMENTS    {0,1,2}
+           --#SEVERITY     MAJOR
+           --#GENERIC      6
+           --#CATEGORY     "Threshold Events"
+           --#SOURCE_ID    "A"
+           --#TIMEINDEX    0
+        ::= 3336
+
+adHSU600TotalCSS  TRAP-TYPE
+        ENTERPRISE     adHSU600
+        VARIABLES {
+                         ifIndex,                             
+                         adProdPhysAddress,     
+                         dsx1LineStatus       
+        }
+        DESCRIPTION
+                "This trap indicates that the total controlled slip
+                second threshold has been exceeded."
+           --#TYPE         "Threshold - Total Controlled Slip Seconds"
+           --#SUMMARY      "HSU600 3337: Total controlled slip second threshold exceeded for "
+           --#SUMMARY      "Line %d, Unit Id: %x, Line Status: %d"
+           --#ARGUMENTS    {0,1,2}
+           --#SEVERITY     WARNING
+           --#GENERIC      6
+           --#CATEGORY     "Threshold Events"
+           --#SOURCE_ID    "A"
+           --#TIMEINDEX    0
+        ::= 3337
+
+adHSU600TotalPCV  TRAP-TYPE
+        ENTERPRISE     adHSU600
+        VARIABLES {
+                         ifIndex,                          
+                         adProdPhysAddress,    
+                         dsx1LineStatus        
+        }
+        DESCRIPTION
+                "This trap indicates that the total path coding violations
+                threshold has been exceeded."
+           --#TYPE         "Threshold - Total Path Coding Violations"
+           --#SUMMARY      "HSU600 3338: Total path coding violations threshold exceeded for "
+           --#SUMMARY      "Line %d, Unit Id: %x, Line Status: %d"
+           --#ARGUMENTS    {0,1,2}
+           --#SEVERITY     WARNING
+           --#GENERIC      6
+           --#CATEGORY     "Threshold Events"
+           --#SOURCE_ID    "A"
+           --#TIMEINDEX    0
+        ::= 3338
+
+adHSU600TotalLES  TRAP-TYPE
+        ENTERPRISE     adHSU600
+        VARIABLES {
+                         ifIndex,                             
+                         adProdPhysAddress, 
+                         dsx1LineStatus       
+        }
+        DESCRIPTION
+                "This trap indicates that the total line errored
+                second threshold has been exceeded."
+           --#TYPE         "Threshold - Total Line Errored Seconds"
+           --#SUMMARY      "HSU600 3339: Total line errored second threshold exceeded for "
+           --#SUMMARY      "Line %d, Unit Id: %x, Line Status: %d"
+           --#ARGUMENTS    {0,1,2}
+           --#SEVERITY     WARNING
+           --#GENERIC      6
+           --#CATEGORY     "Threshold Events"
+           --#SOURCE_ID    "A"
+           --#TIMEINDEX    0
+        ::= 3339
+
+adHSU600TotalLCV  TRAP-TYPE
+        ENTERPRISE     adHSU600
+        VARIABLES {
+                         ifIndex,
+                         adProdPhysAddress,
+                         dsx1LineStatus     
+        }
+        DESCRIPTION
+                "This trap indicates that the total line code
+                violations threshold has been exceeded."
+           --#TYPE         "Threshold - Total Line Code Violations"
+           --#SUMMARY      "HSU600 3342: Total line code violations threshold exceeded for "
+           --#SUMMARY      "Line %d, Unit Id: %x, Line Status: %d"
+           --#ARGUMENTS    {0,1,2}
+           --#SEVERITY     WARNING
+           --#GENERIC      6
+           --#CATEGORY     "Threshold Events"
+           --#SOURCE_ID    "A"
+           --#TIMEINDEX    0
+        ::= 3342
+
+adHSU600DbuActivated  TRAP-TYPE
+        ENTERPRISE     adHSU600
+        VARIABLES {
+                         ifIndex,                            
+                         adProdPhysAddress,   
+                         dsx1LineStatus      
+        }
+        DESCRIPTION
+                "This trap indicates that a Dial Backup Connection
+                 has been activated."
+           --#TYPE         "Status - Dial Backup"
+           --#SUMMARY      "HSU600 3349: Dial Backup Connection activated for "
+           --#SUMMARY      "Line %d, Unit Id: %x, Line Status: %d"
+           --#ARGUMENTS    {0,1,2}
+           --#SEVERITY     WARNING
+           --#GENERIC      6
+           --#CATEGORY     "Status Events"
+           --#SOURCE_ID    "A"
+           --#TIMEINDEX    0
+        ::= 3349
+
+adHSU600DbuTerminated  TRAP-TYPE
+        ENTERPRISE     adHSU600
+        VARIABLES {
+                         ifIndex,
+                         adProdPhysAddress,
+                         dsx1LineStatus      
+        }
+        DESCRIPTION
+                "This trap indicates that a Dial Backup Connection
+                 has been terminated."
+           --#TYPE         "Status - Dial Backup"
+           --#SUMMARY      "HSU600 3350: Dial Backup Connection terminated for "
+           --#SUMMARY      "Line %d, Unit Id: %x, Line Status: %d"
+           --#ARGUMENTS    {0,1,2}
+           --#SEVERITY     WARNING
+           --#GENERIC      6
+           --#CATEGORY     "Status Events"
+           --#SOURCE_ID    "A"
+           --#TIMEINDEX    0
+        ::= 3350
+
+END

@@ -1,0 +1,191 @@
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+--
+--  File         : askeyLacp.mib
+--  Description  : Askey defined to record all managed objects for link aggreation control protocol
+--  Version      : 1.0
+--  Date         : Aug. 25, 2004 by Dennis Tseng   
+--
+--  Copyright (c) 1999-2004 Askey International, Corp.  All Rights Reserved.
+--
+--  -   ipDslam                 FROM ASKEY-DSLAM-MIB
+------------------------------------------------------------------------------
+------------------------------------------------------------------------------
+
+ASKEY-DSLAM-LINK-AGGREGATION-CONTROL-PROTOCOL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    InterfaceIndex          FROM IF-MIB
+    OBJECT-TYPE,
+    Integer32,
+    MODULE-IDENTITY			FROM SNMPv2-SMI
+    RowStatus               FROM  SNMPv2-TC
+    ipDslam                 FROM ASKEY-DSLAM-MIB
+    EnabledStatus           FROM P-BRIDGE-MIB    
+    ;
+
+askeyLacpMib MODULE-IDENTITY
+        LAST-UPDATED    "200503250000Z"  -- march 25, 2005
+        ORGANIZATION    "ASKEY Inc."
+        CONTACT-INFO    "ASKEY Inc.
+                         E-mail: cwfu@askey.com.tw"
+
+        DESCRIPTION     ""
+
+    ::= { ipDslam 13 }
+
+
+lacpGroupTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LacpGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { askeyLacpMib 1 }
+
+
+lacpGroupEntry OBJECT-TYPE
+    SYNTAX      LacpGroupEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "This table describe the information of link aggreation."
+    INDEX { askeyLacpGroupId }
+    ::= { lacpGroupTable 1 }
+    
+LacpGroupEntry ::=
+    SEQUENCE {
+        askeyLacpGroupId      				INTEGER,
+		askeyLacpGroupActivity				INTEGER,
+		askeyLacpGroupTimeout				INTEGER
+    }    
+                            
+askeyLacpGroupId OBJECT-TYPE
+    SYNTAX      INTEGER (1..6)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "The LACP group ID. This ID expresses the aggregation of ports.
+     The ports are linked aggregately have same group ID."
+    ::= { lacpGroupEntry 1 }   
+
+askeyLacpGroupActivity OBJECT-TYPE
+    SYNTAX      INTEGER {
+    	passive (0),
+        active (1)
+    }    
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object corresponds to the administrative values of
+        Actor_State (43.4.2 [Part 3]) as transmitted by the Actor in LACPDUs 
+        of the second bit corresponds to bit 0 (LACP_Activity)"
+    REFERENCE
+    "IEEE 802.3 Subclause 30.7.2.1.20"
+    ::= { lacpGroupEntry 2 }   
+
+askeyLacpGroupTimeout OBJECT-TYPE
+    SYNTAX      INTEGER {
+    	long (0),
+        shot (1)
+    }    
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object corresponds to the administrative values of
+        Actor_State (43.4.2 [Part 3]) as transmitted by the Actor in LACPDUs 
+        of the first bit corresponds to bit 1 (LACP_Timeout)"
+    REFERENCE
+    "IEEE 802.3 Subclause 30.7.2.1.20"
+    ::= { lacpGroupEntry 3 }   
+
+lacpPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF LacpPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { askeyLacpMib 2 }
+
+lacpPortEntry OBJECT-TYPE
+    SYNTAX      LacpPortEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "This table describe information of the uplink ports ."
+    INDEX { askeyLacpPortId }
+    ::= { lacpPortTable 1 }
+
+LacpPortEntry ::=
+    SEQUENCE {
+        askeyLacpPortId      				InterfaceIndex,
+		askeyLacpPortGroupId				INTEGER,
+		askeyLacpPortPriority				INTEGER
+    }    
+
+askeyLacpPortId OBJECT-TYPE
+    SYNTAX      InterfaceIndex (1..6)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "The uplink port interface index."
+    ::= { lacpPortEntry 1 }       
+
+askeyLacpPortGroupId OBJECT-TYPE
+    SYNTAX      INTEGER (1..6)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The value is LACP group ID which this port belongs."
+    ::= { lacpPortEntry 2 }       
+
+askeyLacpPortPriority OBJECT-TYPE
+    SYNTAX       INTEGER (0..65535)
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "A 2-octet read-write value used to define the administrative
+        value of priority associated with the Partner's System ID. The
+        assigned value is used, along with the value of
+        aAggPortPartnerAdminSystemID, aAggPortPartnerAdminKey,
+        aAggPortPartnerAdminPort, and aAggPortPartnerAdminPortPriority,
+        in order to achieve manually configured aggregation."
+    REFERENCE
+        "IEEE 802.3 Subclause 30.7.2.1.7"
+    ::= { lacpPortEntry 3 }       
+
+
+askeyLacp OBJECT-TYPE
+    SYNTAX       INTEGER {
+               enableLacp(1),
+               disabled(2),
+               enableStaticLa(3)
+          }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "Enable or disable link aggreation control protocol."
+    ::= { askeyLacpMib 3 }       
+
+askeyLacpSystemPriority OBJECT-TYPE
+    SYNTAX       INTEGER (0..65535)
+    MAX-ACCESS   read-write
+    STATUS       current
+    DESCRIPTION
+        "A 2-octet read-write value indicating the priority value
+        associated with the Actor's System ID."
+    REFERENCE
+        "IEEE 802.3 Subclause 30.7.1.1.5"
+
+    ::= { askeyLacpMib 4 }
+    
+-- askeyLacpStatic OBJECT-TYPE
+--    SYNTAX INTEGER {
+--               enabled(1),
+--               disabled(2)
+--          }
+--    MAX-ACCESS  read-write
+--    STATUS      current
+--    DESCRIPTION
+--    "Enable or disable static link aggreation."
+--    ::= { askeyLacpMib 5 }       
+
+    END

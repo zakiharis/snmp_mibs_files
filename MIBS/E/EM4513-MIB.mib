@@ -1,0 +1,31 @@
+EM4513-MIB DEFINITIONS ::= BEGIN
+
+
+IMPORTS internet FROM RFC1155-SMI
+	;
+
+private             OBJECT IDENTIFIER ::= { internet 4 }
+enterprises         OBJECT IDENTIFIER ::= { private 1 }
+accton              OBJECT IDENTIFIER ::= { enterprises 259 }
+snmpMgt             OBJECT IDENTIFIER ::= { accton 6 }
+cheetahSwitchMgt    OBJECT IDENTIFIER ::= { snmpMgt 10 }
+em4513MIB           OBJECT IDENTIFIER ::= {cheetahSwitchMgt 39}
+
+
+em4513MIBObjects       OBJECT IDENTIFIER ::= { em4513MIB 1 }
+
+
+swTemperatureOverHeatTrap TRAP-TYPE
+	ENTERPRISE em4513MIB
+	DESCRIPTION
+	    "This trap is sent when the temperature of the switch is overheat."
+	--#TYPE         "Temperature over heat"
+	--#SUMMARY      "Temperature in chasis is too high."
+	--#SEVERITY     CRITICAL
+	--#TIMEINDEX    1
+	--#STATE        NONOPERATIONAL
+	::= 1
+
+END
+
+

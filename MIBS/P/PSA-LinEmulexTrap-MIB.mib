@@ -1,0 +1,2028 @@
+PSA-LinEmulexTrap-MIB DEFINITIONS ::= BEGIN
+
+--PRIMEQUEST system management MIB for Partition
+--
+--
+--$Copyright$
+--Copyright Fujitsu Limited 2004-2010
+--All rights reserved
+--
+--
+--MIB Revision: 02000006
+--
+
+IMPORTS
+	OBJECT-TYPE								FROM RFC-1212
+	TRAP-TYPE								FROM RFC-1215
+	mib-2, DisplayString					FROM RFC1213-MIB
+	TimeTicks, Counter, Gauge, IpAddress	FROM RFC1155-SMI
+	mgmt, enterprises						FROM RFC1155-SMI;
+
+--enterprises	OBJECT IDENTIFIER ::={ iso org(3) dod(6) internet(1) private(4) 1 }
+--
+--PRIMEQUEST system management MIB nodes
+--fujitsu:                    1.3.6.1.4.1.211
+-- products:                  1.3.6.1.4.1.211.1
+--  iaServer:                 1.3.6.1.4.1.211.1.31
+--   primequest:              1.3.6.1.4.1.211.1.31.1
+--    partition:	           1.3.6.1.4.1.211.1.31.1.2
+--
+--Trap enterprise is "psaLinEmulexTrap"
+
+--FUJITSU PRIMEQUEST system management MIB nodes for Partition
+  fujitsu        OBJECT IDENTIFIER  ::={ enterprises 211 }
+  products       OBJECT IDENTIFIER  ::={ fujitsu 1 }
+  iaServer       OBJECT IDENTIFIER  ::={ products 31 }
+  primequest     OBJECT IDENTIFIER  ::={ iaServer 1 }
+   partition     OBJECT IDENTIFIER  ::={ primequest 2 }
+    parititonVariables	OBJECT IDENTIFIER	::={ partition	200 }
+    partitionEnterprise        OBJECT IDENTIFIER  ::={ partition 201 }
+     psaComTrap                OBJECT IDENTIFIER  ::={ partitionEnterprise 1 }
+     psaLinLanComTrap          OBJECT IDENTIFIER  ::={ partitionEnterprise 2 }
+     psaLinIntelE100Trap       OBJECT IDENTIFIER  ::={ partitionEnterprise 3 }
+     psaLinIntelE1000Trap      OBJECT IDENTIFIER  ::={ partitionEnterprise 4 }
+     psaLinBcm5700Trap         OBJECT IDENTIFIER  ::={ partitionEnterprise 5 }
+     psaLinEmulexTrap          OBJECT IDENTIFIER  ::={ partitionEnterprise 6 }
+     psaLinLsiLogicTrap        OBJECT IDENTIFIER  ::={ partitionEnterprise 7 }
+     psaLinScsiComTrap         OBJECT IDENTIFIER  ::={ partitionEnterprise 8 }
+     psaLinGrmpdTrap           OBJECT IDENTIFIER  ::={ partitionEnterprise 9 }
+     psaLinGdsTrap             OBJECT IDENTIFIER  ::={ partitionEnterprise 10 }
+     psaLinGlsTrap             OBJECT IDENTIFIER  ::={ partitionEnterprise 11 }
+     psaLinTg3Trap             OBJECT IDENTIFIER  ::={ partitionEnterprise 12 }
+     psaLinIbTrap              OBJECT IDENTIFIER  ::={ partitionEnterprise 13 }
+     psaLinXframe2Trap         OBJECT IDENTIFIER  ::={ partitionEnterprise 14 }
+     psaGschTrap               OBJECT IDENTIFIER  ::={ partitionEnterprise 15 }
+     psaLinIntelE1000ETrap     OBJECT IDENTIFIER  ::={ partitionEnterprise 16 }
+     psaLinIntelIgbTrap        OBJECT IDENTIFIER  ::={ partitionEnterprise 17 }
+     psaLinSvsRaidTrap         OBJECT IDENTIFIER  ::={ partitionEnterprise 18 }
+     psaExternalFileUnitTrap   OBJECT IDENTIFIER  ::={ partitionEnterprise 101 }
+
+--***************************************************************************************
+--
+--FUJITSU PRIMEQUEST system management trap parameter variables for Partition
+--	They aren't directly accessibles(can't use snmp get/set command), but sent with trap
+--
+--***************************************************************************************
+
+     trapVarComInfo	OBJECT IDENTIFIER	::={ parititonVariables 1 }
+
+trapPartitionName OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Partition name which trap is generated."
+   ::= { trapVarComInfo 1 }
+
+trapPartitionId OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Paritition identifier which trap is generated."
+   ::= { trapVarComInfo 2 }
+
+trapEventLevel OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Event level"
+   ::= { trapVarComInfo 3 }
+
+trapEventId OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Event Identifier"
+   ::= { trapVarComInfo 4 }
+
+trapUnitName OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Unit name which trap is generated."
+   ::= { trapVarComInfo 5 }
+
+trapMmbVip OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Management board vertual IP address."
+   ::= { trapVarComInfo 6 }
+
+     trapVarDivInfo	OBJECT IDENTIFIER	::={ parititonVariables 2 }
+
+trapPartNo OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Parts number of trap source."
+   ::= { trapVarDivInfo 1 }
+
+trapStepping OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 2 }
+
+trapSerialNo OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Serial number of trap source. "
+   ::= { trapVarDivInfo 3 }
+
+trapModelNo OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Model number of trap source."
+   ::= { trapVarDivInfo 4 }
+
+trapSuspect OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Logical name or pci bus number of trap source."
+   ::= { trapVarDivInfo 5 }
+
+trapVendorId OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Vendor identifier of trap source."
+   ::= { trapVarDivInfo 6 }
+
+trapDeviceId OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Device identifier of trap source."
+   ::= { trapVarDivInfo 7 }
+
+trapRevision OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Revision of trap source."
+   ::= { trapVarDivInfo 8 }
+
+trapCardName OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Device name of trap source."
+   ::= { trapVarDivInfo 9 }
+
+trapErrDetail OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 10 }
+
+trapErrCode OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 11 }
+
+trapIrpCode OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 12 }
+
+trapHbaNo OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 13 }
+
+trapErrCause OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 14 }
+
+trapPathNo OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 15 }
+
+trapDiskId OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 16 }
+
+trapFmrDiskId OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 17 }
+
+trapCurDiskId OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 18 }
+
+trapPathId OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 19 }
+
+trapPhysIf OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 20 }
+
+trapVirtualIf OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 21 }
+
+trapLogicalIp OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 22 }
+
+trapWatchIp OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 23 }
+
+trapInterface OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 24 }
+
+trapSourceIp OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 25 }
+
+trapDestIp OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 26 }
+
+trapModelName OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Model name of trap source."
+   ::= { trapVarDivInfo 27 }
+
+trapFlagcode OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { trapVarDivInfo 28 }
+
+--***************************************************************************************
+--
+--FUJITSU PRIMEQUEST system management TRAP definition for Partition
+--	Trap enterprise:	psaLinEmulexTrap (.1.3.6.1.4.1.211.1.31.1.2.201.6)
+--
+--***************************************************************************************
+
+fcEvent0 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter or Software error (Dropping received ELS cmd)"
+   --#TYPE			"Fc Event 0"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter or Software error (Dropping received ELS cmd)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 12000
+
+fcEvent1 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Device error (An FLOGI ELS command was received in Loop Mode)"
+   --#TYPE			"Fc Event 1"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Device error (An FLOGI ELS command was received in Loop Mode) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12001
+
+fcEvent2 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Device or FC-Network error (unknown ELS command received)"
+   --#TYPE			"Fc Event 2"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Device or FC-Network error (unknown ELS command received) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12002
+
+fcEvent3 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Device or FC-Network error (ELS timeout)"
+   --#TYPE			"Fc Event 3"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Device or FC-Network error (ELS timeout) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12003
+
+fcEvent4 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter error (CONFIG_LINK bad hba state)"
+   --#TYPE			"Fc Event 4"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter error (CONFIG_LINK bad hba state) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12004
+
+fcEvent5 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Device or FC-Network error (Nodev timeout)"
+   --#TYPE			"Fc Event 5"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Device or FC-Network error (Nodev timeout) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12005
+
+fcEvent6 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: FC-Network error (unknown Identifier in RSCN)"
+   --#TYPE			"Fc Event 6"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s FC-Network error (unknown Identifier in RSCN) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12006
+
+fcEvent7 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter or FC-Network error (Initial FLOGI timeout)"
+   --#TYPE			"Fc Event 7"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter or FC-Network error (Initial FLOGI timeout) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12007
+
+fcEvent8 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter or FC-Network error (Timeout while waiting for NameServer login)"
+   --#TYPE			"Fc Event 8"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter or FC-Network error (Timeout while waiting for NameServer login) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12008
+
+fcEvent9 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter or FC-Network error (NameServer query timeout)"
+   --#TYPE			"Fc Event 9"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter or FC-Network error (NameServer query timeout) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12009
+
+fcEvent14 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter or Device error (RegLogin failed)"
+   --#TYPE			"Fc Event 14"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter or Device error (RegLogin failed) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12014
+
+fcEvent15 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter error (stray mailbox interrupt mbxCommand)"
+   --#TYPE			"Fc Event 15"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter error (stray mailbox interrupt mbxCommand) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12015
+
+fcEvent16 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter error (CONFIG_LINK mbxStatus Error)"
+   --#TYPE			"Fc Event 16"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter error (CONFIG_LINK mbxStatus Error) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12016
+
+fcEvent17 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter error (Mailbox command timeout)"
+   --#TYPE			"Fc Event 17"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter error (Mailbox command timeout) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12017
+
+fcEvent18 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter or Software error (Ring handler)"
+   --#TYPE			"Fc Event 18"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter or Software error (Ring handler)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 12018
+
+fcEvent20 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter or Software error (Ring issue)"
+   --#TYPE			"Fc Event 20"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter or Software error (Ring issue)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 12020
+
+fcEvent21 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Software error (Cmd ring put)"
+   --#TYPE			"Fc Event 21"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Software error (Cmd ring put)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 12021
+
+fcEvent22 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Software error (Rsp ring get)"
+   --#TYPE			"Fc Event 22"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Software error (Rsp ring get)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 12022
+
+fcEvent23 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter error (READ_SPARM mbxStatus error)"
+   --#TYPE			"Fc Event 23"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter error (READ_SPARM mbxStatus error) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12023
+
+fcEvent24 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter error (CLEAR_LA mbxStatus error)"
+   --#TYPE			"Fc Event 24"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter error (CLEAR_LA mbxStatus error) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12024
+
+fcEvent25 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter or Software error (unknown IOCB command)"
+   --#TYPE			"Fc Event 25"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter or Software error (unknown IOCB command)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 12025
+
+fcEvent26 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter or Software error (unknown Mailbox command)"
+   --#TYPE			"Fc Event 26"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter or Software error (unknown Mailbox command)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 12026
+
+fcEvent27 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter error (Config Port initialization error)"
+   --#TYPE			"Fc Event 27"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter error (Config Port initialization error) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12027
+
+fcEvent28 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter or Software error (cannot find virtual addr for mapped buf on ring)"
+   --#TYPE			"Fc Event 28"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter or Software error (cannot find virtual addr for mapped buf on ring)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 12028
+
+fcEvent29 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter error (Adapter failed to init; timeout)"
+   --#TYPE			"Fc Event 29"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter error (Adapter failed to init; timeout) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12029
+
+fcEvent30 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter error (Adapter failed to init; chipset)"
+   --#TYPE			"Fc Event 30"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter error (Adapter failed to init; chipset) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12030
+
+fcEvent31 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter error (Adapter failed to init; chipset)"
+   --#TYPE			"Fc Event 31"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter error (Adapter failed to init; chipset) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12031
+
+fcEvent32 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter error (Adapter failed to init; mbxCmd READ_REV)"
+   --#TYPE			"Fc Event 32"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter error (Adapter failed to init; mbxCmd READ_REV) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12032
+
+fcEvent33 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter error (Adapter failed to init; mbxCmd READ_REV detected outdated firmware)"
+   --#TYPE			"Fc Event 33"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter error (Adapter failed to init; mbxCmd READ_REV detected outdated firmware) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12033
+
+fcEvent34 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter error (Adapter failed to init; mbxCmd CONFIG_PORT)"
+   --#TYPE			"Fc Event 34"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter error (Adapter failed to init; mbxCmd CONFIG_PORT) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12034
+
+fcEvent35 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter error (Adapter failed to init; mbxCmd CFG_RING)"
+   --#TYPE			"Fc Event 35"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter error (Adapter failed to init; mbxCmd CFG_RING) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12035
+
+fcEvent36 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter error (Adapter failed init; mbxCmd CONFIG_LINK)"
+   --#TYPE			"Fc Event 36"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter error (Adapter failed init; mbxCmd CONFIG_LINK) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12036
+
+fcEvent37 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter error (Adapter failed init; mbxCmd READ_SPARM)"
+   --#TYPE			"Fc Event 37"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter error (Adapter failed init; mbxCmd READ_SPARM) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12037
+
+fcEvent38 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter or Software error (Enable interrupt handler failed)"
+   --#TYPE			"Fc Event 38"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter or Software error (Enable interrupt handler failed) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12038
+
+fcEvent39 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter error (Adapter failed to init; mbxCmd READ_CONFIG)"
+   --#TYPE			"Fc Event 39"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter error (Adapter failed to init; mbxCmd READ_CONFIG) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12039
+
+fcEvent40 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter error (Adapter failed to mbxCmd INIT_LINK)"
+   --#TYPE			"Fc Event 40"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter error (Adapter failed to mbxCmd INIT_LINK) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12040
+
+fcEvent41 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter error (Adapter Hardware Error)"
+   --#TYPE			"Fc Event 41"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter error (Adapter Hardware Error) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12041
+
+fcEvent42 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter or Software error (Too many cmd / rsp ring entries in SLI2 SLIM)"
+   --#TYPE			"Fc Event 42"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter or Software error (Too many cmd / rsp ring entries in SLI2 SLIM)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 12042
+
+fcEvent46 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Device or FC-network error (Re-establishing)"
+   --#TYPE			"Fc Event 46"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Device or FC-network error (Re-establishing) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12046
+
+fcEvent49 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter error (detected pci parity error)"
+   --#TYPE			"Fc Event 49"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter error (detected pci parity error) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12049
+
+fcEvent50 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter error (detected pci parity error)"
+   --#TYPE			"Fc Event 50"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter error (detected pci parity error) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12050
+
+fcEvent51 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter error (detected pci parity error)"
+   --#TYPE			"Fc Event 51"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter error (detected pci parity error) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12051
+
+fcEvent52 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter error (detected pci parity error)"
+   --#TYPE			"Fc Event 52"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter error (detected pci parity error) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12052
+
+fcEvent53 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Software error (high priority IOCB timeout)"
+   --#TYPE			"Fc Event 53"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Software error (high priority IOCB timeout)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 12053
+
+fcEvent54 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Software error (Illegal State Transition)"
+   --#TYPE			"Fc Event 54"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Software error (Illegal State Transition)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 12054
+
+fcEvent55 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Software error (Outstanding I/O count)"
+   --#TYPE			"Fc Event 55"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Software error (Outstanding I/O count)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 12055
+
+fcEvent56 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Software error (IOCB timeout)"
+   --#TYPE			"Fc Event 56"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc: Software error (IOCB timeout)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4 }
+   --#SEVERITY		MINOR
+   ::= 12056
+
+fcEvent57 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter error (readl: Detect PCI parity error. Retrying)"
+   --#TYPE			"Fc Event 57"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter error (readl: Detect PCI parity error. Retrying) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12057
+
+fcEvent58 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter error (readl: Retry succeeded)"
+   --#TYPE			"Fc Event 58"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter error (readl: Retry succeeded) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12058
+
+fcEvent59 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter error (readl: Detected PCI parity error. Retries exhausted)"
+   --#TYPE			"Fc Event 59"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter error (readl: Detected PCI parity error. Retries exhausted) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12059
+
+fcEvent60 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter error (writel: Couldn't read status register. Retrying)"
+   --#TYPE			"Fc Event 60"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter error (writel: Couldn't read status register. Retrying) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12060
+
+fcEvent61 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter error (writel: Detect PCI parity error. Retrying)"
+   --#TYPE			"Fc Event 61"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter error (writel: Detect PCI parity error. Retrying) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12061
+
+fcEvent62 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter error (writel: Retry succeeded)"
+   --#TYPE			"Fc Event 62"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter error (writel: Retry succeeded) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12062
+
+fcEvent63 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter error (writel: Detected PCI parity error. Retries exhausted)"
+   --#TYPE			"Fc Event 63"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter error (writel: Detected PCI parity error. Retries exhausted) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12063
+
+fcEvent64 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter error (Suspect any fixed hardware failure)"
+   --#TYPE			"Fc Event 64"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter error (Suspect any fixed hardware failure) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12064
+
+fcEvent65 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter error (writeb: Couldn't read status register. Retrying)"
+   --#TYPE			"Fc Event 65"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter error (writeb: Couldn't read status register. Retrying) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12065
+
+fcEvent66 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter error (writeb: Detect PCI parity error. Retrying)"
+   --#TYPE			"Fc Event 66"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter error (writeb: Detect PCI parity error. Retrying) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12066
+
+fcEvent67 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter error (writeb: Retry succeeded)"
+   --#TYPE			"Fc Event 67"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter error (writeb: Retry succeeded) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12067
+
+fcEvent68 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter error (writeb: Detected PCI parity error. Retries exhausted)"
+   --#TYPE			"Fc Event 68"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter error (writeb: Detected PCI parity error. Retries exhausted) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12068
+
+fcEvent69 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter error (Resetting adapter)"
+   --#TYPE			"Fc Event 69"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter error (Resetting adapter) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12069
+
+fcEvent70 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter error (Adapter reset failed)"
+   --#TYPE			"Fc Event 70"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter error (Adapter reset failed) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12070
+
+fcEvent71 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Software error (FALLIOCANCEL failed: phba is NULL)"
+   --#TYPE			"Fc Event 71"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Software error (FALLIOCANCEL failed: phba is NULL)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 12071
+
+fcEvent72 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Software error (FALLIOCANCEL failed: LUN block failed)"
+   --#TYPE			"Fc Event 72"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Software error (FALLIOCANCEL failed: LUN block failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 12072
+
+fcEvent73 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Software error (FALLIOCANCEL failed: Abort failed(timeout). HBA resetting)"
+   --#TYPE			"Fc Event 73"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Software error (FALLIOCANCEL failed: Abort failed(timeout). HBA resetting)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 12073
+
+fcEvent74 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Software error (FIOMPACTIVE failed: phba is NULL)"
+   --#TYPE			"Fc Event 74"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Software error (FIOMPACTIVE failed: phba is NULL)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 12074
+
+fcEvent75 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Software error (FIOMPACTIVE failed: LUN unblock failed)"
+   --#TYPE			"Fc Event 75"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Software error (FIOMPACTIVE failed: LUN unblock failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 12075
+
+fcEvent76 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Software error (Device Discovery completion error)"
+   --#TYPE			"Fc Event 76"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Software error (Device Discovery completion error)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 12076
+
+fcEvent77 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Software error (Device Discovery completion error)"
+   --#TYPE			"Fc Event 77"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Software error (Device Discovery completion error)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 12077
+
+fcEvent78 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter error (bigger then rsp ring)"
+   --#TYPE			"Fc Event 78"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter error (bigger then rsp ring) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12078
+
+fcEvent79 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Software error (IOCB wake NOT set)"
+   --#TYPE			"Fc Event 79"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Software error (IOCB wake NOT set)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 12079
+
+fcEvent80 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter error (Unknown IOCB command Data)"
+   --#TYPE			"Fc Event 80"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter error (Unknown IOCB command Data) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12080
+
+fcEvent81 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter error (Unknown IOCB command Data)"
+   --#TYPE			"Fc Event 81"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter error (Unknown IOCB command Data) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12081
+
+fcEvent82 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter error (IOCB wait timeout error)"
+   --#TYPE			"Fc Event 82"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter error (IOCB wait timeout error) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12082
+
+fcEvent83 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Software error (Bus Reset on target failed)"
+   --#TYPE			"Fc Event 83"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Software error (Bus Reset on target failed)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 12083
+
+fcEvent84 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Software error (Adapter failed to set maximum DMA length mbxStatus)"
+   --#TYPE			"Fc Event 84"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Software error (Adapter failed to set maximum DMA length mbxStatus)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 12084
+
+fcEvent85 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Software error (unexpected ASYNC_STATUS)"
+   --#TYPE			"Fc Event 85"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Software error (unexpected ASYNC_STATUS)"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5 }
+   --#SEVERITY		MINOR
+   ::= 12085
+
+fcEvent86 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter error (Adapter heartbeat failure; taking this port offline)"
+   --#TYPE			"Fc Event 86"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter error (Adapter heartbeat failure; taking this port offline) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12086
+
+fcEvent87 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter error (Adapter maximum temperature exceeded; taking this port offline)"
+   --#TYPE			"Fc Event 87"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter error (Adapter maximum temperature exceeded; taking this port offline) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12087
+
+fcEvent88 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter or Software error (Unprocessed Host attention)"
+   --#TYPE			"Fc Event 88"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter or Software error (Unprocessed Host attention) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12088
+
+fcEvent89 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter error (Adapter failed to mbxCmd CONFIG_HBQ)"
+   --#TYPE			"Fc Event 89"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter error (Adapter failed to mbxCmd CONFIG_HBQ) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12089
+
+fcEvent90 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter or Device or FC-Network error (invalid service parameters)"
+   --#TYPE			"Fc Event 90"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter or Device or FC-Network error (invalid service parameters) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12090
+
+fcEvent91 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter error (Adapter failed to set maximum DMA length mbxStatus)"
+   --#TYPE			"Fc Event 91"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter error (Adapter failed to set maximum DMA length mbxStatus) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12091
+
+fcEvent92 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Device or FC-Network error (Invalid response length)"
+   --#TYPE			"Fc Event 92"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Device or FC-Network error (Invalid response length) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12092
+
+fcEvent93 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter or Software error (Tgt Map rport failure)"
+   --#TYPE			"Fc Event 93"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter or Software error (Tgt Map rport failure) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12093
+
+fcEvent94 TRAP-TYPE
+   ENTERPRISE   psaLinEmulexTrap
+   VARIABLES {
+      trapPartitionName,
+      trapPartitionId,
+      trapEventLevel,
+      trapEventId,
+      trapUnitName,
+      trapSuspect,
+      trapVendorId,
+      trapDeviceId,
+      trapRevision,
+      trapMmbVip
+   }
+   DESCRIPTION "lpfc: Adapter or Software error (Device Reset rport failure)"
+   --#TYPE			"Fc Event 94"
+   --#SUMMARY		"%s(PID=%d) %s %d %s lpfc:%s Adapter or Software error (Device Reset rport failure) vendor-id=%s device-id=%s revision=%s"
+   --#ARGUMENTS		{ 0, 1, 2, 3, 4, 5, 6, 7, 8 }
+   --#SEVERITY		MINOR
+   ::= 12094
+
+END

@@ -1,0 +1,236 @@
+    ADTRAN-ACTDAX-MIB  DEFINITIONS ::= BEGIN
+
+    -- TITLE:          ACTDAX List 2 Product MIB (1150.032L2)
+    -- FILENAME:       ACTDAX.MIB
+    -- PARTNUMBER:     9950.017L1-16A
+    -- AUTHOR:         Stacy Murphree / Jeff Wells
+    -- DATE:           94/11/10
+
+    -- This MIB defines the management information for the ACTDAX
+    -- List 2 product.  The ACTDAX is a T1 LIU controller for the
+    -- ACT1241 Channel Bank.
+     
+
+    IMPORTS
+        enterprises
+            FROM RFC1155-SMI
+        OBJECT-TYPE
+            FROM RFC-1212
+        DisplayString,snmp
+            FROM RFC1213-MIB
+        TRAP-TYPE
+            FROM RFC-1215
+        dsx1LineStatus
+            FROM RFC1406-MIB
+        adDS1AlarmIndex,adDS1LineEvent,
+        adDS1AlertIndex,adDS1CurrentAlert,
+        adDS1TotalAlert,adDS1FarCurrentAlert,
+        adDS1FarTotalAlert
+            FROM ADTRAN-DS1-MIB;            
+
+    -- OBJECT IDENTIFIERS
+    
+    adtran          OBJECT IDENTIFIER ::= { enterprises 664 }
+    adProducts      OBJECT IDENTIFIER ::= { adtran 1 }
+    adACTDAX        OBJECT IDENTIFIER ::= { adProducts 2 }
+    adMgmt          OBJECT IDENTIFIER ::= { adtran 2 }
+    adACTDAXmg      OBJECT IDENTIFIER ::= { adMgmt 2 }
+    adACTDAXconfig  OBJECT IDENTIFIER ::= { adACTDAXmg 1 }
+
+    --
+    -- The ACTDAX List 2 Configuration Group
+    --
+    
+    adACTDAXpassword  OBJECT-TYPE
+        SYNTAX      DisplayString
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "The password string used for authentication of SNMP
+            messages between Proxy Agent and ACTDAX."
+        ::= { adACTDAXconfig 1 }
+
+    adACTDAXtime  OBJECT-TYPE
+        SYNTAX      DisplayString
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "The current ACTDAX time value. A sequence of
+            ASCII characters encoded as HR-Hour, MN-Minute,
+            SC-Second. For example, HRMNSC = 123059."
+        ::= { adACTDAXconfig 2 }
+
+    adACTDAXdate  OBJECT-TYPE
+        SYNTAX      DisplayString
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "The current ACTDAX date value. A sequence of
+            ASCII characters encoded as MN-Month, DY-Day,
+            YR-Year.  For example, MNDYYR = 073193."
+        ::= { adACTDAXconfig 3 }
+
+    adACTDAXresetPM  OBJECT-TYPE
+        SYNTAX  INTEGER {
+                    resAll(1),
+                    resDS1A(2),
+                    resDS1B(3)
+                }
+        ACCESS      read-write
+        STATUS      mandatory
+        DESCRIPTION
+            "Resets Performance Monitor DS1 statistic counters
+                in ACTDAX.  Parameter value 1 resets all lines,
+            2 resets line 1 (DS1-A), 3 resets line 2 (DS1-B)."
+        ::= { adACTDAXconfig 4 }
+
+    adACTDAXphone OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            "The dialing sequence (phone number) to reach the
+            network manager."
+        ::= { adACTDAXconfig 5 }
+
+    adACTDAXselfTestA OBJECT-TYPE
+        SYNTAX  INTEGER {
+                   selfTestAoff(1),
+                       selfTestAon(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            " Perform local loopback self-test on DS1 line A."
+        ::= { adACTDAXconfig 6 }
+
+    adACTDAXtestStatusA OBJECT-TYPE
+        SYNTAX  INTEGER {
+                   noTestA(1),
+                   runTestA(2),
+                   passTestA(3),
+                   failTestA(4)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            " Local loopback self-test status for DS1 line A."
+        ::= { adACTDAXconfig 7 }
+
+    adACTDAXselfTestB OBJECT-TYPE
+        SYNTAX  INTEGER {
+                   selfTestBoff(1),
+                       selfTestBon(2)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            " Perform local loopback self-test on DS1 line B."
+        ::= { adACTDAXconfig 8 }
+
+    adACTDAXtestStatusB OBJECT-TYPE
+        SYNTAX  INTEGER {
+                   noTestB(1),
+                   runTestB(2),
+                   passTestB(3),
+                   failTestB(4)
+                }
+        ACCESS  read-write
+        STATUS  mandatory
+        DESCRIPTION
+            " Local loopback self-test status for DS1 line B."
+        ::= { adACTDAXconfig 9 }
+
+
+
+    -- ACTDAX Trap Definitions
+    
+    -- Adtran products will send the Cold Start generic Trap message
+    -- after completion of a power-up initialization sequence
+    -- or after alteration of the product's SNMP configuration.
+    
+    -- If the ENTERPRISE clause is "snmp" the value of sysObjectID
+    -- is placed in the enterprise field of the SNMP Trap-PDU and
+    -- the specific-trap field is set to 0.  For enterprise specific traps,
+    -- the generic-trap field is set to 6 and the specific-trap field is
+    -- set to the value of the TRAP-TYPE macro.  The ENTERPRISE
+    -- field uniquely identifies the product sending the trap. Where multiple
+    -- products may send the same trap-type, a commented list appears
+    -- after the ENTERPRISE value containing the product names.
+    
+
+    coldStart  TRAP-TYPE
+        ENTERPRISE  snmp
+        DESCRIPTION
+            "A coldStart trap signifes that the sending
+            protocol entity is reinitializing itself such that
+            the agent's configuration or the protocol entity
+            implementation may be altered."
+        ::= 0
+
+
+    -- Adtran DS1 Enterprise Specific Traps
+
+    ds1Alarm  TRAP-TYPE
+        ENTERPRISE  adACTDAX
+        VARIABLES {
+            adDS1AlarmIndex,   
+            adDS1LineEvent,    
+            dsx1LineStatus      
+        }
+        DESCRIPTION
+            "A DS1 Alarm Trap indicates a DS1 Line Status
+            bit has changed state, producing an Alarm Event
+            for the DS1 interface.  The bit map Line Events
+            variable identifies the alarm event(s).  The bit
+            map Line Status variable contains the interface
+            status when the alarm occurred.  Only enabled
+            (arm set) status produce an Alarm Trap.
+
+            Alarm event/status bit values:
+                1   No Alarm
+                2   Receive Yellow Alarm
+                4   Transmit Yellow Alarm
+                8   Receive Alarm Indication Signal (AIS)
+               16   Transmit AIS
+               32   RED Alarm
+               64   LOSS, Loss Of Receive Signal
+              128   Loopback
+             2048   Receive Test Code"
+
+        ::= 201
+
+    ds1Alert  TRAP-TYPE
+        ENTERPRISE  adACTDAX
+        VARIABLES {
+            adDS1AlertIndex,    -- DS1 Line Number
+            adDS1CurrentAlert,  -- Current Alert value
+            adDS1TotalAlert,    -- Total Alert value
+            adDS1FarCurrentAlert,   -- Far End Current Alert value
+            adDS1FarTotalAlert  -- Far End Total Alert value
+        }
+        DESCRIPTION
+            "A DS1 Threshold Crossing Alert has occurred.  The
+            Performance Parameters which have exceeded their
+            Threshold Values are identified in the bit mapped
+            Alert variables for the Near End and Far End DS1
+            interface.  Parameters identify Alerts for the
+                            Current 15 minute interval and Total variables.
+
+            Threshold Crossing Alert bit values:
+                1  ES   - Errored Seconds
+                2  SES  - Severely Errored Seconds
+                4  SEFS - Severely Errored Framing Seconds
+                8  UAS  - Unavailable Second
+               16  CSS  - Controlled Slip Seconds
+               32  PCV  - Path Coding Violations
+               64  LES  - Line Errored Seconds
+              128  BES  - Bursty Errored Seconds
+              256  DM   - Degraded Minutes
+              512  LCV  - Line Code Violations"
+
+        ::= 202
+
+
+    END
+    

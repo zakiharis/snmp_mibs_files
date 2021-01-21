@@ -1,0 +1,671 @@
+SIEMENS-MULTIPATH-MIB DEFINITIONS ::= BEGIN
+
+--
+-- $Copyright$
+-- Copyright (C) Siemens AG 1998
+-- Copyright (C) Fujitsu Siemens Computers GmbH 2001
+-- All rights reserved
+--
+
+IMPORTS
+	OBJECT-TYPE				FROM RFC-1212
+	mib-2, DisplayString			FROM RFC1213-MIB
+	TimeTicks, Counter, Gauge, enterprises	FROM RFC1155-SMI;
+
+-- The Windows NT MIB compiler doesn't do IMPORTS.
+-- So, include these definitions here. NT defines "DisplayString" as
+-- OCTET STRING (SIZE(0..255)), in RFC1213 it has no explicit size.
+
+-- DisplayString ::= OCTET  STRING
+-- enterprises     OBJECT IDENTIFIER ::= { iso org(3) dod(6) internet(1) private(4) 1 }
+
+-- Siemens Server Management MIB nodes
+--	sni			OBJECT IDENTIFIER ::= { enterprises    231 }
+--	sniProductMibs		OBJECT IDENTIFIER ::= { sni              2 }
+--	sniExtensions		OBJECT IDENTIFIER ::= { sniProductMibs  10 }
+--	sniServerMgmt		OBJECT IDENTIFIER ::= { sniExtensions    2 }
+--	  sieInventory		OBJECT IDENTIFIER ::=   { sniServerMgmt    1 }
+--	  sniCommon		OBJECT IDENTIFIER ::=   { sniServerMgmt    2 }
+--	    sieBios		OBJECT IDENTIFIER ::=     { sniCommon        1 }
+--	    sieEisa		OBJECT IDENTIFIER ::=     { sniCommon        2 }
+--	    sieHd		OBJECT IDENTIFIER ::=     { sniCommon        3 }
+--	    sieBus		OBJECT IDENTIFIER ::=     { sniCommon        4 }
+--	    sieServerControl	OBJECT IDENTIFIER ::=     { sniCommon        5 }
+--		sieMultiPath	OBJECT IDENTIFIER ::= { sniCommon		 7 }	
+--	  siePcSpecific		OBJECT IDENTIFIER ::=   { sniServerMgmt    3 }
+--	  sieScb		OBJECT IDENTIFIER ::=   { sniServerMgmt    4 }
+--	  sieOsSpecific		OBJECT IDENTIFIER ::=   { sniServerMgmt    5 }
+--	  sieOemComponents	OBJECT IDENTIFIER ::=   { sniServerMgmt    6 }
+--	  sieSecurity		OBJECT IDENTIFIER ::=   { sniServerMgmt    7 }
+--	  sieServerView		OBJECT IDENTIFIER ::=   { sniServerMgmt    8 }
+--	  sieCluster		OBJECT IDENTIFIER ::=   { sniServerMgmt    9 }
+--	  sieVersionView	OBJECT IDENTIFIER ::=   { sniServerMgmt   10 }
+--	sieTrapMib		OBJECT IDENTIFIER ::= { sniExtensions    5 }
+
+--------------------------------------------------------------------------
+-- The path to sieMultiPath: root of this MIB                           --
+--------------------------------------------------------------------------
+
+sni				OBJECT IDENTIFIER ::= { enterprises    231 }
+sniProductMibs 	OBJECT IDENTIFIER ::= { sni              2 }
+sniExtensions  	OBJECT IDENTIFIER ::= { sniProductMibs  10 }
+sniServerMgmt  	OBJECT IDENTIFIER ::= { sniExtensions    2 }
+sniCommon		OBJECT IDENTIFIER ::= { sniServerMgmt	 2 }
+sieMultiPath	OBJECT IDENTIFIER ::= { sniCommon	     7 }
+
+sieMPAgentInfo	OBJECT IDENTIFIER ::= { sieMultiPath     1 }
+sieMPState		OBJECT IDENTIFIER ::= { sieMultiPath     2 }
+sieMPContainer	OBJECT IDENTIFIER ::= { sieMultiPath     3 }
+sieMPTrapInfo	OBJECT IDENTIFIER ::= { sieMultiPath    10 }
+
+--------------------------------------------------------------------------
+-- The MultiPath SNMP agent's info group (for debugging and info)       --
+--                                                                      --
+-- Information concerning the agent's name, version, etc.               --
+--------------------------------------------------------------------------
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.7.1.1.0
+sieMPAgentId		OBJECT-TYPE
+    SYNTAX	DisplayString
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "MultiPath SNMP agent ID string"
+			::= { sieMPAgentInfo 1 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.7.1.2.0
+sieMPAgentCompany	OBJECT-TYPE
+    SYNTAX	DisplayString
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "MultiPath SNMP agent company string"
+			::= { sieMPAgentInfo 2 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.7.1.3.0
+sieMPAgentVersion	OBJECT-TYPE
+    SYNTAX	DisplayString
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "MultiPath SNMP agent version string"
+			::= { sieMPAgentInfo 3 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.7.1.4.0
+sieMPAgentBuild		OBJECT-TYPE
+    SYNTAX	DisplayString
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "MultiPath SNMP agent build date and time string"
+			::= { sieMPAgentInfo 4 }
+
+--------------------------------------------------------------------------
+-- The MultiPath SNMP agent's state group                               --
+--                                                                      --
+-- This is information that is necessary across MultiPath groups.       --
+--------------------------------------------------------------------------
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.7.2.1.0
+sieMPLastDate		OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "Date of last recent reconfiguration in time_t (seconds
+				since 1/1/1970 00:00:00)"
+			::= { sieMPState 1 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.7.2.2.0
+sieMPCurrentState	OBJECT-TYPE
+	SYNTAX	INTEGER {
+			ok (1),
+			degraded (2),
+			error (3),
+			failed (4)
+		}
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"This reflects the overall state of the driver, agent and the
+				underlying ports. Possible values are:
+				OK everything is fine
+				DEGRADED there was an event from the driver marking a change of MultiPath configuration or port status
+				ERROR software exception (software bug)
+				FAILED communication with driver fails (bug, driver not installed)"
+			::= { sieMPState 2 }
+
+--------------------------------------------------------------------------
+-- The MultiPath SNMP agent's containers (groups, ports, luns)          --
+--------------------------------------------------------------------------
+
+--------------------------------------------------------------------------
+-- The MultiPath SNMP agent's MultiPath groups                          --
+--                                                                      --
+-- This is a list of all MultiPath groups that are created on a         --
+-- server. It is possible that a group consists of only one port.       --
+--------------------------------------------------------------------------
+
+sieMPGroupTable		OBJECT-TYPE
+    SYNTAX	SEQUENCE OF SieMPGroup
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION "Table of available MultiPath groups"
+			::= { sieMPContainer 1}
+
+sieMPGroup		OBJECT-TYPE
+    SYNTAX	SieMPGroup
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION "Entry in table of MultiPath groups"
+    INDEX	{ sieMPGroupID }
+			::= { sieMPGroupTable 1}
+
+SieMPGroup		::= SEQUENCE {
+		sieMPGroupID		INTEGER,
+		sieMPGroupCommand	INTEGER,
+		sieMPGroupLoadBalancingStatus	INTEGER,
+		sieMPGroupAutorecoverStatus	INTEGER
+	}
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.7.3.1.1.1.0
+sieMPGroupID		OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "A unique value for each group, starts at 0 and remains 
+				unchanged from one re-initialization of the agent to the next"
+			::= { sieMPGroup 1 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.7.3.1.1.2.0
+sieMPGroupCommand	OBJECT-TYPE
+    SYNTAX	INTEGER {
+			enable-load-balancing (1),
+			disable-load-balancing (2),
+			enable-autorecover (3),
+			disable-autorecover (4),
+			reconfigure (5)
+		}
+    ACCESS	read-write
+    STATUS	mandatory
+    DESCRIPTION "These are the possible commands a frontend can send to a MultiPath group.
+				ENABLE-LOAD-BALANCING I/Os can use all available ports of a MultiPath group
+				DISABLE-LOAD-BALANCING only one port of a MultiPath group can be used for I/Os
+				ENABLE-AUTORECOVER a automatic failback (a formerly failed port was replaced and can be used again) is possible
+				DISABLE-AUTORECOVER don't do automatic failback
+				RECONFIGURE search all ports the can be integrated into a MultiPath group and build this group
+				A GET always returns 0."
+			::= { sieMPGroup 2 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.7.3.1.1.3.0
+sieMPGroupLoadBalancingStatus	OBJECT-TYPE
+    SYNTAX	INTEGER {
+			unknown (0),
+			load-balancing-enabled (1),
+			load-balancing-disabled (2)
+		}
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "Show wether load balancing is enabled or disabled"
+			::= { sieMPGroup 3 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.7.3.1.1.4.0
+sieMPGroupAutorecoverStatus	OBJECT-TYPE
+    SYNTAX	INTEGER {
+			unknown (0),
+			autorecover-enabled (1),
+			autorecover-disabled (2)
+		}
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "Show wether autorecover is enabled or disabled"
+			::= { sieMPGroup 4 }
+
+--------------------------------------------------------------------------
+-- The MultiPath SNMP agent's ports                                     --
+--                                                                      --
+-- This is a list of all ports (atapi, SCSI, FC) of a server. The       --
+-- connection to the surrounding MultiPath group is given by a parent   --
+-- ID that corresponds directly to a group ID.                          --
+--------------------------------------------------------------------------
+
+sieMPPortTable		OBJECT-TYPE
+    SYNTAX	SEQUENCE OF SieMPPort
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION "Table of available ports"
+			::= { sieMPContainer 2}
+
+sieMPPort		OBJECT-TYPE
+    SYNTAX	SieMPPort
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION "Entry in table of ports"
+    INDEX	{ sieMPPortID }
+			::= { sieMPPortTable 1}
+
+SieMPPort		::= SEQUENCE {
+		sieMPPortID		INTEGER,
+		sieMPParentGroup	INTEGER,
+		sieMPPortStatus		INTEGER,
+		sieMPPortCommand	INTEGER,
+		sieMPPortPciSlot	INTEGER,
+		sieMPPortHAType		DisplayString,
+		sieMPPortTargetID	INTEGER,
+		sieMPPortLastErrorNumber	INTEGER,
+		sieMPPortLastErrorTarget	INTEGER,
+		sieMPPortLastErrorLun	INTEGER,
+		sieMPPortLastErrorPath	INTEGER
+	}
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.7.3.2.1.1.0
+sieMPPortID		OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "A unique value for each port, starts at 0 and remains 
+    			unchanged from one re-initialization of	the agent to the next"
+			::= { sieMPPort 1 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.7.3.2.1.2.0
+sieMPParentGroup		OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "sieMPGroupID of the group where port is member"
+			::= { sieMPPort 2 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.7.3.2.1.3.0
+sieMPPortStatus		OBJECT-TYPE
+    SYNTAX	INTEGER {
+			unknown (1),
+			unused (2),
+			disabled (3),
+			passthrough (4),
+			active (5),
+			standby (6),
+			error (7)
+		}
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "These are the possible states a port can be in
+				UNKNOWN cannot get status information for this port
+				UNUSED this port cannot be used for MultiPath (user defined)
+				DISABLED this port is turned off - no I/O is possible
+				PASSTHROUGH every I/O for this port is sent through the driver without being looked at
+				ACTIVE this port can accept I/Os. When load balancing is off only one port of a MultiPath group can be active
+				STANDBY this port waits until an active port fails and takes over all I/Os then
+				ERROR this port failed due to an error"
+			::= { sieMPPort 3 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.7.3.2.1.4.0
+sieMPPortCommand	OBJECT-TYPE
+    SYNTAX	INTEGER {
+			enable (1),
+			disable (2),
+			clear-error (3),
+			active (4),
+			remove-port (5)
+		}
+    ACCESS	read-write
+    STATUS	mandatory
+    DESCRIPTION "These are the possible commands a frontend can send to a port.
+				ENABLE when a port was disabled by user request - enable it
+				DISABLE disable a port
+				CLEAR-ERROR clear the error flag of this port
+				ACTIVE when load balancing is off this port will handle all I/Os. All other ports of this MultiPath group will be in status STANDBY
+				REMOVE-PORT take a port out of a MultiPath group. It will get its own group
+				A GET always returns 0."
+			::= { sieMPPort 4 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.7.3.2.1.5.0
+sieMPPortPciSlot	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "Physical PCI slot of port"
+			::= { sieMPPort 5 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.7.3.2.1.6.0
+sieMPPortHAType		OBJECT-TYPE
+    SYNTAX	DisplayString
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "Vendor, name, type of hostadaptor"
+			::= { sieMPPort 6 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.7.3.2.1.7.0
+sieMPPortTargetID	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "SCSI Target ID of port"
+			::= { sieMPPort 7 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.7.3.2.1.8.0
+sieMPPortLastErrorNumber	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "Last error number for port"
+			::= { sieMPPort 8 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.7.3.2.1.9.0
+sieMPPortLastErrorTarget	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "Last target number where error occured for port"
+			::= { sieMPPort 9 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.7.3.2.1.10.0
+sieMPPortLastErrorLun	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "Last lun number where error occured for port"
+			::= { sieMPPort 10 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.7.3.2.1.11.0
+sieMPPortLastErrorPath	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "Last path where error occured for port"
+			::= { sieMPPort 11 }
+
+--------------------------------------------------------------------------
+-- The MultiPath SNMP agent's luns                                      --
+--                                                                      --
+-- This is a list of all devices the OS can access by SCSI target num   --
+-- and SCSI lun. The corresponding controller is addressed by its ID.   --
+--------------------------------------------------------------------------
+
+sieMPLunTable		OBJECT-TYPE
+    SYNTAX	SEQUENCE OF SieMPLun
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION "Table of available luns"
+			::= { sieMPContainer 3}
+
+sieMPLun		OBJECT-TYPE
+    SYNTAX	SieMPLun
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION "Entry in table of luns"
+    INDEX	{ sieMPLunID }
+			::= { sieMPLunTable 1}
+
+SieMPLun		::= SEQUENCE {
+		sieMPLunID		INTEGER,
+		sieMPLunParentPort	INTEGER,
+		sieMPLunTargetNo	INTEGER,
+		sieMPLunLunNo		INTEGER,
+		sieMPLunInquiry		DisplayString,
+		sieMPOSDeviceName	DisplayString,
+		sieMPLunType		INTEGER,
+		sieMPLunClaimed		INTEGER
+	}
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.7.3.3.1.1.0
+sieMPLunID		OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "A unique value for each lun, starts at 0 and
+				remains unchanged from one re-initialization of
+				the agent to the next"
+			::= { sieMPLun 1 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.7.3.3.1.2.0
+sieMPLunParentPort	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "sieMPPortID of the group where lun is member"
+			::= { sieMPLun 2 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.7.3.3.1.3.0
+sieMPLunTargetNo	OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "SCSI Target ID of lun"
+			::= { sieMPLun 3 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.7.3.3.1.4.0
+sieMPLunLunNo		OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "SCSI LUN of lun"
+			::= { sieMPLun 4 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.7.3.3.1.5.0
+sieMPLunInquiry		OBJECT-TYPE
+    SYNTAX	DisplayString
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "Inquiry string containing serial number, etc. for lun"
+			::= { sieMPLun 5 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.7.3.3.1.6.0
+sieMPOSDeviceName   OBJECT-TYPE
+	SYNTAX  DisplayString
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "The operating system's name for this device (e.g. Windows NT: disk0)."
+			::= { sieMPLun 6 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.7.3.3.1.7.0
+sieMPLunType		OBJECT-TYPE
+    SYNTAX	INTEGER {
+			disk (0),
+			tape (1),
+			printer (2),
+			processor (3),
+			worm (4),
+			cdrom (5),
+			scanner (6),
+			optical-disk (7),
+			jukebox (8),
+			network (9),
+			unit-not-present (127),
+			unknown (255)
+    	}
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "SCSI LUN type"
+			::= { sieMPLun 7 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.7.3.3.1.8.0
+sieMPLunClaimed		OBJECT-TYPE
+    SYNTAX	INTEGER {
+    		not-claimed (0),
+    		claimed (1)
+    	}
+    ACCESS	read-only
+    STATUS	mandatory
+    DESCRIPTION "SCSI LUN claimed status"
+			::= { sieMPLun 8 }
+
+--------------------------------------------------------------------------
+-- The MultiPath SNMP agent's traps                                     --
+--------------------------------------------------------------------------
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.7.10.1
+sieMPTrapServerName		OBJECT-TYPE
+    SYNTAX	DisplayString
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION "Name of the server where the trap occured"
+			::= { sieMPTrapInfo 1 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.7.10.2
+sieMPTrapTime		OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION "Time the trap occured (in seconds since 1/1/1970 00:00:00)"
+			::= { sieMPTrapInfo 2 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.7.10.3
+sieMPTrapGroupID		OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION "The MultiPath Group ID where the change occured"
+			::= { sieMPTrapInfo 3 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.7.10.4
+sieMPTrapPortID		OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION "The MultiPath Port ID where the change occured"
+			::= { sieMPTrapInfo 4 }
+			
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.7.10.5
+sieMPTrapTargetID		OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION "The MultiPath Target ID where the change occured"
+			::= { sieMPTrapInfo 5 }
+			
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.7.10.6
+sieMPTrapLunID		OBJECT-TYPE
+    SYNTAX	INTEGER
+    ACCESS	not-accessible
+    STATUS	mandatory
+    DESCRIPTION "The MultiPath Lun ID where the change occured"
+			::= { sieMPTrapInfo 6 }
+
+sieMPError		TRAP-TYPE
+    ENTERPRISE	sniServerMgmt
+    VARIABLES {
+	sieMPTrapServerName,
+	sieMPTrapTime,
+	sieMPTrapGroupID,
+	sieMPTrapPortID,
+	sieMPTrapTargetID,
+	sieMPTrapLunID
+    }
+    DESCRIPTION "Only one port of the MultiPath group was alive and this one failed. The MultiPath group is not operational anymore."
+    --#TYPE		"MP: Last port failed"
+    --#SUMMARY		"MultiPath group %d on server %s is down."
+    --#ARGUMENTS	{ 2, 0 }
+    --#SEVERITY		CRITICAL
+    --#TIMEINDEX	1
+    --#STATE		NONOPERATIONAL
+			::= 1200
+
+sieMPRetry		TRAP-TYPE
+    ENTERPRISE	sniServerMgmt
+    VARIABLES {
+	sieMPTrapServerName,
+	sieMPTrapTime,
+	sieMPTrapGroupID,
+	sieMPTrapPortID,
+	sieMPTrapTargetID,
+	sieMPTrapLunID
+    }
+    DESCRIPTION "One active port of a MultiPath group has failed. A retry on another path has been started."
+    --#TYPE		"MP: Port failed"
+    --#SUMMARY		"Port %d of MultiPath group %d on server %s is down. Error on ID %d, Lun %d."
+    --#ARGUMENTS	{ 3, 2, 0 ,4 ,5 }
+    --#SEVERITY		MAJOR
+    --#TIMEINDEX	1
+    --#STATE		DEGRADED
+			::= 1201
+
+sieMPActivePortChanged	TRAP-TYPE
+    ENTERPRISE	sniServerMgmt
+    VARIABLES {
+	sieMPTrapServerName,
+	sieMPTrapTime,
+	sieMPTrapGroupID,
+	sieMPTrapPortID,
+	sieMPTrapTargetID,
+	sieMPTrapLunID
+    }
+    DESCRIPTION "Trap occurs after the driver has activated a port as requested by the configuration utility."
+    --#TYPE		"MP: Port activated"
+    --#SUMMARY		"Active port for MultiPath group %d changed on server %s. Port %d is now active port."
+    --#ARGUMENTS	{ 2, 0, 3 }
+    --#SEVERITY		INFORMATIONAL
+    --#TIMEINDEX	1
+    --#STATE		OPERATIONAL
+			::= 1202
+
+sieMPReconfigured	TRAP-TYPE
+    ENTERPRISE	sniServerMgmt
+    VARIABLES {
+	sieMPTrapServerName,
+	sieMPTrapTime,
+	sieMPTrapGroupID,
+	sieMPTrapPortID,
+	sieMPTrapTargetID,
+	sieMPTrapLunID
+    }
+    DESCRIPTION "Trap occurs after the driver has added a port to a MultiPath group (if a matching port was found) or removed a port from a MultiPath group. The action was requested by the configuration utility."
+    --#TYPE		"MP: Port added/removed"
+    --#SUMMARY		"MultiPath group %d reconfigured on server %s. Port %d was affected."
+    --#ARGUMENTS	{ 2, 0, 3 }
+    --#SEVERITY		INFORMATIONAL
+    --#TIMEINDEX	1
+    --#STATE		OPERATIONAL
+			::= 1203
+
+sieMPStatusChanged	TRAP-TYPE
+    ENTERPRISE	sniServerMgmt
+    VARIABLES {
+	sieMPTrapServerName,
+	sieMPTrapTime,
+	sieMPTrapGroupID,
+	sieMPTrapPortID,
+	sieMPTrapTargetID,
+	sieMPTrapLunID
+    }
+    DESCRIPTION "Trap occurs after the driver has changed the behavior of a MultiPath group. Autorecovery was turned or off, loadbalancing was turned on or off or one port was enabled or disabled. The action was requested by the configuration utility."
+    --#TYPE		"MP: Behavior changed"
+    --#SUMMARY		"MultiPath behavior for group %d was changed on server %s."
+    --#ARGUMENTS	{ 2, 0 }
+    --#SEVERITY		INFORMATIONAL
+    --#TIMEINDEX	1
+    --#STATE		OPERATIONAL
+			::= 1204
+
+sieMPAutoRecovered	TRAP-TYPE
+    ENTERPRISE	sniServerMgmt
+    VARIABLES {
+	sieMPTrapServerName,
+	sieMPTrapTime,
+	sieMPTrapGroupID,
+	sieMPTrapPortID,
+	sieMPTrapTargetID,
+	sieMPTrapLunID
+    }
+    DESCRIPTION "Trap occurs when the driver has detected that a port which was in status error is accessible again."
+    --#TYPE		"MP: Port alive again"
+    --#SUMMARY		"MultiPath group %d on server %s: Port %d recovered from error."
+    --#ARGUMENTS	{ 2, 0, 3 }
+    --#SEVERITY		INFORMATIONAL
+    --#TIMEINDEX	1
+    --#STATE		OPERATIONAL
+			::= 1205
+
+sieMPErrorCleared	TRAP-TYPE
+    ENTERPRISE	sniServerMgmt
+    VARIABLES {
+	sieMPTrapServerName,
+	sieMPTrapTime,
+	sieMPTrapGroupID,
+	sieMPTrapPortID,
+	sieMPTrapTargetID,
+	sieMPTrapLunID
+    }
+    DESCRIPTION "Trap occurs after the driver has cleared the error status for a port from a MultiPath group as requested by the configuration utility."
+    --#TYPE		"MP: Status cleared"
+    --#SUMMARY		"MultiPath group %d on server %s: Error for MultiPath port %d was cleared."
+    --#ARGUMENTS	{ 2, 0, 3 }
+    --#SEVERITY		INFORMATIONAL
+    --#TIMEINDEX	1
+    --#STATE		OPERATIONAL
+			::= 1206
+
+END

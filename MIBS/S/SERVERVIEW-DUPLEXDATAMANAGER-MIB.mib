@@ -1,0 +1,1617 @@
+SERVERVIEW-DUPLEXDATAMANAGER-MIB DEFINITIONS ::= BEGIN
+
+--
+-- $Copyright$
+-- Copyright (C) Fujitsu Siemens Computers GmbH 2001
+-- All rights reserved
+--
+
+IMPORTS
+    OBJECT-TYPE                            FROM RFC-1212
+    mib-2                                  FROM RFC1213-MIB
+    DisplayString                          FROM RFC1213-MIB
+    Counter, Gauge, IpAddress, enterprises FROM RFC1155-SMI;
+
+--
+-- The Windows NT MIB compiler doesn't do IMPORTS.
+-- So, include these definitions here. NT defines "DisplayString" as
+-- OCTET STRING (SIZE(0..255)), in RFC1213 it has no explicit size.
+--
+-- DisplayString ::= OCTET STRING
+-- enterprises OBJECT IDENTIFIER ::= { iso org(3) dod(6) internet(1) private(4) 1 }
+--
+
+-- Fujitsu Siemens Computers Server Management MIB nodes
+
+-- sni:                         1.3.6.1.4.1.231
+--  sniProductMibs:             1.3.6.1.4.1.231.2
+--   sniExtensions:             1.3.6.1.4.1.231.2.10
+--    sniServerMgmt:            1.3.6.1.4.1.231.2.10.2
+--      sniCommon:              1.3.6.1.4.1.231.2.10.2.2
+--        fscDuplexDataManager: 1.3.6.1.4.1.231.2.10.2.2.9
+--
+
+-- Trap IDs for all ServerView MIBs:
+-- Trap enterprise is "sniServerMgmt".
+
+-- Siemens Trap MIB:            000..399 (enterprise "sni"!!)
+-- Siemens Mylex MIB:           200..299
+-- Siemens ServerControl MIB:   600..699
+-- Siemens ServerView MIB:      700..749
+-- Siemens Harddisk MIB:        750..799
+-- Siemens NT Cluster MIB:      800..999
+-- Siemens PCI Hotplug MIB:     1000..1099
+-- Siemens Status MIB:          1100..1199
+-- Siemens MultiPath MIB:       1200..1299
+-- Siemens DuplexWrite MIB:     1300..1399
+-- FSC DuplexDataManager MIB:   1400..1499 (this MIB)
+
+
+sni                     OBJECT IDENTIFIER ::= { enterprises            231 }
+sniProductMibs          OBJECT IDENTIFIER ::= { sni                      2 }
+sniExtensions           OBJECT IDENTIFIER ::= { sniProductMibs          10 }
+sniServerMgmt           OBJECT IDENTIFIER ::= { sniExtensions            2 }
+sniCommon               OBJECT IDENTIFIER ::= { sniServerMgmt            2 }
+fscDuplexDataManager    OBJECT IDENTIFIER ::= { sniCommon                9 }
+
+fscDdmAgentInfo         OBJECT IDENTIFIER ::= { fscDuplexDataManager     1 }
+fscDdmStatus            OBJECT IDENTIFIER ::= { fscDuplexDataManager     2 }
+fscDdmDwContainer       OBJECT IDENTIFIER ::= { fscDuplexDataManager     3 }
+fscDdmMPContainer       OBJECT IDENTIFIER ::= { fscDuplexDataManager     4 }
+fscDdmTrapInfo          OBJECT IDENTIFIER ::= { fscDuplexDataManager    10 }
+
+
+-- **********************************************************************************************
+
+-- GROUP: fscDdmAgentInfo
+--
+-- Implementation of this group is mandatory
+--
+-- This group defines agent specific information like agent name, vendor and versions
+
+-- **********************************************************************************************
+
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.1.1.0
+fscDdmAgentId       OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "DuplexDataManager SNMP agent ID."
+            ::= { fscDdmAgentInfo 1 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.1.2.0
+fscDdmAgentCompany  OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "DuplexDataManager SNMP agent company."
+            ::= { fscDdmAgentInfo 2 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.1.3.0
+fscDdmAgentVersion  OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "DuplexDataManager SNMP agent version."
+            ::= { fscDdmAgentInfo 3 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.1.4.0
+fscDdmAgentBuild    OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "DuplexDataManager SNMP agent build date and time."
+            ::= { fscDdmAgentInfo 4 }
+
+
+-- **********************************************************************************************
+
+-- GROUP: fscDdmStatus
+--
+-- This group defines DDM global information
+
+-- **********************************************************************************************
+
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.2.1.0
+fscDdmLastDate      OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Date of last recent reconfiguration in time_t (seconds since 1/1/1970 00:00:00)."
+            ::= { fscDdmStatus 1 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.2.2.0
+fscDdmCurrentStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+        ok (1),
+        degraded (2),
+        error (3),
+        failed (4)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Overall status of the driver, agent and the underlying objects.
+                Possible values are:
+                OK everything is fine
+                DEGRADED at least one MultiPath or DuplexWrite group is in a degraded state (e.g. piece failed)
+                ERROR software exception occured (software bug)
+                FAILED communication with driver failed (e.g. driver not installed)"
+            ::= { fscDdmStatus 2 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.2.3.0
+fscDdmInstallationType  OBJECT-TYPE
+    SYNTAX  INTEGER {
+        ddewin (1),
+        ddmwin (2),
+        mpwin (3),
+        ddelx (4),
+        ddmlx (5),
+        mplx (6),
+        unknown (99)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Type of installed DuplexDataManager edition.
+                Possible values are:
+                DDMWIN PRIMERGY DuplexDataManager(R) (Windows)
+                DDEWIN PRIMERGY easyMirror(TM) (Windows)
+                MPWIN PRIMERGY MultiPath (Windows)
+                DDMLX PRIMERGY DuplexDataManager(R) (Linux)
+                DDELX PRIMERGY easyMirror(TM) (Linux)
+                MPLX PRIMERGY MultiPath (Linux)
+                UNKNOWN none of the above"
+            ::= { fscDdmStatus 3 }
+
+
+-- **********************************************************************************************
+
+-- GROUP: fscDdmDwContainer
+--
+-- The DuplexDataManager SNMP agent's container for DuplexWrite info
+
+-- **********************************************************************************************
+
+
+fscDdmDwPieceTable  OBJECT-TYPE
+    SYNTAX  SEQUENCE OF FscDdmDwPiece
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION "Table of all pieces DuplexWrite has detected."
+            ::= { fscDdmDwContainer 1}
+
+fscDdmDwPiece       OBJECT-TYPE
+    SYNTAX  FscDdmDwPiece
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION "Entry in table of DuplexWrite pieces."
+    INDEX   { fscDdmDwIndex }
+            ::= { fscDdmDwPieceTable 1}
+
+FscDdmDwPiece       ::= SEQUENCE {
+        fscDdmDwIndex           INTEGER,
+        fscDdmDwDwPort          INTEGER,
+        fscDdmDwDwPath          INTEGER,
+        fscDdmDwDwTarget        INTEGER,
+        fscDdmDwDwLun           INTEGER,
+        fscDdmDwDwName          DisplayString,
+        fscDdmDwDwGroupNumber   INTEGER,
+        fscDdmDwDwPieceNumber   INTEGER,
+        fscDdmDwDwSize          INTEGER,
+        fscDdmDwDwRoot          INTEGER,
+        fscDdmDwDwRecoverMode   INTEGER,
+        fscDdmDwDwStatus        INTEGER,
+        fscDdmDwDwReason        INTEGER,
+        fscDdmDwDwActive        INTEGER,
+        fscDdmDwDwRecoverProgress   INTEGER,
+        fscDdmDwDwHidden        INTEGER,
+        fscDdmDwDwRecent        INTEGER,
+        fscDdmDwDwForced        INTEGER,
+        fscDdmDwDwPieceCount    INTEGER,
+        fscDdmDwDwPieceFound    INTEGER,
+        fscDdmDwDwBalance       INTEGER,
+        fscDdmDwMpGroupNumber   INTEGER,
+        fscDdmDwScPort          INTEGER,
+        fscDdmDwScPath          INTEGER,
+        fscDdmDwScTarget        INTEGER,
+        fscDdmDwScLun           INTEGER,
+        fscDdmDwScDiskNumber    INTEGER,
+        fscDdmDwScSize          INTEGER,
+        fscDdmDwScSignature     INTEGER,
+        fscDdmDwScType          INTEGER,
+        fscDdmDwScInquiry       DisplayString,
+        fscDdmDwScResource      DisplayString,
+        fscDdmDwScNode          DisplayString,
+        fscDdmDwScPciBus        INTEGER,
+        fscDdmDwScPciDevice     INTEGER,
+        fscDdmDwScPciFunction   INTEGER,
+        fscDdmDwScDriverName    DisplayString,
+        fscDdmDwScDriverDescription DisplayString
+    }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.3.1.1.1.0
+fscDdmDwIndex       OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Unique value for each DuplexWrite piece, starts at 0 and
+                remains unchanged from one re-initialization of
+                the agent to the next. Only used as index."
+            ::= { fscDdmDwPiece 1 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.3.1.1.2.0
+fscDdmDwDwPort      OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Virtual SCSI port number of the DuplexWrite group."
+            ::= { fscDdmDwPiece 2 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.3.1.1.3.0
+fscDdmDwDwPath      OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Virtual SCSI path number of the DuplexWrite group."
+            ::= { fscDdmDwPiece 3 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.3.1.1.4.0
+fscDdmDwDwTarget    OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Virtual SCSI target ID of the DuplexWrite group."
+            ::= { fscDdmDwPiece 4 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.3.1.1.5.0
+fscDdmDwDwLun       OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Virtual SCSI LUN of the DuplexWrite group"
+            ::= { fscDdmDwPiece 5 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.3.1.1.6.0
+fscDdmDwDwName      OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Name of the DuplexWrite group."
+            ::= { fscDdmDwPiece 6 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.3.1.1.7.0
+fscDdmDwDwGroupNumber   OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Internal group number of the DuplexWrite group."
+            ::= { fscDdmDwPiece 7 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.3.1.1.8.0
+fscDdmDwDwPieceNumber   OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Internal piece number in the DuplexWrite group."
+            ::= { fscDdmDwPiece 8 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.3.1.1.9.0
+fscDdmDwDwSize      OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Size of the DuplexWrite group in MegaBytes."
+            ::= { fscDdmDwPiece 9 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.3.1.1.10.0
+fscDdmDwDwRoot      OBJECT-TYPE
+    SYNTAX  INTEGER {
+        on (1),
+        off (2),
+        unknown (99)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "RootDisk flag of the DuplexWrite group. The RootDisk flag indicates special handling for boot/system disks.
+                Possible values are:
+                ON RootDisk flag is turned on
+                OFF RootDisk flag is turned off
+                UNKNOWN none of the above"
+            ::= { fscDdmDwPiece 10 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.3.1.1.11.0
+fscDdmDwDwRecoverMode   OBJECT-TYPE
+    SYNTAX  INTEGER {
+        copy (1),
+        verify (2),
+        delta (3),
+        unknown (99)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Recover mode of the DuplexWrite groups.
+                Possible values are:
+                COPY during Recover all blocks are copied from one disk to another
+                VERIFY during Recover blocks are read from all disks, compared and only written when a difference is detected
+                DELTA during Recover only those areas of the disk are copied that were changed since the group broke up
+                UNKNOWN none of the above"
+            ::= { fscDdmDwPiece 11 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.3.1.1.12.0
+fscDdmDwDwStatus    OBJECT-TYPE
+    SYNTAX  INTEGER {
+        online (1),
+        preferred (2),
+        error (3),
+        recover (4),
+        disabled (5),
+        cluster (6),
+        hotspare (7),
+        broken (8),
+        unknown (99)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Status of the DuplexWrite piece.
+                Possible values are:
+                ONLINE piece is working properly
+                PREFERRED piece is working properly, used for read operations
+                ERROR error occured during operation
+                RECOVER data of the piece is updated from the other
+                DISABLED operations on piece are stopped
+                CLUSTER piece reserved by other cluster node
+                HOTSPARE piece reserved as hotspare
+                BROKEN piece was replaced by hotspare
+                UNKNOWN none of the above"
+            ::= { fscDdmDwPiece 12 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.3.1.1.13.0
+fscDdmDwDwReason    OBJECT-TYPE
+    SYNTAX  INTEGER {
+        readfailed (1),
+        writefailed (2),
+        reservationconflict (3),
+        timeoutofsync (4),
+        hostoutofsync (5),
+        statusoutofsync (6),
+        user (7),
+        writeconfigfailed (8),
+        readconfigfailed (9),
+        recoverreadfailed (10),
+        recoverwritefailed (11),
+        splitmirror (12),
+        onlinepiecefailed (13),
+        snapshotinactivepiece (14),
+        onlinepieceforced (15),
+        pnpremove (16),
+        writeflag (17),
+        duplicatesignature (18),
+        signaturesarewrong (19),
+        bitmapcopied (20),
+        giveup (21),
+        splitbrain (22),
+        writeprotected (23),
+        piececonserved (24),
+        unknown (99)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Reason why a status was set for the DuplexWrite piece.
+                Possible values are:
+                READFAILED read error
+                WRITEFAILED write error
+                RESERVATIONCONFLICT piece disabled because of SCSI reservation problems
+                TIMEOUTOFSYNC piece disabled because timestamp was older than that of the other one
+                HOSTOUTOFSYNC piece disabled because of different hostnames in DuplexWrite key
+                STATUSOUTOFSYNC piece disabled because of ambiguous status
+                USER status set by user
+                WRITECONFIGFAILED COD could not be updated on disk
+                READCONFIGFAILED COD could not be reread
+                RECOVERREADFAILED data could not be read during recover process
+                RECOVERWRITEFAILED data could not be written during recover process
+                SPLITMIRROR piece disabled because second piece is configured but not accessible
+                ONLINEPIECEFAILED piece disabled because the other (online) piece failed during recover
+                SNAPSHOTINACTIVEPIECE piece disabled due to Snapshot
+                ONLINEPIECEFORCED the more recent piece was set to online during boot
+                PNPREMOVE PNP REMOVE request caused piece to be set to ERROR
+                WRITEFLAG data is inconsistent - COD could not be synced after last WRITE
+                DUPLICATESIGNATURE a duplicate signature was detected
+                SIGNATURESAREWRONG signatures of both pieces of the DuplexWrite group are not the same
+                BITMAPCOPIED piece was disabled after clone bitmap was copied to user
+                GIVEUP give up this piece
+                SPLITBRAIN disabled because a possible split brain situation was detected
+                WRITEPROTECED this piece was disabled because the media is write protected
+                PIECECONSERVED this piece is in status error, although it has the higher write counter - conserve it
+
+                UNKNOWN none of the above"
+            ::= { fscDdmDwPiece 13 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.3.1.1.14.0
+fscDdmDwDwActive    OBJECT-TYPE
+    SYNTAX  INTEGER {
+        on (1),
+        off (2),
+        unknown (99)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Active DuplexWrite piece for Snapshot.
+                Possible values are:
+                ON piece is an active piece for Snapshot
+                OFF piece is not an active piece for Snapshot
+                UNKNOWN none of the above"
+            ::= { fscDdmDwPiece 14 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.3.1.1.15.0
+fscDdmDwDwRecoverProgress   OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Percentage of the Recover progress of the DuplexWrite piece. If no Recover is running the value is 0."
+            ::= { fscDdmDwPiece 15 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.3.1.1.16.0
+fscDdmDwDwHidden    OBJECT-TYPE
+    SYNTAX  INTEGER {
+        on (1),
+        off (2),
+        unknown (99)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Hidden flag for DuplexWrite piece.
+                Possible values are:
+                ON piece is hidden from the operating system (not claimable)
+                OFF piece is not hidden
+                UNKNOWN none of the above"
+            ::= { fscDdmDwPiece 16 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.3.1.1.17.0
+fscDdmDwDwRecent    OBJECT-TYPE
+    SYNTAX  INTEGER {
+        on (1),
+        off (2),
+        unknown (99)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Recent flag for DuplexWrite piece. When no piece is Online the Recent flag indicates which piece was Online more recently.
+                Possible values are:
+                ON piece is the recent one
+                OFF piece is not the recent one
+                UNKNOWN none of the above"
+            ::= { fscDdmDwPiece 17 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.3.1.1.18.0
+fscDdmDwDwForced    OBJECT-TYPE
+    SYNTAX  INTEGER {
+        on (1),
+        off (2),
+        unknown (99)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Forced flag for DuplexWrite piece. This flag indicates that the driver forced this piece Online during boot although it was not shutdown in status Online.
+                Possible values are:
+                ON piece was forced ONLINE during boot
+                OFF piece was not forced ONLINE during boot
+                UNKNOWN none of the above"
+            ::= { fscDdmDwPiece 18 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.3.1.1.19.0
+fscDdmDwDwPieceCount    OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Number of configured pieces in the DuplexWrite group."
+            ::= { fscDdmDwPiece 19 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.3.1.1.20.0
+fscDdmDwDwPieceFound    OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Number of detected pieces in the DuplexWrite group"
+            ::= { fscDdmDwPiece 20 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.3.1.1.21.0
+fscDdmDwDwBalance   OBJECT-TYPE
+    SYNTAX  INTEGER {
+        on (1),
+        off (2),
+        unknown (99)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Dynamic Diskload Balancing state of the DuplexWrite group.
+                Possible values are:
+                ON Dynamic Diskload Balancing is turned on
+                OFF Dynamic Diskload Balancing is turned off
+                UNKNOWN none of the above"
+            ::= { fscDdmDwPiece 21 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.3.1.1.22.0
+fscDdmDwMpGroupNumber   OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Internal MultiPath group number of the DuplexWrite piece starting with 0."
+            ::= { fscDdmDwPiece 22 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.3.1.1.23.0
+fscDdmDwScPort      OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Real SCSI port number of the DuplexWrite piece."
+            ::= { fscDdmDwPiece 23 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.3.1.1.24.0
+fscDdmDwScPath      OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Real SCSI path number of the DuplexWrite piece."
+            ::= { fscDdmDwPiece 24 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.3.1.1.25.0
+fscDdmDwScTarget    OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Real SCSI target ID of the DuplexWrite piece."
+            ::= { fscDdmDwPiece 25 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.3.1.1.26.0
+fscDdmDwScLun       OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Real SCSI LUN of the DuplexWrite piece."
+            ::= { fscDdmDwPiece 26 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.3.1.1.27.0
+fscDdmDwScDiskNumber    OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Operating system assigned disk number of the DuplexWrite piece."
+            ::= { fscDdmDwPiece 27 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.3.1.1.28.0
+fscDdmDwScSize      OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Capacity of the DuplexWrite piece in MegaBytes."
+            ::= { fscDdmDwPiece 28 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.3.1.1.29.0
+fscDdmDwScSignature OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Operating system assigned unique key (signature) of the DuplexWrite piece.
+                If no signature is available the value is -1."
+            ::= { fscDdmDwPiece 29 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.3.1.1.30.0
+fscDdmDwScType      OBJECT-TYPE
+    SYNTAX  INTEGER {
+        disk (1),
+        tape (2),
+        printer (3),
+        processor (4),
+        worm (5),
+        cdrom (6),
+        scanner (7),
+        opticaldisk (8),
+        jukebox (9),
+        network (10),
+        unknown (99)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "The SCSI type of the DuplexWrite piece.
+                Possible values are:
+                DISK direct access device
+                TAPE tape device
+                PRINTER printer device
+                PROCESSOR processor device
+                WORM write once read multiple device
+                CDROM read only direct access device
+                SCANNER scanner device
+                OPTICALDISK optical device
+                JUKEBOX medium changer
+                NETWORK communication device
+                UNKNOWN none of the above"
+            ::= { fscDdmDwPiece 30 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.3.1.1.31.0
+fscDdmDwScInquiry   OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "SCSI inquiry string (vendor and product id) of the DuplexWrite piece."
+            ::= { fscDdmDwPiece 31 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.3.1.1.32.0
+fscDdmDwScResource  OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Cluster resource name of the DuplexWrite piece. Empty, if the piece is not a cluster resource."
+            ::= { fscDdmDwPiece 32 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.3.1.1.33.0
+fscDdmDwScNode      OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Cluster node name that owns the DuplexWrite piece. Empty, if the piece is not a cluster resource."
+            ::= { fscDdmDwPiece 33 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.3.1.1.34.0
+fscDdmDwScPciBus    OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "PCI location of the controller (bus number). -1 if the location cannot be detected."
+            ::= { fscDdmDwPiece 34 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.3.1.1.35.0
+fscDdmDwScPciDevice OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "PCI location of the controller (device number). -1 if the location cannot be detected."
+            ::= { fscDdmDwPiece 35 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.3.1.1.36.0
+fscDdmDwScPciFunction   OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "PCI location of the controller (function number). -1 if the location cannot be detected."
+            ::= { fscDdmDwPiece 36 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.3.1.1.37.0
+fscDdmDwScDriverName    OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Name of the driver that handles the controller."
+            ::= { fscDdmDwPiece 37 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.3.1.1.38.0
+fscDdmDwScDriverDescription OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Description of the driver that handles the controller. Empty, if no description is available."
+            ::= { fscDdmDwPiece 38 }
+
+
+-- **********************************************************************************************
+
+-- GROUP: fscDdmMPContainer
+--
+-- The DuplexDataManager SNMP agent's container for DuplexWrite info
+
+-- **********************************************************************************************
+
+
+fscDdmMpPieceTable  OBJECT-TYPE
+    SYNTAX  SEQUENCE OF FscDdmMpPiece
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION "Table of all paths MultiPath has detected."
+            ::= { fscDdmMPContainer 1}
+
+fscDdmMpPiece       OBJECT-TYPE
+    SYNTAX  FscDdmMpPiece
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION "Entry in table of MultiPath paths."
+    INDEX   { fscDdmMpIndex }
+            ::= { fscDdmMpPieceTable 1}
+
+FscDdmMpPiece       ::= SEQUENCE {
+        fscDdmMpIndex           INTEGER,
+        fscDdmMpMpPort          INTEGER,
+        fscDdmMpMpPath          INTEGER,
+        fscDdmMpMpTarget        INTEGER,
+        fscDdmMpMpLun           INTEGER,
+        fscDdmMpMpGroupNumber   INTEGER,
+        fscDdmMpMpAutoRecovery  INTEGER,
+        fscDdmMpMpAutoFailback  INTEGER,
+        fscDdmMpMpCabinetHandling   INTEGER,
+        fscDdmMpMpStatus        INTEGER,
+        fscDdmMpMpPreferred     INTEGER,
+        fscDdmMpDwName          DisplayString,
+        fscDdmMpDwGroupNumber   INTEGER,
+        fscDdmMpScPort          INTEGER,
+        fscDdmMpScPath          INTEGER,
+        fscDdmMpScTarget        INTEGER,
+        fscDdmMpScLun           INTEGER,
+        fscDdmMpScDiskNumber    INTEGER,
+        fscDdmMpScSize          INTEGER,
+        fscDdmMpScSignature     INTEGER,
+        fscDdmMpScType          INTEGER,
+        fscDdmMpScInquiry       DisplayString,
+        fscDdmMpScResource      DisplayString,
+        fscDdmMpScNode          DisplayString,
+        fscDdmMpScPciBus        INTEGER,
+        fscDdmMpScPciDevice     INTEGER,
+        fscDdmMpScPciFunction   INTEGER,
+        fscDdmMpScDriverName    DisplayString,
+        fscDdmMpScDriverDescription DisplayString
+    }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.4.1.1.1.0
+fscDdmMpIndex       OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Unique value for each MultiPath path, starts at 0 and
+                remains unchanged from one re-initialization of
+                the agent to the next. Only used as index."
+            ::= { fscDdmMpPiece 1 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.4.1.1.2.0
+fscDdmMpMpPort      OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Virtual SCSI port number of the MultiPath group."
+            ::= { fscDdmMpPiece 2 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.4.1.1.3.0
+fscDdmMpMpPath      OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Virtual SCSI path number of the MultiPath group."
+            ::= { fscDdmMpPiece 3 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.4.1.1.4.0
+fscDdmMpMpTarget    OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Virtual SCSI target ID of the MultiPath group."
+            ::= { fscDdmMpPiece 4 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.4.1.1.5.0
+fscDdmMpMpLun       OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Virtual SCSI LUN of the MultiPath group."
+            ::= { fscDdmMpPiece 5 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.4.1.1.6.0
+fscDdmMpMpGroupNumber   OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Internal group number of the MultiPath group."
+            ::= { fscDdmMpPiece 6 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.4.1.1.7.0
+fscDdmMpMpAutoRecovery  OBJECT-TYPE
+    SYNTAX  INTEGER {
+        on (1),
+        off (2),
+        unknown (99)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "AutoRecovery status of the MultiPath group.
+                When AutoRecovery is turned on a repaired connection returns into a MultiPath group as Active or Standby otherwise it remains in status Error.
+                Possible values are:
+                ON AutoRecovery is turned on
+                OFF AutoRecovery is turned off
+                UNKNOWN none of the above"
+            ::= { fscDdmMpPiece 7 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.4.1.1.8.0
+fscDdmMpMpAutoFailback  OBJECT-TYPE
+    SYNTAX  INTEGER {
+        on (1),
+        off (2),
+        unknown (99)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "AutoFailback status of the MultiPath group.
+                If AutoFailback is turned on a repaired connection returns into a MultiPath group in the state it was before the error occured.
+                Possible values are:
+                ON AutoFailback is turned on
+                OFF AutoFailback is turned off
+                UNKNOWN none of the above"
+            ::= { fscDdmMpPiece 8 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.4.1.1.9.0
+fscDdmMpMpCabinetHandling   OBJECT-TYPE
+    SYNTAX  INTEGER {
+        default (1),
+        clariion (2),
+        unknown (99)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Connected storage type. If this cannot be detected the value is UNKNOWN.
+                Possible values are:
+                DEFAULT S40, JBOD
+                CLARIION FibreCAT
+                UNKNOWN none of the above"
+            ::= { fscDdmMpPiece 9 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.4.1.1.10.0
+fscDdmMpMpStatus    OBJECT-TYPE
+    SYNTAX  INTEGER {
+        active (1),
+        standby (2),
+        error (3),
+        disabled (4),
+        unknown (99)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Status of the MultiPath path.
+                Possible values are:
+                ACTIVE the piece can accept I/Os. When LoadBalancing is off only one path of a MultiPath group can be active
+                STANDBY the path waits until an active path fails and takes over all I/Os then
+                ERROR the path failed due to an error
+                DISABLED the path is turned off - no I/O is possible
+                UNKNOWN none of the above"
+            ::= { fscDdmMpPiece 10 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.4.1.1.11.0
+fscDdmMpMpPreferred OBJECT-TYPE
+    SYNTAX  INTEGER {
+        on (1),
+        off (2),
+        unknown (99)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Flag which path of a MultiPath group will be active after an error situation is cleared.
+                This flag is only valid in case of AutoFailback.
+                Possible values are:
+                ON use the path as preferred MultiPath path
+                OFF not marked as the preferred MultiPath path
+                UNKNOWN none of the above"
+            ::= { fscDdmMpPiece 11 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.4.1.1.12.0
+fscDdmMpDwName      OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Name of the DuplexWrite group where the MultiPath group is piece of. Empty, if the MultiPath group is not a member of a DuplexWrite group."
+            ::= { fscDdmMpPiece 12 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.4.1.1.13.0
+fscDdmMpDwGroupNumber   OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Internal DuplexWrite group number where the MultiPath group is piece of. -1, if the MultiPath group is not a member of a DuplexWrite group."
+            ::= { fscDdmMpPiece 13 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.4.1.1.14.0
+fscDdmMpScPort      OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Real SCSI port number of the MultiPath path."
+            ::= { fscDdmMpPiece 14 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.4.1.1.15.0
+fscDdmMpScPath      OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Real SCSI path number of the MultiPath path."
+            ::= { fscDdmMpPiece 15 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.4.1.1.16.0
+fscDdmMpScTarget    OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Real SCSI target ID of the MultiPath path."
+            ::= { fscDdmMpPiece 16 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.4.1.1.17.0
+fscDdmMpScLun       OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Real SCSI LUN of the MultiPath path."
+            ::= { fscDdmMpPiece 17 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.4.1.1.18.0
+fscDdmMpScDiskNumber    OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Operating system assigned disk number of the MultiPath path."
+            ::= { fscDdmMpPiece 18 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.4.1.1.19.0
+fscDdmMpScSize      OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Capacity of the MultiPath path in MegaBytes."
+            ::= { fscDdmMpPiece 19 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.4.1.1.20.0
+fscDdmMpScSignature OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Operating system assigned unique key (signature) of the MultiPath path. If the signature cannot be detected or is not available the value is -1."
+            ::= { fscDdmMpPiece 20 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.4.1.1.21.0
+fscDdmMpScType      OBJECT-TYPE
+    SYNTAX  INTEGER {
+        disk (1),
+        tape (2),
+        printer (3),
+        processor (4),
+        worm (5),
+        cdrom (6),
+        scanner (7),
+        opticaldisk (8),
+        jukebox (9),
+        network (10),
+        unknown (11)
+    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "The SCSI type of the MultiPath path.
+                Possible values are:
+                DISK direct access device
+                TAPE tape device
+                PRINTER printer device
+                PROCESSOR processor device
+                WORM write once read multiple device
+                CDROM read only direct access device
+                SCANNER scanner device
+                OPTICALDISK optical device
+                JUKEBOX medium changer
+                NETWORK communication device
+                UNKNOWN none of the above or cannot be detected"
+            ::= { fscDdmMpPiece 21 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.4.1.1.22.0
+fscDdmMpScInquiry   OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "SCSI inquiry string (vendor and product id) of the MultiPath path."
+            ::= { fscDdmMpPiece 22 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.4.1.1.23.0
+fscDdmMpScResource  OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Cluster resource name of the MultiPath path. Empty, if the piece is not a cluster resource."
+            ::= { fscDdmMpPiece 23 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.4.1.1.24.0
+fscDdmMpScNode      OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Cluster node name that owns the MultiPath path. Empty, if the piece is not a cluster resource."
+            ::= { fscDdmMpPiece 24 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.4.1.1.25.0
+fscDdmMpScPciBus    OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "PCI location of the controller (bus number). -1 if the location cannot be detected."
+            ::= { fscDdmMpPiece 25 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.4.1.1.26.0
+fscDdmMpScPciDevice OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "PCI location of the controller (device number). -1 if the location cannot be detected."
+            ::= { fscDdmMpPiece 26 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.4.1.1.27.0
+fscDdmMpScPciFunction   OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "PCI location of the controller (function number). -1 if the location cannot be detected."
+            ::= { fscDdmMpPiece 27 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.4.1.1.28.0
+fscDdmMpScDriverName    OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Name of the driver that handles the controller."
+            ::= { fscDdmMpPiece 28 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.4.1.1.29.0
+fscDdmMpScDriverDescription OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION "Description of the driver that handles the controller. Empty, if no description is available."
+            ::= { fscDdmMpPiece 29 }
+
+
+-- **********************************************************************************************
+
+-- GROUP: fscDdmTrapInfo
+--
+-- The DuplexDataManager SNMP agent's traps
+
+-- **********************************************************************************************
+
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.10.1
+fscDdmTrapServerName        OBJECT-TYPE
+    SYNTAX  DisplayString
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION "Name of the server where the trap occured."
+            ::= { fscDdmTrapInfo 1 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.10.2
+fscDdmTrapTime      OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION "Time the trap occured (in seconds since 1/1/1970 00:00:00)."
+            ::= { fscDdmTrapInfo 2 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.10.3
+fscDdmTrapPort      OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION "Physical SCSI port number where the change occured."
+            ::= { fscDdmTrapInfo 3 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.10.4
+fscDdmTrapPath      OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION "Physical SCSI path number where the change occured."
+            ::= { fscDdmTrapInfo 4 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.10.5
+fscDdmTrapTarget    OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION "Physical SCSI target ID where the change occured."
+            ::= { fscDdmTrapInfo 5 }
+
+-- Oid: .1.3.6.1.4.1.231.2.10.2.2.9.10.6
+fscDdmTrapLun       OBJECT-TYPE
+    SYNTAX  INTEGER
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION "Physical SCSI LUN where the change occured."
+            ::= { fscDdmTrapInfo 6 }
+
+
+fscDdmNewConfig TRAP-TYPE
+    ENTERPRISE  sniServerMgmt
+    VARIABLES {
+        fscDdmTrapServerName,
+        fscDdmTrapTime,
+        fscDdmTrapPort,
+        fscDdmTrapPath,
+        fscDdmTrapTarget,
+        fscDdmTrapLun
+    }
+    DESCRIPTION     "The driver has created a new DuplexWrite group or has added a new piece to an existing DuplexWrite group as requested by the user."
+    --#TYPE         "DDM: New DuplexWrite configuration"
+    --#SUMMARY      "Configuration for DuplexWrite group %d/%d/%d/%d was created or updated on server %s."
+    --#ARGUMENTS    { 2, 3, 4, 5, 0 }
+    --#SEVERITY     INFORMATIONAL
+    --#TIMEINDEX    1
+    --#HELP         "None - normal behavior"
+    --#STATE        OPERATIONAL
+            ::= 1400
+
+fscDdmPieceRemoved  TRAP-TYPE
+    ENTERPRISE  sniServerMgmt
+    VARIABLES {
+        fscDdmTrapServerName,
+        fscDdmTrapTime,
+        fscDdmTrapPort,
+        fscDdmTrapPath,
+        fscDdmTrapTarget,
+        fscDdmTrapLun
+    }
+    DESCRIPTION     "The driver has removed a piece from a DuplexWrite group as requested by the user."
+    --#TYPE         "DDM: DuplexWrite piece removed"
+    --#SUMMARY      "DuplexWrite piece %d/%d/%d/%d was removed from group on server %s"
+    --#ARGUMENTS    { 2, 3, 4, 5, 0 }
+    --#SEVERITY     INFORMATIONAL
+    --#TIMEINDEX    1
+    --#HELP         "None - normal behavior"
+    --#STATE        OPERATIONAL
+            ::= 1401
+
+fscDdmConfigRemoved TRAP-TYPE
+    ENTERPRISE  sniServerMgmt
+    VARIABLES {
+        fscDdmTrapServerName,
+        fscDdmTrapTime,
+        fscDdmTrapPort,
+        fscDdmTrapPath,
+        fscDdmTrapTarget,
+        fscDdmTrapLun
+    }
+    DESCRIPTION     "The driver has removed a DuplexWrite group as requested by the user."
+    --#TYPE         "DDM: DuplexWrite configuration removed"
+    --#SUMMARY      "DuplexWrite group %d/%d/%d/%d was removed on server %s."
+    --#ARGUMENTS    { 2, 3, 4, 5, 0 }
+    --#SEVERITY     INFORMATIONAL
+    --#TIMEINDEX    1
+    --#HELP         "None - normal behavior"
+    --#STATE        OPERATIONAL
+            ::= 1402
+
+fscDdmStatusSet TRAP-TYPE
+    ENTERPRISE  sniServerMgmt
+    VARIABLES {
+        fscDdmTrapServerName,
+        fscDdmTrapTime,
+        fscDdmTrapPort,
+        fscDdmTrapPath,
+        fscDdmTrapTarget,
+        fscDdmTrapLun
+    }
+    DESCRIPTION     "The driver has set the status of a DuplexWrite piece as requested by the user."
+    --#TYPE         "DDM: DuplexWrite status changed"
+    --#SUMMARY      "Status of DuplexWrite piece %d/%d/%d/%d on server %s has changed (user request)."
+    --#ARGUMENTS    { 2, 3, 4, 5, 0 }
+    --#SEVERITY     MINOR
+    --#TIMEINDEX    1
+    --#HELP         "None - normal behavior"
+    --#STATE        OPERATIONAL
+            ::= 1403
+
+fscDdmUpdateStatus  TRAP-TYPE
+    ENTERPRISE  sniServerMgmt
+    VARIABLES {
+        fscDdmTrapServerName,
+        fscDdmTrapTime,
+        fscDdmTrapPort,
+        fscDdmTrapPath,
+        fscDdmTrapTarget,
+        fscDdmTrapLun
+    }
+    DESCRIPTION     "The driver has updated the status of a DuplexWrite piece."
+    --#TYPE         "DDM: DuplexWrite piece status updated"
+    --#SUMMARY      "Status of DuplexWrite piece %d/%d/%d/%d on server %s has changed (driver request)."
+    --#ARGUMENTS    { 2, 3, 4, 5, 0 }
+    --#SEVERITY     MINOR
+    --#TIMEINDEX    1
+    --#HELP         "None - normal behavior"
+    --#STATE        OPERATIONAL
+            ::= 1404
+
+fscDdmPieceRecovered    TRAP-TYPE
+    ENTERPRISE  sniServerMgmt
+    VARIABLES {
+        fscDdmTrapServerName,
+        fscDdmTrapTime,
+        fscDdmTrapPort,
+        fscDdmTrapPath,
+        fscDdmTrapTarget,
+        fscDdmTrapLun
+    }
+    DESCRIPTION     "The driver has successfully recovered a DuplexWrite group. Both pieces are ONLINE."
+    --#TYPE         "DDM: DuplexWrite piece recovered"
+    --#SUMMARY      "DuplexWrite piece %d/%d/%d/%d successfully recovered on server %s."
+    --#ARGUMENTS    { 2, 3, 4, 5, 0 }
+    --#SEVERITY     INFORMATIONAL
+    --#TIMEINDEX    1
+    --#HELP         "None - normal behavior"
+    --#STATE        OPERATIONAL
+            ::= 1405
+
+fscDdmRecoverAborted    TRAP-TYPE
+    ENTERPRISE  sniServerMgmt
+    VARIABLES {
+        fscDdmTrapServerName,
+        fscDdmTrapTime,
+        fscDdmTrapPort,
+        fscDdmTrapPath,
+        fscDdmTrapTarget,
+        fscDdmTrapLun
+    }
+    DESCRIPTION     "The driver has aborted the recover process of a DuplexWrite group as requested by the user."
+    --#TYPE         "DDM: Recover aborted"
+    --#SUMMARY      "DuplexWrite piece %d/%d/%d/%d aborted Recover process on server %s."
+    --#ARGUMENTS    { 2, 3, 4, 5, 0 }
+    --#SEVERITY     MINOR
+    --#TIMEINDEX    1
+    --#HELP         "None - normal behavior"
+    --#STATE        OPERATIONAL
+            ::= 1406
+
+fscDdmReservationConflict   TRAP-TYPE
+    ENTERPRISE  sniServerMgmt
+    VARIABLES {
+        fscDdmTrapServerName,
+        fscDdmTrapTime,
+        fscDdmTrapPort,
+        fscDdmTrapPath,
+        fscDdmTrapTarget,
+        fscDdmTrapLun
+    }
+    DESCRIPTION     "The driver has detected a reservation conflict. A whole DuplexWrite group is not accessible from now on. This is only an error if it happens during operation (not initialization) of the group and if the group is not on another cluster node."
+    --#TYPE         "DDM: Reservation conflict"
+    --#SUMMARY      "Reservation conflict occured on DuplexWrite group %d/%d/%d/%d on server %s - group is not accessible."
+    --#ARGUMENTS    { 2, 3, 4, 5, 0 }
+    --#SEVERITY     INFORMATIONAL
+    --#TIMEINDEX    1
+    --#HELP         "None - normal behavior"
+    --#STATE        OPERATIONAL
+            ::= 1407
+
+fscDdmConfigChanged TRAP-TYPE
+    ENTERPRISE  sniServerMgmt
+    VARIABLES {
+        fscDdmTrapServerName,
+        fscDdmTrapTime,
+        fscDdmTrapPort,
+        fscDdmTrapPath,
+        fscDdmTrapTarget,
+        fscDdmTrapLun
+    }
+    DESCRIPTION     "The driver has done a rescan/reread and found a new configuration."
+    --#TYPE         "DDM: DuplexWrite configuration changed"
+    --#SUMMARY      "DuplexWrite has found a new configuration on server %s."
+    --#ARGUMENTS    { 0 }
+    --#SEVERITY     INFORMATIONAL
+    --#TIMEINDEX    1
+    --#HELP         "None - normal behavior"
+    --#STATE        OPERATIONAL
+            ::= 1408
+
+fscDdmConfigInvalidated TRAP-TYPE
+    ENTERPRISE  sniServerMgmt
+    VARIABLES {
+        fscDdmTrapServerName,
+        fscDdmTrapTime,
+        fscDdmTrapPort,
+        fscDdmTrapPath,
+        fscDdmTrapTarget,
+        fscDdmTrapLun
+    }
+    DESCRIPTION     "The driver has invalidated the configuration information for a DuplexWrite group. The configuration information is reread before the next access of the DuplexWrite group on this cluster element."
+    --#TYPE         "DDM: DuplexWrite configuration invalidated"
+    --#SUMMARY      "Configuration information was invalidated for DuplexWrite group %d/%d/%d/%d on server %s."
+    --#ARGUMENTS    { 2, 3, 4, 5, 0 }
+    --#SEVERITY     INFORMATIONAL
+    --#TIMEINDEX    1
+    --#HELP         "None - normal behavior"
+    --#STATE        OPERATIONAL
+            ::= 1409
+
+fscDdmActiveLunChanged  TRAP-TYPE
+    ENTERPRISE  sniServerMgmt
+    VARIABLES {
+        fscDdmTrapServerName,
+        fscDdmTrapTime,
+        fscDdmTrapPort,
+        fscDdmTrapPath,
+        fscDdmTrapTarget,
+        fscDdmTrapLun
+    }
+    DESCRIPTION     "The driver has selected a specified piece of a DuplexWrite group for read commands."
+    --#TYPE         "DDM: Active DuplexWrite piece changed"
+    --#SUMMARY      "DuplexWrite piece %d/%d/%d/%d is used for read commands on server %s."
+    --#ARGUMENTS    { 2, 3, 4, 5, 0 }
+    --#SEVERITY     INFORMATIONAL
+    --#TIMEINDEX    1
+    --#HELP         "None - normal behavior"
+    --#STATE        OPERATIONAL
+            ::= 1410
+
+fscDdmPieceFailed   TRAP-TYPE
+    ENTERPRISE  sniServerMgmt
+    VARIABLES {
+        fscDdmTrapServerName,
+        fscDdmTrapTime,
+        fscDdmTrapPort,
+        fscDdmTrapPath,
+        fscDdmTrapTarget,
+        fscDdmTrapLun
+    }
+    DESCRIPTION     "The driver has detected an error on a DuplexWrite piece."
+    --#TYPE         "DDM: DuplexWrite piece failed"
+    --#SUMMARY      "DuplexWrite piece %d/%d/%d/%d failed on server %s."
+    --#ARGUMENTS    { 2, 3, 4, 5, 0 }
+    --#SEVERITY     CRITICAL
+    --#TIMEINDEX    1
+    --#HELP         "Examine the event details to get the reason for this error.\nIf the reason is some kind of read or write error, and this error occured more than one or two times, you should replace the disk.\nIn other cases or after replacing the disk recover the error device."
+    --#STATE        DEGRADED
+            ::= 1411
+
+fscDdmRootFlagChanged   TRAP-TYPE
+    ENTERPRISE  sniServerMgmt
+    VARIABLES {
+        fscDdmTrapServerName,
+        fscDdmTrapTime,
+        fscDdmTrapPort,
+        fscDdmTrapPath,
+        fscDdmTrapTarget,
+        fscDdmTrapLun
+    }
+    DESCRIPTION     "The driver has changed the root behavior of a DuplexWrite group."
+    --#TYPE         "DDM: RootDisk flag changed"
+    --#SUMMARY      "RootDisk flag changed on DuplexWrite group %d/%d/%d/%d on server %s."
+    --#ARGUMENTS    { 2, 3, 4, 5, 0 }
+    --#SEVERITY     INFORMATIONAL
+    --#TIMEINDEX    1
+    --#HELP         "None - normal behavior"
+    --#STATE        OPERATIONAL
+            ::= 1412
+
+fscDdmForceActive   TRAP-TYPE
+    ENTERPRISE  sniServerMgmt
+    VARIABLES {
+        fscDdmTrapServerName,
+        fscDdmTrapTime,
+        fscDdmTrapPort,
+        fscDdmTrapPath,
+        fscDdmTrapTarget,
+        fscDdmTrapLun
+    }
+    DESCRIPTION     "The driver has marked a disk of a DuplexWrite group forced active at next boot. The partner disk can be used as Snapshot."
+    --#TYPE         "DDM: DuplexWrite piece forced active"
+    --#SUMMARY      "DuplexWrite piece %d/%d/%d/%d marked forced active on server %s (Snapshot)."
+    --#ARGUMENTS    { 2, 3, 4, 5, 0 }
+    --#SEVERITY     INFORMATIONAL
+    --#TIMEINDEX    1
+    --#HELP         "None - normal behavior"
+    --#STATE        OPERATIONAL
+            ::= 1413
+
+fscDdmNameChanged   TRAP-TYPE
+    ENTERPRISE  sniServerMgmt
+    VARIABLES {
+        fscDdmTrapServerName,
+        fscDdmTrapTime,
+        fscDdmTrapPort,
+        fscDdmTrapPath,
+        fscDdmTrapTarget,
+        fscDdmTrapLun
+    }
+    DESCRIPTION     "The driver has changed the name of a DuplexWrite group."
+    --#TYPE         "DDM: DuplexWrite group name changed"
+    --#SUMMARY      "Name of DuplexWrite group %d/%d/%d/%d has changed on server %s."
+    --#ARGUMENTS    { 2, 3, 4, 5, 0 }
+    --#SEVERITY     INFORMATIONAL
+    --#TIMEINDEX    1
+    --#HELP         "None - normal behavior"
+    --#STATE        OPERATIONAL
+            ::= 1414
+
+fscDdmPathFailed    TRAP-TYPE
+    ENTERPRISE  sniServerMgmt
+    VARIABLES {
+        fscDdmTrapServerName,
+        fscDdmTrapTime,
+        fscDdmTrapPort,
+        fscDdmTrapPath,
+        fscDdmTrapTarget,
+        fscDdmTrapLun
+    }
+    DESCRIPTION     "The driver has detected an error on one path of a MultiPath group."
+    --#TYPE         "DDM/MP/MPIO: MultiPath path failed"
+    --#SUMMARY      "MultiPath path %d/%d/%d/%d failed on server %s."
+    --#ARGUMENTS    { 2, 3, 4, 5, 0 }
+    --#SEVERITY     CRITICAL
+    --#TIMEINDEX    1
+    --#HELP         "Check fibre channel cabling, external storage, fibre channel switch and host bus adapter to find the reason."
+    --#STATE        DEGRADED
+            ::= 1415
+
+fscDdmRetry TRAP-TYPE
+    ENTERPRISE  sniServerMgmt
+    VARIABLES {
+        fscDdmTrapServerName,
+        fscDdmTrapTime,
+        fscDdmTrapPort,
+        fscDdmTrapPath,
+        fscDdmTrapTarget,
+        fscDdmTrapLun
+    }
+    DESCRIPTION     "The driver has detected an error on one path of a MultiPath group and the retry of the command was successful on another path."
+    --#TYPE         "MPIO: MultiPath path retried"
+    --#SUMMARY      "MultiPath path %d/%d/%d/%d failed on server %s - retry successful on other port."
+    --#ARGUMENTS    { 2, 3, 4, 5, 0 }
+    --#SEVERITY     MAJOR
+    --#TIMEINDEX    1
+    --#HELP         "Check fibre channel cabling, external storage, fibre channel switch and host bus adapter to find the reason."
+    --#STATE        OPERATIONAL
+            ::= 1416
+
+fscDdmActivePortChanged TRAP-TYPE
+    ENTERPRISE  sniServerMgmt
+    VARIABLES {
+        fscDdmTrapServerName,
+        fscDdmTrapTime,
+        fscDdmTrapPort,
+        fscDdmTrapPath,
+        fscDdmTrapTarget,
+        fscDdmTrapLun
+    }
+    DESCRIPTION     "The driver has changed the active path of a MultiPath group."
+    --#TYPE         "DDM/MP/MPIO: Active MultiPath path changed"
+    --#SUMMARY      "MultiPath path %d/%d/%d/%d is active on server %s."
+    --#ARGUMENTS    { 2, 3, 4, 5, 0 }
+    --#SEVERITY     INFORMATIONAL
+    --#TIMEINDEX    1
+    --#HELP         "None - normal behavior"
+    --#STATE        OPERATIONAL
+            ::= 1417
+
+fscDdmReconfigured  TRAP-TYPE
+    ENTERPRISE  sniServerMgmt
+    VARIABLES {
+        fscDdmTrapServerName,
+        fscDdmTrapTime,
+        fscDdmTrapPort,
+        fscDdmTrapPath,
+        fscDdmTrapTarget,
+        fscDdmTrapLun
+    }
+    DESCRIPTION     "The driver has detected a MultiPath configuration change."
+    --#TYPE         "MPIO: MultiPath reconfigured"
+    --#SUMMARY      "MultiPath configuration changed on server %s."
+    --#ARGUMENTS    { 0 }
+    --#SEVERITY     INFORMATIONAL
+    --#TIMEINDEX    1
+    --#HELP         "None - normal behavior"
+    --#STATE        OPERATIONAL
+            ::= 1418
+
+fscDdmStatusChanged TRAP-TYPE
+    ENTERPRISE  sniServerMgmt
+    VARIABLES {
+        fscDdmTrapServerName,
+        fscDdmTrapTime,
+        fscDdmTrapPort,
+        fscDdmTrapPath,
+        fscDdmTrapTarget,
+        fscDdmTrapLun
+    }
+    DESCRIPTION     "The MultiPath status has changed.\nThe user has activated, disabled, ... the MultiPath path, or changed the failover policy.\nThe path has changed as request of MultiPath AutoBalance."
+    --#TYPE         "DDM/MP/MPIO: MultiPath status changed"
+    --#SUMMARY      "Status of MultiPath path %d/%d/%d/%d has changed on server %s."
+    --#ARGUMENTS    { 2, 3, 4, 5, 0 }
+    --#SEVERITY     INFORMATIONAL
+    --#TIMEINDEX    1
+    --#HELP         "None - normal behavior"
+    --#STATE        OPERATIONAL
+            ::= 1419
+
+fscDdmAutoRecovered TRAP-TYPE
+    ENTERPRISE  sniServerMgmt
+    VARIABLES {
+        fscDdmTrapServerName,
+        fscDdmTrapTime,
+        fscDdmTrapPort,
+        fscDdmTrapPath,
+        fscDdmTrapTarget,
+        fscDdmTrapLun
+    }
+    DESCRIPTION     "The driver has enabled a path of a MultiPath group (AutoRecovery)."
+    --#TYPE         "DDM/MP: MultiPath path AutoRecovered"
+    --#SUMMARY      "MultiPath path %d/%d/%d/%d automatically recovered on server %s."
+    --#ARGUMENTS    { 2, 3, 4, 5, 0 }
+    --#SEVERITY     INFORMATIONAL
+    --#TIMEINDEX    1
+    --#HELP         "None - normal behavior"
+    --#STATE        OPERATIONAL
+            ::= 1420
+
+fscDdmErrorCleared  TRAP-TYPE
+    ENTERPRISE  sniServerMgmt
+    VARIABLES {
+        fscDdmTrapServerName,
+        fscDdmTrapTime,
+        fscDdmTrapPort,
+        fscDdmTrapPath,
+        fscDdmTrapTarget,
+        fscDdmTrapLun
+    }
+    DESCRIPTION     "The error of MultiPath path is cleared and reused (AutoFailback)."
+    --#TYPE         "MPIO: MultiPath path error cleared"
+    --#SUMMARY      "Error cleared on MultiPath path %d/%d/%d/%d on server %s."
+    --#ARGUMENTS    { 2, 3, 4, 5, 0 }
+    --#SEVERITY     INFORMATIONAL
+    --#TIMEINDEX    1
+    --#HELP         "None - normal behavior"
+    --#STATE        OPERATIONAL
+            ::= 1421
+
+fscDdmPnPRemove     TRAP-TYPE
+    ENTERPRISE  sniServerMgmt
+    VARIABLES {
+        fscDdmTrapServerName,
+        fscDdmTrapTime,
+        fscDdmTrapPort,
+        fscDdmTrapPath,
+        fscDdmTrapTarget,
+        fscDdmTrapLun
+    }
+    DESCRIPTION     "A Plug and Play Removal of an device was detected."
+    --#TYPE         "DDM/MP/MPIO: Plug and Play Removal"
+    --#SUMMARY      "Plug and Play Removal occured on server %s."
+    --#ARGUMENTS    { 0 }
+    --#SEVERITY     INFORMATIONAL
+    --#TIMEINDEX    1
+    --#HELP         "Please check the configuration for a missing device."
+    --#STATE        OPERATIONAL
+            ::= 1422
+
+fscDdmPnPNew        TRAP-TYPE
+    ENTERPRISE  sniServerMgmt
+    VARIABLES {
+        fscDdmTrapServerName,
+        fscDdmTrapTime,
+        fscDdmTrapPort,
+        fscDdmTrapPath,
+        fscDdmTrapTarget,
+        fscDdmTrapLun
+    }
+    DESCRIPTION     "A Plug and Play Add of an device was detected."
+    --#TYPE         "DDM/MP/MPIO: Plug and Play Add"
+    --#SUMMARY      "Plug and Play Add occured on server %s."
+    --#ARGUMENTS    { 0 }
+    --#SEVERITY     INFORMATIONAL
+    --#TIMEINDEX    1
+    --#HELP         "Please check the configuration for a new device."
+    --#STATE        OPERATIONAL
+            ::= 1423
+
+fscDdmCluster       TRAP-TYPE
+    ENTERPRISE  sniServerMgmt
+    VARIABLES {
+        fscDdmTrapServerName,
+        fscDdmTrapTime,
+        fscDdmTrapPort,
+        fscDdmTrapPath,
+        fscDdmTrapTarget,
+        fscDdmTrapLun
+    }
+    DESCRIPTION     "The DuplexDataManager service has detected a cluster configuration change."
+    --#TYPE         "DDM/MP: Cluster configuration changed"
+    --#SUMMARY      "Cluster configuration changed on server %s."
+    --#ARGUMENTS    { 0 }
+    --#SEVERITY     INFORMATIONAL
+    --#TIMEINDEX    1
+    --#HELP         "Please check the configuration."
+    --#STATE        OPERATIONAL
+            ::= 1424
+
+
+END

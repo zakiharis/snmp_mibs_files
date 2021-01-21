@@ -1,0 +1,6480 @@
+
+-- LAST-UPDATED "200206260000Z"
+-- *****************************************************************
+-- CISCO MGX82XX TRAPS MIB - MIB File Containing Traps supported in
+-- MGX8220, MGX8850.
+--
+-- August 2000, Subra Hegde
+--
+-- Copyright (c) 2000 by cisco Systems, Inc.
+-- All rights reserved.
+-- *****************************************************************
+
+CISCO-MGX82XX-TRAPS-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+        lastSequenceNumber              FROM RTM-MIB
+        shelfNodeName, shelfNum,
+        shelfIntegratedAlarm,
+        shelfSlotNum,
+        userName,
+        redPrimarySlotNum,
+        redPrimaryType,
+        redPrimaryState,
+        redSecondarySlotNum,
+        redSecondaryType,
+	redType,
+        redSecondaryState,
+	shelfFilteredAlarm
+        
+		                        FROM BASIS-SHELF-MIB
+        moduleSlotNumber,
+        moduleTrapAlarmSeverity,
+        functionModuleState,
+        functionModuleResetReason,
+        functionModuleType,
+        lineModuleState,
+        lineModuleType,
+        configChangeObjectIndex,
+	configChangeParentObjectIndex,
+	configChangeGrandParentObjectIndex,
+	configChangeSMSpecificObject,
+	configChangeStatus,
+	secLineModuleState,
+	secLineModuleType,
+	configChangeTypeBitMap
+                         		FROM BASIS-GENERIC-MIB
+        genericTimeStamp,
+        genericLineNum,
+        genericLineType		        FROM GENERICOBJECT-MIB
+        sonetLineNum,
+        sonetLineType,
+        cwSonetLineCurrentStatus,
+        sonetSectionStatAlarmStatus,
+        apsProtectionSlot,
+	apsProtectionLine,
+	apsActiveLine,
+	apsWorkingSlot,
+	apsWorkingLine,
+	apsCardFailureCode,
+	sonetLineStatAlarmStatus,
+        apsLineFailureCode,
+	apsLineSwReason,
+	apsLineSwFailureCode,
+	apsStandbyLineFailureCode,
+	sonetPathStatAlarmStatus 
+-- added for xmt clock source change and loss traps
+        ,
+        sonetLineXmtClkSrc
+-- end of added
+					FROM CISCO-MGX82XX-SONET-MIB
+        
+        dsx3LineNum,
+        cwDsx3LineType,
+        dsx3LineAlarmState,
+        dsx3PlcpLineAlarmState, 
+        dsx3PlcpLineStatisticalAlarmState, 
+        dsx3LineStatisticalAlarmState,
+        dsx3LineEnable,
+        dsx3LineXmtFEACCode,
+        dsx3FarEndLoopbkLineNum,
+        dsx3NearEndLoopbkLineStatus,
+	dsx3LineXmtClockSrc
+        
+
+   				FROM CISCO-MGX82XX-DSX3-MIB
+        
+   
+        lineNum,
+        lineType,
+	lineStatisticalAlarmState,
+	almlineNum,
+	lineImaAlarmState,
+	axisImaLinkNeRxFailureStatus,
+	tCAlarmState,
+	almImaGrpNum,
+        lineAlarmState			FROM CISCO-MGX82XX-DSX1-MIB
+
+
+	rasDskStatus,
+	crptdPRIfiles,
+	crptdFWfiles,
+	numBadSectors		FROM BASIS-RAS-DISK-MIB
+
+        portState,
+        portSignallingState,
+        portDs0ConfigBitMap,
+        portNum,
+        x21portNum,
+        x21LineNum,
+        x21LineType,
+        chanNum,
+        dLCI,
+        chanStatusBitMap,
+	asmPhysicalAlarmState,
+        asmAlarmUnitNum,
+        x21LineAlarmState,
+        bertSlotNumber,
+        bertPort,
+        bertLine,
+        bertTestMedium,
+        bertAbortReason,
+        srmT3LineNum,
+        srmStartT1LineNum,
+        srmTargetSlotNum,
+        srmTargetSlotLineNum,
+-- added for srme link trap
+        srmeLineNum,
+        srmeStartVtNum,
+        srmeTargetSlotNum,
+        srmeTargetSlotLineNum,
+        srmeVtFramingType,
+-- end of srme link trap
+	cardOversubscribed,
+	cardIngrPercentUtil,
+	portOversubscribed,
+	portIngrPercentUtil,
+	portEgrPercentUtil,
+	bertStatus,
+	cardLcnPartitionType,
+	chanPacketNumber,
+	chanOAMstatus32,
+	chanOAMstatus64,
+	chanOAMstatus96,
+	chanOAMstatus128,
+	chanOAMstatus160,
+	chanOAMstatus192,
+	chanOAMstatus224,
+	chanOAMstatus256,
+	listLinksPresentInImaGroup,
+	imaPortState,
+	imaStatePortNum,
+	imaObsDiffDelay,
+	currentClockSource,
+	primaryClockSource,
+	secondaryClockSource,
+	imatmdsx3PortIndex,
+	imatmDsx3SingleBitErrCorrEnable,
+	axisImaGroupFailureStatus,
+	listOfLinksInImaGrp,
+	axisImaGroupTxAvailCellRate,
+	axisImaGroupRxAvailCellRate,
+	ausmPortNum,
+	ausmPortState,
+	ausmInterfacePortNum,
+	ausmInterfaceMyNeighborIpAddress,
+	ausmSignallingProtocolType,
+	ausmChanPortNum,
+	ausmChanNum,
+	chanVpi,
+	chanVci,
+	chanConnType,
+	ausmChanStatusBitMap,
+	cesCnfChanNum,
+	cesChanPortNum,
+	cesPortNum,
+	cesChanRowStatus,
+	cesPortDs0ConfigBitMap,
+	cesChanStatusBitMap,
+	pxmCurrentClock,
+	pxmPreviousClock,
+	pxmPrimaryMuxClockSource,
+	pxmPrimaryInbandClockSourceLineNumber,
+	pxmPrimarySMClockSourceSlotNumber,
+	pxmSecondaryMuxClockSource,
+	pxmSecondaryInbandClockSourceLineNumber,
+	pxmSecondarySMClockSourceSlotNumber,
+	pxmExtClockPresent,
+	pxmExtClkSrcImpedance,
+	pxmExtClkConnectorType,
+	pxmClkStratumLevel,
+	pxmClkErrReason,
+	pxmExtClock2Present,
+	pxmExtClk2SrcImpedance,
+	pxmExtClk2ConnectorType,
+	atmLineCnfNum,
+	atmLineInterfaceFormat,
+	imaPortNum,
+	bbIfLineNum,
+	bbIfNum,
+	bbIfState,
+	bbRscPartCtrlrNum,
+	bbIfRscPrtRowStatus,
+	bbChanIfNum,
+	bbChanCnfNum,
+	bbChanVpi,
+	bbChanVci,
+	bbChanConnType,
+	rpmPortInterface,
+	rpmPortSubInterface,
+	rpmChanInterface,
+	rpmChanNum,
+	rpmChanVpi,
+	rpmChanVci,
+	parSnNodeId,
+	parSnNodeAlarmStatus,
+	parTrkId,
+	parSnNodeName,
+	parTrkLocalSlotNumber,
+	parTrkLocalPortNumber,
+	parTrkLocalVTrunkId,
+	parTrkRemoteNodeId,
+	parTrkRemoteTrunkId,
+	parTrkRemoteSlotNumber,
+	parTrkRemotePortNumber,
+	parTrkRemoteVTrunkId,
+	parTrkRemoteNodeIP,
+	parTrkRemoteNodeType,
+	parTrkRemoteNodeName,
+	parTrkAlarmStatus,
+	parTrkAlarmType,
+	parSnNodeIP,
+	parIfLogicalInterface,
+	parTrkStatReserve,
+	parTrkCnfgCcRestrict,
+	parTrkCnfgLineType,
+	parTrkCnfgPassSync,
+	parTrkCnfgDerouteDelay,
+	parTrkCnfgTrafficClassFst,
+	parTrkCnfgTrafficClassFr,
+	parTrkCnfgTrafficClassNts,
+	parTrkCnfgTrafficClassTs,
+	parTrkCnfgTrafficClassVoice,
+	parTrkCnfgTrafficClassCbr,
+	parTrkCnfgTrafficClassVbr,
+	parTrkCnfgTrafficClassAbr,
+	parTrkCnfgRoutingCost,
+	parConnLocalSlot,
+	parConnLocalPort,
+	parConnLocalVpi,
+	parConnLocalVci,
+	parConnLocalVcIndx,
+	parConnAdminStatus,
+	parConnRemoteNodeName,
+	parConnRemoteSlot,
+	parConnRemotePort,
+	parConnRemoteVpi,
+	parConnRemoteVci,
+	currentClock,
+	bnmLineInterfaceFormat,
+	diagType,
+	diagResult,
+	diagTestId,
+	ausmChanRowStatus,
+	vismIpAddress,
+	vismCnfChanNum,
+        vismChanPortNum,
+	vismPortNum,
+        vismPortDs0ConfigBitMap,
+        vismPortType,
+	vismPortState,
+	vismChanActivityState,
+	vismChanLockingState,
+	vismCasVariantName,
+        vismCasFileName,
+        vismCasVariantState,
+	vismChanNum,
+        networkCacConfigState,
+	vismFeatureBitMap,
+	vismConfigChangeTypeBitMap,
+	vismTrapIntIndex1,
+        vismTrapIntIndex2,
+        vismTrapStrIndex1,
+	vismAppliedTemplate,
+	vismAal2SubcellMuxing,
+	vismAal2CidState,
+	vismAal2CidFailReason,
+	vismMode,
+	vismAal2CidNum,
+	vismAal2CidLcn,
+	vismHdlcChanNum,
+	vismChanRowStatus,
+	vismChanReroute,
+        vismChanStatusBitMap,
+	
+	chanRowStatus
+		
+
+	
+
+
+        		FROM CISCO-WAN-AXIPOP-MIB
+	basis	         		FROM BASIS-MIB
+
+	TRAP-TYPE                           FROM RFC-1215;
+
+-- -----------------------------------------------------------------
+--
+--
+-- This file contains the SNMP TRAPS common to AXIS and MGX
+--
+--
+--
+--
+-- -----------------------------------------------------------------
+-- TO ADD 1) FUNCTION_MODULE_RESET_REASON
+--
+shelRestartTrap    TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       { 
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         functionModuleResetReason
+                        }
+        DESCRIPTION
+                "Shelf restart with reset reason
+                "
+        ::= 50001
+
+-- #define FUNCTION_MODULE_REMOVE_TRAP  BASIS_TRAPS+2
+		 
+functionModuleRemovedTrap    TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       { 
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         functionModuleState,
+                         functionModuleType
+                        }
+        DESCRIPTION
+                "Indicates that a function module has been 
+  		removed. This includes SRM removal.
+                "
+        ::= 50002
+
+-- #define FUNCTION_MODULE_INSERT_TRAP  BASIS_TRAPS+3
+
+functionModuleInsertedTrap    TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       { 
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         functionModuleState,
+                         functionModuleType
+                        }
+        DESCRIPTION
+                "Indicates that a function module has been 
+  		inserted. This includes SRM insertion.
+                "
+        ::= 50003
+
+-- #define FUNCTION_MODULE_SWITCH_TRAP  BASIS_TRAPS+4
+		 
+functionModuleSwitchoverTrap    TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       { 
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         functionModuleState,
+                         functionModuleType
+                        }
+        DESCRIPTION
+                "Indicates that a function module has changed  
+  		state from standby to active or vice versa
+                "
+        ::= 50004
+
+-- #define FUNCTION_MODULE_ACTIVE_TRAP  BASIS_TRAPS+5
+
+		 
+functionModuleActiveTrap    TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       { 
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         functionModuleState,
+                         functionModuleType
+                        }
+        DESCRIPTION
+                "Indicates that a function module is 
+  		operational
+                "
+        ::= 50005
+
+-- #define FUNCTION_MODULE_FAILED_TRAP  BASIS_TRAPS+6
+
+functionModuleFailedTrap    TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       { 
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         functionModuleState,
+                         functionModuleType
+                        }
+        DESCRIPTION
+                "Indicates that a function module is 
+  		inoperational
+                "
+        ::= 50006
+
+functionModuleMismatchTrap    TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       { 
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         functionModuleState,
+                         functionModuleType
+                        }
+        DESCRIPTION
+                "Informational alarm generated due to
+		a) different front card inserted
+		b) same front card with a different feature
+		list is inserted
+                "
+        ::= 50007
+
+-- #define SELF_TEST_RESULT             BASIS_TRAPS+8
+functionModuleSlefTestFailedTrap    TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       { 
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         functionModuleState,
+                         functionModuleType
+                        }
+        DESCRIPTION
+                "Indicates that a function module self 
+  		test failed. Not generated when self test passes
+                "
+        ::= 50008
+
+-- #define FUNCTION_MODULE_STANDBY_TRAP BASIS_TRAPS+9 X
+
+functionModuleStandbyTrap    TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       { 
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         functionModuleState,
+                         functionModuleType
+                        }
+        DESCRIPTION
+                "Indicates that a function module is 
+  		in standby state
+                "
+        ::= 50009
+
+lineModuleRemovedTrap  TRAP-TYPE
+         ENTERPRISE   basis
+         VARIABLES    {
+                       lastSequenceNumber,
+                       shelfNodeName,
+                       shelfNum,
+                       moduleSlotNumber,
+                       moduleTrapAlarmSeverity,
+                       lineModuleState,
+                       lineModuleType
+                      }
+      DESCRIPTION
+              "Indicates whether or not a particular line
+	       line module has been removed
+              "
+         ::= 50030
+
+lineModuleInsertedTrap  TRAP-TYPE
+         ENTERPRISE   basis
+         VARIABLES    {
+                       lastSequenceNumber,
+                       shelfNodeName,
+                       shelfNum,
+                       moduleSlotNumber,
+                       moduleTrapAlarmSeverity,
+                       lineModuleState,
+                       lineModuleType
+                      }
+      DESCRIPTION
+              "Indicates whether or not a particular line
+	       line module has been inserted
+              "
+         ::= 50031
+
+lineModuleMismatchTrap  TRAP-TYPE
+         ENTERPRISE   basis
+         VARIABLES    {
+                       lastSequenceNumber,
+                       shelfNodeName,
+                       shelfNum,
+                       moduleSlotNumber,
+                       moduleTrapAlarmSeverity,
+                       lineModuleType,
+                       functionModuleType
+                      }
+      DESCRIPTION
+              "Indicates that the front card 
+	       does not support the line module.
+              "
+         ::= 50032
+
+
+-- ------------------------------------------------------------------
+--
+-- TRAPS for the Core Card 
+--
+-- ------------------------------------------------------------------
+
+coreCardSwitchTrap      TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       { 
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         functionModuleState,
+                         functionModuleType
+                        }
+ 
+        DESCRIPTION
+                "The standby cards have become active, due
+                 to the failure of the active cards.  The
+                 log in the card, shows the reason
+                 the cards are ASC and BNM.
+                "
+        ::= 50000
+
+
+coreCardSwitchInProgress      TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       { 
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         functionModuleType,
+                         genericTimeStamp
+                        }
+ 
+        DESCRIPTION
+                "This indicates that the switchcc process is 
+                 in progress, that all the initial checks for 
+                 switchcc to happen were successful.
+                "
+        ::= 50064
+
+coreCardSwitchBlocked      TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       { 
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         functionModuleType,
+                         genericTimeStamp
+                        }
+ 
+        DESCRIPTION
+                "This indicates that the switchcc process cannot
+                 happen due to the checks failing. Hence a switchcc
+                 blocked trap is being sent . more like a failure trap
+                "
+        ::= 50065
+ 
+coreCardsConfigMismatchTrap TRAP-TYPE
+	ENTERPRISE	basis
+	VARIABLES	{
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+			 shelfSlotNum,
+			 functionModuleType
+			}
+        DESCRIPTION
+                "Mismatch between the core card configuration and 
+	  	 the physical core cards in the system, e.g., if
+		 ASC card has configuration for a BNM-T3 card but 
+		 a BNM-E3 card is plugged in.
+                "
+	::= 50040
+
+coreCardsPeerMismatchTrap TRAP-TYPE
+	ENTERPRISE	basis
+	VARIABLES	{
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+			 shelfSlotNum,
+			 functionModuleType
+			}
+        DESCRIPTION
+                "Mismatch between two core card sets, e.g., one set
+		 has BNM-T3 but another set has BNM-E3.
+                "
+	::= 50041
+
+
+coreCardsConfigClearTrap TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         functionModuleType
+                        }
+ 
+        DESCRIPTION
+                "Sent when the config is cleared.
+                "
+        ::= 50042
+
+
+cardResPartTypeChangeTrap  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         functionModuleType,
+                         genericTimeStamp,
+                         cardLcnPartitionType
+                        }
+        DESCRIPTION
+                 "
+                  This trap is sent out when the resource partition
+                  type is changed. The possible changes for
+                  cardLcnPartitionType are:
+                        1: no partition,
+                        2: controller based,
+                        3: port controller based
+                 "
+        ::= 50033
+ 
+
+-- ------------------------------------------------------------------------------------------------------
+--
+--
+--    BNM TRAPS
+--
+-- ------------------------------------------------------------------------------------------------------
+
+bnmTemperatureNormalTrap	TRAP-TYPE
+        	ENTERPRISE      basis
+        	VARIABLES       {
+ 	        	         lastSequenceNumber,
+        	                 shelfNodeName,
+         	                 shelfNum,
+         	                 moduleSlotNumber,
+          	                 moduleTrapAlarmSeverity,
+          	                 asmPhysicalAlarmState
+          	                }
+        	DESCRIPTION
+         	       "Indicates the temperature is within  the normal
+			range
+          	      "
+        	::= 50010
+
+bnmTemperatureAboveNormalTrap 	TRAP-TYPE
+        	ENTERPRISE      basis
+        	VARIABLES       {
+         	                 lastSequenceNumber,
+        	                 shelfNodeName,
+         	                 shelfNum,
+         	                 moduleSlotNumber,
+          	                 moduleTrapAlarmSeverity,
+          	                 asmPhysicalAlarmState
+          	                }
+        	 DESCRIPTION
+         	       "Indicates the temperature has exceeded the
+			 upper limit of its normal range
+          	      "
+        	::= 50011
+
+bnmDclevelNormalTrap	TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         asmPhysicalAlarmState,
+	                 asmAlarmUnitNum
+                        }
+        DESCRIPTION
+                "Indicates that the shelf is 
+                 within its normal DC level
+                "
+        ::= 50012
+
+bnmDclevelBelowNormalTrap	TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         asmPhysicalAlarmState,
+	                 asmAlarmUnitNum
+                        }
+        DESCRIPTION
+                "Indicates that the shelf is DC level
+                 below the normal DC level
+                "
+        ::= 50013
+
+bnmPowersupplyNormalTrap  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         asmPhysicalAlarmState,
+                         asmAlarmUnitNum
+                        }
+        DESCRIPTION
+                "Indicates the shelfs power supply status is normal
+                "
+        ::= 50014
+
+bnmPowersupplyFailedTrap  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         asmPhysicalAlarmState,
+                         asmAlarmUnitNum
+                        }
+        DESCRIPTION
+                "Indicates the shelfs power supply status has Failed
+                "
+        ::= 50015
+
+
+bnmFanrpmNormalTrap       TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         asmPhysicalAlarmState,
+                         asmAlarmUnitNum
+                        }
+        DESCRIPTION
+                "Indicates that a particular fan's RPM Normal
+                "
+        ::= 50016
+
+bnmFanrpmBelowNormalTrap       TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         asmPhysicalAlarmState,
+                         asmAlarmUnitNum
+                        }
+        DESCRIPTION
+                "Indicates that a particular fan's RPM below
+		Normal
+                "
+        ::= 50017
+
+shelfIntegratedAlarmTrap       TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         shelfIntegratedAlarm,
+                         shelfFilteredAlarm
+                        }
+        DESCRIPTION
+                "Indicates that the shelf integrated alarm status is changed
+		 and sends the status of the shelf integrated alarm. The
+	         shelfFilteredAlarm contains the alarm status of a filtered 
+        	 subset of all node alarms.
+                "
+        ::= 50018
+
+-- # 8.1.1
+userLoginTrap       TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         userName
+                        }
+        DESCRIPTION
+                "Indicates that a user logged in
+                "
+        ::= 50020
+
+userLogoutTrap       TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         asmPhysicalAlarmState,
+                         userName
+                        }
+        DESCRIPTION
+                "Indicates that a user logout
+                "
+        ::= 50021
+
+-- # 8.1.1
+
+shelfLossLmiAlarmTrap       TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity
+                        }
+        DESCRIPTION
+                "Indicates the Loss of LMI Alarm for AXIS BNM trunk.
+                 (ANNEX G signalling failure)
+                "
+        ::= 50022
+
+shelfLossLmiAlarmClearTrap       TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity
+                        }
+        DESCRIPTION
+                "Indicates the Clear of Loss of LMI Alarm for AXIS BNM trunk.
+                 (ANNEX G signalling failure has cleared)
+                "
+        ::= 50023
+
+-- The following four traps are obsoleted from AXIS 4.0
+bnmNolinealarmTrapnum  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         lineNum,
+                         lineType,
+                         lineAlarmState
+                        }
+        DESCRIPTION
+              "Indicates no line alarm, obsoleted from AXIS4.0
+              "
+      ::= 50100
+
+bnmlinealarmTrapnum  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         lineNum,
+                         lineType,
+                         lineAlarmState
+                        }
+        DESCRIPTION
+              "Indicates line alarm exists, obsoleted from AXIS4.0
+                0x01    rcvRAIstate
+                0x02    xmtRAIstate
+                0x04    rcvAISstate
+                0x08    xmtAISstate
+                0x10    rcvOOFstate
+                0x20    rcvLOSstate
+              "
+      ::= 50101
+ 
+bnmLineLpbkEnableTrapnum  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         lineNum,
+                         lineType,
+                         lineAlarmState
+                        }
+        DESCRIPTION
+              "Indicates that line loopback has been enabled,
+               obsoleted from AXIS4.0
+              "
+      ::= 50102
+ 
+bnmLineLpbkDisableTrapnum  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         lineNum,
+                         lineType,
+                         lineAlarmState
+                        }
+        DESCRIPTION
+              "Indicates that line loopback has been disabled,
+               obsoleted from AXIS 4.0
+              "
+      ::= 50103
+
+-- The above four obsoleted traps are replaced by the following traps in AXIS4.0
+dsx3LineNoAlarmTrap  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+ 	                 dsx3LineNum,
+        	         cwDsx3LineType,
+                         dsx3LineAlarmState
+                        }
+        DESCRIPTION
+              "Indicates no line alarm
+              "
+      ::= 50104
+
+dsx3LineInAlarmTrap  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+ 	                 dsx3LineNum,
+        	         cwDsx3LineType,
+                         dsx3LineAlarmState
+                        }
+        DESCRIPTION
+		"
+		"
+      ::= 50105
+
+
+
+dsx3LineLpbkEnableTrap  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+ 	                 dsx3LineNum,
+        	         cwDsx3LineType,
+                         dsx3LineAlarmState
+                        }
+        DESCRIPTION
+              "Indicates that line loopback has been enabled
+              "
+      ::= 50106
+
+dsx3LineLpbkDisableTrap  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+ 	                 dsx3LineNum,
+        	         cwDsx3LineType,
+                         dsx3LineAlarmState
+                        }
+        DESCRIPTION
+              "Indicates that line loopback has been disabled.
+              "
+      ::= 50107
+
+sonetLineInAlarmTrap  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+ 	                 sonetLineNum,
+        	         sonetLineType,
+                         cwSonetLineCurrentStatus
+                        }
+        DESCRIPTION
+              "Indicates line alarm exists.
+
+               Note that the value sent in cwSonetLineCurrentStatus in this trap
+               contains information for all the three sonet layers (section,
+               line, path) and also the loopback state. So it doesn't match
+               the description provided for the cwSonetLineCurrentStatus object
+               under `cwSonetLineCurrentTable'.
+
+               The various bits in cwSonetLineCurrentStatus are: 
+               bit 1        sonetLineRcvRAI
+               bit 2        sonetLineXmtRAI
+               bit 3        sonetLineRcvAIS
+               bit 4        sonetLineXmtAIS
+               bit 5        sonetSectionRcvOOF
+               bit 6        sonetSectionRcvLOS
+               bit 7        localLoopBack
+               bit 8        remoteLoopBack
+               bit 9        remotePayloadLoopBack
+               bit 10       sonetPathRcvLOCD
+               bit 11       sonetPathRcvLOP
+               bit 12       sonetPathRcvAis
+               bit 13       sonetPathXmtAis
+               bit 14       sonetPathRcvRdi
+               bit 15       sonetPathXmtRdi
+              "
+      ::= 50108
+
+sonetLineNoAlarmTrap  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+ 	                 sonetLineNum,
+        	         sonetLineType,
+                         cwSonetLineCurrentStatus
+                        }
+        DESCRIPTION
+              "Indicates line alarm has cleared
+               Please refer to sonetLineInAlarmTrap for
+               the format of cwSonetLineCurrentStatus
+              "
+	::= 50109
+
+sonetLineLpbkEnableTrapnum  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+ 	                 sonetLineNum,
+        	         sonetLineType,
+                         cwSonetLineCurrentStatus
+                        }
+        DESCRIPTION
+              "Indicates that line loopback has been enabled
+               Please refer to sonetLineInAlarmTrap for
+               the format of cwSonetLineCurrentStatus
+              "
+      ::= 50110
+
+sonetLineLpbkDisableTrapnum  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+ 	                 sonetLineNum,
+        	         sonetLineType,
+                         cwSonetLineCurrentStatus
+                        }
+        DESCRIPTION
+              "Indicates that line loopback has been disabled.
+               Please refer to sonetLineInAlarmTrap for
+               the format of cwSonetLineCurrentStatus
+              "
+      ::= 50111
+
+dsx3StatLineAlarmTrap  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         dsx3LineNum,
+                         cwDsx3LineType,
+                         dsx3LineStatisticalAlarmState
+                        }
+        DESCRIPTION
+                "Indicates the current statistical alarm State
+                "
+        ::= 50131
+
+bnmStatSonetSectionalmTrapnum  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         sonetLineNum,
+                         sonetLineType,
+                         sonetSectionStatAlarmStatus
+                        }
+        DESCRIPTION
+                "Indicates the current sonet section statistical alarm State
+                "
+        ::= 50132
+
+bnmStatSonetLinealmTrapnum  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         sonetLineNum,
+                         sonetLineType,
+                         sonetLineStatAlarmStatus
+                        }
+        DESCRIPTION
+                "Indicates the current sonet Line statistical alarm State
+                "
+        ::= 50133
+
+bnmStatSonetPathalmTrapnum  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         sonetLineNum,
+                         sonetLineType,
+                         sonetPathStatAlarmStatus
+                        }
+        DESCRIPTION
+                "Indicates the current sonet Path statistical alarm State
+                "
+        ::= 50134
+
+bnmPlcpAlmActiveTrap  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         dsx3PlcpLineAlarmState,
+                         dsx3LineNum,
+                         cwDsx3LineType
+                        }
+        DESCRIPTION
+                "Indicates that no PLCP alarm exists
+                "
+        ::= 50300
+ 
+bnmPlcpAlmFailedTrap  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         dsx3PlcpLineAlarmState,
+                         dsx3LineNum,
+                         cwDsx3LineType
+                        }
+        DESCRIPTION
+                "Indicates that PLCP alarm exists
+                "
+        ::= 50301
+  
+ 
+bnmPlcpStatalmTrap TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         dsx3PlcpLineStatisticalAlarmState,
+                         dsx3LineNum,
+                         cwDsx3LineType
+                        }
+        DESCRIPTION
+                "PLCP Statistical alarm state change
+                "
+        ::= 50303
+
+bnmPlcpLpbkEnableTrap TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         dsx3PlcpLineAlarmState,
+                         dsx3LineNum,
+                         cwDsx3LineType
+                        }
+        DESCRIPTION
+                "Loopback Enable trap
+                "
+        ::= 50304
+ 
+bnmPlcpLpbkDisableTrap TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         dsx3PlcpLineAlarmState,
+                         dsx3LineNum,
+                         cwDsx3LineType
+                        }
+        DESCRIPTION
+                "Loopback Disable trap
+                "
+        ::= 50305
+-- --------------------------------------------------------------------
+--
+-- BERT traps
+--
+--
+-- --------------------------------------------------------------------
+
+trapBERTStart TRAP-TYPE
+	ENTERPRISE	basis
+	VARIABLES	{
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+			 shelfSlotNum,
+			 functionModuleType,
+			 bertSlotNumber,
+			 bertTestMedium,
+			 bertPort,
+			 bertLine,
+			 bertStatus
+			}
+	DESCRIPTION
+	     "Sent when BERT is configured and started.
+	     "
+	::= 50060
+
+trapBERTEnd TRAP-TYPE
+	ENTERPRISE	basis
+	VARIABLES	{
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+			 shelfSlotNum,
+			 functionModuleType,
+			 bertSlotNumber,
+			 bertTestMedium,
+			 bertPort,
+			 bertLine
+			}
+	DESCRIPTION
+	     "Sent when the ongoing BERT is stopped.
+	     "
+	::= 50061
+
+trapBERTAbort TRAP-TYPE
+	ENTERPRISE	basis
+	VARIABLES	{
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+			 shelfSlotNum,
+			 functionModuleType,
+			 bertSlotNumber,
+			 bertTestMedium,
+			 bertPort,
+			 bertLine,
+			 bertAbortReason
+			}
+	DESCRIPTION
+	     "This is sent out when ongoing BERT is aborted 
+	      due to state changes of the cards that BERT 
+	      involves namely ASC, SRM and SM. The test will
+	      be aborted when there is a core card switch or 
+	      a SM switch to redundant card also.
+             "
+	::= 50062
+
+-- -----------------------------------------------------------------
+----------------------------
+--
+--    SRM3T3 traps
+--
+--
+-- -----------------------------------------------------------------
+----------------------------
+
+srm3t3Xmtclksource TRAP-TYPE
+	ENTERPRISE	basis
+	VARIABLES	{
+			lastSequenceNumber,
+			shelfNodeName,
+			shelfNum,
+			moduleSlotNumber,
+			moduleTrapAlarmSeverity,
+			dsx3LineNum,
+			cwDsx3LineType,
+			dsx3LineXmtClockSrc
+		}
+	DESCRIPTION
+		"Indicates that the current clock source has been 
+		 changed.
+		"
+	::= 50140
+
+srm3t3LineEnable TRAP-TYPE
+	ENTERPRISE	basis
+	VARIABLES	{
+			lastSequenceNumber,
+			shelfNodeName,
+			shelfNum,
+			moduleSlotNumber,
+			moduleTrapAlarmSeverity,
+			dsx3LineNum,
+			cwDsx3LineType,
+			dsx3LineEnable
+		}
+	DESCRIPTION
+		"Indicates that one T3 line has been enabled.
+		"
+	::= 50141
+
+srm3t3LineDisable TRAP-TYPE
+	ENTERPRISE	basis
+	VARIABLES	{
+			lastSequenceNumber,
+			shelfNodeName,
+			shelfNum,
+			moduleSlotNumber,
+			moduleTrapAlarmSeverity,
+			dsx3LineNum,
+			cwDsx3LineType,
+			dsx3LineEnable
+		}
+	DESCRIPTION
+		"Indicates that one T3 line has been disabled.
+		"
+	::= 50142
+
+srm3t3FELineLpbkEnable TRAP-TYPE
+	ENTERPRISE	basis
+	VARIABLES	{
+			lastSequenceNumber,
+			shelfNodeName,
+			shelfNum,
+			moduleSlotNumber,
+			moduleTrapAlarmSeverity,
+			dsx3LineNum,
+			cwDsx3LineType,
+			dsx3LineXmtFEACCode,
+			dsx3FarEndLoopbkLineNum
+		}
+	DESCRIPTION
+		"Indicates which DS1 or DS3 has been set in the 
+		 loopback testing.
+		"
+	::= 50143
+
+srm3t3LineLpbkDisable TRAP-TYPE
+	ENTERPRISE	basis
+	VARIABLES	{
+			lastSequenceNumber,
+			shelfNodeName,
+			shelfNum,
+			moduleSlotNumber,
+			moduleTrapAlarmSeverity,
+			dsx3LineNum,
+			cwDsx3LineType,
+			dsx3LineXmtFEACCode,
+			dsx3FarEndLoopbkLineNum
+		}
+	DESCRIPTION
+		"Indicates which DS1 or DS3 has been reset from 
+		 the loopback testing.
+		"
+	::= 50144
+
+srm3t3AddLink TRAP-TYPE
+	ENTERPRISE	basis
+	VARIABLES	{
+			lastSequenceNumber,
+			shelfNodeName,
+			shelfNum,
+			moduleSlotNumber,
+			moduleTrapAlarmSeverity,
+			srmT3LineNum,
+			srmStartT1LineNum,
+			srmTargetSlotNum,
+			srmTargetSlotLineNum
+		}
+	DESCRIPTION
+		"Indicates which T1 line from a T3 is added to 
+		 which slot and which line.
+		"
+	::= 50145
+
+
+srm3t3DelLink TRAP-TYPE
+	ENTERPRISE	basis
+	VARIABLES	{
+			lastSequenceNumber,
+			shelfNodeName,
+			shelfNum,
+			moduleSlotNumber,
+			moduleTrapAlarmSeverity,
+                        srmT3LineNum,
+                        srmStartT1LineNum,
+                        srmTargetSlotNum,
+                        srmTargetSlotLineNum
+		}
+	DESCRIPTION
+		"Indicates which T1 line from a T3 is deleted from
+		 which slot and which line.
+		"
+	::= 50146
+
+srm3t3DelSlotLink TRAP-TYPE
+	ENTERPRISE	basis
+	VARIABLES	{
+			lastSequenceNumber,
+			shelfNodeName,
+			shelfNum,
+			moduleSlotNumber,
+			moduleTrapAlarmSeverity,
+                        srmT3LineNum,
+                        srmStartT1LineNum,
+                        srmTargetSlotNum,
+                        srmTargetSlotLineNum
+		}
+	DESCRIPTION
+		"Indicates which line is deleted from a slot
+		"
+	::= 50147
+
+srm3t3NELineLpbkEnable TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                        lastSequenceNumber,
+                        shelfNodeName,
+                        shelfNum,
+                        moduleSlotNumber,
+                        moduleTrapAlarmSeverity,
+                        dsx3LineNum,
+                        cwDsx3LineType,
+                        dsx3NearEndLoopbkLineStatus
+                 }
+        DESCRIPTION
+                "Indicates which DS1 or DS3 at the near end has been
+                 set for the loopback testing.
+                "
+        ::= 50148 
+
+srm3t3NELineLpbkDisable TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                        lastSequenceNumber,
+                        shelfNodeName,
+                        shelfNum,
+                        moduleSlotNumber,
+                        moduleTrapAlarmSeverity,
+                        dsx3LineNum,
+                        cwDsx3LineType,
+                        dsx3NearEndLoopbkLineStatus
+
+                  }
+        DESCRIPTION
+                "Indicates which DS1 or DS3 at the near end has been
+                 removed from the loopback testing.
+                "
+        ::= 50149 
+
+srmLossOfClockTrap TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                        lastSequenceNumber,
+                        shelfNodeName,
+                        shelfNum,
+                        moduleSlotNumber,
+                        moduleTrapAlarmSeverity,
+                        dsx3LineNum,
+                        cwDsx3LineType
+                  }
+        DESCRIPTION
+                "Indicates a SRM T3 line lost clock source.
+                "
+        ::= 50150
+
+--    SRM3T3 traps end
+--
+----------------------------
+-- ---------------------------------------------------------------------------------------------
+--
+--    SM traps
+--
+-- ---------------------------------------------------------------------------------------------
+dsx1LineNoAlarmTrap  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+ 	                 lineNum,
+        	         lineType,
+                         lineAlarmState
+                        }
+        DESCRIPTION
+              "Indicates no line alarm
+              "
+      ::= 50120
+
+dsx1LineInAlarmTrap  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+ 	                 lineNum,
+        	         lineType,
+                         lineAlarmState
+                        }
+        DESCRIPTION
+              "Indicates line alarm exists
+               	0x01	rcvRAIstate
+               	0x02	xmtRAIstate
+               	0x04	rcvAISstate
+               	0x08	xmtAISstate
+               	0x10	rcvOOFstate
+               	0x20	rcvLOSstate
+              "
+      ::= 50121
+
+
+
+dsx1LineLpbkEnableTrap  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+ 	                 lineNum,
+        	         lineType,
+                         lineAlarmState
+                        }
+        DESCRIPTION
+              "Indicates that line loopback has been enabled
+              "
+      ::= 50122
+
+dsx1LineLpbkDisableTrap  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+ 	                 lineNum,
+        	         lineType,
+                         lineAlarmState
+                        }
+        DESCRIPTION
+              "Indicates that line loopback has been disabled.
+              "
+      ::= 50123
+
+trapLineEnabled                  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         lineNum,
+                         lineType
+                        }
+ 
+        DESCRIPTION
+                "indicates line enabled. Applicable to AUSM and all FRSM cards except HS1 HS2 HS2B.
+                "
+        ::= 50350
+trapConfigChange  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+			 functionModuleType,
+                         configChangeTypeBitMap,
+                         configChangeObjectIndex,
+			 configChangeStatus
+                        }
+ 
+        DESCRIPTION
+                "Sent when the config has changed.
+                 The bit map tells if the change on
+                 line/port/channel and the object
+                 index shows the line#/port#/channel#,
+		 the status shows if it's an add or
+		 mod or del.
+                "
+        ::= 50600
+ 
+--------------------------------------------
+-- needs test----------------------
+
+trapSMclearAllCfg TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         functionModuleType
+                        }
+ 
+        DESCRIPTION
+                "Sent when the config is cleared.
+                "
+        ::= 50800
+ 
+redActiveatedTrap TRAP-TYPE
+	ENTERPRISE	basis
+	VARIABLES	{
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+			 moduleTrapAlarmSeverity,
+			 redType,
+			 redPrimarySlotNum,
+			 redSecondarySlotNum
+			}
+	DESCRIPTION
+		"Sent when the redundant card goes active
+		"
+	::= 50045
+
+
+redRevertedTrap TRAP-TYPE
+	ENTERPRISE	basis
+	VARIABLES	{
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+			 redType,
+			 redPrimarySlotNum,
+			 redSecondarySlotNum
+			}
+	DESCRIPTION
+		"Sent when the redundant card is reverted
+		 back to standby (reset first)
+		"
+	::= 50046
+
+redAddedTrap TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         redType,
+                         redPrimarySlotNum,
+                         redPrimaryType,
+                         redPrimaryState,
+                         redSecondarySlotNum,
+			 redSecondaryType,
+			 redSecondaryState
+                        }
+        DESCRIPTION
+                "Sent when the redundancy is added
+                "
+        ::= 50047
+
+redDeletedTrap TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         redType,
+                         redPrimarySlotNum,
+                         redPrimaryType,
+                         redPrimaryState,
+                         redSecondarySlotNum,
+			 redSecondaryType,
+			 redSecondaryState
+                        }
+        DESCRIPTION
+                "Sent when the redundansy is deleted
+                "
+        ::= 50048
+
+
+ 
+trapChanOamLpbkStatus  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         functionModuleType,
+                         genericTimeStamp,
+                         chanPacketNumber,
+                         chanOAMstatus32,
+                         chanOAMstatus64,
+                         chanOAMstatus96,
+                         chanOAMstatus128,
+                         chanOAMstatus160,
+                         chanOAMstatus192,
+                         chanOAMstatus224,
+                         chanOAMstatus256
+ 
+                        }
+        DESCRIPTION
+                "
+		 Sent when the chan Ras_Oam_Loopback_state changes from
+		 Failed to Ok or Ok to Failed. It will carry status for a 
+		 chunk of 256 channels as bitmaps. If the status of only 1 
+		 channel belonging to the chunk of 256 changes, trap is sent 
+		 only for that chunk of 256 channels and not for any other chunk.
+		 For eg., suppose if channel 500 fails ras loopback test, trap is 
+		 sent for the second chunk of 256 channels spanning channel nos 
+		 257 to 512. 
+                "
+        ::= 50311
+
+dsx1StatLineAlarmTrap  TRAP-TYPE
+        ENTERPRISE     basis
+        VARIABLES      {
+                       lastSequenceNumber,
+                       shelfNodeName,
+                       shelfNum,
+                       moduleSlotNumber,
+                       moduleTrapAlarmSeverity,
+                       lineNum,
+                       lineType,
+                       lineStatisticalAlarmState
+                       }
+       DESCRIPTION
+               "Indicates the current statistical alarm State "
+                
+        ::= 50130
+
+trapChanStatusSummary     TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                        lastSequenceNumber,
+                        shelfNodeName,
+                        shelfNum,
+                        moduleSlotNumber,
+                        moduleTrapAlarmSeverity,
+                        functionModuleType,
+                        genericTimeStamp
+                        }
+        DESCRIPTION
+        "Sent when there are multiple channel failures and the
+        total number of traps in 1 min exceeds the card level set
+        thresholds. This trap is common to all the NBSM cards.
+        viz. FRSM-8T1E1, CESM-8T1E1, AUSM-8T1E1, FRSM-VHS, CESM-T3E3
+
+        This traps informs the network management tool that the channel
+        traps will not be sent from now but only summary traps will be
+        sent at every 1 minute till the condition that is causing so many
+        traps in quick succession goes away.
+
+        This trap is not applicable to MGX Release 1.x.
+        "
+        ::= 50314
+
+--------------------------------------------------------------
+-- FRSM Traps
+--    All port and channel specific traps here below are not applicable for FRSM-VHS.
+--------------------------------------------------------------
+trapCardOvrSubscribed TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         functionModuleType,
+                         cardOversubscribed,
+                         cardIngrPercentUtil
+                        }
+        DESCRIPTION
+                "The card is over-subscribed
+                "
+        ::= 50380
+ 
+trapPortAdded                  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         portNum,
+                         lineNum,
+                         lineType,
+                         portState,
+                         portSignallingState,
+                         portDs0ConfigBitMap
+                        }
+ 
+        DESCRIPTION
+                "indicates port added, currently this trap is not used
+                "
+        ::= 50405
+ 
+trapPortActive  		TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       { 
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         portNum,
+                         lineNum,
+                         lineType,
+                         portState,
+                         portSignallingState,
+			 portDs0ConfigBitMap
+                        }
+ 
+        DESCRIPTION
+                "indicates port active
+                "
+        ::= 50400
+
+trapPortFailed TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       { 
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         portNum,
+                         lineNum,
+                         lineType,
+                         portState,
+                         portSignallingState,
+			 portDs0ConfigBitMap
+                        }
+ 
+        DESCRIPTION
+                "The port fails
+                "
+        ::= 50401
+
+trapPortDelete TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       { 
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         portNum,
+                         lineNum,
+                         lineType,
+                         portState,
+                         portSignallingState,
+			 portDs0ConfigBitMap
+                        }
+ 
+        DESCRIPTION
+                "The port is deleted
+                "
+        ::= 50402
+
+trapPortLoopbackEnabled TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       { 
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         portNum,
+                         lineNum,
+                         lineType,
+                         portState,
+                         portSignallingState
+                        }
+ 
+        DESCRIPTION
+                "The port loopback is enabled
+                "
+        ::= 50403
+
+trapPortLoopbackDisabled TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       { 
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         portNum,
+                         lineNum,
+                         lineType,
+                         portState,
+                         portSignallingState
+                        }
+ 
+        DESCRIPTION
+                "The port loopback is disabled
+                "
+        ::= 50404
+
+trapPortOvrSubscribed TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         portNum,
+                         lineNum,
+                         lineType,
+			 portOversubscribed,
+			 portIngrPercentUtil,
+			 portEgrPercentUtil
+			}
+        DESCRIPTION
+                "The port is over-subscribed
+                "
+        ::= 50406
+
+trapChanAdded  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         lineNum,
+                         portNum,
+                         chanNum,
+                         dLCI,
+                         lineType,
+                         portDs0ConfigBitMap
+                        }
+        DESCRIPTION
+                "Sent when the chan is added, currently this trap is not used
+                "
+        ::= 50503
+ 
+trapChanActive  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         lineNum,
+                         portNum,
+                         chanNum,
+                         dLCI,
+                         lineType,
+                         portDs0ConfigBitMap
+                        }
+ 
+        DESCRIPTION
+                "Sent when the chan is active
+                "
+        ::= 50500
+
+trapChanFailed  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         lineNum,
+                         portNum,
+                         chanNum,
+                         dLCI,
+                         lineType,
+                         portDs0ConfigBitMap
+                        }
+ 
+        DESCRIPTION
+                "Sent when the chan is failed
+                "
+        ::= 50501
+ 
+
+trapChanDelete  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         lineNum,
+                         portNum,
+                         chanNum,
+                         dLCI,
+                         lineType,
+                         portDs0ConfigBitMap
+                        }
+ 
+        DESCRIPTION
+                "Sent when the chan is deleted
+                "
+        ::= 50502
+
+egressDataBuffersOverflowTrap TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         functionModuleType
+                        }
+ 
+        DESCRIPTION
+                "Sent when the Egress Data Buffers are not available.
+                "
+        ::= 50505
+
+egressDataBuffersNormalTrap TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         functionModuleType
+                        }
+ 
+        DESCRIPTION
+                "Sent when the Egress Data Buffers are available.
+                "
+        ::= 50506
+
+
+-- ------------------------------------------
+-- Begin. FRSM_HS1/HS2/HS2B HSSI/X.21 line specific traps
+
+x21LineNoAlarmTrap  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+ 	                 x21LineNum,
+        	         x21LineType,
+			x21LineAlarmState
+                        }
+        DESCRIPTION
+              "Indicates no line alarm
+              "
+      ::= 50200
+
+x21LineInAlarmTrap  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+ 	                 x21LineNum,
+        	         x21LineType,
+			x21LineAlarmState
+                        }
+        DESCRIPTION
+              "Indicates line alarm exists
+              "
+      ::= 50201
+
+
+x21LineLpbkEnableTrap  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+ 	                 x21LineNum,
+        	         x21LineType,
+			x21LineAlarmState
+                        }
+        DESCRIPTION
+              "Indicates that line loopback has been enabled
+              "
+      ::= 50202
+
+x21LineLpbkDisableTrap  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+ 	                 x21LineNum,
+        	         x21LineType,
+			x21LineAlarmState
+                        }
+        DESCRIPTION
+              "Indicates that line loopback has been disabled.
+              "
+      ::= 50203
+
+x21LineLpbkDetectedTrap  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+ 	                 x21LineNum,
+        	         x21LineType,
+                         x21LineAlarmState
+                        }
+        DESCRIPTION
+              "Indicates that line loopback code/condition detected.
+              "
+      ::= 50204
+
+x21LineLpbkRemovedTrap  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+ 	                 x21LineNum,
+        	         x21LineType,
+                         x21LineAlarmState
+                        }
+        DESCRIPTION
+              "Indicates that line loopback code/condition does not exist any more.
+              "
+      ::= 50205
+
+
+-- End. FRSM_HS1 specific traps
+-- ----------------------------------------------
+
+
+-- --------------------------------------
+-- BEGIN. FRSM_HS1 HSSI/X.21 Port specific traps
+trapX21PortAdded                  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         portNum,
+                         lineNum,
+                         lineType,
+                         portState,
+                         portSignallingState
+                        }
+ 
+        DESCRIPTION
+                "indicates port added
+                "
+        ::= 50455
+ 
+trapX21PortActive  		TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       { 
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         x21portNum,
+                         x21LineNum,
+                         x21LineType,
+                         portState,
+                         portSignallingState
+                        }
+ 
+        DESCRIPTION
+                "indicates port active
+                "
+        ::= 50450
+
+trapX21PortFailed TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       { 
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         x21portNum,
+                         x21LineNum,
+                         x21LineType,
+                         portState,
+                         portSignallingState,
+			 portDs0ConfigBitMap
+                        }
+ 
+        DESCRIPTION
+                "The port fails
+                "
+        ::= 50451
+
+trapX21PortDelete TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       { 
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         x21portNum,
+                         x21LineNum,
+                         x21LineType,
+                         portState,
+                         portSignallingState,
+			 portDs0ConfigBitMap
+                        }
+ 
+        DESCRIPTION
+                "The port is deleted
+                "
+        ::= 50452
+
+trapX21PortLoopbackEnabled TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       { 
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         x21portNum,
+                         x21LineNum,
+                         x21LineType,
+                         portState,
+                         portSignallingState
+                        }
+ 
+        DESCRIPTION
+                "The port loopback is enabled
+                "
+        ::= 50453
+
+trapX21PortLoopbackDisabled TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       { 
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         x21portNum,
+                         x21LineNum,
+                         x21LineType,
+                         portState,
+                         portSignallingState
+                        }
+ 
+        DESCRIPTION
+                "The port loopback is disabled
+                "
+        ::= 50454
+
+-- END.   FRSM_HS1 Port specific traps
+-- --------------------------------------
+
+
+-- -----------------------------------------------------------------
+--
+--
+-- This file contains all the SNMP TRAPS specific 
+-- to AUSM-8p and IMATM cards. It includes the traps generated that
+-- are specific to IMA functionality as well as the traps specific
+-- only to IMATM.
+--
+-- -----------------------------------------------------------------
+
+
+--
+-- Traps specific to IMA functionality
+--
+
+trapImaDisabled         TRAP-TYPE
+		ENTERPRISE      basis
+		VARIABLES       { 
+						lastSequenceNumber,
+						shelfNodeName,
+						shelfNum,
+						moduleSlotNumber,
+						moduleTrapAlarmSeverity,
+						imaStatePortNum,
+						listLinksPresentInImaGroup,
+						imaPortState
+                        }
+ 
+        DESCRIPTION
+                "Indicates that IMA group is disabled
+                "
+        ::= 50230
+ 
+trapImaActive			TRAP-TYPE
+		ENTERPRISE      basis
+		VARIABLES       { 
+						lastSequenceNumber,
+						shelfNodeName,
+						shelfNum,
+						moduleSlotNumber,
+						moduleTrapAlarmSeverity,
+						imaStatePortNum,
+						listLinksPresentInImaGroup,
+						imaPortState
+                        }
+ 
+        DESCRIPTION
+                "Indicates that IMA group is Configured 
+                "
+        ::= 50231
+ 
+trapImaBandwidthChanged TRAP-TYPE
+		ENTERPRISE      basis
+		VARIABLES       {
+						lastSequenceNumber,
+						shelfNodeName,
+						shelfNum,
+						moduleSlotNumber,
+						moduleTrapAlarmSeverity,
+						imaStatePortNum,
+						listLinksPresentInImaGroup,
+						imaPortState
+                        }
+ 
+        DESCRIPTION
+                "Indicates that the bandwidth of an IMA group changed
+		 due to addition/deletion of links to/from the IMA group.
+		 This trap is Obsolete for MGX8850.
+                "
+        ::= 50232
+ 
+ 
+trapImaFailedAcpTimeout TRAP-TYPE
+		ENTERPRISE      basis
+		VARIABLES       { 
+						lastSequenceNumber,
+						shelfNodeName,
+						shelfNum,
+						moduleSlotNumber,
+						moduleTrapAlarmSeverity,
+						imaStatePortNum,
+						listLinksPresentInImaGroup,
+						imaPortState
+                        }
+ 
+        DESCRIPTION
+                "Indicates that the IMA group was brought down
+		 due to ACP cells not being received within the
+		 expected interval.
+		 This trap is Obsolete for MGX8850.
+                "
+        ::= 50233
+
+
+trapImaFailedMajorAlm	TRAP-TYPE
+		ENTERPRISE      basis
+		VARIABLES       {
+						lastSequenceNumber,
+						shelfNodeName,
+						shelfNum,
+						moduleSlotNumber,
+						moduleTrapAlarmSeverity,
+						imaStatePortNum,
+						listLinksPresentInImaGroup,
+						imaPortState
+                        }
+ 
+        DESCRIPTION
+                "Indicates that the IMA group failed due to major
+		 alarm on the IMA group
+		 This trap is Obsolete for MGX8850.
+                "
+        ::= 50234
+
+trapImaFailedSigFailure	TRAP-TYPE
+		ENTERPRISE      basis
+		VARIABLES       {
+						lastSequenceNumber,
+						shelfNodeName,
+						shelfNum,
+						moduleSlotNumber,
+						moduleTrapAlarmSeverity,
+						imaStatePortNum,
+						listLinksPresentInImaGroup,
+						imaPortState
+                        }
+ 
+        DESCRIPTION
+                "Indicates that the IMA group failed due to an
+		 IMA signalling failure (eg: ACP cells are being
+		 received but the expected ones are not being received
+		 or an unexpected change in IMA-ID/LID on a link 
+		 occurred etc
+		 This trap is Obsolete for MGX8850.
+                "
+        ::= 50235
+
+trapImaFailedBadDiffDelay	TRAP-TYPE
+		ENTERPRISE      basis
+		VARIABLES       {
+						lastSequenceNumber,
+						shelfNodeName,
+						shelfNum,
+						moduleSlotNumber,
+						moduleTrapAlarmSeverity,
+						imaStatePortNum,
+						listLinksPresentInImaGroup,
+						imaObsDiffDelay,
+						imaPortState
+                        }
+ 
+        DESCRIPTION
+                "Indicates that the IMA group failed due to differential
+		 delay exceeding the maximum permissible for this
+		 IMA group. The variable 'imaObsDiffDelay' gives the
+		 current observed differential delay for this IMA group
+		 This trap is Obsolete for MGX8850.
+                "
+        ::= 50236
+
+--
+-- Traps for Local OAM cells (only in IMATM)
+--
+trapImaRcvAisLoam       TRAP-TYPE
+		ENTERPRISE      basis
+		VARIABLES       {
+						lastSequenceNumber,
+						shelfNodeName,
+						shelfNum,
+						moduleSlotNumber,
+						moduleTrapAlarmSeverity,
+						imaStatePortNum,
+						listLinksPresentInImaGroup,
+						imaObsDiffDelay,
+						imaPortState
+                        }
+ 
+        DESCRIPTION
+                "Indicates that the IMA is receiving a local OAM cell
+		 AIS from the remote end
+		 This trap is Obsolete for MGX8850.
+                "
+        ::= 50237
+
+trapImaRcvRdiLoam     TRAP-TYPE
+		ENTERPRISE      basis
+		VARIABLES       {
+						lastSequenceNumber,
+						shelfNodeName,
+						shelfNum,
+						moduleSlotNumber,
+						moduleTrapAlarmSeverity,
+						imaStatePortNum,
+						listLinksPresentInImaGroup,
+						imaObsDiffDelay,
+						imaPortState
+                        }
+ 
+        DESCRIPTION
+                "Indicates that the IMA is receiving a local OAM cell
+		 RDI from the remote end
+		 This trap is Obsolete for MGX8850.
+                "
+        ::= 50238
+
+trapImaFailedOtherReason   TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                        lastSequenceNumber,
+                        shelfNodeName,
+                        shelfNum,
+                        moduleSlotNumber,
+                        moduleTrapAlarmSeverity,
+                        imaStatePortNum,
+                        listLinksPresentInImaGroup,
+                        imaPortState
+                        }
+ 
+        DESCRIPTION
+                "Indicates that the IMA group failed due to a non-
+                 IMA protocol related failure. The value of imaPortState
+                 will denote the reason for failure.
+                "
+        ::= 50239
+
+--
+-- Traps specific only to IMATM
+--
+
+trapImatmClockChange   	TRAP-TYPE
+		ENTERPRISE      basis
+		VARIABLES       {
+						lastSequenceNumber,
+						shelfNodeName,
+						shelfNum,
+						moduleSlotNumber,
+						moduleTrapAlarmSeverity,
+						currentClockSource,
+						primaryClockSource,
+						secondaryClockSource
+                        }
+ 
+        DESCRIPTION
+                "Indicates that the current clock source changed from
+				 primary to secondary
+                "
+        ::= 50240
+
+
+trapImatmBadClockSource TRAP-TYPE
+		ENTERPRISE      basis
+		VARIABLES       {
+						lastSequenceNumber,
+						shelfNodeName,
+						shelfNum,
+						moduleSlotNumber,
+						moduleTrapAlarmSeverity,
+						currentClockSource,
+						primaryClockSource,
+						secondaryClockSource
+                        }
+ 
+        DESCRIPTION
+                "Indicates that no good clock source is available
+                "
+        ::= 50241
+
+--
+-- Used by all cards that support IMA feature
+--
+trapImaLinkInLoopback TRAP-TYPE
+		ENTERPRISE      basis
+		VARIABLES       {
+						lastSequenceNumber,
+						shelfNodeName,
+						shelfNum,
+						moduleSlotNumber,
+						moduleTrapAlarmSeverity,
+						almImaGrpNum,
+						almlineNum,
+						lineImaAlarmState
+                        }
+ 
+        DESCRIPTION
+                "Indicates that IMA Line Alarm exists. Can be
+				 lineLcpErr
+				 lineNotInLDS
+				 lineInLoopback
+                "
+        ::= 50245
+
+--
+-- Used by all cards that support IMA feature
+--
+trapImatmDsx3HecChange TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                        lastSequenceNumber,
+                        shelfNodeName,
+                        shelfNum,
+                        moduleSlotNumber,
+                        moduleTrapAlarmSeverity,
+						imatmdsx3PortIndex,
+						imatmDsx3SingleBitErrCorrEnable
+                        }
+ 
+        DESCRIPTION
+                "
+				Indicate that the HEC Error Correction Option for DSX3 has changed.
+				Can be Enable or Disable.
+                "
+        ::= 50246
+
+-- M.S.Prasad on 7/11/97 for IMA purpose.
+trapImaGTSMchange TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                        lastSequenceNumber,
+                        shelfNodeName,
+                        shelfNum,
+                        moduleSlotNumber,
+                        moduleTrapAlarmSeverity,
+                        functionModuleType,
+                        genericTimeStamp,
+                        imaStatePortNum,
+                        listLinksPresentInImaGroup,
+                        imaPortState,
+                        axisImaGroupFailureStatus,
+						listOfLinksInImaGrp
+                        }
+ 
+        DESCRIPTION
+                "
+                Indicate the failure status of the IMA group(GTSM goes UP/DOWN)
+                "
+        ::= 50250
+
+trapImaCellRateChange TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                        lastSequenceNumber,
+                        shelfNodeName,
+                        shelfNum,
+                        moduleSlotNumber,
+                        moduleTrapAlarmSeverity,
+                        functionModuleType,
+                        genericTimeStamp,
+                        imaStatePortNum,
+                        listLinksPresentInImaGroup,
+                        imaPortState,
+                        axisImaGroupTxAvailCellRate,
+                        axisImaGroupRxAvailCellRate,
+						listOfLinksInImaGrp
+                        }
+ 
+        DESCRIPTION
+                "Indicates that the bandwidth of an IMA group changed
+                 due to addition/deletion of links to/from the IMA group
+                "
+        ::= 50251
+
+trapImaLinkStateChange TRAP-TYPE
+          ENTERPRISE      basis
+          VARIABLES       {
+		                  lastSequenceNumber,
+		                  shelfNodeName,
+		                  shelfNum,
+		                  moduleSlotNumber,
+		                  moduleTrapAlarmSeverity,
+		                  functionModuleType,
+		                  genericTimeStamp,
+		                  almlineNum,
+		                  almImaGrpNum,
+		                  axisImaLinkNeRxFailureStatus
+		                  }
+ 
+        DESCRIPTION
+                "Indicates that the link in an IMA group is in LIF
+                 LODS or No Failure.
+                "
+        ::= 50244
+
+
+-- -----------------------------------------------------------------
+--
+--
+-- This file contains all the SNMP TRAPS specific 
+--	to AUSM card.
+--
+-- -----------------------------------------------------------------
+
+
+trapAusmPlppActive      TRAP-TYPE
+		ENTERPRISE      basis
+		VARIABLES       { 
+						lastSequenceNumber,
+						shelfNodeName,
+						shelfNum,
+						moduleSlotNumber,
+						moduleTrapAlarmSeverity,
+						lineNum,
+						lineType,
+						tCAlarmState
+                        }
+ 
+        DESCRIPTION
+                "Indicates that no PLPP alarm exists
+                "
+        ::= 50900
+ 
+trapAusmPlppInactive	TRAP-TYPE
+		ENTERPRISE      basis
+		VARIABLES       { 
+						lastSequenceNumber,
+						shelfNodeName,
+						shelfNum,
+						moduleSlotNumber,
+						moduleTrapAlarmSeverity,
+						lineNum,
+						lineType,
+						tCAlarmState
+                        }
+ 
+        DESCRIPTION
+                "Indicates that  PLPP alarm exists
+                "
+        ::= 50901
+ 
+trapAusmPlppLbEnable	TRAP-TYPE
+		ENTERPRISE      basis
+		VARIABLES       { 
+						lastSequenceNumber,
+						shelfNodeName,
+						shelfNum,
+						moduleSlotNumber,
+						moduleTrapAlarmSeverity,
+						lineNum,
+						lineType,
+						tCAlarmState
+                        }
+ 
+        DESCRIPTION
+                "Indicates that  PLPP Loopback Enabled
+                "
+        ::= 50904
+ 
+ 
+trapAusmPlppLbDisable      TRAP-TYPE
+		ENTERPRISE      basis
+		VARIABLES       { 
+						lastSequenceNumber,
+						shelfNodeName,
+						shelfNum,
+						moduleSlotNumber,
+						moduleTrapAlarmSeverity,
+						lineNum,
+						lineType,
+						tCAlarmState
+                        }
+ 
+        DESCRIPTION
+                "Indicates that  PLPP Loopback Disabled
+                "
+        ::= 50905
+
+
+trapAusmPortActive		TRAP-TYPE
+		ENTERPRISE      basis
+		VARIABLES       { 
+						lastSequenceNumber,
+						shelfNodeName,
+						shelfNum,
+						moduleSlotNumber,
+						moduleTrapAlarmSeverity,
+						ausmPortNum,
+						lineNum,
+						lineType,
+						ausmPortState
+                        }
+ 
+        DESCRIPTION
+                "Indicates that Port is Active and out of Alarm
+                "
+        ::= 50910
+
+
+trapAusmPortFailed		TRAP-TYPE
+		ENTERPRISE      basis
+		VARIABLES       { 
+						lastSequenceNumber,
+						shelfNodeName,
+						shelfNum,
+						moduleSlotNumber,
+						moduleTrapAlarmSeverity,
+						ausmPortNum,
+						lineNum,
+						lineType,
+						ausmPortState
+                        }
+ 
+        DESCRIPTION
+                "Indicates that Port Failed (In Alarm)
+                "
+        ::= 50911
+
+trapAusmPortDelete		TRAP-TYPE
+		ENTERPRISE      basis
+		VARIABLES       { 
+						lastSequenceNumber,
+						shelfNodeName,
+						shelfNum,
+						moduleSlotNumber,
+						moduleTrapAlarmSeverity,
+						ausmPortNum,
+						lineNum,
+						lineType
+                        }
+ 
+        DESCRIPTION
+                "Indicates that Port is Deleted
+                "
+        ::= 50912
+
+
+trapAusmPortSvcRangeChanged	TRAP-TYPE
+		ENTERPRISE      basis
+		VARIABLES       { 
+						lastSequenceNumber,
+						shelfNodeName,
+						shelfNum,
+						moduleSlotNumber,
+						moduleTrapAlarmSeverity,
+						ausmPortNum,
+						lineNum,
+						lineType,
+						ausmPortState
+                        }
+ 
+        DESCRIPTION
+                "Indicates that Port SVC resource range has changed
+				 (used for ATM T1/E1 UNI ports)
+                "
+        ::= 50913
+
+
+trapImaPortSvcRangeChanged	TRAP-TYPE
+		ENTERPRISE      basis
+		VARIABLES       { 
+						lastSequenceNumber,
+						shelfNodeName,
+						shelfNum,
+						moduleSlotNumber,
+						moduleTrapAlarmSeverity,
+						imaPortNum,
+						listLinksPresentInImaGroup,
+						imaPortState
+                        }
+ 
+        DESCRIPTION
+                "Indicates that Port SVC resource range has changed
+				 (used for IMA ports)
+                "
+        ::= 50914
+
+
+trapPortIpChangedGeneric	TRAP-TYPE
+		ENTERPRISE      basis
+		VARIABLES       { 
+						lastSequenceNumber,
+						shelfNodeName,
+						shelfNum,
+						moduleSlotNumber,
+						moduleTrapAlarmSeverity,
+						functionModuleType,
+						genericTimeStamp,
+						ausmInterfacePortNum,
+						ausmInterfaceMyNeighborIpAddress,
+						ausmPortState,
+						ausmSignallingProtocolType
+                        }
+ 
+        DESCRIPTION
+                "Indicates that Ip change has been detected from the
+				 CPE connected to the ausm PORT
+                "
+        ::= 50915
+
+
+
+trapAusmChanActive		TRAP-TYPE
+		ENTERPRISE      basis
+		VARIABLES       { 
+						lastSequenceNumber,
+						shelfNodeName,
+						shelfNum,
+						moduleSlotNumber,
+						moduleTrapAlarmSeverity,
+						lineNum,
+						ausmChanPortNum,
+						ausmChanNum,
+						chanVpi,
+						chanVci,
+						lineType,
+						chanConnType
+                        }
+ 
+        DESCRIPTION
+                "Sent when a Channel becomes active
+                "
+        ::= 50920
+
+
+trapAusmChanFailed		TRAP-TYPE
+		ENTERPRISE      basis
+		VARIABLES       { 
+						lastSequenceNumber,
+						shelfNodeName,
+						shelfNum,
+						moduleSlotNumber,
+						moduleTrapAlarmSeverity,
+						lineNum,
+						ausmChanPortNum,
+						ausmChanNum,
+						chanVpi,
+						chanVci,
+						lineType,
+						chanConnType
+                        }
+ 
+        DESCRIPTION
+                "Sent when a Channel fails (In alarm)
+
+                "
+        ::= 50921
+
+trapAusmChanDelete		TRAP-TYPE
+		ENTERPRISE      basis
+		VARIABLES       { 
+						lastSequenceNumber,
+						shelfNodeName,
+						shelfNum,
+						moduleSlotNumber,
+						moduleTrapAlarmSeverity,
+						lineNum,
+						ausmChanPortNum,
+						ausmChanNum,
+						chanVpi,
+						chanVci,
+						lineType,
+						chanConnType
+                        }
+ 
+        DESCRIPTION
+                "Sent when a Channel is deleted
+                "
+        ::= 50922
+
+
+trapAusmConDown   TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                        lastSequenceNumber,
+                        shelfNodeName,
+                        shelfNum,
+                        moduleSlotNumber,
+                        moduleTrapAlarmSeverity,
+                        functionModuleType,
+                        genericTimeStamp,
+                        ausmChanPortNum,
+                        ausmChanNum,
+                        ausmChanRowStatus,
+                        chanVpi,
+                        chanVci,
+			lineNum
+                        }
+
+        DESCRIPTION
+                "Sent when a  AUSM Channel is brought down.
+                 This trap is not applicable to MGX Release 1.x.
+                "
+        ::= 50923
+
+
+trapAusmConUp   TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                        lastSequenceNumber,
+                        shelfNodeName,
+                        shelfNum,
+                        moduleSlotNumber,
+                        moduleTrapAlarmSeverity,
+                        functionModuleType,
+                        genericTimeStamp,
+	                    ausmChanPortNum,	
+                        ausmChanNum,
+                        ausmChanRowStatus,
+                        chanVpi,
+                        chanVci,
+			lineNum
+                        }
+        DESCRIPTION
+                "Sent when a  AUSM Channel is brought up from down.
+                 The previous RowStatus of this channel must be outOfService.
+                 This trap is not applicable to MGX Release 1.x.
+                "
+        ::= 50924
+
+
+trapAusmChanReroute   TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                        lastSequenceNumber,
+                        shelfNodeName,
+                        shelfNum,
+                        moduleSlotNumber,
+                        moduleTrapAlarmSeverity,
+                        functionModuleType,
+                        genericTimeStamp,
+                        ausmChanPortNum,
+                        ausmChanNum,
+                        ausmChanRowStatus,
+                        chanVpi,
+                        chanVci,
+			lineNum
+                        }
+        DESCRIPTION
+                "Sent when a  AUSM Channel is rerouted.
+                 This trap is not applicable to MGX Release 1.x.
+                "
+        ::= 50925
+
+trapAusmChannelAlarm       TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                        lastSequenceNumber,
+                        shelfNodeName,
+                        shelfNum,
+                        moduleSlotNumber,
+                        moduleTrapAlarmSeverity,
+                        functionModuleType,
+                        genericTimeStamp,
+                        lineNum,
+                        ausmChanPortNum,
+                        ausmChanNum,
+                        chanVpi,
+                        chanVci,
+                        lineType,
+                        chanConnType,
+                        ausmChanStatusBitMap
+                        }
+
+        DESCRIPTION
+                "Sent when an AUSM logical channel is in Alarm, 
+                i.e. the channel can pass traffic within the PNNI 
+                n/w but is in Alarm because of CPE connectivity, or 
+                the line being in alarm.
+                This trap is not applicable to MGX Release 1.x.
+                "
+        ::= 50918  
+
+
+trapAusmChannelFailed TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                        lastSequenceNumber,
+                        shelfNodeName,
+                        shelfNum,
+                        moduleSlotNumber,
+                        moduleTrapAlarmSeverity,
+                        functionModuleType,
+                        genericTimeStamp,
+                        lineNum,
+                        ausmChanPortNum,
+                        ausmChanNum,
+                        chanVpi,
+                        chanVci,
+                        lineType,
+                        chanConnType,
+                        ausmChanStatusBitMap
+                        }
+
+        DESCRIPTION
+                "Sent when an AUSM logical channel fails, i.e. the channel
+                cannot pass traffic within the PNNI n/w.
+                This trap is not applicable to MGX Release 1.x.
+                "
+        ::= 50919
+
+-- -----------------------------------------------------------------
+--
+--
+-- This file contains all the SNMP TRAPS specific 
+--    to CESM card.
+--
+-- -----------------------------------------------------------------
+
+-- -----------------------------------------------------------------
+--
+--
+--  Traps specific to CESM-4P  
+--
+--
+-- -----------------------------------------------------------------
+
+trapCesmChanActive		TRAP-TYPE
+		ENTERPRISE      basis
+		VARIABLES       { 
+						lastSequenceNumber,
+						shelfNodeName,
+						shelfNum,
+						moduleSlotNumber,
+						moduleTrapAlarmSeverity,
+						lineNum,
+						cesCnfChanNum
+                        }
+ 
+        DESCRIPTION
+                "Sent when a CESM Channel becomes active
+                "
+        ::= 50950
+
+trapCesmChanDelete		TRAP-TYPE
+		ENTERPRISE      basis
+		VARIABLES       { 
+						lastSequenceNumber,
+						shelfNodeName,
+						shelfNum,
+						moduleSlotNumber,
+						moduleTrapAlarmSeverity,
+						lineNum,
+						cesCnfChanNum
+                        }
+ 
+        DESCRIPTION
+                "Sent when a CESM Channel is deleted
+                "
+        ::= 50952
+
+
+trapCesmChanUnderflow	TRAP-TYPE
+		ENTERPRISE      basis
+		VARIABLES       { 
+						lastSequenceNumber,
+						shelfNodeName,
+						shelfNum,
+						moduleSlotNumber,
+						moduleTrapAlarmSeverity,
+						lineNum,
+						cesCnfChanNum
+                        }
+ 
+        DESCRIPTION
+                "Sent when a CESM Channel egress underflows
+                "
+        ::= 50960
+
+trapCesmChanOverflow	TRAP-TYPE
+		ENTERPRISE      basis
+		VARIABLES       { 
+						lastSequenceNumber,
+						shelfNodeName,
+						shelfNum,
+						moduleSlotNumber,
+						moduleTrapAlarmSeverity,
+						lineNum,
+						cesCnfChanNum
+                        }
+ 
+        DESCRIPTION
+                "Sent when a CESM Channel egress overflows
+                "
+        ::= 50961
+
+
+trapCesmChanCellLoss	TRAP-TYPE
+		ENTERPRISE      basis
+		VARIABLES       { 
+						lastSequenceNumber,
+						shelfNodeName,
+						shelfNum,
+						moduleSlotNumber,
+						moduleTrapAlarmSeverity,
+						lineNum,
+						cesCnfChanNum
+                        }
+ 
+        DESCRIPTION
+                "Sent when a CESM Channel Egress cell  loss occurs
+                "
+        ::= 50962
+
+-- -----------------------------------------------------------------
+--
+--
+--  Traps specific to CESM-8T1/E1
+--
+--
+-- -----------------------------------------------------------------
+trapCesmChanActiveNew        TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       { 
+                        lastSequenceNumber,
+                        shelfNodeName,
+                        shelfNum,
+                        moduleSlotNumber,
+                        moduleTrapAlarmSeverity,
+                        lineNum,
+                        cesCnfChanNum,
+                        cesChanPortNum
+                        }
+ 
+        DESCRIPTION
+                "Sent when a CESM Channel becomes active
+                "
+        ::= 50941
+
+trapCesmChanDeleteNew        TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       { 
+                        lastSequenceNumber,
+                        shelfNodeName,
+                        shelfNum,
+                        moduleSlotNumber,
+                        moduleTrapAlarmSeverity,
+                        lineNum,
+                        cesCnfChanNum,
+                        cesChanPortNum
+                        }
+ 
+        DESCRIPTION
+                "Sent when a CESM Channel is deleted
+                "
+        ::= 50942
+
+
+trapCesmChanUnderflowNew    TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       { 
+                        lastSequenceNumber,
+                        shelfNodeName,
+                        shelfNum,
+                        moduleSlotNumber,
+                        moduleTrapAlarmSeverity,
+                        lineNum,
+                        cesCnfChanNum,
+                        cesChanPortNum
+                        }
+ 
+        DESCRIPTION
+                "Sent when a CESM Channel egress underflows
+                "
+        ::= 50943
+
+trapCesmChanOverflowNew    TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       { 
+                        lastSequenceNumber,
+                        shelfNodeName,
+                        shelfNum,
+                        moduleSlotNumber,
+                        moduleTrapAlarmSeverity,
+                        lineNum,
+                        cesCnfChanNum,
+                        cesChanPortNum
+                        }
+ 
+        DESCRIPTION
+                "Sent when a CESM Channel egress overflows
+                "
+        ::= 50944
+
+
+trapCesmChanCellLossNew    TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       { 
+                        lastSequenceNumber,
+                        shelfNodeName,
+                        shelfNum,
+                        moduleSlotNumber,
+                        moduleTrapAlarmSeverity,
+                        lineNum,
+                        cesCnfChanNum,
+                        cesChanPortNum
+                        }
+ 
+        DESCRIPTION
+                "Sent when a CESM Channel Egress cell  loss occurs
+                "
+        ::= 50945
+
+
+trapCesmChanIdleSuppStartNew     TRAP-TYPE
+            ENTERPRISE      basis
+            VARIABLES       { 
+                            lastSequenceNumber,
+                            shelfNodeName,
+                            shelfNum,
+                            moduleSlotNumber,
+                            moduleTrapAlarmSeverity,
+                            lineNum,
+                            cesCnfChanNum,
+                            cesChanPortNum
+                           }
+ 
+        DESCRIPTION
+                "Sent when Idle suppression starts on this connection
+                "
+        ::= 50946 
+
+
+trapCesmChanIdleSuppStopNew    TRAP-TYPE
+            ENTERPRISE      basis
+            VARIABLES       { 
+                            lastSequenceNumber,
+                            shelfNodeName,
+                            shelfNum,
+                            moduleSlotNumber,
+                            moduleTrapAlarmSeverity,
+                            lineNum,
+                            cesCnfChanNum,
+                            cesChanPortNum
+                          }
+ 
+        DESCRIPTION
+				"Sent when Idle suppression stops on this connection
+                "
+        ::= 50947
+
+trapCesmPortAdded          TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         lineNum,
+                         lineType,
+                         cesPortNum,
+                         cesPortDs0ConfigBitMap
+  
+                        }
+ 
+        DESCRIPTION
+                "indicates port added (enabled)
+                "
+        ::= 50971
+
+trapCesmPortActive          TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         lineNum,
+                         lineType,
+                         cesPortNum,
+                         cesPortDs0ConfigBitMap
+  
+                        }
+ 
+        DESCRIPTION
+                "indicates port active
+                "
+        ::= 50972
+
+trapCesmPortFailed      TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         lineNum,
+                         lineType,
+                         cesPortNum,
+                         cesPortDs0ConfigBitMap
+                        }
+ 
+        DESCRIPTION
+                "indicates port failed
+                "
+        ::= 50973
+
+trapCesmPortDelete      TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         lineNum,
+                         lineType,
+                         cesPortNum,
+                         cesPortDs0ConfigBitMap
+                        }
+ 
+        DESCRIPTION
+                "indicates port deleted
+                "
+        ::= 50974
+
+-- -----------------------------------------------------------------
+--
+--
+--  Traps generic to CESM-4P/8P/T3/E3
+--
+--
+-- -----------------------------------------------------------------
+
+trapCesmChanActiveGeneric        TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       { 
+                        lastSequenceNumber,
+                        shelfNodeName,
+                        shelfNum,
+                        moduleSlotNumber,
+                        moduleTrapAlarmSeverity,
+			functionModuleType,
+			genericTimeStamp,
+                        genericLineNum,
+                        cesCnfChanNum,
+                        cesChanPortNum
+                        }
+ 
+        DESCRIPTION
+                "Sent when a CESM Channel becomes active
+                "
+        ::= 50926
+
+trapCesmChanDeleteGeneric        TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       { 
+                        lastSequenceNumber,
+                        shelfNodeName,
+                        shelfNum,
+                        moduleSlotNumber,
+                        moduleTrapAlarmSeverity,
+			functionModuleType,
+			genericTimeStamp,
+                        genericLineNum,
+                        cesCnfChanNum,
+                        cesChanPortNum
+                        }
+ 
+        DESCRIPTION
+                "Sent when a CESM Channel is deleted
+                "
+        ::= 50927
+
+
+trapCesmChanUnderflowGeneric    TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       { 
+                        lastSequenceNumber,
+                        shelfNodeName,
+                        shelfNum,
+                        moduleSlotNumber,
+                        moduleTrapAlarmSeverity,
+			functionModuleType,
+			genericTimeStamp,
+                        genericLineNum,
+                        cesCnfChanNum,
+                        cesChanPortNum
+                        }
+ 
+        DESCRIPTION
+                "Sent when a CESM Channel egress underflows
+                "
+        ::= 50928
+
+trapCesmChanOverflowGeneric    TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       { 
+                        lastSequenceNumber,
+                        shelfNodeName,
+                        shelfNum,
+                        moduleSlotNumber,
+                        moduleTrapAlarmSeverity,
+			functionModuleType,
+			genericTimeStamp,
+                        genericLineNum,
+                        cesCnfChanNum,
+                        cesChanPortNum
+                        }
+ 
+        DESCRIPTION
+                "Sent when a CESM Channel egress overflows
+                "
+        ::= 50929
+
+
+trapCesmChanCellLossGeneric    TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       { 
+                        lastSequenceNumber,
+                        shelfNodeName,
+                        shelfNum,
+                        moduleSlotNumber,
+                        moduleTrapAlarmSeverity,
+			functionModuleType,
+			genericTimeStamp,
+                        genericLineNum,
+                        cesCnfChanNum,
+                        cesChanPortNum
+                        }
+ 
+        DESCRIPTION
+                "Sent when a CESM Channel Egress cell  loss occurs
+                "
+        ::= 50930
+
+
+trapCesmChanIdleSuppStartGeneric     TRAP-TYPE
+            ENTERPRISE      basis
+            VARIABLES       { 
+                            lastSequenceNumber,
+                            shelfNodeName,
+                            shelfNum,
+                            moduleSlotNumber,
+                            moduleTrapAlarmSeverity,
+        		    functionModuleType,
+			    genericTimeStamp,
+                            genericLineNum,
+                            cesCnfChanNum,
+                            cesChanPortNum
+                           }
+ 
+        DESCRIPTION
+                "Sent when Idle suppression starts on this connection
+                "
+        ::= 50931 
+
+
+trapCesmChanIdleSuppStopGeneric    TRAP-TYPE
+            ENTERPRISE      basis
+            VARIABLES       { 
+                            lastSequenceNumber,
+                            shelfNodeName,
+                            shelfNum,
+                            moduleSlotNumber,
+                            moduleTrapAlarmSeverity,
+        		    functionModuleType,
+			    genericTimeStamp,
+                            genericLineNum,
+                            cesCnfChanNum,
+                            cesChanPortNum
+                          }
+ 
+        DESCRIPTION
+				"Sent when Idle suppression stops on this connection
+                "
+        ::= 50932
+
+trapCesmPortAddedGeneric          TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+		         functionModuleType,
+			 genericTimeStamp,
+                         genericLineNum,
+                         genericLineType,
+			 cesPortNum,
+                         cesPortDs0ConfigBitMap
+  
+                        }
+ 
+        DESCRIPTION
+                "indicates port added (enabled)
+                "
+        ::= 50933
+
+trapCesmPortActiveGeneric          TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+		         functionModuleType,
+			 genericTimeStamp,
+                         genericLineNum,
+                         genericLineType,
+                         cesPortNum,
+                         cesPortDs0ConfigBitMap
+  
+                        }
+ 
+        DESCRIPTION
+                "indicates port active
+                "
+        ::= 50934
+
+trapCesmPortFailedGeneric      TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+		         functionModuleType,
+			 genericTimeStamp,
+                         genericLineNum,
+                         genericLineType,
+                         cesPortNum,
+                         cesPortDs0ConfigBitMap
+                        }
+ 
+        DESCRIPTION
+                "indicates port is failed
+                "
+        ::= 50935
+
+trapCesmPortDeleteGeneric      TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+		         functionModuleType,
+			 genericTimeStamp,
+                         genericLineNum,
+                         genericLineType,
+                         cesPortNum,
+                         cesPortDs0ConfigBitMap
+                        }
+ 
+        DESCRIPTION
+                "indicates port  is deleted
+                "
+        ::= 50936
+
+
+
+trapCesmConDown   TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                        lastSequenceNumber,
+                        shelfNodeName,
+                        shelfNum,
+                        moduleSlotNumber,
+                        moduleTrapAlarmSeverity,
+                        functionModuleType,
+                        genericTimeStamp,
+                        cesCnfChanNum,
+                        cesChanPortNum,
+                        cesChanRowStatus,
+                        genericLineNum,
+                        cesPortDs0ConfigBitMap
+                        }
+
+        DESCRIPTION
+                "Sent when a  CESM Channel is brought down.
+                 This object is not applicable to MGX Release 1.x.
+                "
+        ::= 50937
+
+
+trapCesmConUp   TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                        lastSequenceNumber,
+                        shelfNodeName,
+                        shelfNum,
+                        moduleSlotNumber,
+                        moduleTrapAlarmSeverity,
+                        functionModuleType,
+                        genericTimeStamp,
+                        cesCnfChanNum,
+                        cesChanPortNum,
+                        cesChanRowStatus,
+                        genericLineNum,
+                        cesPortDs0ConfigBitMap
+                        }
+        DESCRIPTION
+                "Sent when a  CESM Channel is brought up from down.
+                 The previous RowStatus of this channel must be outOfService.
+                 This object is not applicable to MGX Release 1.x.
+                "
+        ::= 50938
+
+
+trapCesmChanReroute   TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                        lastSequenceNumber,
+                        shelfNodeName,
+                        shelfNum,
+                        moduleSlotNumber,
+                        moduleTrapAlarmSeverity,
+                        functionModuleType,
+                        genericTimeStamp,
+                        cesCnfChanNum,
+                        cesChanPortNum,
+                        cesChanRowStatus,
+                        genericLineNum,
+                        cesPortDs0ConfigBitMap
+                        }
+        DESCRIPTION
+                "Sent when a  CESM Channel is rerouted.
+                 This object is not applicable to MGX Release 1.x.
+                "
+        ::= 50939
+
+trapCesmChannelAlarm  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                        lastSequenceNumber,
+                        shelfNodeName,
+                        shelfNum,
+                        moduleSlotNumber,
+                        moduleTrapAlarmSeverity,
+                        functionModuleType,
+                        genericTimeStamp,
+                        genericLineNum,
+                        cesCnfChanNum,
+                        cesChanPortNum,
+                        cesChanStatusBitMap
+                        }
+
+        DESCRIPTION
+                "Sent when an CESM logical channel is in Alarm,
+                i.e. the channel can pass traffic within the PNNI
+                n/w but is in Alarm because of CPE connectivity, or
+                the line being in alarm.
+                This object is not applicable to MGX Release 1.x.
+                "
+        ::= 50948
+
+trapCesmChannelFailed TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                        lastSequenceNumber,
+                        shelfNodeName,
+                        shelfNum,
+                        moduleSlotNumber,
+                        moduleTrapAlarmSeverity,
+                        functionModuleType,
+                        genericTimeStamp,
+                        genericLineNum,
+                        cesCnfChanNum,
+                        cesChanPortNum,
+                        cesChanStatusBitMap
+                        }
+
+        DESCRIPTION
+                "Sent when a CESM logical channel fails, i.e. the channel
+                cannot pass traffic within the PNNI n/w.
+                This object is not applicable to MGX Release 1.x.
+                "
+        ::= 50949
+-- -----------------------------------------------------------------
+--
+--
+-- This file contains all the SNMP TRAPS specific 
+-- to FRSM-VHS cards.
+--
+-- -----------------------------------------------------------------
+
+
+trapGenFrPortActive  TRAP-TYPE
+    ENTERPRISE  basis
+    VARIABLES   { 
+        lastSequenceNumber,
+        shelfNodeName,
+        shelfNum,
+        moduleSlotNumber,
+        moduleTrapAlarmSeverity,
+        functionModuleType,
+        genericTimeStamp,
+        portNum,
+        genericLineNum,
+        genericLineType,
+        portState,
+        portSignallingState,
+        portDs0ConfigBitMap
+    }
+    DESCRIPTION
+    "Trap that is generated to indicate that a FR logical
+     port has become active. Currently, this trap is used
+     only in all flavours of FRSM-VHS card (FRSM-2CT3/T3/E3/
+     HS2).
+    "
+    ::= 50381
+
+trapGenFrPortFailed TRAP-TYPE
+    ENTERPRISE  basis
+    VARIABLES   { 
+        lastSequenceNumber,
+        shelfNodeName,
+        shelfNum,
+        moduleSlotNumber,
+        moduleTrapAlarmSeverity,
+        functionModuleType,
+        genericTimeStamp,
+        portNum,
+        genericLineNum,
+        genericLineType,
+        portState,
+        portSignallingState,
+        portDs0ConfigBitMap
+    }
+    DESCRIPTION
+    "Trap that is generated to indicate that a FR logical
+     port has failed. Currently, this trap is used only in
+     all flavours of FRSM-VHS card (FRSM-2CT3/T3/E3/HS2).
+    "
+    ::= 50382
+
+trapGenFrPortDelete TRAP-TYPE
+    ENTERPRISE  basis
+    VARIABLES   { 
+        lastSequenceNumber,
+        shelfNodeName,
+        shelfNum,
+        moduleSlotNumber,
+        moduleTrapAlarmSeverity,
+        functionModuleType,
+        genericTimeStamp,
+        portNum,
+        genericLineNum,
+        genericLineType,
+        portState,
+        portSignallingState,
+        portDs0ConfigBitMap
+    }
+   DESCRIPTION
+   "Trap that is generated to indicate that a FR logical
+    port has become deleted. Currently, this trap is used
+    only in all flavours of FRSM-VHS card (FRSM-2CT3/T3/E3/
+    HS2).
+   "
+   ::= 50383
+
+trapGenFrPortLoopbackEnabled TRAP-TYPE
+   ENTERPRISE  basis
+   VARIABLES   { 
+       lastSequenceNumber,
+       shelfNodeName,
+       shelfNum,
+       moduleSlotNumber,
+       moduleTrapAlarmSeverity,
+       functionModuleType,
+       genericTimeStamp,
+       portNum,
+       genericLineNum,
+       genericLineType,
+       portState,
+       portSignallingState
+   }
+   DESCRIPTION
+   "Trap that is generated to indicate that loopback on a FR
+    logical port has become active. Currently, this trap is used
+    only in all flavours of FRSM-VHS card (FRSM-2CT3/T3/E3/HS2).
+   "
+   ::= 50384
+
+trapGenFrPortLoopbackDisabled TRAP-TYPE
+    ENTERPRISE  basis
+    VARIABLES   { 
+        lastSequenceNumber,
+        shelfNodeName,
+        shelfNum,
+        moduleSlotNumber,
+        moduleTrapAlarmSeverity,
+        functionModuleType,
+        genericTimeStamp,
+        portNum,
+        genericLineNum,
+        genericLineType,
+        portState,
+        portSignallingState
+    }
+    DESCRIPTION
+    "Trap that is generated to indicate that loopback on
+     a FR logical port has become disabled. Currently, this
+     trap is used only in all flavours of FRSM-VHS card
+     (FRSM-2CT3/T3/E3/HS2).
+    "
+    ::= 50385
+
+trapGenFrPortOvrSubscribed TRAP-TYPE
+    ENTERPRISE      basis
+    VARIABLES       {
+        lastSequenceNumber,
+        shelfNodeName,
+        shelfNum,
+        moduleSlotNumber,
+        moduleTrapAlarmSeverity,
+        functionModuleType,
+        genericTimeStamp,
+        portNum,
+        genericLineNum,
+        genericLineType,
+        portOversubscribed,
+        portIngrPercentUtil,
+        portEgrPercentUtil
+    }
+    DESCRIPTION
+    "Trap that is generated to indicate that a FR logical
+     port has become oversubscribed. Currently, this trap
+     is used only in all flavours of FRSM-VHS card
+     (FRSM-2CT3/T3/E3/HS2).
+    "
+    ::= 50386
+
+trapGenFrChanActive  TRAP-TYPE
+    ENTERPRISE  basis
+    VARIABLES   {
+        lastSequenceNumber,
+        shelfNodeName,
+        shelfNum,
+        moduleSlotNumber,
+        moduleTrapAlarmSeverity,
+        functionModuleType,
+        genericTimeStamp,
+        genericLineNum,
+        portNum,
+        chanNum,
+        dLCI,
+        genericLineType,
+        portDs0ConfigBitMap
+    }
+    DESCRIPTION
+    "Sent when an FR logical channel becomes active: this trap is
+     currently used only in all flavours of FRSM-VHS card
+    (FRSM-2CT3/T3/E3/HS2).
+    "
+    ::= 50387
+
+trapGenFrChanFailed  TRAP-TYPE
+    ENTERPRISE  basis
+    VARIABLES   {
+        lastSequenceNumber,
+        shelfNodeName,
+        shelfNum,
+        moduleSlotNumber,
+        moduleTrapAlarmSeverity,
+        functionModuleType,
+        genericTimeStamp,
+        genericLineNum,
+        portNum,
+        chanNum,
+        dLCI,
+        genericLineType,
+        portDs0ConfigBitMap
+    }
+    DESCRIPTION
+    "Sent when an FR logical channel fails: this trap is
+     currently used only in all flavours of FRSM-VHS card
+     (FRSM-2CT3/T3/E3/HS2).
+    "
+    ::= 50388
+ 
+
+trapGenFrChanDelete  TRAP-TYPE
+    ENTERPRISE  basis
+    VARIABLES   {
+        lastSequenceNumber,
+        shelfNodeName,
+        shelfNum,
+        moduleSlotNumber,
+        moduleTrapAlarmSeverity,
+        functionModuleType,
+        genericTimeStamp,
+        genericLineNum,
+        portNum,
+        chanNum,
+        dLCI,
+        genericLineType,
+        portDs0ConfigBitMap
+    }
+    DESCRIPTION
+    "Sent when an FR logical channel is deleted: this trap is
+     currently used only in all flavours of FRSM-VHS card
+     (FRSM-2CT3/T3/E3/HS2).
+    "
+    ::= 50389
+
+
+trapGenFrsmConDown   TRAP-TYPE
+    ENTERPRISE      basis
+    VARIABLES       {
+        lastSequenceNumber,
+        shelfNodeName,
+        shelfNum,
+        moduleSlotNumber,
+        moduleTrapAlarmSeverity,
+        functionModuleType,
+        genericTimeStamp,
+        portNum,
+        chanNum,
+        chanRowStatus,
+        dLCI,
+        genericLineNum,
+        portDs0ConfigBitMap
+    }
+
+    DESCRIPTION
+    "Sent when a FRSM Channel is brought down.
+     This trap is not applicable to MGX Release 1.x.
+    "
+    ::= 50390
+
+
+trapGenFrsmConUp   TRAP-TYPE
+    ENTERPRISE      basis
+    VARIABLES       {
+        lastSequenceNumber,
+        shelfNodeName,
+        shelfNum,
+        moduleSlotNumber,
+        moduleTrapAlarmSeverity,
+        functionModuleType,
+        genericTimeStamp,
+        portNum,
+        chanNum,
+        chanRowStatus,
+        dLCI,
+        genericLineNum,
+        portDs0ConfigBitMap
+    }
+
+    DESCRIPTION
+    "Sent when a FRSM Channel is brought up from down.
+     The previous RowStatus of this channel must be outOfService.
+     This trap is not applicable to MGX Release 1.x.
+    "
+    ::= 50391
+
+
+trapGenFrsmChanReroute   TRAP-TYPE
+    ENTERPRISE      basis
+    VARIABLES       {
+        lastSequenceNumber,
+        shelfNodeName,
+        shelfNum,
+        moduleSlotNumber,
+        moduleTrapAlarmSeverity,
+        functionModuleType,
+        genericTimeStamp,
+        portNum,
+        chanNum,
+        chanRowStatus,
+        dLCI,
+        genericLineNum,
+        portDs0ConfigBitMap
+    }
+
+    DESCRIPTION
+    "Sent when a FRSM Channel is rerouted.
+     This trap is not applicable to MGX Release 1.x.
+    "
+    ::= 50392
+
+trapGenFrChannelAlarm   TRAP-TYPE
+    ENTERPRISE  basis
+    VARIABLES   {
+        lastSequenceNumber,
+        shelfNodeName,
+        shelfNum,
+        moduleSlotNumber,
+        moduleTrapAlarmSeverity,
+        functionModuleType,
+        genericTimeStamp,
+        genericLineNum,
+        portNum,
+        chanNum,
+        dLCI,
+        chanStatusBitMap,
+        genericLineType,
+        portDs0ConfigBitMap
+    }
+    DESCRIPTION
+    "Sent when an FR logical channel is in Alarm, i.e. the channel
+    can pass traffic within the PNNI n/w but is in Alarm because of
+    CPE connectivity, or the line being in alarm.
+    This trap is used for all FRSM flavors.
+    This trap is not applicable to MGX Release 1.x.
+    "
+    ::= 50393
+
+trapGenFrChannelFailed  TRAP-TYPE
+    ENTERPRISE  basis
+    VARIABLES   {
+        lastSequenceNumber,
+        shelfNodeName,
+        shelfNum,
+        moduleSlotNumber,
+        moduleTrapAlarmSeverity,
+        functionModuleType,
+        genericTimeStamp,
+        genericLineNum,
+        portNum,
+        chanNum,
+        dLCI,
+        chanStatusBitMap,
+        genericLineType,
+        portDs0ConfigBitMap
+    }
+    DESCRIPTION
+    "Sent when an FR logical channel fails, i.e. the channel
+    cannot pass traffic within the PNNI n/w.
+    This trap is used for all FRSM flavors.
+    This trap is not applicable to MGX Release 1.x.
+    "
+    ::= 50394
+------------------------------------------------------------------
+--
+-- START: TRAPS specific to VISM card.
+--
+-------------------------------------------------------------------
+--
+-- Modification History
+--
+-- 06/07 - Split all stateChange traps into separate traps and added
+--         traps for each table creation/deletion of MGMIB. Totally
+--         18 new traps have been added.
+-- 
+--         Updated the varbinds of trapEndpointCreated/Deleted to takeout
+--         mgEndpointLineNumber as this is no longer an index to 
+--         mgEndpointTable.  
+--
+-- 08/16 - Introduced config change traps : 
+--         trapVismTableChange & trapVismScalarChange    
+
+-- 09/08  Added traps for 1.5.x & 1.5.y
+-- 10/24  Added traps vismChanAdded, vismChanFailed, vismPortDelete 
+-- 12/03  Added traps trapVismConDown trapVismConUp trapVismChanReroute 
+--         for vism2.0
+--
+-- 02/09/00  Added the following traps for PRI and GR303 backhaul project:
+--         trapLapdAdded, trapLapdDeleted, trapSessionGrpAdded,
+--         trapSessionGrpDeleted, trapRudpSessionAdded, trapRudpSessionDeleted,
+--         trapRudpSessionOos, trapRudpSessionIs, trapRudpSessionPrimaryIs,
+--         trapSessionGrpActive, trapSessionGrpOos, trapSessionGrpIs,
+--         trapSessionSetOos, trapSessionSetActiveIs, trapSessionSetStandbyIs,
+--         trapSessionSetFullIs, trapLapdDlcAdded, trapLapdDlcDeleted,
+--         trapLapdDlcUp, trapLapdDlcDown. 
+--
+-- 12/23 Removed vismNSAPAddress trap
+--
+-- 03/02/00 change TRAP_rudpSession_TBL_CHG bitmap 0x4000 to 
+--                 TRAP_RUDPSESSION_TBL_CHG bitmap 0x10000
+--         
+-- 03/08/00 change trap name trapSessionGrpActive to trapRudpSessionActive
+--          and the varbinds from vismSessionGrpNum and  
+--          vismSessionGrpState to vismRudpSessionNum and 
+--          vismRudpSessionState.
+--
+-- 03/10/00 Added trap trapVismAal2Muxing for VISM1.53
+--
+-- 03/24/00 add trapSessionSetAdded and trapSessionSetDeleted.
+--
+-- 05/01/00 Add in description that genericLineNum is not applicable to 
+--          VISM for trap 50709, 50710, 50755, 50756
+--
+-- 05/10/00 Take out genericLineNum in trapVismScalarChange.
+--
+-- 05/11/00 Move vismRudpSession and vismLapd related traps to 
+--          vismNonAxipopTraps.my
+--
+-- 10/09/00 Change the trap number for trapVismFeatureChanged to 50790.
+--
+-- 10/01/01 Add vismAal2CidFailReason object to trap trapVismCidState
+--
+-- 12/21/01 Add vismChanStatusBitMap object for Abit channel alarm enhancement 
+--
+-- 01/07/02 Sync from AXIPOPMIBS after 12/26/01 MIB release.
+--
+
+trapVismIpAddressChanged    TRAP-TYPE
+    ENTERPRISE      basis
+    VARIABLES       {
+        lastSequenceNumber,
+        shelfNodeName,
+        shelfNum,
+        moduleSlotNumber,
+        moduleTrapAlarmSeverity,
+        functionModuleType,
+        genericTimeStamp,
+        vismIpAddress
+        }
+ 
+    DESCRIPTION
+        " Sent when the VISM card's IP address is changed.
+        "
+    ::= 50700
+
+
+trapVismChanActive        TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       { 
+                        lastSequenceNumber,
+                        shelfNodeName,
+                        shelfNum,
+                        moduleSlotNumber,
+                        moduleTrapAlarmSeverity,
+			functionModuleType,
+			genericTimeStamp,
+                        genericLineNum,
+                        vismCnfChanNum,
+                        vismChanPortNum
+                        }
+ 
+        DESCRIPTION
+                "Sent when a VISM Channel becomes active.
+                 genericLineNum is always set to 0 since it is not
+                 applicable to VISM.
+                "
+        ::= 50709
+
+trapVismChanDeleted     TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       { 
+                        lastSequenceNumber,
+                        shelfNodeName,
+                        shelfNum,
+                        moduleSlotNumber,
+                        moduleTrapAlarmSeverity,
+			functionModuleType,
+			genericTimeStamp,
+                        genericLineNum,
+                        vismCnfChanNum,
+                        vismChanPortNum
+                        }
+ 
+        DESCRIPTION
+                "Sent when a VISM Channel is deleted
+                 genericLineNum is always set to 0 since it is not
+                 applicable to VISM.
+                "
+        ::= 50710
+
+trapVismPortAdded    TRAP-TYPE
+    ENTERPRISE      basis
+    VARIABLES       {
+        lastSequenceNumber,
+        shelfNodeName,
+        shelfNum,
+        moduleSlotNumber,
+        moduleTrapAlarmSeverity,
+        functionModuleType,
+        genericTimeStamp,
+        genericLineNum,
+        genericLineType,
+        vismPortNum,
+        vismPortDs0ConfigBitMap,
+        vismPortType
+        }
+ 
+    DESCRIPTION
+               " Indicates port added.
+               "
+    ::= 50711
+ 
+trapVismPortActive  TRAP-TYPE
+    ENTERPRISE      basis
+    VARIABLES       {
+        lastSequenceNumber,
+        shelfNodeName,
+        shelfNum,
+        moduleSlotNumber,
+        moduleTrapAlarmSeverity,
+        functionModuleType,
+        genericTimeStamp,
+        genericLineNum,
+        genericLineType,
+        vismPortNum,
+        vismPortDs0ConfigBitMap,
+        vismPortType
+        }
+ 
+    DESCRIPTION
+        " Indicates port active.
+        "
+    ::= 50712
+ 
+trapVismPortFailed  TRAP-TYPE
+    ENTERPRISE      basis
+    VARIABLES       {
+        lastSequenceNumber,
+        shelfNodeName,
+        shelfNum,
+        moduleSlotNumber,
+        moduleTrapAlarmSeverity,
+        functionModuleType,
+        genericTimeStamp,
+        genericLineNum,
+        genericLineType,
+        vismPortNum,
+        vismPortDs0ConfigBitMap,
+        vismPortType,
+        vismPortState
+        }
+
+-- status
+-- obsolete
+-- port is a virtual concept that does not fail.
+ 
+ 
+    DESCRIPTION
+        " Indicates port Failed.
+        "
+    ::= 50713
+ 
+-- 
+-- VISM MIB extensions for Channel Protection
+--  
+
+trapProtectedChanActive        TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       { 
+                        lastSequenceNumber,
+                        shelfNodeName,
+                        shelfNum,
+                        moduleSlotNumber,
+                        moduleTrapAlarmSeverity,
+			functionModuleType,
+			genericTimeStamp,
+                        genericLineNum,
+                        vismCnfChanNum,
+                        vismChanPortNum,
+                        vismChanActivityState
+                        }
+ 
+        DESCRIPTION
+                "Sent when vismChanActivityState transitions to active.
+                "
+        ::= 50714
+
+trapProtectedChanStandby        TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       { 
+                        lastSequenceNumber,
+                        shelfNodeName,
+                        shelfNum,
+                        moduleSlotNumber,
+                        moduleTrapAlarmSeverity,
+			functionModuleType,
+			genericTimeStamp,
+                        genericLineNum,
+                        vismCnfChanNum,
+                        vismChanPortNum,
+                        vismChanActivityState
+                        }
+ 
+        DESCRIPTION
+                "Sent when vismChanActivityState transitions to standby.
+                "
+        ::= 50715
+
+trapProtectedChanFailed        TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       { 
+                        lastSequenceNumber,
+                        shelfNodeName,
+                        shelfNum,
+                        moduleSlotNumber,
+                        moduleTrapAlarmSeverity,
+			functionModuleType,
+			genericTimeStamp,
+                        genericLineNum,
+                        vismCnfChanNum,
+                        vismChanPortNum,
+                        vismChanActivityState
+                        }
+ 
+        DESCRIPTION
+                "Sent when vismChanActivityState transitions to failed.
+                "
+        ::= 50716
+
+trapProtectedChanLocked        TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       { 
+                        lastSequenceNumber,
+                        shelfNodeName,
+                        shelfNum,
+                        moduleSlotNumber,
+                        moduleTrapAlarmSeverity,
+			functionModuleType,
+			genericTimeStamp,
+                        genericLineNum,
+                        vismCnfChanNum,
+                        vismChanPortNum,
+                        vismChanLockingState
+                        }
+ 
+        DESCRIPTION
+                "Sent when vismChanLockingState transitions to lock.
+                "
+        ::= 50717
+
+trapProtectedChanUnlocked        TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       { 
+                        lastSequenceNumber,
+                        shelfNodeName,
+                        shelfNum,
+                        moduleSlotNumber,
+                        moduleTrapAlarmSeverity,
+			functionModuleType,
+			genericTimeStamp,
+                        genericLineNum,
+                        vismCnfChanNum,
+                        vismChanPortNum,
+                        vismChanLockingState
+                        }
+ 
+        DESCRIPTION
+                "Sent when vismChanLockingState transitions to unlock.
+                "
+        ::= 50718
+
+
+-- -----------------------------------------------------------------
+--
+-- START: TRAPS specific to CAS Backhaul feature 
+--
+-- -----------------------------------------------------------------
+trapVismCasVariantAdded    TRAP-TYPE
+    ENTERPRISE      basis
+    VARIABLES       {
+        lastSequenceNumber,
+        shelfNodeName,
+        shelfNum,
+        moduleSlotNumber,
+        moduleTrapAlarmSeverity,
+        functionModuleType,
+        genericTimeStamp,
+        vismCasVariantName,
+        vismCasFileName,
+        vismCasVariantState
+        }
+ 
+    DESCRIPTION
+        " Indicates that an entry has been added to vismCasVarintTable.
+        "
+    ::= 50739
+ 
+trapVismCasVariantDeleted    TRAP-TYPE
+    ENTERPRISE      basis
+    VARIABLES       {
+        lastSequenceNumber,
+        shelfNodeName,
+        shelfNum,
+        moduleSlotNumber,
+        moduleTrapAlarmSeverity,
+        functionModuleType,
+        genericTimeStamp,
+        vismCasVariantName
+        }
+ 
+    DESCRIPTION
+        " Indicates that an entry has been deleted from vismCasVarintTable.
+        "
+    ::= 50740
+
+trapVismCasVariantConfigured    TRAP-TYPE
+    ENTERPRISE      basis
+    VARIABLES       {
+        lastSequenceNumber,
+        shelfNodeName,
+        shelfNum,
+        moduleSlotNumber,
+        moduleTrapAlarmSeverity,
+        functionModuleType,
+        genericTimeStamp,
+        vismCasVariantName 
+        }
+ 
+    DESCRIPTION
+        " Indicates that casVariantState is transitioned to configured.
+        "
+    ::= 50741
+
+
+trapVismCasVariantNotConfigured    TRAP-TYPE
+    ENTERPRISE      basis
+    VARIABLES       {
+        lastSequenceNumber,
+        shelfNodeName,
+        shelfNum,
+        moduleSlotNumber,
+        moduleTrapAlarmSeverity,
+        functionModuleType,
+        genericTimeStamp,
+        vismCasVariantName
+        }
+ 
+    DESCRIPTION
+        " Indicates that casVariantState is transitioned to notConfigured.
+        "
+    ::= 50742
+
+-- -----------------------------------------------------------------
+--
+-- END: TRAPS specific to CAS Backhaul feature
+--
+-- -----------------------------------------------------------------
+
+-- -----------------------------------------------------------------
+--
+-- START: Config Change Traps
+--
+-- -----------------------------------------------------------------
+
+trapVismScalarChange  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                        shelfNodeName,
+                        shelfNum,
+                        moduleSlotNumber,
+                        moduleTrapAlarmSeverity,
+			functionModuleType,
+			genericTimeStamp,
+--                        genericLineNum,
+                         vismConfigChangeTypeBitMap
+                        }
+ 
+        DESCRIPTION
+                "Sent when a scalar object/objects changes.
+                 The bit map indicates the group to which the 
+                 changed object/objects belong. For a single SET
+                 operation, a single trap will be sent per group,
+                 regardless of how many objects got changed in 
+                 in that group.
+                "
+        ::= 50745
+
+
+trapVismTableChange  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+			 functionModuleType,
+			 genericTimeStamp,
+                         vismConfigChangeTypeBitMap,
+                         vismTrapIntIndex1,
+                         vismTrapIntIndex2,
+                         vismTrapStrIndex1
+                        }
+ 
+        DESCRIPTION
+                "Sent when a table config has changed.
+                 The bit map tells which table got changed.
+                 and vismTrapIntIndex1 shows the index of the
+                 table entry which got changed. If there are
+                 2 index values, the 2nd index will be contained
+                 in vismTrapIntIndex2. If the table has a string
+                 index, the index value will be contained in
+                 vismTrapStrIndex1.
+                "
+        ::= 50746
+
+
+-- -----------------------------------------------------------------
+--
+-- END: Config Change Traps
+--
+-- -----------------------------------------------------------------
+
+
+-- -----------------------------------------------------------------
+-- Card Specific modification traps
+-- ------------------------------------------------------------------
+trapVismCodecTemplateChanged    TRAP-TYPE
+    ENTERPRISE      basis
+    VARIABLES       {
+        lastSequenceNumber,
+        shelfNodeName,
+        shelfNum,
+        moduleSlotNumber,
+        moduleTrapAlarmSeverity,
+        functionModuleType,
+        genericTimeStamp,
+		vismAppliedTemplate
+        }
+ 
+    DESCRIPTION
+        " Indicates that the VISM Codec template has been changed. 
+        "
+    ::= 50743
+
+
+trapVismModeChanged    TRAP-TYPE
+    ENTERPRISE      basis
+    VARIABLES       {
+        lastSequenceNumber,
+        shelfNodeName,
+        shelfNum,
+        moduleSlotNumber,
+        moduleTrapAlarmSeverity,
+        functionModuleType,
+        genericTimeStamp,
+        vismMode
+        }
+ 
+    DESCRIPTION
+        " Indicates that the vismMode has been changed on the card.
+        "
+    ::= 50744
+-- ----------------------------------------------------------------------
+--
+-- AAL2 CID table related traps
+--
+-- ----------------------------------------------------------------------
+
+trapVismAal2CidAdded    TRAP-TYPE
+    ENTERPRISE      basis
+    VARIABLES       {
+        lastSequenceNumber,
+        shelfNodeName,
+        shelfNum,
+        moduleSlotNumber,
+        moduleTrapAlarmSeverity,
+        functionModuleType,
+        genericTimeStamp,
+		vismAal2CidNum,
+		vismAal2CidLcn
+        }
+ 
+    DESCRIPTION
+        " Indicates that an entry has been added to the table vismAal2CidCnfTable.
+        "
+    ::= 50747
+
+
+trapVismAal2CidDeleted    TRAP-TYPE
+    ENTERPRISE      basis
+    VARIABLES       {
+        lastSequenceNumber,
+        shelfNodeName,
+        shelfNum,
+        moduleSlotNumber,
+        moduleTrapAlarmSeverity,
+        functionModuleType,
+        genericTimeStamp,
+		vismAal2CidNum,
+		vismAal2CidLcn
+        }
+ 
+    DESCRIPTION
+        " Indicates that an entry has been deleted from the table vismAal2CidCnfTable.
+        "
+    ::= 50748
+
+
+-- ----------------------------------------------------------------------
+--
+-- HDLC Channel related traps
+--
+-- ----------------------------------------------------------------------
+
+trapVismHdlcChanAdded    TRAP-TYPE
+    ENTERPRISE      basis
+    VARIABLES       {
+        lastSequenceNumber,
+        shelfNodeName,
+        shelfNum,
+        moduleSlotNumber,
+        moduleTrapAlarmSeverity,
+        functionModuleType,
+        genericTimeStamp,
+        vismHdlcChanNum
+        }
+ 
+    DESCRIPTION
+        " Indicates that an entry has been added to the table vismHdlcChanTable.
+        "
+    ::= 50752
+
+
+trapVismHdlcChanDeleted    TRAP-TYPE
+    ENTERPRISE      basis
+    VARIABLES       {
+        lastSequenceNumber,
+        shelfNodeName,
+        shelfNum,
+        moduleSlotNumber,
+        moduleTrapAlarmSeverity,
+        functionModuleType,
+        genericTimeStamp,
+        vismHdlcChanNum
+        }
+ 
+    DESCRIPTION
+        " Indicates that an entry has been deleted from the table vismHdlcChanTable.
+        "
+    ::= 50753
+
+-- ----------------------------------------------------------------------
+--
+-- Additional PVC and port related traps
+--
+-- ----------------------------------------------------------------------
+
+trapVismPortDeleted  TRAP-TYPE
+    ENTERPRISE      basis
+    VARIABLES       {
+        lastSequenceNumber,
+        shelfNodeName,
+        shelfNum,
+        moduleSlotNumber,
+        moduleTrapAlarmSeverity,
+        functionModuleType,
+        genericTimeStamp,
+        genericLineNum,
+        genericLineType,
+        vismPortNum,
+        vismPortDs0ConfigBitMap,
+        vismPortType
+        }
+ 
+    DESCRIPTION
+        " Indicates port deleted.
+        "
+    ::= 50754
+
+trapVismChanAdded     TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       { 
+                        lastSequenceNumber,
+                        shelfNodeName,
+                        shelfNum,
+                        moduleSlotNumber,
+                        moduleTrapAlarmSeverity,
+			functionModuleType,
+			genericTimeStamp,
+                        genericLineNum,
+                        vismCnfChanNum,
+                        vismChanPortNum
+                        }
+ 
+        DESCRIPTION
+                "Sent when a VISM Channel is added
+                 genericLineNum is always set to 0 since it is not
+                 applicable to VISM.
+                "
+        ::= 50755
+
+
+trapVismChanFailed        TRAP-TYPE
+
+        ENTERPRISE      basis
+        VARIABLES       { 
+                        lastSequenceNumber,
+                        shelfNodeName,
+                        shelfNum,
+                        moduleSlotNumber,
+                        moduleTrapAlarmSeverity,
+                        functionModuleType,
+                        genericTimeStamp,
+                        genericLineNum,
+                        vismCnfChanNum,
+                        vismChanPortNum,
+                        vismChanStatusBitMap
+                        }
+ 
+        DESCRIPTION
+                "Sent when a VISM Channel fails 
+                 genericLineNum is always set to 0 since it is not
+                 applicable to VISM.
+                "
+        ::= 50756
+--
+-- Traps for vism 2.0
+--
+trapVismConDown     TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                        lastSequenceNumber,
+                        shelfNodeName,
+                        shelfNum,
+                        moduleSlotNumber,
+                        moduleTrapAlarmSeverity,
+                        functionModuleType,
+                        genericTimeStamp,
+                        genericLineNum,
+                        vismCnfChanNum,
+                        vismChanRowStatus,
+                        vismChanStatusBitMap
+                        }
+
+        DESCRIPTION
+                "Sent when a VISM Channel is brought down.
+                "
+        ::= 50757
+
+trapVismConUp     TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                        lastSequenceNumber,
+                        shelfNodeName,
+                        shelfNum,
+                        moduleSlotNumber,
+                        moduleTrapAlarmSeverity,
+                        functionModuleType,
+                        genericTimeStamp,
+                        genericLineNum,
+                        vismCnfChanNum,
+                        vismChanRowStatus,
+                        vismChanStatusBitMap
+                        }
+
+        DESCRIPTION
+                "Sent when a VISM Channel is brought up from down.
+                 The previous RowStatus of this channel must be outOfService.
+                "
+        ::= 50758
+
+trapVismChanReroute     TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                        lastSequenceNumber,
+                        shelfNodeName,
+                        shelfNum,
+                        moduleSlotNumber,
+                        moduleTrapAlarmSeverity,
+                        functionModuleType,
+                        genericTimeStamp,
+                        genericLineNum,
+                        vismCnfChanNum,
+                        vismChanReroute
+                        }
+
+        DESCRIPTION
+                "Sent when a VISM Channel is rerouted.
+                "
+        ::= 50759
+
+-- VISM1.53
+trapVismAal2Muxing     TRAP-TYPE
+       ENTERPRISE      basis
+       VARIABLES       {
+                        lastSequenceNumber,
+                        shelfNodeName,
+                        shelfNum,
+                        moduleSlotNumber,
+                        moduleTrapAlarmSeverity,
+                        functionModuleType,
+                        genericTimeStamp,
+                        vismAal2SubcellMuxing
+                        }
+       DESCRIPTION
+                 "sent when aal2 muxing type is changed.
+                 "
+         ::= 50760
+-- VISM1.53
+
+trapVismCidState  TRAP-TYPE
+    ENTERPRISE    basis
+    VARIABLES     {
+                   lastSequenceNumber,
+                   shelfNodeName,
+                   shelfNum,
+                   moduleSlotNumber,
+                   moduleTrapAlarmSeverity,
+                   functionModuleType,
+                   genericTimeStamp,
+                vismAal2CidNum,
+                vismAal2CidLcn,
+                vismAal2CidState,
+                vismAal2CidFailReason
+                }
+      DESCRIPTION
+              "sent when cid state changes.
+              "
+          ::= 50785
+
+trapNetworkCacConfigState TRAP-TYPE
+      ENTERPRISE  basis
+      VARIABLES    {
+                   lastSequenceNumber,
+                   shelfNodeName,
+                   shelfNum,
+                   moduleSlotNumber,
+                   moduleTrapAlarmSeverity,
+                   functionModuleType,
+                   genericTimeStamp,
+                   vismChanNum,
+                   networkCacConfigState
+                  }
+      DESCRIPTION
+              "sent when networkCacConfigState changes.
+              "
+          ::= 50788
+
+-- Trap for Mode 2
+--
+trapVismFeatureChanged    TRAP-TYPE
+    ENTERPRISE      basis
+    VARIABLES       {
+        lastSequenceNumber,
+        shelfNodeName,
+        shelfNum,
+        moduleSlotNumber,
+        moduleTrapAlarmSeverity,
+        functionModuleType,
+        genericTimeStamp,
+        vismFeatureBitMap
+        }
+ 
+    DESCRIPTION
+        " Indicates that the vismFeatureBitMap has been changed on 
+          the card.
+        "
+    ::= 50790
+--
+-- -----------------------------------------------------------------
+--
+-- END: TRAPS specific to VISM card.
+--
+-- -----------------------------------------------------------------
+--
+--
+
+-- -----------------------------------------------------------------
+--
+--
+-- This file contains all the SNMP TRAPS generated by AXIS (but not MGX)
+--
+--
+--
+--
+-- -----------------------------------------------------------------
+
+bnmCurclksourceTrap  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         currentClock
+                        }
+        DESCRIPTION
+                "Indicates that the current clock source has changed
+                "
+        ::= 50050
+
+bnmTrunkCellFormatTrapnum       TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         bnmLineInterfaceFormat
+                        }
+        DESCRIPTION
+                "This trap is sent out when the trunk cell format is changed.
+	When a BNM-155 card is present it can be changed between UNI and NNI
+	when there are no connections on the shelf. This is fixed for a T3/E3
+	card to STI format.
+        "
+        ::= 50051
+ 
+ 
+
+rasDskChksumStatusTrap  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         functionModuleType,
+                         genericTimeStamp,
+                         functionModuleState,
+                         rasDskStatus,
+                         crptdPRIfiles,
+                         crptdFWfiles
+                        }
+        DESCRIPTION
+                "Indicates the Status of the SM configuration and FirmWare
+                 files. The Trap shows the number of corrupted PRI and
+                 Firmware files in the ASC from where it is sent. This
+		 Trap is sent everytime the diagnostics is completed.
+                "
+        ::= 50312
+
+rasDskBadSectorsTrap    TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         functionModuleType,
+                         genericTimeStamp,
+                         functionModuleState,
+                         rasDskStatus,
+                         numBadSectors
+                        }
+        DESCRIPTION
+                "Indicates the number of Bad Sectors in the ASC Hard Disk.
+                 If the number of Bad Sectors exceeds the threshold value,
+		 the rasDskHealth is set to FAIL. The threshold value is
+		 30% of the total number of Sectors. This Trap is sent
+		 everytime the diagnostics is completed.
+                "
+        ::= 50313
+
+
+
+diagStatusTrap TRAP-TYPE
+      ENTERPRISE     basis
+      VARIABLES      {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         functionModuleType,
+                         genericTimeStamp,
+                         functionModuleState,
+                         diagType,
+                         diagResult,
+                         diagTestId
+                     }
+      DESCRIPTION
+           "This trap is sent out to report the results of the Diagnostics
+      performed on the shelf. The diagtype varbind indicates whether this is
+      the results of Power On Self Test (POST) or Online Diagnostics.
+      For POST,
+          this trap is sent only when POST fails and the diagTestId varbind
+      specifies the test number of the first test that failed.
+      For Online Diagnostics,
+          this trap is sent whenever a diagnostics test configured as part of
+      online diagnostics fails or passes. The traps is sent when the results of
+      a  diagnostic test changes from passed to failed or changes from failed
+      to passed. The diagResult varbind specifies passed/failed and the
+      diagTestId varbind specifies the test that failed."
+
+        ::= 50053
+
+
+-- -----------------------------------------------------------------
+--
+--
+-- This file contains all the SNMP TRAPS generated by MGX (but not AXIS)
+--
+--
+--
+--
+-- -----------------------------------------------------------------
+
+shelfPowerOverLoadTrap TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+ 			 functionModuleType,
+                         genericTimeStamp,
+                         shelfIntegratedAlarm
+                        }
+        DESCRIPTION
+                "Indicates that the functionModuleType when inserted raised the 
+		total power consumption of the shelf beyond threshold value. 
+		functionModuleType value other(1) indicates that a fan tray has been removed, 
+		which increases the power consumption value beyond the capacity of 
+		remaining fan tray. shelfIntegeratedAlarm is set to the value major(3). 
+		When the alarm condition is cleared, the same trap is sent with shelfIntegratedAlarm 
+		value set to clear (1)"
+
+        ::= 50024
+
+pxmCurClkSourceTrap  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         functionModuleType,
+                         genericTimeStamp,
+                         pxmCurrentClock,
+                         pxmPreviousClock,
+                         pxmPrimaryMuxClockSource,
+                         pxmPrimaryInbandClockSourceLineNumber,
+                         pxmPrimarySMClockSourceSlotNumber,
+                         pxmSecondaryMuxClockSource,
+                         pxmSecondaryInbandClockSourceLineNumber,
+                         pxmSecondarySMClockSourceSlotNumber,
+                         pxmExtClockPresent,
+                         pxmExtClkSrcImpedance,
+                         pxmExtClkConnectorType,
+                         pxmClkStratumLevel,
+                         pxmClkErrReason,
+                         pxmExtClock2Present,
+                         pxmExtClk2SrcImpedance,
+                         pxmExtClk2ConnectorType
+                        }
+        DESCRIPTION
+                "Indicates that the current clock source has changed
+                "
+        ::= 50135
+
+atmLineCellFormatTrap TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         functionModuleType,
+                         genericTimeStamp,
+                         atmLineCnfNum,
+                         atmLineInterfaceFormat
+                        }
+        DESCRIPTION
+                "This trap is sent out when the line cell format is changed.
+        PXM lines can be configured to either UNI or NNI cell formats.
+        STI format is not supported in MGX PXM.
+        "
+        ::= 50052
+
+secLineModuleRemovedTrap  TRAP-TYPE
+         ENTERPRISE   basis
+         VARIABLES    {
+                       lastSequenceNumber,
+                       shelfNodeName,
+                       shelfNum,
+                       moduleSlotNumber,
+                       moduleTrapAlarmSeverity,
+                       functionModuleType,
+                       genericTimeStamp,
+                       secLineModuleState,
+                       secLineModuleType
+                      }
+      DESCRIPTION
+              "Indicates whether or not a particular secondary
+               (bottom) line module has been removed.
+               This is applicable to MGX only, in a case 
+               where the front card(functionModuleType) is 
+               a full height card with 2 half height back cards.
+              "
+         ::= 50035
+
+secLineModuleInsertedTrap  TRAP-TYPE
+         ENTERPRISE   basis
+         VARIABLES    {
+                       lastSequenceNumber,
+                       shelfNodeName,
+                       shelfNum,
+                       moduleSlotNumber,
+                       moduleTrapAlarmSeverity,
+                       functionModuleType,
+                       genericTimeStamp,
+                       secLineModuleState,
+                       secLineModuleType
+                      }
+      DESCRIPTION
+              "Indicates whether or not a particular secondary
+	       (bottom) line module has been inserted
+               This is applicable to MGX only, in a case 
+               where the front card(functionModuleType) is 
+               a full height card with 2 half height back cards.
+              "
+         ::= 50036
+
+secLineModuleMismatchTrap  TRAP-TYPE
+         ENTERPRISE   basis
+         VARIABLES    {
+                       lastSequenceNumber,
+                       shelfNodeName,
+                       shelfNum,
+                       moduleSlotNumber,
+                       moduleTrapAlarmSeverity,
+                       functionModuleType,
+                       genericTimeStamp,
+                       secLineModuleType
+                      }
+      DESCRIPTION
+              "Indicates that the front card 
+	       does not support the secondary (bottom)line module.
+               This is applicable to MGX only, in a case 
+               where the front card(functionModuleType) is 
+               a full height card with 2 half height back cards.
+              "
+         ::= 50037
+
+----------------------------------------------------------------
+pxmApsDeactivateTrap  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         functionModuleType,
+                         genericTimeStamp,
+                         apsWorkingSlot,
+                         apsWorkingLine,
+                         apsProtectionSlot,
+                         apsProtectionLine,
+                         apsActiveLine
+                        }
+        DESCRIPTION
+        "This trap indicates APS feature is deactivated for the working
+         and protection pair. Severity = Clear
+         
+         NOTE: it is used by SRME too and the moduleSlotNumber will
+              identify the source from PXM or SRME
+        "
+        ::= 50603
+
+pxmApsActivateTrap  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         functionModuleType,
+                         genericTimeStamp,
+                         apsWorkingSlot,
+                         apsWorkingLine,
+                         apsProtectionSlot,
+                         apsProtectionLine,
+                         apsActiveLine
+                        }
+        DESCRIPTION
+        "This trap indicates APS feature is Activated for the working
+         and protection pair. Severity = Clear
+         
+         NOTE: it is used by SRME too and the moduleSlotNumber will
+              identify the source from PXM or SRME
+        "
+        ::= 50604
+
+
+pxmApsCardFailureTrap  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         functionModuleType,
+                         genericTimeStamp,
+                         apsWorkingSlot,
+                         apsWorkingLine,
+                         apsProtectionSlot,
+                         apsProtectionLine,
+                         apsActiveLine,
+                         apsCardFailureCode
+                        }
+        DESCRIPTION
+        "This trap indicates abnormal condition on a PSM card
+         which is used for APS feature. Severity = Major
+         
+         NOTE: it is used by SRME too and the moduleSlotNumber will
+              identify the source from PXM or SRME
+        "
+        ::= 50605
+
+pxmApsLineFailureTrap  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         functionModuleType,
+                         genericTimeStamp,
+                         apsWorkingSlot,
+                         apsWorkingLine,
+                         apsProtectionSlot,
+                         apsProtectionLine,
+                         apsActiveLine,
+                         apsLineFailureCode
+                        }
+        DESCRIPTION
+        "This trap indicates abnormal condition occurs on the working 
+         SONET line in the APS pair. Severity = Major
+         
+         NOTE: it is used by SRME too and the moduleSlotNumber will
+              identify the source from PXM or SRME
+        "
+        ::= 50606
+
+pxmApsLineSwitchTrap TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         functionModuleType,
+                         genericTimeStamp,
+                         apsWorkingSlot,
+                         apsWorkingLine,
+                         apsProtectionSlot,
+                         apsProtectionLine,
+                         apsActiveLine,
+                         apsLineSwReason
+                        }
+        DESCRIPTION
+        "This trap indicates the APS line has been switched.
+         The apsLineSwReason describes the switch reason. Severity = Minor
+         
+         NOTE: it is used by SRME too and the moduleSlotNumber will
+              identify the source from PXM or SRME
+        "
+        ::= 50607
+
+pxmApsLineSwitchFailureTrap TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         functionModuleType,
+                         genericTimeStamp,
+                         apsWorkingSlot,
+                         apsWorkingLine,
+                         apsProtectionSlot,
+                         apsProtectionLine,
+                         apsActiveLine,
+                         apsLineSwFailureCode
+                        }
+        DESCRIPTION
+        "This trap indicates abnormal condition occurs during 
+         the APS switch event. The apsLineSwFailureCode
+         describes the failure reason. Severity = Major
+         
+         NOTE: it is used by SRME too and the moduleSlotNumber will
+              identify the source from PXM or SRME
+        "
+        ::= 50608
+
+pxmApsStandbyLineFailureTrap TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         functionModuleType,
+                         genericTimeStamp,
+                         apsWorkingSlot,
+                         apsWorkingLine,
+                         apsProtectionSlot,
+                         apsProtectionLine,
+                         apsActiveLine,
+                         apsStandbyLineFailureCode
+                        }
+        DESCRIPTION
+        "This trap indicates abnormal condition occurs on the protection
+         SONET line in the APS pair. The apsLineFailureCode describes the
+         failure reason. Severity = Major
+         
+         NOTE: it is used by SRME too and the moduleSlotNumber will
+              identify the source from PXM or SRME
+        "
+        ::= 50609
+ 
+pxmApsCardClearTrap TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         functionModuleType,
+                         genericTimeStamp,
+                         apsWorkingSlot,
+                         apsWorkingLine,
+                         apsProtectionSlot,
+                         apsProtectionLine,
+                         apsActiveLine
+                        }
+        DESCRIPTION
+        "This trap indicates abnormal condition on one of the PXM cards
+         in this APS pair is cleared.
+         Severity = Clear
+         
+         NOTE: it is used by SRME too and the moduleSlotNumber will
+              identify the source from PXM or SRME
+        "
+        ::= 50610
+
+pxmApsLineClearTrap TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         functionModuleType,
+                         genericTimeStamp,
+                         apsWorkingSlot,
+                         apsWorkingLine,
+                         apsProtectionSlot,
+                         apsProtectionLine,
+                         apsActiveLine
+                        }
+        DESCRIPTION
+        "This trap indicates abnormal condition on the working SONET line
+         is cleared.  Severity = Clear
+         
+         NOTE: it is used by SRME too and the moduleSlotNumber will
+              identify the source from PXM or SRME
+        "
+        ::= 50611
+ 
+pxmApsStandbyLineClearTrap TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         functionModuleType,
+                         genericTimeStamp,
+                         apsWorkingSlot,
+                         apsWorkingLine,
+                         apsProtectionSlot,
+                         apsProtectionLine,
+                         apsActiveLine
+                        }
+        DESCRIPTION
+        "This trap indicates abnormal condition on the standby SONET
+         line is clear.  Severity = Clear
+         
+         NOTE: it is used by SRME too and the moduleSlotNumber will
+              identify the source from PXM or SRME
+        "
+        ::= 50612
+
+-- Added for SRME
+pxmApsConfigChangeTrap TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         functionModuleType,
+                         genericTimeStamp,
+                         apsWorkingSlot,
+                         apsWorkingLine,
+                         apsProtectionSlot,
+                         apsProtectionLine,
+                         apsActiveLine
+                        }
+        DESCRIPTION
+        "This trap indicates sonet APS configuration changed
+        "
+        ::= 50613
+
+pxmApsModeMismatchTrap TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         functionModuleType,
+                         genericTimeStamp,
+                         apsWorkingSlot,
+                         apsWorkingLine,
+                         apsProtectionSlot,
+                         apsProtectionLine,
+                         apsActiveLine
+                        }
+        DESCRIPTION
+        "This trap indicates that sonet APS architecture mode on the
+	 two ends of the APS pair is different. This mismatch will no
+	 cause a mode switch from 1+1 on the near end. Far end, if
+	 capable, may change its mode. If far end is not capable, 
+	 manual intervention will be required.
+         
+         NOTE: it is used by SRME too and the moduleSlotNumber will
+              identify the source from PXM or SRME
+        "
+        ::= 50614
+
+pxmApsModeMismatchClearTrap TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         functionModuleType,
+                         genericTimeStamp,
+                         apsWorkingSlot,
+                         apsWorkingLine,
+                         apsProtectionSlot,
+                         apsProtectionLine,
+                         apsActiveLine
+                        }
+        DESCRIPTION
+        "This trap indicates sonet APS architecture mode
+	 mismatch is cleared.
+         
+         NOTE: it is used by SRME too and the moduleSlotNumber will
+              identify the source from PXM or SRME
+        "
+        ::= 50615
+
+--- added for dealing with SRME xmt clock source change/loss traps
+sonetXmtClkSrcChangeTrap  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         functionModuleType,
+                         genericTimeStamp,
+                         sonetLineNum,
+                         sonetLineType,
+                         sonetLineXmtClkSrc
+                        }
+        DESCRIPTION
+                "Indicates the transmit clock source changed 
+                "
+        ::= 50112
+
+sonetXmtClkSrcLossTrap  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         functionModuleType,
+                         genericTimeStamp,
+                         sonetLineNum,
+                         sonetLineType,
+                         sonetLineXmtClkSrc
+                        }
+        DESCRIPTION
+                "Indicates that the transmit clock source is lost and 
+                 a new clock source is in effect.
+                "
+        ::= 50113
+
+-- added for srme link traps
+
+srmeAddLink TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                        lastSequenceNumber,
+                        shelfNodeName,
+                        shelfNum,
+                        moduleSlotNumber,
+                        moduleTrapAlarmSeverity,
+                        functionModuleType,
+                        genericTimeStamp,
+                        srmeLineNum,
+                        srmeStartVtNum,
+                        srmeTargetSlotNum,
+                        srmeTargetSlotLineNum,
+                        srmeVtFramingType
+                }
+        DESCRIPTION
+                "Indicates which Vt from a SRME Line is added to
+                 which slot and which line.
+                "
+        ::= 50161
+
+
+srmeDelLink TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                        lastSequenceNumber,
+                        shelfNodeName,
+                        shelfNum,
+                        moduleSlotNumber,
+                        moduleTrapAlarmSeverity,
+                        functionModuleType,
+                        genericTimeStamp,
+                        srmeLineNum,
+                        srmeStartVtNum,
+                        srmeTargetSlotNum,
+                        srmeTargetSlotLineNum,
+                        srmeVtFramingType
+                }
+        DESCRIPTION
+                "Indicates which Vt from SRME Line is deleted from
+                 which slot and which line.
+                "
+        ::= 50162
+
+srmeDelSlotLink TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                        lastSequenceNumber,
+                        shelfNodeName,
+                        shelfNum,
+                        moduleSlotNumber,
+                        moduleTrapAlarmSeverity,
+                        functionModuleType,
+                        genericTimeStamp,
+                        srmeLineNum,
+                        srmeStartVtNum,
+                        srmeTargetSlotNum,
+                        srmeTargetSlotLineNum,
+                        srmeVtFramingType
+                }
+        DESCRIPTION
+                "Indicates which line is deleted from a slot
+                "
+        ::= 50163
+
+
+srmeCnfLink TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                        lastSequenceNumber,
+                        shelfNodeName,
+                        shelfNum,
+                        moduleSlotNumber,
+                        moduleTrapAlarmSeverity,
+                        functionModuleType,
+                        genericTimeStamp,
+                        srmeLineNum,
+                        srmeStartVtNum,
+                        srmeTargetSlotNum,
+                        srmeTargetSlotLineNum,
+                        srmeVtFramingType
+                }
+        DESCRIPTION
+                "Indicates which Vt in which framing type is
+                 changed.
+                "
+        ::= 50164
+-- end of srme link traps
+
+functionModuleHoldTrap    TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         functionModuleType,
+                         genericTimeStamp,
+                         functionModuleState
+                        }
+        DESCRIPTION
+                "Indicates that a function module is
+                in Hold state
+                "
+        ::= 50044
+
+
+trapConfigChangeRev2  TRAP-TYPE
+        ENTERPRISE      basis
+        VARIABLES       {
+                         lastSequenceNumber,
+                         shelfNodeName,
+                         shelfNum,
+                         moduleSlotNumber,
+                         moduleTrapAlarmSeverity,
+                         functionModuleType,
+                         genericTimeStamp,
+                         configChangeTypeBitMap,
+                         configChangeObjectIndex,
+                         configChangeParentObjectIndex,
+                         configChangeGrandParentObjectIndex,
+                         configChangeStatus,
+						 configChangeSMSpecificObject
+                        }
+ 
+        DESCRIPTION
+                "Sent when the config has changed.
+                 The bit map indicates the change in card, line, port,
+				 channel, egress-q or resource partition configuration.
+
+                 The configChangeObjectIndex object shows the
+                 the line, port, channel, egress-q or resource partition
+                 index.
+
+                 The configChangeParentObjectIndex object shows
+                 the parent (higher level) index of configChangeObjectIndex.
+
+                 The configChangeGrandParentObjectIndex object shows
+                 the parent (higher level) index of configChangeParentObjectIndex.
+
+                 The configChangeStatus shows the operation type
+                 which can be add, mod or del.
+
+				 The configChangeSMSpecificObject is a generic object
+				 and based on the requirement can be used differently
+				 in each card type. The usage of the same is listed
+				 below.
+
+                 This trap is not applicable to MGX-8850 Release 1.x.x
+                 and MGX-8220
+                "
+
+        ::= 50315
+ 
+ 
+
+-- -----------------------------------------------------------------
+--
+-- This file contains all the SNMP TRAPS specific 
+-- to broadband interfaces on the PXM card of MGX.
+--
+-- -----------------------------------------------------------------
+
+trapBbIfAdded      TRAP-TYPE
+    ENTERPRISE      basis
+    VARIABLES       {
+        lastSequenceNumber,
+        shelfNodeName,
+        shelfNum,
+        moduleSlotNumber,
+        moduleTrapAlarmSeverity,
+        functionModuleType,
+        genericTimeStamp,
+        bbIfLineNum,
+        bbIfNum,
+        bbIfState
+    }
+    DESCRIPTION "
+        Indicates that Broadband Interface is Added .
+    "
+    ::= 50980
+
+trapBbIfActive  TRAP-TYPE
+    ENTERPRISE      basis
+    VARIABLES       { 
+        lastSequenceNumber,
+        shelfNodeName,
+        shelfNum,
+        moduleSlotNumber,
+        moduleTrapAlarmSeverity,
+        functionModuleType,
+        genericTimeStamp,
+        bbIfLineNum,
+        bbIfNum,
+        bbIfState
+    }
+    DESCRIPTION "
+        Indicates that Broadband Interface is Active.
+    "
+    ::= 50981
+
+trapBbIfDelete  TRAP-TYPE
+    ENTERPRISE      basis
+    VARIABLES       { 
+        lastSequenceNumber,
+        shelfNodeName,
+        shelfNum,
+        moduleSlotNumber,
+        moduleTrapAlarmSeverity,
+        functionModuleType,
+        genericTimeStamp,
+        bbIfLineNum,
+        bbIfNum,
+        bbIfState
+    }
+    DESCRIPTION "
+    Indicates that Broadband Interface is Deleted
+    "
+    ::= 50982
+
+trapBbIfFailed  TRAP-TYPE
+    ENTERPRISE      basis
+    VARIABLES       { 
+        lastSequenceNumber,
+        shelfNodeName,
+        shelfNum,
+        moduleSlotNumber,
+        moduleTrapAlarmSeverity,
+        functionModuleType,
+        genericTimeStamp,
+        bbIfLineNum,
+        bbIfNum,
+        bbIfState
+    }
+    DESCRIPTION "
+        Indicates that Broadband Interface is Failed ( In alarm )
+    "
+    ::= 50983
+
+trapBbIfCnfChange TRAP-TYPE
+    ENTERPRISE      basis
+    VARIABLES       { 
+        lastSequenceNumber,
+        shelfNodeName,
+        shelfNum,
+        moduleSlotNumber,
+        moduleTrapAlarmSeverity,
+        functionModuleType,
+        genericTimeStamp,
+        bbIfLineNum,
+        bbIfNum,
+        bbIfState
+    }
+    DESCRIPTION "
+        Indicates that Broadband Interface configuration has been modified.
+    "
+    ::= 50984
+
+trapBbIfRscAlloc TRAP-TYPE
+    ENTERPRISE      basis
+    VARIABLES       { 
+        lastSequenceNumber,
+        shelfNodeName,
+        shelfNum,
+        moduleSlotNumber,
+        moduleTrapAlarmSeverity,
+        functionModuleType,
+        genericTimeStamp,
+        bbIfLineNum,
+        bbIfNum,
+        bbRscPartCtrlrNum,
+        bbIfRscPrtRowStatus
+    }
+    DESCRIPTION "
+        Indicates that Broadband Interface Resource has been allocated to a
+        network controller ( for e.g. PAR )
+    "
+    ::= 50985
+
+trapBbChanAdded    TRAP-TYPE
+    ENTERPRISE      basis
+    VARIABLES       {
+        lastSequenceNumber,
+        shelfNodeName,
+        shelfNum,
+        moduleSlotNumber,
+        moduleTrapAlarmSeverity,
+        functionModuleType,
+        genericTimeStamp,
+        bbIfLineNum,
+        bbChanIfNum,
+        bbChanCnfNum,
+        bbChanVpi,
+        bbChanVci,
+        bbChanConnType
+    }
+    DESCRIPTION "
+        Indicates that Broadband Channel on user port of PXM is Added 
+    "
+    ::= 50990
+ 
+trapBbChanActive TRAP-TYPE
+    ENTERPRISE      basis
+    VARIABLES       { 
+        lastSequenceNumber,
+        shelfNodeName,
+        shelfNum,
+        moduleSlotNumber,
+        moduleTrapAlarmSeverity,
+        functionModuleType,
+        genericTimeStamp,
+        bbIfLineNum,
+        bbChanIfNum,
+        bbChanCnfNum,
+        bbChanVpi,
+        bbChanVci,
+        bbChanConnType
+    }
+    DESCRIPTION "
+        Indicates that Broadband Channel on user port of PXM is Active and 
+        No alarms exist.
+    "
+    ::= 50991
+
+trapBbChanDelete TRAP-TYPE
+    ENTERPRISE      basis
+    VARIABLES       { 
+        lastSequenceNumber,
+        shelfNodeName,
+        shelfNum,
+        moduleSlotNumber,
+        moduleTrapAlarmSeverity,
+        functionModuleType,
+        genericTimeStamp,
+        bbIfLineNum,
+        bbChanIfNum,
+        bbChanCnfNum,
+        bbChanVpi,
+        bbChanVci,
+        bbChanConnType
+    }
+    DESCRIPTION "
+        Sent when a Channel is deleted
+    "
+    ::= 50992
+
+trapBbChanFailed TRAP-TYPE
+    ENTERPRISE      basis
+    VARIABLES       { 
+        lastSequenceNumber,
+        shelfNodeName,
+        shelfNum,
+        moduleSlotNumber,
+        moduleTrapAlarmSeverity,
+        functionModuleType,
+        genericTimeStamp,
+        bbIfLineNum,
+        bbChanIfNum,
+        bbChanCnfNum,
+        bbChanVpi,
+        bbChanVci,
+        bbChanConnType
+    }
+    DESCRIPTION "
+        Sent when a Channel fails (In alarm)
+    "
+    ::= 50993
+
+------------------------------------------------------------------------
+--
+-- RPM TRAPS
+-- Traps chan failed, up and down will be added later.
+--
+------------------------------------------------------------------------
+
+trapRpmPortAdd    TRAP-TYPE
+	ENTERPRISE      basis
+	VARIABLES       {
+		lastSequenceNumber,
+		shelfNodeName,
+		shelfNum,
+		moduleSlotNumber,
+		moduleTrapAlarmSeverity,
+		functionModuleType,
+		genericTimeStamp,
+		rpmPortInterface,
+		rpmPortSubInterface
+	}
+	DESCRIPTION
+	" 
+		Indicates that a sub interface is added.
+	"
+	::= 50191
+
+
+trapRpmPortDelete   TRAP-TYPE
+	ENTERPRISE      basis
+	VARIABLES       {
+		lastSequenceNumber,
+		shelfNodeName,
+		shelfNum,
+		moduleSlotNumber,
+		moduleTrapAlarmSeverity,
+		functionModuleType,
+		genericTimeStamp,
+		rpmPortInterface,
+		rpmPortSubInterface
+	}
+	DESCRIPTION
+	" 
+		Indicates that a sub interface is deleted.
+	"
+	::= 50192
+
+
+trapRpmPortModify	TRAP-TYPE
+	ENTERPRISE      basis
+	VARIABLES       {
+		lastSequenceNumber,
+		shelfNodeName,
+		shelfNum,
+		moduleSlotNumber,
+		moduleTrapAlarmSeverity,
+		functionModuleType,
+		genericTimeStamp,
+		rpmPortInterface,
+		rpmPortSubInterface
+	}
+	DESCRIPTION
+	" 
+		Indicates that a sub interface is modified.
+	"
+	::= 50193
+
+trapRpmPortActive	TRAP-TYPE
+	ENTERPRISE      basis
+	VARIABLES       {
+		lastSequenceNumber,
+		shelfNodeName,
+		shelfNum,
+		moduleSlotNumber,
+		moduleTrapAlarmSeverity,
+		functionModuleType,
+		genericTimeStamp,
+		rpmPortInterface,
+		rpmPortSubInterface
+	}
+	DESCRIPTION
+	" 
+		Indicates that a sub interface is Active.
+	"
+	::= 50194
+
+
+trapRpmChanAdd    TRAP-TYPE
+	ENTERPRISE      basis
+	VARIABLES       {
+		lastSequenceNumber,
+		shelfNodeName,
+		shelfNum,
+		moduleSlotNumber,
+		moduleTrapAlarmSeverity,
+		functionModuleType,
+		genericTimeStamp,
+		rpmChanInterface,
+		rpmChanNum,
+		rpmChanVpi,
+		rpmChanVci
+	}
+	DESCRIPTION
+	" 
+		Indicates that a rpm channel is added.
+	"
+	::= 50196
+
+
+trapRpmChanDelete	TRAP-TYPE
+	ENTERPRISE      basis
+	VARIABLES       {
+		lastSequenceNumber,
+		shelfNodeName,
+		shelfNum,
+		moduleSlotNumber,
+		moduleTrapAlarmSeverity,
+		functionModuleType,
+		genericTimeStamp,
+		rpmChanInterface,
+		rpmChanNum,
+		rpmChanVpi,
+		rpmChanVci
+	}
+	DESCRIPTION
+	" 
+		Indicates that a rpm channel is deleted.
+	"
+	::= 50197
+
+
+trapRpmChanModify	TRAP-TYPE
+	ENTERPRISE      basis
+	VARIABLES       {
+		lastSequenceNumber,
+		shelfNodeName,
+		shelfNum,
+		moduleSlotNumber,
+		moduleTrapAlarmSeverity,
+		functionModuleType,
+		genericTimeStamp,
+		rpmChanInterface,
+		rpmChanNum,
+		rpmChanVpi,
+		rpmChanVci
+	}
+	DESCRIPTION
+	" 
+		Indicates that a rpm channel is modified.
+	"
+	::= 50198
+
+
+trapRpmChanActive	TRAP-TYPE
+	ENTERPRISE      basis
+	VARIABLES       {
+		lastSequenceNumber,
+		shelfNodeName,
+		shelfNum,
+		moduleSlotNumber,
+		moduleTrapAlarmSeverity,
+		functionModuleType,
+		genericTimeStamp,
+		rpmChanInterface,
+		rpmChanNum,
+		rpmChanVpi,
+		rpmChanVci
+	}
+	DESCRIPTION
+	" 
+		Indicates that a rpm channel is Active.
+	"
+	::= 50199
+-- -----------------------------------------------------------------
+--
+--
+-- This file contains all the SNMP TRAPS specific
+-- to PAR.
+--
+-- -----------------------------------------------------------------
+
+parNodeStatusChange  TRAP-TYPE
+    ENTERPRISE  basis
+    VARIABLES {
+    lastSequenceNumber,
+    shelfNodeName,
+    shelfNum,
+    moduleSlotNumber,
+    moduleTrapAlarmSeverity,
+    functionModuleType,
+    genericTimeStamp,
+    parSnNodeId,
+    parSnNodeAlarmStatus
+    }
+    DESCRIPTION
+    "This trap is generated when a alarm status of the node 
+     (parnNodeId) changes."
+    ::= 51201
+
+
+parNodeParmsChange  TRAP-TYPE
+    ENTERPRISE  basis
+    VARIABLES {
+        lastSequenceNumber,
+        shelfNodeName,
+        shelfNum,
+        moduleSlotNumber,
+        moduleTrapAlarmSeverity,
+        functionModuleType,
+        genericTimeStamp,
+        parSnNodeId,
+        parSnNodeIP,
+        parSnNodeName,
+        parSnNodeAlarmStatus
+    }
+    DESCRIPTION
+    "This trap is generated when a node (parnNodeId) parameters change."
+    ::= 51202
+
+
+parTrunkAdd  TRAP-TYPE
+    ENTERPRISE  basis
+    VARIABLES {
+        lastSequenceNumber,
+        shelfNodeName,
+        shelfNum,
+        moduleSlotNumber,
+        moduleTrapAlarmSeverity,
+        functionModuleType,
+        genericTimeStamp,
+        parSnNodeId,
+        parTrkId,
+        parTrkLocalSlotNumber,
+        parTrkLocalPortNumber,
+        parTrkLocalVTrunkId,
+        parTrkRemoteNodeId,
+        parTrkRemoteTrunkId,
+        parTrkRemoteSlotNumber,
+        parTrkRemotePortNumber,
+        parTrkRemoteVTrunkId,
+        parTrkRemoteNodeIP,
+        parTrkRemoteNodeType,
+        parTrkRemoteNodeName,
+        parTrkAlarmStatus,
+        parTrkAlarmType
+    }
+    DESCRIPTION
+    "This trap is generated when a new trunk is added in the network."
+    ::= 51203
+
+
+parTrunkStatusChange  TRAP-TYPE
+    ENTERPRISE  basis
+    VARIABLES {
+        lastSequenceNumber,
+        shelfNodeName,
+        shelfNum,
+        moduleSlotNumber,
+        moduleTrapAlarmSeverity,
+        functionModuleType,
+        genericTimeStamp,
+        parSnNodeId,
+        parTrkId,
+        parTrkLocalSlotNumber,
+        parTrkLocalPortNumber,
+        parTrkLocalVTrunkId,
+        parTrkRemoteNodeId,
+        parTrkRemoteTrunkId,
+        parTrkRemoteSlotNumber,
+        parTrkRemotePortNumber,
+        parTrkRemoteVTrunkId,
+        parTrkRemoteNodeIP,
+        parTrkRemoteNodeType,
+        parTrkRemoteNodeName,
+        parTrkAlarmStatus,
+        parTrkAlarmType
+    }
+    DESCRIPTION
+    "This trap is generated when the status of the trunk changes or the type of alarm changes."
+    ::= 51204
+
+
+
+parTrunkDelete  TRAP-TYPE
+    ENTERPRISE  basis
+    VARIABLES {
+        lastSequenceNumber,
+        shelfNodeName,
+        shelfNum,
+        moduleSlotNumber,
+        moduleTrapAlarmSeverity,
+        functionModuleType,
+        genericTimeStamp,
+        parSnNodeId,
+        parTrkId,
+        parTrkLocalSlotNumber,
+        parTrkLocalPortNumber,
+        parTrkLocalVTrunkId,
+        parTrkRemoteNodeId,
+        parTrkRemoteTrunkId,
+        parTrkRemoteSlotNumber,
+        parTrkRemotePortNumber,
+        parTrkRemoteVTrunkId,
+        parTrkRemoteNodeIP,
+        parTrkRemoteNodeType,
+        parTrkRemoteNodeName
+    }
+    DESCRIPTION
+    "This trap is generated when the trunk is deleted from the network."
+    ::= 51205
+
+
+parTrunkConfig  TRAP-TYPE
+    ENTERPRISE  basis
+    VARIABLES {
+        lastSequenceNumber,
+        shelfNodeName,
+        shelfNum,
+        moduleSlotNumber,
+        moduleTrapAlarmSeverity,
+        functionModuleType,
+        genericTimeStamp,
+        parSnNodeId,
+        parIfLogicalInterface,
+        parTrkStatReserve,
+        parTrkCnfgCcRestrict,
+        parTrkCnfgLineType,
+        parTrkCnfgPassSync,
+        parTrkCnfgDerouteDelay,
+        parTrkCnfgTrafficClassFst,
+        parTrkCnfgTrafficClassFr,
+        parTrkCnfgTrafficClassNts,
+        parTrkCnfgTrafficClassTs,
+        parTrkCnfgTrafficClassVoice,
+        parTrkCnfgTrafficClassCbr,
+        parTrkCnfgTrafficClassVbr,
+        parTrkCnfgTrafficClassAbr,
+        parTrkCnfgRoutingCost
+    }
+    DESCRIPTION
+    "This trap is generated when the trunk parameters are configured."
+    ::= 51206
+
+
+parUpConnStateChange  TRAP-TYPE
+    ENTERPRISE  basis
+    VARIABLES {
+        lastSequenceNumber,
+        shelfNodeName,
+        shelfNum,
+        moduleSlotNumber,
+        moduleTrapAlarmSeverity,
+        functionModuleType,
+        genericTimeStamp,
+        parConnLocalSlot,
+        parConnLocalPort,
+        parConnLocalVpi,
+        parConnLocalVci,
+        parConnLocalVcIndx,
+        parConnAdminStatus,
+        parConnRemoteNodeName,
+        parConnRemoteSlot,
+        parConnRemotePort,
+        parConnRemoteVpi,
+        parConnRemoteVci
+    }
+    DESCRIPTION
+    "This trap is generated when a connection is upped. 
+     This trap is generated only by the node that masters the connection."
+    ::= 51207
+
+
+parDownConnStateChange  TRAP-TYPE
+    ENTERPRISE  basis
+    VARIABLES {
+        lastSequenceNumber,
+        shelfNodeName,
+        shelfNum,
+        moduleSlotNumber,
+        moduleTrapAlarmSeverity,
+        functionModuleType,
+        genericTimeStamp,
+        parConnLocalSlot,
+        parConnLocalPort,
+        parConnLocalVpi,
+        parConnLocalVci,
+        parConnLocalVcIndx,
+        parConnAdminStatus,
+        parConnRemoteNodeName,
+        parConnRemoteSlot,
+        parConnRemotePort,
+        parConnRemoteVpi,
+        parConnRemoteVci
+    }
+    DESCRIPTION
+    "This trap is generated when a connection is downed.
+     This trap is generated only by the node that masters the connection."
+    ::= 51208
+
+parConnAutoRemove  TRAP-TYPE
+    ENTERPRISE  basis
+    VARIABLES {
+        lastSequenceNumber,
+        shelfNodeName,
+        shelfNum,
+        moduleSlotNumber,
+        moduleTrapAlarmSeverity,
+        functionModuleType,
+        genericTimeStamp,
+        parConnLocalSlot,
+        parConnLocalPort,
+        parConnLocalVpi,
+        parConnLocalVci,
+        parConnRemoteNodeName,
+        parConnRemoteSlot,
+        parConnRemotePort,
+        parConnRemoteVpi,
+        parConnRemoteVci
+    }
+    DESCRIPTION
+    "This trap is generated when a connection is auto removed."
+    ::= 51209
+
+ END 

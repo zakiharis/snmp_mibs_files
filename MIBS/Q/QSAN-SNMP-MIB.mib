@@ -1,0 +1,2026 @@
+-- *****************************************************************
+-- nas.mib:
+-- Structure of Management Information for NAS
+--
+-- Jan 5 2012
+-- *****************************************************************
+
+QSAN-SNMP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS 
+    OBJECT-TYPE FROM RFC-1212
+    TRAP-TYPE FROM RFC-1215
+    enterprises FROM RFC1155-SMI
+    DisplayString FROM RFC1213-MIB;
+
+-- QSAN SNMP tree structur
+qsan                    OBJECT IDENTIFIER ::= { enterprises 22274 }
+nas                        OBJECT IDENTIFIER ::= { qsan 2 }
+volume-config             OBJECT IDENTIFIER ::= { nas 2 }
+enclosure-management    OBJECT IDENTIFIER ::= { nas 3 }
+maintenance                OBJECT IDENTIFIER ::= { nas 4 }
+maintenance-info        OBJECT IDENTIFIER ::= { maintenance 1 }
+
+-- definition of object
+-- nas/volume-config
+-- nas/volume-config/pd
+pdTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF PDENTRY
+    ACCESS    not-accessible
+    STATUS    mandatory
+    DESCRIPTION
+        "physical disk table"
+    ::= { volume-config 1 }
+pdEntry    OBJECT-TYPE
+    SYNTAX    PDENTRY
+    ACCESS    not-accessible
+    STATUS    mandatory
+    DESCRIPTION
+        "physical disk entry"
+    INDEX    { pd-location }
+    ::= { pdTable 1 }
+PDENTRY ::= SEQUENCE {
+    pd-location DisplayString,
+    pd-status DisplayString,
+    pd-status-health DisplayString,
+    pd-status-usage DisplayString,
+    pd-vendor DisplayString,
+    pd-serial DisplayString
+}
+pd-location    OBJECT-TYPE
+    SYNTAX    DisplayString
+    ACCESS     read-only
+    STATUS    mandatory
+    DESCRIPTION
+        "PD location. e0d0: local controller slot 1, e1d0: JBOD slot 1, etc..."
+    ::= { pdEntry 1 }
+pd-status    OBJECT-TYPE
+    SYNTAX    DisplayString
+    ACCESS     read-only
+    STATUS    mandatory
+    DESCRIPTION
+        "status"
+    ::= { pdEntry 2 }
+pd-status-health    OBJECT-TYPE
+    SYNTAX    DisplayString
+    ACCESS     read-only
+    STATUS    mandatory
+    DESCRIPTION
+        "health"
+    ::= { pdEntry 3 }
+pd-status-usage    OBJECT-TYPE
+    SYNTAX    DisplayString
+    ACCESS     read-only
+    STATUS    mandatory
+    DESCRIPTION
+        "usage"
+    ::= { pdEntry 4 }
+pd-vendor    OBJECT-TYPE
+    SYNTAX    DisplayString
+    ACCESS     read-only
+    STATUS    mandatory
+    DESCRIPTION
+        "vendor"
+    ::= { pdEntry 5 }
+pd-serial    OBJECT-TYPE
+    SYNTAX    DisplayString
+    ACCESS     read-only
+    STATUS    mandatory
+    DESCRIPTION
+        "serial number"
+    ::= { pdEntry 6 }
+
+-- nas/volume-config/pool
+poolTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF POOLENTRY
+    ACCESS    not-accessible
+    STATUS    mandatory
+    DESCRIPTION
+        "pool table"
+    ::= { volume-config 2 }
+poolEntry     OBJECT-TYPE
+    SYNTAX    POOLENTRY
+    ACCESS    not-accessible
+    STATUS    mandatory
+    DESCRIPTION
+        "pool entry"
+    INDEX    { pool-no }
+    ::= { poolTable 1 }
+POOLENTRY ::= SEQUENCE {
+    pool-name DisplayString,
+    pool-total DisplayString,
+    pool-free DisplayString,
+    pool-status DisplayString
+}
+pool-name    OBJECT-TYPE
+    SYNTAX    DisplayString
+    ACCESS     read-only
+    STATUS    mandatory
+    DESCRIPTION
+        "name"
+    ::= { poolEntry 1 }
+pool-total    OBJECT-TYPE
+    SYNTAX    DisplayString
+    ACCESS     read-only
+    STATUS    mandatory
+    DESCRIPTION
+        "total size in GB"
+    ::= { poolEntry 2 }
+pool-free    OBJECT-TYPE
+    SYNTAX    DisplayString
+    ACCESS     read-only
+    STATUS    mandatory
+    DESCRIPTION
+        "free size in GB"
+    ::= { poolEntry 3 }
+pool-status    OBJECT-TYPE
+    SYNTAX    DisplayString
+    ACCESS     read-only
+    STATUS    mandatory
+    DESCRIPTION
+        "status"
+    ::= { poolEntry 4 }
+
+-- nas/enclosure-management/monitor
+monitorTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF MONITORENTRY
+    ACCESS    not-accessible
+    STATUS    mandatory
+    DESCRIPTION
+        "hardware monitor table"
+    ::= { enclosure-management 2 }
+monitorEntry     OBJECT-TYPE
+    SYNTAX    MONITORENTRY
+    ACCESS    not-accessible
+    STATUS    mandatory
+    DESCRIPTION
+        "hardware monitor entry"
+    INDEX    { ems-item }
+    ::= { monitorTable 1 }
+MONITORENTRY ::= SEQUENCE {
+                ems-loc DisplayString,
+                ems-type DisplayString,
+                ems-item DisplayString,
+                ems-value DisplayString,
+                ems-status DisplayString    }
+ems-loc    OBJECT-TYPE
+    SYNTAX    DisplayString
+    ACCESS     read-only
+    STATUS    mandatory
+    DESCRIPTION
+        "Location"
+    ::= { monitorEntry 1 }
+ems-type    OBJECT-TYPE
+    SYNTAX    DisplayString
+    ACCESS     read-only
+    STATUS    mandatory
+    DESCRIPTION
+        "Item type"
+    ::= { monitorEntry 2 }
+ems-item    OBJECT-TYPE
+    SYNTAX    DisplayString
+    ACCESS     read-only
+    STATUS    mandatory
+    DESCRIPTION
+        "item"
+    ::= { monitorEntry 3 }
+ems-value    OBJECT-TYPE
+    SYNTAX    DisplayString
+    ACCESS     read-only
+    STATUS    mandatory
+    DESCRIPTION
+        "Value"
+    ::= { monitorEntry 4 }
+ems-status    OBJECT-TYPE
+    SYNTAX    DisplayString
+    ACCESS     read-only
+    STATUS    mandatory
+    DESCRIPTION
+        "Status"
+    ::= { monitorEntry 5 }
+
+-- nas/enclosure-management/SMART
+smartTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF SMARTENTRY
+    ACCESS    not-accessible
+    STATUS    mandatory
+    DESCRIPTION
+        "HDD S.M.A.R.T. table"
+    ::= { enclosure-management 4 }
+smartEntry     OBJECT-TYPE
+    SYNTAX    SMARTENTRY
+    ACCESS    not-accessible
+    STATUS    mandatory
+    DESCRIPTION
+        "HDD S.M.A.R.T. entry"
+    INDEX    { hdd-loc }
+    ::= { smartTable 1 }
+SMARTENTRY ::= SEQUENCE {
+                hdd-loc DisplayString,
+                hdd-type DisplayString,
+                hdd-readerror DisplayString,
+                hdd-temperature DisplayString    }
+hdd-loc    OBJECT-TYPE
+    SYNTAX    DisplayString
+    ACCESS     read-only
+    STATUS    mandatory
+    DESCRIPTION
+        "Location"
+    ::= { smartEntry 1 }
+hdd-type    OBJECT-TYPE
+    SYNTAX    DisplayString
+    ACCESS     read-only
+    STATUS    mandatory
+    DESCRIPTION
+        "Type"
+    ::= { smartEntry 2 }
+hdd-readerror    OBJECT-TYPE
+    SYNTAX    DisplayString
+    ACCESS     read-only
+    STATUS    mandatory
+    DESCRIPTION
+        "Read error"
+    ::= { smartEntry 3 }
+hdd-temperature    OBJECT-TYPE
+    SYNTAX    DisplayString
+    ACCESS     read-only
+    STATUS    mandatory
+    DESCRIPTION
+        "HDD temperature in celsius"
+    ::= { smartEntry 4 }
+
+-- nas/maintenance
+-- nas/maintenance/info
+maintenance-info-fw    OBJECT-TYPE
+    SYNTAX    DisplayString
+    ACCESS     read-only
+    STATUS    mandatory
+    DESCRIPTION
+        "Firmware version"
+    ::= { maintenance-info 3 }
+
+-- definition of trap
+-- nas/event
+event        OBJECT IDENTIFIER ::= { nas    8000 }
+eventString OBJECT-TYPE
+    SYNTAX    DisplayString
+    ACCESS    not-accessible
+    STATUS    mandatory
+    DESCRIPTION
+        "event message"
+    ::= { nas 8001 }
+
+-- SNMP traps
+evtid-test    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 0
+evtid-hdd-readerr    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 1
+evtid-hdd-jbod-readerr    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 2
+evtid-hdd-writeerr    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 3
+evtid-hdd-jbod-writeerr    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 4
+evtid-smart-tec    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 5
+evtid-smart-fail    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 6
+evtid-jbod-smart-tec    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 7
+evtid-jbod-smart-fail    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 8
+evtid-smartctl-test-error    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 9
+evtid-smartctl-jbod-test-error    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 10
+evtid-pd-inserted    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 11
+evtid-pd-removed    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 12
+evtid-jbod-pd-inserted    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 13
+evtid-jbod-pd-removed    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 14
+evtid-zpool-create-ok    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 15
+evtid-zpool-create-fail    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 16
+evtid-zpool-destroy-ok    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 17
+evtid-zpool-destroy-fail    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 18
+evtid-zpool-expand-fail    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 19
+evtid-zpool-expand-vdev-ok    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 20
+evtid-zpool-expand-vdev-fail    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 21
+evtid-zpool-remove-ok    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 22
+evtid-zpool-remove-fail    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 23
+evtid-zpool-online-ok    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 24
+evtid-zpool-online-fail    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 25
+evtid-zpool-offline-ok    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 26
+evtid-zpool-offline-fail    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 27
+evtid-zpool-export-ok    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 28
+evtid-zpool-export-fail    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 29
+evtid-zpool-import-ok    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 30
+evtid-zpool-import-fail    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 31
+evtid-zpool-attach-ok    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 32
+evtid-zpool-attach-fail    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 33
+evtid-zpool-detach-ok    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 34
+evtid-zpool-detach-fail    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 35
+evtid-zpool-set-ok    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 36
+evtid-zpool-set-fail    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 37
+evtid-zpool-clear-ok    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 38
+evtid-zpool-clear-fail    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 39
+evtid-zpool-replace-ok    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 40
+evtid-zpool-replace-fail    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 41
+evtid-zpool-replace-smart-ok    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 42
+evtid-zpool-replace-smart-fail    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 43
+evtid-zpool-scrub-start    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 44
+evtid-zpool-scrub-finish    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 45
+evtid-zpool-scrub-fail-to-start    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 46
+evtid-zpool-scrub-fail-to-abort    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 47
+evtid-zpool-scrub-start-error    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 48
+evtid-zpool-scrub-abort-error    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 49
+evtid-zpool-scrub-abort-ok    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 50
+evtid-zpool-split-ok    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 51
+evtid-zpool-split-fail    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 52
+evtid-zpool-upgrade-ok    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 53
+evtid-zpool-upgrade-fail    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 54
+evtid-zpool-size-reach    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 55
+evtid-zpool-size-full    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 56
+evtid-zfs-create-ok    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 57
+evtid-zfs-create-fail    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 58
+evtid-zfs-destroy-ok    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 59
+evtid-zfs-destroy-fail    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 60
+evtid-zfs-snapshot-ok    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 61
+evtid-zfs-snapshot-fail    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 62
+evtid-zfs-snapshot-full    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 63
+evtid-zfs-snap-fail-1    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 64
+evtid-zfs-snap-fail-2    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 65
+evtid-zfs-snapshot-mount-fail    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 66
+evtid-zfs-rollback-ok    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 67
+evtid-zfs-rollback-fail    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 68
+evtid-zfs-clone-ok    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 69
+evtid-zfs-clone-fail    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 70
+evtid-zfs-mount    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 71
+evtid-zfs-mount-ok    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 72
+evtid-zfs-mount-fail    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 73
+evtid-zfs-unmount-ok    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 74
+evtid-zfs-unmount-fail    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 75
+evtid-zfs-share    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 76
+evtid-zfs-share-ok    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 77
+evtid-zfs-share-fail    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 78
+evtid-zfs-unshare-ok    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 79
+evtid-zfs-unshare-fail    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 80
+evtid-zfs-send-ok-1    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 81
+evtid-zfs-send-ok-2    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 82
+evtid-zfs-send-fail-1    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 83
+evtid-zfs-send-fail-2    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 84
+evtid-zfs-receive-ok    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 85
+evtid-zfs-receive-fail    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 86
+evtid-zfs-recv-fail-1    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 87
+evtid-zfs-recv-fail-2    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 88
+evtid-zfs-allow-ok    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 89
+evtid-zfs-allow-fail    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 90
+evtid-zfs-unallow-ok    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 91
+evtid-zfs-unallow-fail    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 92
+evtid-zfs-holds    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 93
+evtid-zfs-hold-ok    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 94
+evtid-zfs-hold-fail    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 95
+evtid-zfs-release-ok    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 96
+evtid-zfs-release-fail    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 97
+evtid-zfs-set-ok    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 98
+evtid-zfs-set-fail    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 99
+evtid-zfs-set-prop-ok    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 100
+evtid-zfs-set-prop-fail    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 101
+evtid-zfs-promote-ok    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 102
+evtid-zfs-promote-fail    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 103
+evtid-zfs-upgrade-ok    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 104
+evtid-zfs-upgrade-fail    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 105
+evtid-zfs-diff-ok    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 106
+evtid-zfs-diff-fail    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 107
+evtid-zfs-rename-ok    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 108
+evtid-zfs-rename-fail    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 109
+evtid-zfs-inherit-ok    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 110
+evtid-zfs-inherit-fail    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 111
+evtid-zfs-dedup-full    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 112
+evtid-zvol-id-resolve-ok    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 113
+evtid-zvol-id-resolve-fail    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 114
+evtid-zdb-guid-resolve-ok    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 115
+evtid-zdb-guid-resolve-fail    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 116
+evtid-ztest    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 117
+evtid-spa-state-faulted    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 118
+evtid-spa-state-degraded    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 119
+evtid-spa-resilver-start    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 120
+evtid-spa-resilver-done    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 121
+evtid-spa-data-error    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 122
+evtid-spa-io-failure    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 123
+evtid-spa-io-error    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 124
+evtid-spa-checksum-error    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 125
+evtid-spa-probe-failure    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 126
+evtid-spa-io-delay    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 127
+evtid-sys-shutdown    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 128
+evtid-sys-web-shutdown    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 129
+evtid-sys-btn-shutdown    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 130
+evtid-sys-lcm-shutdown    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 131
+evtid-sys-console-shutdown    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 132
+evtid-sys-shutdown-ng    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 133
+evtid-sys-reboot    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 134
+evtid-sys-web-reboot    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 135
+evtid-sys-lcm-reboot    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 136
+evtid-sys-console-reboot    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 137
+evtid-sys-power-on    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 138
+evtid-sys-bootup    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 139
+evtid-fw-upgrade-start    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 140
+evtid-fw-upgrade-success    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 141
+evtid-fw-upgrade-failure    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 142
+evtid-ipc-fw-upgrade-timeout    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 143
+evtid-daughter-card-mismatch    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 144
+evtid-user-create    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 145
+evtid-user-delete    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 146
+evtid-user-change-passwd    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 147
+evtid-user-change-quota    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 148
+evtid-user-add-group    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 149
+evtid-user-delete-group    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 150
+evtid-user-quota-reach    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 151
+evtid-zfs-quota-reach    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 152
+evtid-group-create    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 153
+evtid-group-delete    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 154
+evtid-env-vol-track    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 155
+evtid-env-vol-level-1    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 156
+evtid-env-vol-level-2    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 157
+evtid-env-vol-level-3    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 158
+evtid-env-vol-level-2-shutdown    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 159
+evtid-env-vol-l2-ctr-shutdown    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 160
+evtid-env-therm-level-1    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 161
+evtid-env-therm-level-2    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 162
+evtid-env-therm-level-2-shutdown    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 163
+evtid-env-therm-track    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 164
+evtid-env-therm-l2-ctr-shutdown    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 165
+evtid-env-power-install    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 166
+evtid-env-power-absent    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 167
+evtid-env-power-rst    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 168
+evtid-env-power-fail    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 169
+evtid-env-power-sig-vol    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 170
+evtid-env-fan-rst    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 171
+evtid-env-fan-fail    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 172
+evtid-env-fan-pr    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 173
+evtid-env-fan-not-pr    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 174
+evtid-env-fan-over-speed    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 175
+evtid-env-fan-track    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 176
+evtid-bbm-installed    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 177
+evtid-bbm-sts-good    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 178
+evtid-bbm-sts-charging    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 179
+evtid-bbm-sts-fail    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 180
+evtid-bbm-inserted    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 181
+evtid-bbm-removed    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 182
+evtid-env-ups-ok    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 183
+evtid-env-ups-fail    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 184
+evtid-env-ups-ac-loss    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 185
+evtid-env-ups-power-low    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 186
+evtid-ecc-single    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 187
+evtid-ecc-multiple    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 188
+evtid-ecc-dimm    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 189
+evtid-ecc-none    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 190
+evtid-bbm-enabled    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 191
+evtid-bbm-disabled    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 192
+evtid-bbm-not-backuped    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 193
+evtid-bbm-sig-error    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 194
+evtid-bbm-inconsistent    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 195
+evtid-bbm-build-zil-start    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 196
+evtid-bbm-build-zil-finish    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 197
+evtid-bbm-num-log-built    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 198
+evtid-backup-create    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 199
+evtid-backup-delete    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 200
+evtid-backup-start    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 201
+evtid-backup-failure    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 202
+evtid-backup-finish    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 203
+evtid-backup-terminated    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 204
+evtid-backup-stop-by-shutdown    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 205
+evtid-backup-stop-by-reboot    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 206
+evtid-backup-ssh-timeout    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 207
+evtid-backup-invalid-source-1    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 208
+evtid-backup-invalid-source-2    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 209
+evtid-backup-invalid-target-1    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 210
+evtid-backup-invalid-target-2    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 211
+evtid-backup-take-snapshot-fail    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 212
+evtid-local-clone-create    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 213
+evtid-local-clone-delete    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 214
+evtid-local-clone-start    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 215
+evtid-local-clone-failure    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 216
+evtid-local-clone-finish    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 217
+evtid-local-clone-terminated    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 218
+evtid-avtask-create    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 219
+evtid-avscan-delete    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 220
+evtid-avscan-start    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 221
+evtid-avscan-failure    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 222
+evtid-avscan-finish    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 223
+evtid-avscan-terminated    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 224
+evtid-virus-found    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 225
+evtid-virus-repaired    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 226
+evtid-virus-conn-fail    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 227
+evtid-virus-log-clear    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 228
+evtid-avupdate-start    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 229
+evtid-avupdate-finish    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 230
+evtid-avupdate-failure    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 231
+evtid-send-mail-fail    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 232
+evtid-hac-ctr-inserted    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 233
+evtid-hac-ctr-removed    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 234
+evtid-hac-ctr-timeout    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 235
+evtid-hac-ctr-lockdown    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 236
+evtid-hac-ctr-failover    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 237
+evtid-hac-ctr-reset    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 238
+evtid-hac-ctr-memory-ng    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 239
+evtid-hac-ctr-firmware-ng    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 240
+evtid-hac-ctr-lowspeed-ng    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 241
+evtid-hac-ctr-highspeed-ng    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 242
+evtid-hac-ctr-be-ng    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 243
+evtid-hac-ctr-fe-ng    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 244
+evtid-hanas-hac-failover-completed    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 245
+evtid-hanas-hac-failback-completed    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 246
+evtid-iscsi-login-accepted    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 247
+evtid-iscsi-login-rejected    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 248
+evtid-iscsi-logout-recvd    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 249
+evtid-fc-port-linkup    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 250
+evtid-fc-port-linkdown    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 251
+evtid-webdav-login-rejected    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 252
+evtid-webdavs-login-rejected    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 253
+evtid-ftp-login-accepted    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 254
+evtid-ftp-login-rejected    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 255
+evtid-ftp-logout-recvd    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 256
+evtid-ftps-login-accepted    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 257
+evtid-ftps-login-rejected    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 258
+evtid-ftps-logout-recvd    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 259
+evtid-sftp-login-accepted    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 260
+evtid-sftp-login-rejected    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 261
+evtid-sftp-logout-recvd    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 262
+evtid-ftp-login-rejected-by-conn-count    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 263
+evtid-ftp-login-rejected-by-conn-rate    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 264
+evtid-cifs-login-accepted    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 265
+evtid-cifs-login-rejected    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 266
+evtid-cifs-folder-create    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 267
+evtid-cifs-file-create    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 268
+evtid-cifs-folder-open    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 269
+evtid-cifs-file-open    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 270
+evtid-cifs-file-write    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 271
+evtid-cifs-file-folder-rename    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 272
+evtid-cifs-folder-delete    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 273
+evtid-cifs-file-delete    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 274
+evtid-afp-login-accepted    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 275
+evtid-afp-login-rejected    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 276
+evtid-afp-logout-recvd    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 277
+evtid-domain-join-fail    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 278
+evtid-net-cable-plugged    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 279
+evtid-net-cable-unplugged    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 280
+evtid-rms-console-login    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 281
+evtid-rms-console-logout    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 282
+evtid-rms-web-login    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 283
+evtid-rms-web-logout    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 284
+evtid-rms-web-login-failed    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 285
+evtid-log-clear    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 286
+evtid-servicelog-clear    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 287
+evtid-bios-upgrade-start    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 288
+evtid-bios-upgrade-success    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 289
+evtid-bios-upgrade-failure    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 290
+evtid-copy-backup-failed    TRAP-TYPE
+    ENTERPRISE    event
+    VARIABLES    { eventString }
+    DESCRIPTION
+        "%s"
+    ::= 291
+END

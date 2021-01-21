@@ -1,0 +1,805 @@
+PSA-WIN-MIB DEFINITIONS ::= BEGIN
+
+--PRIMEQUEST system management MIB for Partition
+--
+--
+--$Copyright$
+--Copyright Fujitsu Limited 2003 - 2009
+--All rights reserved
+--
+--
+--MIB Revision: 02000000
+--
+
+IMPORTS
+	OBJECT-TYPE								FROM RFC-1212
+	TRAP-TYPE								FROM RFC-1215
+	mib-2, DisplayString, PhysAddress		FROM RFC1213-MIB
+	TimeTicks, Counter, Gauge, IpAddress	FROM RFC1155-SMI
+	mgmt, enterprises						FROM RFC1155-SMI
+	InetAddressType, InetAddress			FROM INET-ADDRESS-MIB;
+
+--enterprises	OBJECT IDENTIFIER ::={ iso org(3) dod(6) internet(1) private(4) 1 }
+--
+--PRIMEQUEST system management MIB nodes
+--fujitsu:                    1.3.6.1.4.1.211
+-- products:                  1.3.6.1.4.1.211.1
+--  iaServer:                 1.3.6.1.4.1.211.1.31
+--   primequest:              1.3.6.1.4.1.211.1.31.1
+--    partition:              1.3.6.1.4.1.211.1.31.1.2
+--     partitionCommon:       1.3.6.1.4.1.211.1.31.1.2.100
+--
+
+--FUJITSU PRIMEQUEST system management MIB nodes for Partition
+  fujitsu        OBJECT IDENTIFIER  ::={ enterprises 211 }
+  products       OBJECT IDENTIFIER  ::={ fujitsu 1 }
+  iaServer       OBJECT IDENTIFIER  ::={ products 31 }
+  primequest     OBJECT IDENTIFIER  ::={ iaServer 1 }
+   partition     OBJECT IDENTIFIER  ::={ primequest 2 }
+    partitionCommon	OBJECT IDENTIFIER	::={ partition	100 }
+     physicalComponent	OBJECT IDENTIFIER	::={ partitionCommon 1 }
+     logicalComponentForLinux	OBJECT IDENTIFIER	::={ partitionCommon 2 }
+     logicalComponentForWindows	OBJECT IDENTIFIER	::={ partitionCommon 3 }
+     monitoringFunction	OBJECT IDENTIFIER	::={ partitionCommon 4 }
+     thresholdFunction	OBJECT IDENTIFIER	::={ partitionCommon 5 }
+     statusFunction	OBJECT IDENTIFIER	::={ partitionCommon 6 }
+     otherFunction	OBJECT IDENTIFIER	::={ partitionCommon 7 }
+     pxFunction	OBJECT IDENTIFIER	::={ partitionCommon 8 }
+
+--FUJITSU PRIMEQUEST system management MIB objects for Partition
+
+
+--physicalComponent-MIB groups
+
+
+--logicalComponentForLinux-MIB groups
+
+
+--logicalComponentForWindows-MIB groups
+
+     winLogicalCpuInfo	OBJECT IDENTIFIER	::={ logicalComponentForWindows 1 }
+     winLogicalMemoryInfo	OBJECT IDENTIFIER	::={ logicalComponentForWindows 2 }
+     winNetworkInfo	OBJECT IDENTIFIER	::={ logicalComponentForWindows 4 }
+     winHardwareResourceInfo	OBJECT IDENTIFIER	::={ logicalComponentForWindows 5 }
+     winOperatingSystemInfo	OBJECT IDENTIFIER	::={ logicalComponentForWindows 6 }
+
+-- ****************************************************************************
+--
+-- GROUP: winLogicalCpuInfo
+--
+--	winLogicalCpuInfo :	.1.3.6.1.4.1.211.1.31.1.2.100.3.1
+--
+--Implementation of this group is mandatory
+--
+-- ****************************************************************************
+
+winNumOfLogicalCpus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Number of effective logical CPUs in the partition."
+   ::= { winLogicalCpuInfo 6 }
+
+
+-- ****************************************************************************
+--
+-- GROUP: winLogicalMemoryInfo
+--
+--	winLogicalMemoryInfo :	.1.3.6.1.4.1.211.1.31.1.2.100.3.2
+--
+--Implementation of this group is mandatory
+--
+-- ****************************************************************************
+
+winLgMemSize OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Memory size of the partition.(unit:Mbyte)"
+   ::= { winLogicalMemoryInfo 1 }
+
+winLgMemSwapSize OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Swap size of the partition.(unit:Mbyte)"
+   ::= { winLogicalMemoryInfo 2 }
+
+
+-- ****************************************************************************
+--
+-- GROUP: winNetworkInfo
+--
+--	winNetworkInfo :	.1.3.6.1.4.1.211.1.31.1.2.100.3.4
+--
+--Implementation of this group is mandatory
+--
+-- ****************************************************************************
+
+
+-- ----------------------------------------------------------------------------
+-- TABLE: winNetworkInterfaceTable
+--
+--	winNetworkInterfaceTable :	.1.3.6.1.4.1.211.1.31.1.2.100.3.4.1
+--
+--Implementation of this table is mandatory
+-- ----------------------------------------------------------------------------
+winNetworkInterfaceTable OBJECT-TYPE
+   SYNTAX   SEQUENCE OF WinNetworkInterface
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Table with network interface information."
+   ::= { winNetworkInfo 1 }
+
+winNetworkInterfaceEntry OBJECT-TYPE
+   SYNTAX   WinNetworkInterface
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   INDEX   { winNIIndex }
+   ::= { winNetworkInterfaceTable 1 }
+
+WinNetworkInterface ::=
+   SEQUENCE {
+      winNIIndex
+         INTEGER,
+      winNIMACAddress
+         PhysAddress,
+      winNIIPAddress
+         OCTET STRING,
+      winNIInterfaceName
+         DisplayString,
+      winNISpeed
+         INTEGER,
+      winNISubNetMask
+         OCTET STRING,
+      winNINetworkType
+         INTEGER,
+      winNIBusType
+         INTEGER,
+      winNISegment
+         INTEGER,
+      winNIBusNumber
+         INTEGER,
+      winNIDeviceNumber
+         INTEGER,
+      winNIFunction
+         INTEGER,
+      winNIStatus
+         INTEGER,
+      winNIIpPacketsIn
+         Counter,
+      winNIIpPacketsOut
+         Counter,
+      winNIDeviceName
+         DisplayString,
+      winNILinkStatus
+         INTEGER,
+      winNIPhysicalID
+         DisplayString,
+      winNIIPAddress2
+         DisplayString,
+      winNISubNetMask2
+         DisplayString
+   }
+
+winNIIndex OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Network inteface identification number."
+   ::= { winNetworkInterfaceEntry 1 }
+
+winNIMACAddress OBJECT-TYPE
+   SYNTAX   PhysAddress
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "The interface address of the physical layer of the network."
+   ::= { winNetworkInterfaceEntry 2 }
+
+winNIIPAddress OBJECT-TYPE
+   SYNTAX   OCTET STRING
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "IP address of the network interface."
+   ::= { winNetworkInterfaceEntry 3 }
+
+winNIInterfaceName OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Network interface name.(e.g.eth0)."
+   ::= { winNetworkInterfaceEntry 4 }
+
+winNISpeed OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Network speed.(unit:Mbit/s)"
+   ::= { winNetworkInterfaceEntry 5 }
+
+winNISubNetMask OBJECT-TYPE
+   SYNTAX   OCTET STRING
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Subnet address of the network interface."
+   ::= { winNetworkInterfaceEntry 6 }
+
+winNINetworkType OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Network interface type.  The network type definition are assigned by the IANA."
+   ::= { winNetworkInterfaceEntry 7 }
+
+winNIBusType OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Bus type of the network interface. Refer to the following definitions;
+                value     contens
+                 0           other
+                 1           isa
+                 2           eisa
+                 3           pci"
+   ::= { winNetworkInterfaceEntry 8 }
+
+winNISegment OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Segment number of the network interface."
+   ::= { winNetworkInterfaceEntry 9 }
+
+winNIBusNumber OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Bus number of the network interface."
+   ::= { winNetworkInterfaceEntry 10 }
+
+winNIDeviceNumber OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Device number of the network interface."
+   ::= { winNetworkInterfaceEntry 11 }
+
+winNIFunction OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Function number of the network interface."
+   ::= { winNetworkInterfaceEntry 12 }
+
+winNIStatus OBJECT-TYPE
+   SYNTAX   INTEGER{
+      up(1),
+      down(2),
+      testing(3)
+   }
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "The current operational state of the interface.
+                The testing(3) state indicates that no operational packets can be passed."
+   ::= { winNetworkInterfaceEntry 13 }
+
+winNIIpPacketsIn OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { winNetworkInterfaceEntry 14 }
+
+winNIIpPacketsOut OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { winNetworkInterfaceEntry 15 }
+
+winNIDeviceName OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Device name of the network interface."
+   ::= { winNetworkInterfaceEntry 16 }
+
+winNILinkStatus OBJECT-TYPE
+   SYNTAX   INTEGER{
+      up(1),
+      down(2)
+   }
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "The current link state of the interface. If 0; link status is unknown."
+   ::= { winNetworkInterfaceEntry 17 }
+
+winNIPhysicalID OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Identification name of Network Interface cand."
+   ::= { winNetworkInterfaceEntry 18 }
+
+winNIIPAddress2 OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "IP address of the network interface.
+                Please use this object instead of 'winNIIPAddress'."
+   ::= { winNetworkInterfaceEntry 19 }
+
+winNISubNetMask2 OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Subnet address of the network interface.
+                Please use this object instead of 'winNISubNetMask'."
+   ::= { winNetworkInterfaceEntry 20 }
+
+
+-- ----------------------------------------------------------------------------
+-- TABLE: winIPv6NetworkInterfaceTable
+--
+--	winIPv6NetworkInterfaceTable :	.1.3.6.1.4.1.211.1.31.1.2.100.3.4.2
+--
+--Implementation of this table is mandatory
+-- ----------------------------------------------------------------------------
+winIPv6NetworkInterfaceTable OBJECT-TYPE
+   SYNTAX   SEQUENCE OF WinIPv6NetworkInterface
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Table with IPv6 network interface information."
+   ::= { winNetworkInfo 2 }
+
+winIPv6NetworkInterfaceEntry OBJECT-TYPE
+   SYNTAX   WinIPv6NetworkInterface
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   INDEX   { winIPv6NIIndex }
+   ::= { winIPv6NetworkInterfaceTable 1 }
+
+WinIPv6NetworkInterface ::=
+   SEQUENCE {
+      winIPv6NIIndex
+         INTEGER,
+      winIPv6NIMACAddress
+         PhysAddress,
+      winIPv6NIIPAddress
+         OCTET STRING,
+      winIPv6NIIPAddress2
+         DisplayString,
+      winIPv6NIInterfaceName
+         DisplayString,
+      winIPv6NISpeed
+         INTEGER,
+      winIPv6NIPrefix
+         INTEGER,
+      winIPv6NIScope
+         INTEGER,
+      winIPv6NIDADStatus
+         INTEGER,
+      winIPv6NINetworkType
+         INTEGER,
+      winIPv6NIBusType
+         INTEGER,
+      winIPv6NISegment
+         INTEGER,
+      winIPv6NIBusNumber
+         INTEGER,
+      winIPv6NIDeviceNumber
+         INTEGER,
+      winIPv6NIFunction
+         INTEGER,
+      winIPv6NIStatus
+         INTEGER,
+      winIPv6NIIpPacketsIn
+         Counter,
+      winIPv6NIIpPacketsOut
+         Counter,
+      winIPv6NIlinkStatus
+         INTEGER,
+      winIPv6NIPhysicalID
+         DisplayString
+   }
+
+winIPv6NIIndex OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "IPv6 Network inteface identification number."
+   ::= { winIPv6NetworkInterfaceEntry 1 }
+
+winIPv6NIMACAddress OBJECT-TYPE
+   SYNTAX   PhysAddress
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "The interface address of the physical layer of the IPv6 network."
+   ::= { winIPv6NetworkInterfaceEntry 2 }
+
+winIPv6NIIPAddress OBJECT-TYPE
+   SYNTAX   OCTET STRING
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "IPv6 address of the network interface. This object returns IPv6 address of 16 bytes binary data."
+   ::= { winIPv6NetworkInterfaceEntry 3 }
+
+winIPv6NIIPAddress2 OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "IPv6 address of the network interface. This object returns IPv6 address of text string format"
+   ::= { winIPv6NetworkInterfaceEntry 4 }
+
+winIPv6NIInterfaceName OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "IPv6 Network interface name.(e.g.eth0)."
+   ::= { winIPv6NetworkInterfaceEntry 5 }
+
+winIPv6NISpeed OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "IPv6 Network speed.(unit:Mbit/s)"
+   ::= { winIPv6NetworkInterfaceEntry 6 }
+
+winIPv6NIPrefix OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "IPv6 network interface prefix"
+   ::= { winIPv6NetworkInterfaceEntry 7 }
+
+winIPv6NIScope OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "IPv6 network interface scope. Refer to the following definitions;
+                value    contents
+                  0        global
+                 16       loopback
+                 32       link
+                 64       site"
+   ::= { winIPv6NetworkInterfaceEntry 8 }
+
+winIPv6NIDADStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "IPv6 network interface DAD Status. Refer to the following definitions;
+                value     contents
+                 0          The DAD state is invalid
+                 1          The DAD state is tentative
+                 2          A duplicate IP address has been detected
+                 3          The IP address has been deprecated
+                 4          The IP address is the preferred address"
+   ::= { winIPv6NetworkInterfaceEntry 9 }
+
+winIPv6NINetworkType OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "IPv6 network interface type. The network type definition are assigned by the IANA."
+   ::= { winIPv6NetworkInterfaceEntry 10 }
+
+winIPv6NIBusType OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Bus type of the IPv6 network interface. Refer to the following definitions;
+                value     contens
+                 0           other
+                 1           isa
+                 2           eisa
+                 3           pci"
+   ::= { winIPv6NetworkInterfaceEntry 11 }
+
+winIPv6NISegment OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Segment number of the IPv6 network interface."
+   ::= { winIPv6NetworkInterfaceEntry 12 }
+
+winIPv6NIBusNumber OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Bus number of the IPv6 network interface."
+   ::= { winIPv6NetworkInterfaceEntry 13 }
+
+winIPv6NIDeviceNumber OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Device number of the IPv6 network interface."
+   ::= { winIPv6NetworkInterfaceEntry 14 }
+
+winIPv6NIFunction OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Function number of the IPv6 network interface."
+   ::= { winIPv6NetworkInterfaceEntry 15 }
+
+winIPv6NIStatus OBJECT-TYPE
+   SYNTAX   INTEGER{
+      up(1),
+      down(2),
+      testing(3)
+   }
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "The current operational state of the IPv6 interface.
+                The testing(3) state indicates that no operational packets can be passed."
+   ::= { winIPv6NetworkInterfaceEntry 16 }
+
+winIPv6NIIpPacketsIn OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { winIPv6NetworkInterfaceEntry 17 }
+
+winIPv6NIIpPacketsOut OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { winIPv6NetworkInterfaceEntry 18 }
+
+winIPv6NIlinkStatus OBJECT-TYPE
+   SYNTAX   INTEGER{
+      up(1),
+      down(2)
+   }
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "The current link state of the IPv6 interface. If 0; link status is unknown."
+   ::= { winIPv6NetworkInterfaceEntry 19 }
+
+winIPv6NIPhysicalID OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Identification name of IPv6 network interface cand."
+   ::= { winIPv6NetworkInterfaceEntry 20 }
+
+
+-- ****************************************************************************
+--
+-- GROUP: winHardwareResourceInfo
+--
+--	winHardwareResourceInfo :	.1.3.6.1.4.1.211.1.31.1.2.100.3.5
+--
+--Implementation of this group is mandatory
+--
+-- ****************************************************************************
+
+
+-- ----------------------------------------------------------------------------
+-- TABLE: winHardwareResourceTable
+--
+--	winHardwareResourceTable :	.1.3.6.1.4.1.211.1.31.1.2.100.3.5.1
+--
+--Implementation of this table is mandatory
+-- ----------------------------------------------------------------------------
+winHardwareResourceTable OBJECT-TYPE
+   SYNTAX   SEQUENCE OF WinHardwareResource
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { winHardwareResourceInfo 1 }
+
+winHardwareResourceEntry OBJECT-TYPE
+   SYNTAX   WinHardwareResource
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   INDEX   { winHWRBusType,
+	     winHWRSegment,
+	     winHWRBusNumber,
+	     winHWRDeviceNumber,
+	     winHWRFunction }
+   ::= { winHardwareResourceTable 1 }
+
+WinHardwareResource ::=
+   SEQUENCE {
+      winHWRBusType
+         INTEGER,
+      winHWRSegment
+         INTEGER,
+      winHWRBusNumber
+         INTEGER,
+      winHWRDeviceNumber
+         INTEGER,
+      winHWRFunction
+         INTEGER,
+      winHWRMemArea
+         DisplayString,
+      winHWRIRQ
+         INTEGER,
+      winHWRIoPort
+         DisplayString,
+      winHWRAdapterName
+         DisplayString,
+      winHWRVendor
+         DisplayString,
+      winHWRClass
+         OCTET STRING
+   }
+
+winHWRBusType OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Bus type of the device. Refer to the following definitions;
+                value     contens
+                 0           other
+                 1           isa
+                 2           eisa
+                 3           pci"
+   ::= { winHardwareResourceEntry 1 }
+
+winHWRSegment OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Segment number of the device."
+   ::= { winHardwareResourceEntry 2 }
+
+winHWRBusNumber OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Bus number of the device."
+   ::= { winHardwareResourceEntry 3 }
+
+winHWRDeviceNumber OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Device number of the device."
+   ::= { winHardwareResourceEntry 4 }
+
+winHWRFunction OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Function number of the device."
+   ::= { winHardwareResourceEntry 5 }
+
+winHWRMemArea OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Memory area used the device."
+   ::= { winHardwareResourceEntry 6 }
+
+winHWRIRQ OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Interrupt number used the device."
+   ::= { winHardwareResourceEntry 7 }
+
+winHWRIoPort OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "I/O port area used the device."
+   ::= { winHardwareResourceEntry 8 }
+
+winHWRAdapterName OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Adapter name id of the device."
+   ::= { winHardwareResourceEntry 9 }
+
+winHWRVendor OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Vendor id of the device."
+   ::= { winHardwareResourceEntry 10 }
+
+winHWRClass OBJECT-TYPE
+   SYNTAX   OCTET STRING
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Device classification; according to the PCI classification scheme.
+                   Byte           Contents
+                      0               BaseClass
+                      1               SubClass
+                      2               ProgIf"
+   ::= { winHardwareResourceEntry 11 }
+
+
+-- ****************************************************************************
+--
+-- GROUP: winOperatingSystemInfo
+--
+--	winOperatingSystemInfo :	.1.3.6.1.4.1.211.1.31.1.2.100.3.6
+--
+--Implementation of this group is mandatory
+--
+-- ****************************************************************************
+
+winOSName OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Operating system name that running on the partition."
+   ::= { winOperatingSystemInfo 1 }
+
+winOSVersion OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Operating system version that running on the partition."
+   ::= { winOperatingSystemInfo 2 }
+
+winOSRunTime OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Current partition up time.(unit:sec)"
+   ::= { winOperatingSystemInfo 3 }
+
+winOSSystemTime OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Current date and time as visible string."
+   ::= { winOperatingSystemInfo 4 }
+
+winOSCurrentSession OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Number of current session."
+   ::= { winOperatingSystemInfo 5 }
+
+winOSAverageUsageRate OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "The average system usage rate over all processors since startup.(unit:%)"
+   ::= { winOperatingSystemInfo 6 }
+
+winOSServicePack OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Service pack."
+   ::= { winOperatingSystemInfo 9 }
+
+winOSCharactorCode OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "System charactor code.This value is the Code-page indentifiers."
+   ::= { winOperatingSystemInfo 10 }
+
+
+--monitoringFunction-MIB groups
+
+
+--thresholdFunction-MIB groups
+
+
+--statusFunction-MIB groups
+
+
+--otherFunction-MIB groups
+
+
+--pxFunction-MIB groups
+
+
+END

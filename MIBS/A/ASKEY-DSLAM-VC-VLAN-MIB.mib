@@ -1,0 +1,403 @@
+------------------------------------------------------------------------------
+--
+--  File         : askeyVcVlan.mib
+--  Description  : Askey defined to record all managed objects for VC and VLAN mappings
+--  Version      : 1.0
+--  Date         : Dec. 25, 2004
+--
+--  Copyright (c) 2004-2006 Askey International, Corp.  All Rights Reserved.
+--
+------------------------------------------------------------------------------
+
+ASKEY-DSLAM-VC-VLAN-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    ifIndex             FROM IF-MIB
+    IpAddress,
+    MODULE-IDENTITY,
+    OBJECT-TYPE         FROM SNMPv2-SMI
+    RowStatus           FROM SNMPv2-TC
+    SnmpAdminString     FROM SNMP-FRAMEWORK-MIB
+    ipDslam             FROM ASKEY-DSLAM-MIB
+;
+
+askeyDslamVcVlanMIB MODULE-IDENTITY
+    LAST-UPDATED  "0311240900Z"
+    ORGANIZATION  "Askey, Inc."
+    CONTACT-INFO  "William Fu
+                  Software Department
+                  Askey Inc.
+                  10F, NO. 119 Chien-Kang Rd.
+                  Chung-Ho, Taipei, Taiwan, R.O.C.
+                  886-3-4759460 Ext. 816
+                  cwfu@askey.com.tw"
+    DESCRIPTION
+            "The MIB module presents all managed objects for mapping between vc
+            and vlan."
+    ::= { ipDslam 11 }
+
+
+--
+--  The Vc Vlan Table
+--
+askeyVcVlanTable  OBJECT-TYPE
+     SYNTAX  SEQUENCE OF AskeyVcVlanEntry
+     MAX-ACCESS  not-accessible
+     STATUS  current
+     DESCRIPTION
+             ""
+     ::= { askeyDslamVcVlanMIB 1}
+
+askeyVcVlanEntry  OBJECT-TYPE
+    SYNTAX  AskeyVcVlanEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "An entry in the Vc-Vlan table.
+            It defines traffic parameter values and the QoS Class of a virtual
+            channel and other parameters that traffic on this virtual channel
+            should be mapped to such as VLAN ID, 802.1p. It also specifies
+            the RFC2684 mode and mac limits.
+            To create a entry at Vc Vlan entry, the following procedures
+            is used:
+
+            Negotiated VC-VLAN establishment
+
+            (1a) The management application creates a VC-VLAN entry in the
+                 askeyVcVlanTable by setting vcVlanEntryRowStatus to
+                 createAndWait(5).
+                 This may fail for the following reasons:
+                 - The selected VPI/VCI values are unavailable,
+                 - The selected VPI/VCI values are in use.
+                 Otherwise, the agent creates a row and reserves the VPI/VCI
+                 values on that port.
+            (1b) The management application creates a VC-VLAN entry in the
+                 askeyVcVlanTable by setting any field to a valid value except
+                 vcVlanEntryRowStatus.
+
+            (2)  The manager activates the VC-VLAN by setting the
+                 vcVlanEntryRowStatus to active(1).
+                 If this set is successful, the agent has reserved the
+                 resources to satisfy the requested traffic parameter values
+                 and the QoS Class for that VC-VLAN. Traffic flow is on.
+
+            (3)  The manager de-actives the VC-VLAN by setting the
+                 vcVlanEntryRowStatus to notInService(3) and the agent may
+                 release all associated resources.
+
+            VC-VLAN Retirement
+            An entry is released by setting vcVlanEntryRowStatus to destroy(6),
+            and the agent may release all associated resources."
+    INDEX {ifIndex, vcVlanEntryVpi, vcVlanEntryVci }
+    ::= { askeyVcVlanTable 1 }
+
+AskeyVcVlanEntry ::= SEQUENCE {
+    vcVlanEntryVpi                      INTEGER,
+    vcVlanEntryVci                      INTEGER,
+--  vcVlanEntryDownStreamRateLimit      INTEGER,
+--  vcVlanEntryDownStreamPriority       INTEGER,
+    vcVlanEntryVlanId                   INTEGER,
+    vcVlanEntry8021pPriority            INTEGER,
+    vcVlanEntryMacLimit                 INTEGER,
+    vcVlanEntryRfc2684Mode              INTEGER,     --CWFu add per CHT-2004-tender
+    vcVlanEntryRoutedModeNexthop        SnmpAdminString,
+    vcVlanEntryIPTrafficProfile         SnmpAdminString,  -- Add for CHT Tender requirement
+    vcVlanEntryServiceType              INTEGER,          -- Add for Hungary Tender requirement
+    vcVlanEntryServiceStaticIpBase      IpAddress,
+    vcVlanEntryServiceIpNumberLimit     INTEGER,
+    vcVlanEntryOperStatus               INTEGER,
+    vcVlanEntryRowStatus                RowStatus
+}
+
+vcVlanEntryVpi  OBJECT-TYPE
+    SYNTAX  INTEGER (0..255)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The VPI value of the VCL.  The maximum VPI value cannot exceed
+            the value allowable by the atmInterfaceMaxVpiBits."
+    ::= { askeyVcVlanEntry 1}
+
+vcVlanEntryVci  OBJECT-TYPE
+    SYNTAX  INTEGER (0..65535)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The VCI value of the VCL.  The maximum VCI value cannot exceed
+            the value allowable by the atmInterfaceMaxVciBits."
+    ::= { askeyVcVlanEntry 2 }
+
+vcVlanEntryVlanId  OBJECT-TYPE
+    SYNTAX  INTEGER (1..4094)
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+     "IEEE 802.1q VLAN tag number that traffic on this VCL should be mapped to
+     in the upstream direction."
+    ::= { askeyVcVlanEntry 3 }
+
+vcVlanEntry8021pPriority  OBJECT-TYPE
+    SYNTAX  INTEGER (0..7)
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+            "IEEE 802.1p Priority that traffic on this VCL should be mapped to
+            in the upstream direction."
+    ::= { askeyVcVlanEntry 4 }
+
+vcVlanEntryMacLimit  OBJECT-TYPE
+    SYNTAX  INTEGER  (1..8)
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+            "The maximum number of MAC associated to the VCL link. The total
+            number of MAC associated to VCL links of one port can not over 8.
+            This attribute only applies to bridged mode VC, if the VC is routed
+            mode, the mac limit will always be 1."
+    ::= { askeyVcVlanEntry 5 }
+
+-- CWFu add per CHT-2004-tender
+vcVlanEntryRfc2684Mode  OBJECT-TYPE
+    SYNTAX  INTEGER {
+                routed(1),
+                bridged(2),
+                pppoe(3)
+            }
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+            "The meanings of the values are:
+            routed(1): RFC2684 routed mode
+            bridged(2): RFC2684 bridged mode
+            pppoE(3): only PPPoE frames. Not supported now."
+    ::= { askeyVcVlanEntry 6 }
+
+vcVlanEntryRoutedModeNexthop  OBJECT-TYPE
+    SYNTAX  SnmpAdminString (SIZE (0..32))
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+            "This attribute only applies to routed mode VC. If the VC is
+            bridged mode, ignore this.  The name of the nexthop(ISP) needed in
+            routed mode."
+    ::= { askeyVcVlanEntry 7 }
+
+-- used to replace vc-rate limit and vc priority
+vcVlanEntryIPTrafficProfile  OBJECT-TYPE
+    SYNTAX  SnmpAdminString (SIZE (1..32))
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+            "This attribute indicates the IP traffic profile used to describe
+            the VC VLAN entry's traffic characteristic."
+    ::= { askeyVcVlanEntry 8 }
+
+vcVlanEntryServiceType  OBJECT-TYPE
+    SYNTAX  INTEGER{
+                unknown(0),
+                pppoe(1),
+                dhcp(2),
+                pppoeanddhcp(3),
+                staticip(4)
+            }
+    MAX-ACCESS   read-create
+    STATUS  current
+    DESCRIPTION
+            "This attribute indicates the ethertype filter of the upstream
+            direction.
+            If the filter type is PPPoE, allow the PPPoE packet only.
+            If the filter type is DHCP, allow the DHCP packet only.
+            If the filter type is PPPoEandDHCP, allow the PPPoEandDHCP packet.
+            If the filter type is Static_IP, allow the specific IP according to
+            vcVlanEntryServiceStaticIpBase and vcVlanEntryServiceStaticIpNumber."
+    ::= { askeyVcVlanEntry 9 }
+
+vcVlanEntryServiceStaticIpBase  OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+            "vcVlanEntryServiceStaticIpBase and vcVlanEntryServiceStaticIpNumber
+            limit."
+    ::= {askeyVcVlanEntry 10}
+
+vcVlanEntryServiceIpNumberLimit  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+            "This attribute limits the number of DHCP or static IP per PVC.
+            It can not be bigger than MAC limit if service type is staticip;
+            otherwise it can not be bigger than 8."
+    ::= { askeyVcVlanEntry 11 }
+
+vcVlanEntryOperStatus  OBJECT-TYPE
+    SYNTAX  INTEGER{
+                up(1),
+                down(2)
+            }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "This attribute indicates the operational status of the VC VLAN
+            entry."
+    ::= {askeyVcVlanEntry 12}
+
+vcVlanEntryRowStatus  OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+            "This object is used to create, delete or modify a row in this
+            table.  To create a new entry, this object is initially set to
+            'createAndWait'. 'createAndGo' is not supported"
+    ::= { askeyVcVlanEntry 13 }
+
+-- vcVlanEntryDownStreamRateLimit   OBJECT-TYPE
+--     SYNTAX  INTEGER (0..32736)
+--     MAX-ACCESS  read-create
+--     STATUS  obselete    ---- replaced by IP traffic profile
+--     DESCRIPTION
+--             "The maximum transmit data rate in Kbps applied to the
+--             down-stream direction of this VCL.  The specified data rate
+--             will be rounded to the largest multiple of 32."
+--     ::= { askeyVcVlanEntry 4 }
+
+-- vcVlanEntryDownStreamPriority  OBJECT-TYPE
+--     SYNTAX  INTEGER (0..3)
+--     MAX-ACCESS  read-create
+--     STATUS  obselete    ---- replaced by IP traffic profile
+--     DESCRIPTION
+--             "The transmit priority applied to the down-stream direction of
+--             this VCL.
+--             The value 0 indicateds the lowest priority,
+--             the value 3 indicateds the highest priority"
+--     ::= { askeyVcVlanEntry 5 }
+
+
+--
+-- IP Traffic Profile Configuration Table
+-- Add by Amy, 2005-05-11 Based on requirement of CHT tender to provide IP
+-- traffic profile
+--
+ipTrafficObects OBJECT IDENTIFIER ::= { askeyDslamVcVlanMIB 2 }
+
+ipTrafficProfileCount  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "This object respresents the total count of configured IP traffic
+            profiles."
+    ::= { ipTrafficObects 1 }
+
+ipTrafficProfileTable  OBJECT-TYPE
+    SYNTAX  SEQUENCE OF IpTrafficProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "This table contains IP traffic profiles and each IP traffic
+            profile can be defined to represent characteristics of an IP
+            traffic.  One entry in this table reflects an IP traffic profile
+            defined by a manager which can be used to assign to any VC-VLAN
+            entry of each the ADSL subscriber line.
+            Maximum number of IP traffic profiles is 60."
+::= { ipTrafficObects 2 }
+
+ipTrafficProfileEntry  OBJECT-TYPE
+    SYNTAX  IpTrafficProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "Each entry consists of a list of parameters that represents an IP
+            traffic profile."
+    INDEX { IMPLIED ipTrafficProfileName }
+    ::= { ipTrafficProfileTable 1 }
+
+IpTrafficProfileEntry ::= SEQUENCE {
+    ipTrafficProfileName            SnmpAdminString,
+    ipTrafficProfileUsRateLimit     INTEGER,
+    ipTrafficProfileMaxDsRate       INTEGER,
+    ipTrafficProfileDsPriority      INTEGER,
+    ipTrafficProfileDsBcastFilter   INTEGER,
+    ipTrafficProfileRowStatus       RowStatus
+}
+
+ipTrafficProfileName  OBJECT-TYPE
+    SYNTAX  SnmpAdminString (SIZE (1..32))
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "The profile name is used to be the index of each IP traffic
+            profile.  It must be unique and can contains '0'~'9', 'A'~'Z',
+            'a'~'z', '-','_','.','@' only."
+    ::= { ipTrafficProfileEntry 1 }
+
+ipTrafficProfileUsRateLimit  OBJECT-TYPE
+    SYNTAX  INTEGER {
+                noRateLimit(0),
+                rate32k(1),
+                rate64k(2),
+                rate128k(3),
+                rate256k(4),
+                rate384k(5),
+                rate512k(6),
+                rate768k(7)
+            }
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+            "The level of rate limiting in up-stream direction of this IP
+            traffic profile."
+    ::= { ipTrafficProfileEntry 2 }
+
+ipTrafficProfileMaxDsRate  OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+            "The maximum transmit data rate in Kbps in the down-stream
+            direction of this IP traffic profile.  The specified data rate will
+            be rounded to the largest multiple of 32."
+    ::= { ipTrafficProfileEntry 3 }
+
+ipTrafficProfileDsPriority OBJECT-TYPE
+    SYNTAX  INTEGER (0..3)
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+            "The transmit priority applied to the down-stream direction of
+            this IP traffic profile.  The value 0 indicateds the lowest
+            priority, the value 3 indicateds the highest priority"
+    ::= { ipTrafficProfileEntry 4 }
+
+ipTrafficProfileRowStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+            "The rowStatus of a mcast service profile.  Set rowStatus to
+            createAndGo to create an IP traffic profile and set to destory to
+            delete an IP traffic profile.  If the profile is used by any
+            VC-VLAN entry, it is not allowed to be deleted."
+    ::= { ipTrafficProfileEntry 5 }
+
+ipTrafficProfileDsBcastFilter OBJECT-TYPE
+    SYNTAX  INTEGER{
+               passAll(1),
+               dropAll(2),
+               spcific(3)
+            }
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+            "This object indicates down stream broadcast filter setting.
+            The setting includes the following values:
+            Passing all broadcast packets is used to 'passAll(1)'.
+            Dropping all broadcast packets  is used to 'dropAll(2)'.
+            'specific(3)' will fileter packets and only pass the broadcast
+            packets that is spcific VLAN ID."
+    ::= { ipTrafficProfileEntry 6 }
+
+
+END

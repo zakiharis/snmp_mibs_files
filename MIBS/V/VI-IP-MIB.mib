@@ -1,0 +1,822 @@
+-- extracted from draft-sebastian-vitcpmib-00.txt
+-- at Sat Nov 25 16:04:50 2000
+
+   VI-IP-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+
+   OBJECT-TYPE                                  FROM RFC-1212
+   PhysAddress FROM SNMPv2-TC
+   Counter32, Gauge32, Integer32,Opaque                FROM SNMPv2-SMI
+   NOTIFICATION-TYPE                            FROM SNMPv2-SMI
+   mib-2,enterprises, NetworkAddress, IpAddress       FROM RFC1155-SMI
+   Counter, ObjectName                          FROM RFC1155-SMI
+   DisplayString                                FROM RFC1213-MIB;
+
+   viIPMib MODULE-IDENTITY
+       LAST-UPDATED "0011150655Z"
+       ORGANIZATION ""
+       CONTACT-INFO
+               "          Bino Sebastian
+
+                   Postal: Bino Sebastian
+                           Giganet, Inc.
+                           Concord Office Center
+                           2352 Main Street
+                           Concord, Massachusetts  01742
+                           978.461.0402 (tel)
+                           978.461.0430 (fax)
+                           www.giganet.com
+
+                      Tel: +1 978 461 0402
+                      Fax: +1 978 461 0430
+
+                   E-mail: bsebastian@giganet.com"
+       DESCRIPTION
+           "The MIB module to describe objects for virtual interface
+           over TCP implementation."
+
+       ::= { mib-2 1 }
+
+   viIPMibObjects OBJECT IDENTIFIER ::= { viIPMib 1 }
+
+   viaNodeConnection OBJECT IDENTIFIER ::= { viIPMibObjects 1 }
+
+   viaNodeSystemName OBJECT-TYPE
+       SYNTAX    DisplayString(SIZE (0..255))
+       ACCESS    read-only
+       STATUS    current
+       DESCRIPTION
+           "A string by which the node is identified in the cluster."
+       ::= { viaNodeConnection 1 }
+
+   viaCreated OBJECT-TYPE
+       SYNTAX    Counter32
+       ACCESS    read-only
+       STATUS    current
+       DESCRIPTION
+           "The number of VIs have been created."
+       ::= { viaNodeConnection 2 }
+
+   viaConnectRequest OBJECT-TYPE
+       SYNTAX    Counter32
+       ACCESS    read-only
+       STATUS    current
+       DESCRIPTION
+           "The number of times Connect Request call is made."
+       ::= { viaNodeConnection 3 }
+
+   viaConnectWait OBJECT-TYPE
+       SYNTAX    Counter32
+       ACCESS    read-only
+       STATUS    current
+       DESCRIPTION
+           "The number of times Connect wait call is made."
+       ::= { viaNodeConnection 4 }
+
+   viaDisconnect OBJECT-TYPE
+       SYNTAX    Counter32
+       ACCESS    read-only
+       STATUS    current
+       DESCRIPTION
+           "Number of times VI got disconnected with out any error."
+       ::= { viaNodeConnection 5 }
+
+   viaConnectTimeOut OBJECT-TYPE
+       SYNTAX    Counter32
+       ACCESS    read-only
+       STATUS    current
+       DESCRIPTION
+           "Number of times VI connect request got timed out."
+       ::= { viaNodeConnection 6 }
+
+   viaConnected OBJECT-TYPE
+       SYNTAX    Counter32
+       ACCESS    read-only
+       STATUS    current
+       DESCRIPTION
+           "Number of time VI got connected with out any error."
+       ::= { viaNodeConnection 7 }
+
+   viaCurrConnectPending OBJECT-TYPE
+       SYNTAX    Gauge32
+       ACCESS    read-only
+       STATUS    current
+       DESCRIPTION
+           "The number of VIs for which connect request is pending."
+       ::= { viaNodeConnection 8 }
+
+   viaCurrConnectWaitPending OBJECT-TYPE
+       SYNTAX    Gauge32
+       ACCESS    read-only
+       STATUS    current
+       DESCRIPTION
+           "The number of VIs for which connect wait request is
+           pending."
+       ::= { viaNodeConnection 9 }
+
+   viaCurrConnected OBJECT-TYPE
+       SYNTAX    Gauge32
+       ACCESS    read-only
+       STATUS    current
+       DESCRIPTION
+           "The number of VIs for which the current state is CONNECTED."
+       ::= { viaNodeConnection 10 }
+
+   viaCurrError OBJECT-TYPE
+       SYNTAX    Gauge32
+       ACCESS    read-only
+       STATUS    current
+       DESCRIPTION
+           "The number of VIs for which the current state is ERROR"
+       ::= { viaNodeConnection 11 }
+
+   viaTotalError OBJECT-TYPE
+       SYNTAX    Counter32
+       ACCESS    read-only
+       STATUS    current
+       DESCRIPTION
+           "The number of VIs which encountered error state."
+       ::= { viaNodeConnection 12 }
+
+   viaInMsgs OBJECT-TYPE
+       SYNTAX    Counter32
+       ACCESS    read-only
+       STATUS    current
+       DESCRIPTION
+           "The total number of incoming Messages received."
+       ::= { viaNodeConnection 13 }
+
+   viaInRdma OBJECT-TYPE
+       SYNTAX    Counter32
+       ACCESS    read-only
+       STATUS    current
+       DESCRIPTION
+           "The total number of incoming RDMA requests received."
+       ::= { viaNodeConnection 14 }
+
+   viaInBytes OBJECT-TYPE
+       SYNTAX    Counter32
+       ACCESS    read-only
+       STATUS    current
+       DESCRIPTION
+           "The total number of incoming bytes received, including
+           those received in error. This count includes bytes received
+           on currently established connections. This corresponds to
+           the sum of bytes received through received messages,
+           incoming RDMA writes and RDMA reads issued"
+       ::= { viaNodeConnection 15 }
+
+   viaInRDMAReadBytes OBJECT-TYPE
+       SYNTAX    Counter32
+       ACCESS    read-only
+       STATUS    current
+       DESCRIPTION
+           "The total number of incoming bytes received through RDMA
+           read, including those received in error. This count includes
+           bytes received on currently established connections."
+       ::= { viaNodeConnection 16 }
+
+   viaInRDMAWriteBytes OBJECT-TYPE
+       SYNTAX    Counter32
+       ACCESS    read-only
+       STATUS    current
+       DESCRIPTION
+           "The total number of bytes received through incoming RDMA
+           writes, including those received in error. This count
+           includes bytes received on currently established
+           connections."
+       ::= { viaNodeConnection 17 }
+
+   viaOutMsgs OBJECT-TYPE
+       SYNTAX    Counter32
+       ACCESS    read-only
+       STATUS    current
+       DESCRIPTION
+           "The total number of Messages sent."
+       ::= { viaNodeConnection 18 }
+
+   viaOutRdma OBJECT-TYPE
+       SYNTAX    Counter32
+       ACCESS    read-only
+       STATUS    current
+       DESCRIPTION
+           "The total number of RDMA requests sent."
+       ::= { viaNodeConnection 19 }
+
+   viaOutBytes OBJECT-TYPE
+       SYNTAX    Counter32
+       ACCESS    read-only
+       STATUS    current
+       DESCRIPTION
+           "The total number of bytes sent, including those
+           sent in error. This count includes bytes sent on
+           currently established connections."
+       ::= { viaNodeConnection 20 }
+
+   viaOutRDMAReadBytes OBJECT-TYPE
+       SYNTAX    Counter32
+       ACCESS    read-only
+       STATUS    current
+       DESCRIPTION
+           "The total number of bytes sent through an incoming
+           RDMA read request, including those sent in error.
+           This count includes bytes sent on currently established
+           connections."
+       ::= { viaNodeConnection 21 }
+
+   viaOutRDMAWriteBytes OBJECT-TYPE
+       SYNTAX    Counter32
+       ACCESS    read-only
+       STATUS    current
+       DESCRIPTION
+           "The total number of bytes sent through a RDMA write
+           operation, including those sent in error. This count
+           includes bytes sent on currently established connections."
+       ::= { viaNodeConnection 22 }
+
+
+   viaConnTable OBJECT-TYPE
+       SYNTAX    SEQUENCE OF VIAConnEntry
+       ACCESS    not-accessible
+       STATUS    current
+       DESCRIPTION
+           "A table containing VIA connection specific information."
+       ::= { viaNodeConnection 23 }
+
+   viaConnEntry OBJECT-TYPE
+       SYNTAX    VIAConnEntry
+       ACCESS    not-accessible
+       STATUS    current
+       DESCRIPTION
+           "A conceptual row of the VIAConnTable containing information
+           about a particular current VIA connection. Each row of this
+           table is transient, and it ceases to exist when the
+           connection makes transition to the CLOSED state."
+        INDEX    { viaConnVINumber
+       }
+        ::= { viaConnTable 1 }
+
+   VIAConnEntry  ::= SEQUENCE {
+
+       viaConnState                 INTEGER,
+       viaConnVINumber              INTEGER,
+       viaConnRemoteNetAddress      IpAddress,
+       viaConnLocalNetAddress       IpAddress,
+       viaConnRemotePortNumber      INTEGER,
+       viaConnLocalPortNumber       INTEGER,
+       viaConnLocalDescriminator    Opaque,
+       viaConnRemoteDescriminator   Opaque,
+       viaConnLocalMaxTransferSize  INTEGER,
+       viaConnRemoteMaxTransferSize INTEGER,
+       viaConnLocalEnableRdmaWrite  INTEGER,
+       viaConnLocalEnableRdmaRead   INTEGER,
+       viaConnRemoteEnableRdmaWrite INTEGER,
+       viaConnRemoteEnableRdmaRead  INTEGER,
+       viaConnSentMessages          Counter32,
+       viaConnSentRdmaReadMessages  Counter32,
+       viaConnSentRdmaWriteMessages Counter32,
+       viaConnRcvdMessages          Counter32,
+       viaConnRcvdRdmaReadMessages  Counter32,
+       viaConnRcvdRdmaWriteMessages Counter32
+
+       }
+
+   viaConnState OBJECT-TYPE
+       SYNTAX   INTEGER {
+            idle (1),
+            pendingConnect(2),
+            connected(3),
+            error(4)
+            }
+       ACCESS             read-only
+       STATUS             current
+       DESCRIPTION
+               "The state of this VIA connection
+                Legal States:
+                      Idle            1
+                      Pending Connect 2
+                      Connected       3
+                      Error           4"
+       ::= { viaConnEntry 1 }
+
+   viaConnVINumber    OBJECT-TYPE
+       SYNTAX        INTEGER
+       ACCESS        read-only
+       STATUS        current
+       DESCRIPTION
+           "A number which uniquely defines a connection."
+       ::= { viaConnEntry 2 }
+
+   viaConnRemoteNetAddress    OBJECT-TYPE
+       SYNTAX        IpAddress
+       ACCESS        read-only
+       STATUS        current
+       DESCRIPTION
+           "IP address of the remote system of the connection."
+       ::= { viaConnEntry 3 }
+
+   viaConnLocalNetAddress OBJECT-TYPE
+       SYNTAX      IpAddress
+       ACCESS      read-only
+       STATUS      current
+       DESCRIPTION
+           "Local IPadress of the connection."
+       ::= { viaConnEntry 4 }
+
+   viaConnRemotePortNumber    OBJECT-TYPE
+       SYNTAX        INTEGER
+       ACCESS        read-only
+       STATUS        current
+       DESCRIPTION
+           "Remote TCP port number of the connection."
+       ::= { viaConnEntry 5 }
+
+   viaConnLocalPortNumber    OBJECT-TYPE
+       SYNTAX        INTEGER
+       ACCESS        read-only
+       STATUS        current
+       DESCRIPTION
+           "Local TCP Portnumber of the connection."
+       ::= { viaConnEntry 6 }
+
+   viaConnLocalDescriminator    OBJECT-TYPE
+       SYNTAX        OCTET STRING
+       ACCESS        read-only
+       STATUS        current
+       DESCRIPTION
+           "An identifier used by the local process to identify the
+           VI connection."
+       ::= { viaConnEntry 7 }
+
+   viaConnRemoteDescriminator    OBJECT-TYPE
+       SYNTAX        OCTET STRING
+       ACCESS        read-only
+       STATUS        current
+       DESCRIPTION
+           "An identifier used by the remote process to identify the
+           VI connection."
+       ::= { viaConnEntry 8 }
+
+   viaConnLocalMaxTransferSize    OBJECT-TYPE
+       SYNTAX        INTEGER
+       ACCESS        read-only
+       STATUS        current
+       DESCRIPTION
+           "The local limit on the maximum packet size that can be
+           transfered through the connection."
+       ::= { viaConnEntry 9 }
+
+   viaConnRemoteMaxTransferSize OBJECT-TYPE
+       SYNTAX        INTEGER
+       ACCESS        read-only
+       STATUS        current
+       DESCRIPTION
+           "The remote limit on the maximum packet size that can be
+           transfered through the connection."
+       ::= { viaConnEntry 10 }
+
+   viaConnLocalEnableRdmaWrite    OBJECT-TYPE
+       SYNTAX        INTEGER
+       ACCESS        read-only
+       STATUS        current
+       DESCRIPTION
+               "The value is 1 if remote DMA write is enabled
+               in the local system otherwise, it is 0."
+       ::= { viaConnEntry 11 }
+
+   viaConnLocalEnableRdmaRead    OBJECT-TYPE
+       SYNTAX        INTEGER
+       ACCESS        read-only
+       STATUS        current
+       DESCRIPTION
+               "The value is 1 if remote DMA read is enabled
+               in the local system otherwise, it is 0."
+       ::= { viaConnEntry 12 }
+
+   viaConnRemoteEnableRdmaWrite    OBJECT-TYPE
+       SYNTAX        INTEGER
+       ACCESS        read-only
+       STATUS        current
+       DESCRIPTION
+               "The value is 1 if remote DMA write is enabled
+               in the remote system otherwise, it is 0."
+       ::= { viaConnEntry 13 }
+
+   viaConnRemoteEnableRdmaRead    OBJECT-TYPE
+       SYNTAX        INTEGER
+       ACCESS        read-only
+       STATUS        current
+       DESCRIPTION
+               "The value is 1 if remote DMA read is enabled
+               in the remote system otherwise, it is 0."
+       ::= { viaConnEntry 14 }
+
+   viaConnSentMessages    OBJECT-TYPE
+       SYNTAX        Counter32
+       ACCESS        read-only
+       STATUS        current
+       DESCRIPTION
+               "Total number of messages sent through the connection."
+       ::= { viaConnEntry 15 }
+
+   viaConnSentRdmaReadMessages    OBJECT-TYPE
+       SYNTAX        Counter32
+       ACCESS        read-only
+       STATUS        current
+       DESCRIPTION
+               "Total number of rdma read messages sent through the
+               connection."
+       ::= { viaConnEntry 16 }
+
+   viaConnSentRdmaWriteMessages    OBJECT-TYPE
+       SYNTAX        Counter32
+       ACCESS        read-only
+       STATUS        current
+       DESCRIPTION
+               "Total number of rdma write messages sent through the
+               connection."
+       ::= { viaConnEntry 17 }
+
+   viaConnRcvdMessages    OBJECT-TYPE
+       SYNTAX        Counter32
+       ACCESS        read-only
+       STATUS        current
+       DESCRIPTION
+               "Total number of messages received through the
+               connection."
+       ::= { viaConnEntry 18 }
+
+   viaConnRcvdRdmaReadMessages    OBJECT-TYPE
+       SYNTAX        Counter32
+       ACCESS        read-only
+       STATUS        current
+       DESCRIPTION
+               "Total number of rdma read messages received through the
+               connection."
+       ::= { viaConnEntry 19 }
+
+   viaConnRcvdRdmaWriteMessages    OBJECT-TYPE
+       SYNTAX        Counter32
+       ACCESS        read-only
+       STATUS        current
+       DESCRIPTION
+               "Total number of rdma write messages received through the
+               connection."
+       ::= { viaConnEntry 20 }
+
+   viaErrors OBJECT IDENTIFIER ::= { viIPMibObjects 2 }
+
+   viaErrPostDesc        OBJECT-TYPE
+       SYNTAX          Counter32
+       ACCESS          read-only
+       STATUS          current
+       DESCRIPTION
+               "The total number of descriptors completed in error
+               by NIC."
+       ::= { viaErrors 1 }
+
+   viaErrConnLost        OBJECT-TYPE
+       SYNTAX          Counter32
+       ACCESS          read-only
+       STATUS          current
+       DESCRIPTION
+               "The total number of Lost Connection errors. "
+       ::= { viaErrors 2 }
+
+   viaErrRecvQEmpty    OBJECT-TYPE
+       SYNTAX          Counter32
+       ACCESS          read-only
+       STATUS          current
+       DESCRIPTION
+               "The total number of errors due to an empty receive
+               Queue."
+       ::= { viaErrors 3 }
+
+   viaErrRdmawProt        OBJECT-TYPE
+       SYNTAX          Counter32
+       ACCESS          read-only
+       STATUS          current
+       DESCRIPTION
+               "The total number of remote DMA write protection
+               errors. "
+       ::= { viaErrors 4 }
+
+   viaErrRdmarProt        OBJECT-TYPE
+       SYNTAX          Counter32
+       ACCESS          read-only
+       STATUS          current
+       DESCRIPTION
+               "The total number of remote DMA read protection errors. "
+       ::= { viaErrors 5 }
+
+   viaErrCompProt    OBJECT-TYPE
+       SYNTAX          Counter32
+       ACCESS          read-only
+       STATUS          current
+       DESCRIPTION
+               "The total number of protection errors. "
+       ::= { viaErrors 6 }
+
+   viaErrorThreshold OBJECT-TYPE
+       SYNTAX            INTEGER
+       ACCESS            read-write
+       STATUS            current
+       DESCRIPTION
+           "Setting this threshold will cause a trap to be enabled
+           such that if the total error exceeds error threshold set
+           a VIANodeErrorsTrap trap will be generated. The trap will
+           reset the error counter."
+       ::= { viaErrors 7 }
+
+   viaNicAttributes OBJECT IDENTIFIER ::= { viIPMibObjects 3 }
+
+   viaNicTable        OBJECT-TYPE
+       SYNTAX            SEQUENCE OF VIANicEntry
+       ACCESS            not-accessible
+       STATUS            current
+       DESCRIPTION
+               "A table containing VIA NIC specific information."
+       ::= { viaNicAttributes 1}
+
+   viaNicEntry        OBJECT-TYPE
+       SYNTAX            VIANicEntry
+       ACCESS            not-accessible
+       STATUS            current
+       DESCRIPTION
+               "A conceptual row of the VIANicTable containing
+                information about a particular VINic."
+
+       INDEX    {    viaNicIndex }
+       ::= { viaNicTable 1 }
+
+   VIANicEntry ::= SEQUENCE {
+               viaNicIndex               INTEGER,
+               viaName                   DisplayString,
+               viaHardwareVersion        DisplayString,
+               viaProviderVersion        DisplayString,
+               viaNicAddress             PhysAddress,
+               viaThreadSafe             INTEGER,
+               viaMaxDiscriminatorLength INTEGER,
+               viaMaxRegisterBytes       INTEGER,
+               viaMaxRegisterRegions     INTEGER,
+               viaMaxRegisterBlockBytes  INTEGER,
+               viaMaxVI                  INTEGER,
+               viaMaxDescriptorsPerQueue INTEGER,
+               viaMaxSegmentsPerDesc     INTEGER,
+               viaMaxCQ                  INTEGER,
+               viaMaxCQEntries           INTEGER,
+               viaMaxTransferSize        INTEGER,
+               viaNativeMTU              INTEGER,
+               viaMaxPTags               INTEGER,
+               viaCurrRegisterBytes      INTEGER,
+               viaCurrRegisterRegions    INTEGER,
+               viaCurrVI                 INTEGER,
+               viaCurrCQ                 INTEGER,
+               viaCurrPTags              INTEGER,
+               viaConnectionListenPort   INTEGER
+       }
+
+   viaNicIndex        OBJECT-TYPE
+       SYNTAX        INTEGER
+       ACCESS        read-only
+       STATUS        current
+       DESCRIPTION
+           "The index of the NIC in the NIC table."
+       ::= { viaNicEntry 1 }
+
+   viaName            OBJECT-TYPE
+       SYNTAX        DisplayString (SIZE (0..255))
+       ACCESS        read-only
+       STATUS        current
+       DESCRIPTION
+           "The symbolic name of the NIC device."
+       ::= { viaNicEntry 2 }
+
+   viaHardwareVersion    OBJECT-TYPE
+       SYNTAX        DisplayString (SIZE (0..255))
+       ACCESS        read-only
+       STATUS        current
+       DESCRIPTION
+           "The version of the VINIC described by this MIB."
+       ::= { viaNicEntry 3 }
+
+   viaProviderVersion    OBJECT-TYPE
+       SYNTAX        DisplayString (SIZE (0..255))
+       ACCESS        read-only
+       STATUS        current
+       DESCRIPTION
+           "The version of the VI provider."
+       ::= { viaNicEntry 4 }
+
+   viaNicAddress    OBJECT-TYPE
+       SYNTAX        PhysAddress
+       ACCESS        read-only
+       STATUS        current
+       DESCRIPTION
+           "The Network address of the NIC."
+       ::= { viaNicEntry 5 }
+
+   viaThreadSafe    OBJECT-TYPE
+       SYNTAX       INTEGER
+       ACCESS       read-only
+       STATUS       current
+       DESCRIPTION
+           "1 if synchronisation model is thread safe else 0."
+       ::= { viaNicEntry 6 }
+
+   viaMaxDiscriminatorLength    OBJECT-TYPE
+       SYNTAX        INTEGER
+       ACCESS        read-only
+       STATUS        current
+       DESCRIPTION
+           "The maximum number of bytes that the VI provider allows
+           for a connection descriminator."
+       ::= { viaNicEntry 7 }
+
+   viaMaxRegisterBytes    OBJECT-TYPE
+       SYNTAX        INTEGER
+       ACCESS        read-only
+       STATUS        current
+       DESCRIPTION
+           "Maximum number of bytes that can be registered by the
+           VI user."
+       ::= { viaNicEntry 8 }
+
+   viaMaxRegisterRegions    OBJECT-TYPE
+       SYNTAX        INTEGER
+       ACCESS        read-only
+       STATUS        current
+       DESCRIPTION
+           "Maximum number of memory regions that can be registered by
+           VI user."
+       ::= { viaNicEntry 9 }
+
+   viaMaxRegisterBlockBytes    OBJECT-TYPE
+       SYNTAX        INTEGER
+       ACCESS        read-only
+       STATUS        current
+       DESCRIPTION
+           "Largest contiguous block of memory that can be
+           registered by VI user."
+       ::= { viaNicEntry 10 }
+
+   viaMaxVI        OBJECT-TYPE
+       SYNTAX        INTEGER
+       ACCESS        read-only
+       STATUS        current
+       DESCRIPTION
+           "The limit on the total number of VI instances this NIC
+           can support."
+       ::= { viaNicEntry 11 }
+
+   viaMaxDescriptorsPerQueue    OBJECT-TYPE
+       SYNTAX        INTEGER
+       ACCESS        read-only
+       STATUS        current
+       DESCRIPTION
+           "Maximum Descriptors per VI Work Queue that this VI provider
+           can support."
+       ::= { viaNicEntry 12 }
+
+   viaMaxSegmentsPerDesc    OBJECT-TYPE
+       SYNTAX        INTEGER
+       ACCESS        read-only
+       STATUS        current
+       DESCRIPTION
+           "Maximum number of segments per descriptor that this VI
+           provider can support."
+       ::= { viaNicEntry 13 }
+
+   viaMaxCQ        OBJECT-TYPE
+       SYNTAX        INTEGER
+       ACCESS        read-only
+       STATUS        current
+       DESCRIPTION
+           "Maximum number of completion queues this VI provider
+           can support."
+       ::= { viaNicEntry 14 }
+
+   viaMaxCQEntries        OBJECT-TYPE
+       SYNTAX        INTEGER
+       ACCESS        read-only
+       STATUS        current
+       DESCRIPTION
+           "Maximum number of Completion queue entries per
+           completion queue that this VI provider can
+           support."
+       ::= { viaNicEntry 15 }
+
+   viaMaxTransferSize    OBJECT-TYPE
+       SYNTAX        INTEGER
+       ACCESS        read-only
+       STATUS        current
+       DESCRIPTION
+           "The maximum transfer size supported by the VI Nic. The
+            maximum transfer size is the amount of data that can
+            be described by a single VI descriptor."
+       ::= { viaNicEntry 16 }
+
+   viaNativeMTU    OBJECT-TYPE
+       SYNTAX        INTEGER
+       ACCESS        read-only
+       STATUS        current
+       DESCRIPTION
+           "The native MTU size of the underlying network. For
+           frame-based networks, this could reflect its native
+           frame size. For cell-based networks, it could reflect
+           the MTU of the appropriate abstraction layer that it
+           supports."
+       ::= { viaNicEntry 17 }
+
+   viaMaxPTags        OBJECT-TYPE
+       SYNTAX        INTEGER
+       ACCESS        read-only
+       STATUS        current
+       DESCRIPTION
+           "The maximum number of protection tags that are
+           supported by this VI provider."
+       ::= { viaNicEntry 18 }
+
+   viaCurrRegisterBytes    OBJECT-TYPE
+       SYNTAX        INTEGER
+       ACCESS        read-only
+       STATUS        current
+       DESCRIPTION
+           "Number of bytes registered by the VI user for this
+           NIC."
+       ::= { viaNicEntry 19 }
+
+   viaCurrRegisterRegions    OBJECT-TYPE
+       SYNTAX        INTEGER
+       ACCESS        read-only
+       STATUS        current
+       DESCRIPTION
+           "Number of memory regions that is registered by VI user
+           for this NIC."
+       ::= { viaNicEntry 20 }
+
+   viaCurrVI        OBJECT-TYPE
+       SYNTAX        INTEGER
+       ACCESS        read-only
+       STATUS        current
+       DESCRIPTION
+           "The current number of VI instances for this NIC."
+       ::= { viaNicEntry 21 }
+
+   viaCurrCQ        OBJECT-TYPE
+       SYNTAX        INTEGER
+       ACCESS        read-only
+       STATUS        current
+       DESCRIPTION
+           "Current number of completion queues this VI provider
+           has."
+       ::= { viaNicEntry 22 }
+
+   viaCurrPTags      OBJECT-TYPE
+       SYNTAX        INTEGER
+       ACCESS        read-only
+       STATUS        current
+       DESCRIPTION
+           "Current Number of protection tags this VI provider has."
+       ::= { viaNicEntry 23 }
+
+   viaConnectionListenPort        OBJECT-TYPE
+       SYNTAX        INTEGER
+       ACCESS        read-only
+       STATUS        current
+       DESCRIPTION
+           "Port number on which VI server is listening for VI
+            connection request."
+       ::= { viaNicEntry 24 }
+
+
+   viipTraps          OBJECT IDENTIFIER ::= { viIPMib 2 }
+
+   viaNodeErrorsTrap    TRAP-TYPE
+      ENTERPRISE        giganet
+       VARIABLES        {
+                       viaErrPostDesc,
+                       viaErrConnLost,
+                       viaErrRecvQEmpty,
+                       viaErrVIOverrun,
+                       viaErrRdmawProt,
+                       viaErrRdmawData,
+                       viaErrRdmawAbort,
+                       viaErrCompProt,
+                       viaErrors }
+       DESCRIPTION
+           "A VIANodeErrorsTrap trap signifies that the total number of
+           errors exceeded the error threshold."
+       ::= { viipTraps 1 }
+
+
+   viaNodeUpTrap        TRAP-TYPE
+          ENTERPRISE     giganet
+          VARIABLES     { viaNodeSystemName }
+          DESCRIPTION
+          "A VIANodeUpTrap trap signifies a VIA Node is started
+          and initialised successfully."
+          ::= { viipTraps 2 }
+
+   END

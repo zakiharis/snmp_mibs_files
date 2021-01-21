@@ -1,0 +1,566 @@
+--
+--  TAX3 Series MIB
+--	Copyright FUJITSU LIMITED 2013
+--
+-- $Revision: 1.1 $
+
+TAX3-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+	OBJECT-TYPE		FROM RFC-1212
+	TRAP-TYPE		FROM RFC-1215
+	enterprises		FROM RFC1155-SMI
+	DisplayString		FROM RFC1213-MIB;
+
+    fujitsu		OBJECT IDENTIFIER ::= { enterprises 211 }
+    product		OBJECT IDENTIFIER ::= { fujitsu 1 }
+    nonos		OBJECT IDENTIFIER ::= { product 127 }
+    pineapple		OBJECT IDENTIFIER ::= { nonos 118 }
+
+--
+-- sysObjectID
+--
+    tax3	OBJECT IDENTIFIER ::= { pineapple 95 }
+
+--
+-- FUJITSU EXTENDED MIB
+--
+    nonosBase		OBJECT IDENTIFIER ::= { nonos 1 }
+    nonosLineset	OBJECT IDENTIFIER ::= { nonos 13 }
+    nosDualPower	OBJECT IDENTIFIER ::= { nonos 22 }
+    nosSystemInfo	OBJECT IDENTIFIER ::= { nonos 71 }
+
+--
+-- groups in nonosBase
+--
+    nonosSystem		OBJECT IDENTIFIER ::= { nonosBase 1 }
+    nonosSystemError	OBJECT IDENTIFIER ::= { nonosBase 2 }
+
+--
+-- groups in nonosLineset
+--
+    nosLineset		OBJECT IDENTIFIER ::= { nonosLineset 1 }
+
+--
+-- groups in nonosDualPower
+--
+    dualPowerBase	OBJECT IDENTIFIER ::= { nosDualPower 1 }
+    dualPowerState	OBJECT IDENTIFIER ::= { nosDualPower 2 }
+
+--
+-- nonosSystem group
+--
+nosResetSystem OBJECT-TYPE
+    SYNTAX  INTEGER {
+    		none(1),
+		reset(2),
+		indicated-reset(3),
+		unindicated-reset(4)
+	    }
+    ACCESS  read-write
+    STATUS  mandatory
+    DESCRIPTION
+	"Refer to attached file ('TAX3_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { nonosSystem 1 }
+
+--
+-- nonosSystemError group
+--
+nosSystemErrorPoint OBJECT-TYPE
+    SYNTAX  OCTET STRING (SIZE (4))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"Refer to attached file ('TAX3_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { nonosSystemError 1 }
+
+nosSystemErrorText1 OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"Refer to attached file ('TAX3_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { nonosSystemError 2 }
+
+nosSystemErrorText2 OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"Refer to attached file ('TAX3_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { nonosSystemError 3 }
+
+nosSystemErrorText3 OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"Refer to attached file ('TAX3_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { nonosSystemError 4 }
+
+nosSystemErrorText4 OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"Refer to attached file ('TAX3_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { nonosSystemError 5 }
+
+nosSystemErrorText5 OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"Refer to attached file ('TAX3_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { nonosSystemError 6 }
+
+nosSystemErrorText6 OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"Refer to attached file ('TAX3_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { nonosSystemError 7 }
+
+nosSystemErrorText7 OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"Refer to attached file ('TAX3_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { nonosSystemError 8 }
+
+nosSystemErrorText8 OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    ACCESS  read-only
+    STATUS  optional
+    DESCRIPTION
+	"Refer to attached file ('TAX3_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { nonosSystemError 9 }
+
+nosSystemErrorText9 OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"Refer to attached file ('TAX3_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { nonosSystemError 10 }
+
+nosSystemErrorText10 OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"Refer to attached file ('TAX3_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { nonosSystemError 11 }
+
+nosSystemErrorText11 OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"Refer to attached file ('TAX3_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { nonosSystemError 12 }
+
+nosSystemErrorText12 OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"Refer to attached file ('TAX3_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { nonosSystemError 13 }
+
+nosSystemErrorText13 OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"Refer to attached file ('TAX3_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { nonosSystemError 14 }
+
+nosSystemErrorText14 OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"Refer to attached file ('TAX3_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { nonosSystemError 15 }
+
+nosSystemErrorText15 OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"Refer to attached file ('TAX3_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { nonosSystemError 16 }
+
+nosSystemErrorText16 OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"Refer to attached file ('TAX3_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { nonosSystemError 17 }
+
+nosSystemErrorText17 OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"Refer to attached file ('TAX3_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { nonosSystemError 18 }
+
+nosSystemErrorText18 OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"Refer to attached file ('TAX3_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { nonosSystemError 19 }
+
+nosSystemErrorText19 OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"Refer to attached file ('TAX3_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { nonosSystemError 20 }
+
+nosSystemErrorText20 OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"Refer to attached file ('TAX3_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { nonosSystemError 21 }
+
+--
+-- nosLineset Table
+--
+nosLinesetTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF NosLinesetEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+	"Refer to attached file ('TAX3_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { nosLineset 1 }
+
+nosLinesetEntry OBJECT-TYPE
+    SYNTAX  NosLinesetEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+	"Refer to attached file ('TAX3_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    INDEX   { nosLinesetIndex }
+    ::= { nosLinesetTable 1 }
+
+NosLinesetEntry ::= SEQUENCE {
+    nosLinesetIndex		INTEGER,
+    nosLinesetId		DisplayString,
+    nosLinesetStatus		INTEGER
+}
+
+nosLinesetIndex OBJECT-TYPE
+    SYNTAX  INTEGER (1..2147483647)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"Refer to attached file ('TAX3_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { nosLinesetEntry 1 }
+
+nosLinesetId OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"Refer to attached file ('TAX3_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { nosLinesetEntry 2 }
+
+-- { nosLinesetEntry 3 }
+
+nosLinesetStatus OBJECT-TYPE
+    SYNTAX  INTEGER {
+    		other(1),
+		up(2),
+		failure(3),
+		down(4),
+		testing(5)
+	    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"Refer to attached file ('TAX3_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { nosLinesetEntry 4 }
+
+-- { nosLinesetEntry 5 }...{ nosLinesetEntry 7 }
+
+--
+-- dualPowerBase group
+--
+dualPowerSet OBJECT-TYPE
+    SYNTAX  INTEGER {
+    		used(1),
+		not-used(2)
+	    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"Refer to attached file ('TAX3_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { dualPowerBase  1 }
+
+--
+-- dualPowerState group
+--
+dualPowerStateTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF DualPowerStateEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+	"Refer to attached file ('TAX3_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { dualPowerState  1 }
+
+dualPowerStateEntry OBJECT-TYPE
+    SYNTAX  DualPowerStateEntry
+    ACCESS  not-accessible
+    STATUS  mandatory
+    DESCRIPTION
+	"Refer to attached file ('TAX3_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    INDEX   { dualPowerStateUnitIndex }
+    ::= { dualPowerStateTable 1 }
+
+DualPowerStateEntry ::= SEQUENCE {
+    dualPowerStateUnitIndex	INTEGER,
+    dualPowerStateUnit		INTEGER
+}
+
+dualPowerStateUnitIndex OBJECT-TYPE
+    SYNTAX  INTEGER (1..2)
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"Refer to attached file ('TAX3_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { dualPowerStateEntry  1 }
+
+dualPowerStateUnit OBJECT-TYPE
+    SYNTAX  INTEGER {
+    		normal(1),
+		not-set(2),
+		abnormal(3)
+	    }
+    ACCESS  read-only
+    STATUS  mandatory
+    DESCRIPTION
+	"Refer to attached file ('TAX3_MIB_OBJECT_Description.txt') for
+	the meaning and the value of this object."
+    ::= { dualPowerStateEntry  2 }
+
+--
+-- groups in nosSystemInfo
+--
+    nosSystemActualPowerConsumption	OBJECT IDENTIFIER ::= { nosSystemInfo 10 }
+    nosSystemAirFlow			OBJECT IDENTIFIER ::= { nosSystemInfo 11 }
+    nosSystemAmbientTemperature		OBJECT IDENTIFIER ::= { nosSystemInfo 12 }
+    nosSystemPowerSource		OBJECT IDENTIFIER ::= { nosSystemInfo 13 }
+    nosSystemPermittedPowerConsumption	OBJECT IDENTIFIER ::= { nosSystemInfo 14 }
+
+--
+-- nosSystemActualPowerConsumption group
+--
+    nosSystemActualPowerConsumptionValue OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+	    "An INTEGER type object shows power consumption.
+	    When this feature is not supported, 0 is set."
+	::= { nosSystemActualPowerConsumption 1 }
+
+    nosSystemActualPowerConsumptionUnit OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+	    "A DisplayString type object, shows unit of power consumption 'W'."
+	::= { nosSystemActualPowerConsumption 2 }
+
+    nosSystemActualPowerMinPollingInterval OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+	    "An INTEGER type object shows minimum time of interval to get above object. 
+	    Unit of value is a second. 
+	    This value also shows interval of update.
+	    (It's meaningless to get value less than this value, because value won't be
+	    updated.)
+	    When this feature is not supported, maximum value of INTEGER type is set."
+
+	::= { nosSystemActualPowerConsumption 3 }
+
+--
+-- nosSystemAirFlow group
+--
+    nosSystemExhaustAirFlowValue OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+	    "An INTEGER type object shows air flow.
+	    When this feature is not supported, 0 is set."
+	::= { nosSystemAirFlow 1 }
+
+    nosSystemExhaustAirFlowUnit OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+	    "A DisplayString type object, shows unit of air flow 'CMH',
+	    cubic meter per hour."
+	::= { nosSystemAirFlow 2 }
+
+    nosSystemExhaustAirFlowMinPollingInterval OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+	    "An INTEGER type object shows minimum time of interval to get above object. 
+	    Unit of value is a second. 
+	    This value also shows interval of update.
+	    (It's meaningless to get value less than this value, because value won't be
+	    updated.)
+	    When this feature is not supported, maximum value of INTEGER type is set."
+	::= { nosSystemAirFlow 3 }
+
+--
+-- nosSystemAmbientTemperature group
+--
+    nosSystemAmbientTemperatureValue OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+	    "A DisplayString type object shows air flow.
+	    When this feature is not supported, 0 is set."
+	::= { nosSystemAmbientTemperature 1 }
+
+    nosSystemAmbientTemperatureUnit OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+	    "A DisplayString type object, shows unit of temerature 'degC'."
+	::= { nosSystemAmbientTemperature 2 }
+
+    nosSystemAmbientTemperatureMinPollingInterval OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+	    "An INTEGER type object shows minimum time of interval to get above object. 
+	    Unit of value is a second. 
+	    This value also shows interval of update.
+	    (It's meaningless to get value less than this value, because value won't be
+	    updated.)
+	    When this feature is not supported, maximum value of INTEGER type is set."
+	::= { nosSystemAmbientTemperature 3 }
+
+--
+-- nosSystemPowerSource group
+--
+    nosSystemPowerSourceType OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+	    "A DisplayString type object, shows type of input power, such as 'AC' or 'DC'. 
+	    When this feature is not supported, (NULL) will be set."
+	::= { nosSystemPowerSource 1 }
+
+    nosSystemPowerSourcePhase OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+	    "An Integer type object, shows type of phase of input power, such as 2, 
+	    single phase, or 3, 3 phase.
+	    When this feature is not supported, 0 will be set."
+	::= { nosSystemPowerSource 2 }
+
+    nosSystemPowerSourceVoltage OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+	    "An Integer type object, shows input voltage, such as 100 or 200.
+	    When this feature is not supported, 0 will be set."
+	::= { nosSystemPowerSource 3 }
+
+--
+-- nosSystemPermittedPowerConsumption group
+--
+    nosSystemPermittedPowerConsumptionValue OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+	    "An INTEGER type object shows maximum power consumption which
+	    will consume maximum power over variety of configurations. 
+	    When this feature is not supported, 0 is set."
+	::= { nosSystemPermittedPowerConsumption 1 }
+
+    nosSystemPermittedPowerConsumptionUnit OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION
+	    "A DisplayString type object, shows unit of power consumption 'W'."
+	::= { nosSystemPermittedPowerConsumption 2 }
+
+--
+-- Trap
+--
+nosError TRAP-TYPE
+    ENTERPRISE  nonosBase
+    DESCRIPTION
+	"Some errors occurred in this switch."
+    --#TYPE		"Some errors occurred."
+    --#SUMMARY		"Some errors occurred in this switch."
+    --#ARGUMENTS	{}
+    --#SEVERITY		MAJOR
+    --#TIMEINDEX	0
+    --#HELP		"Action: This trap only notifies the error occasion. To specify the content of the error, get the contents of from nosSystemErrorText1 (1.3.6.1.4.1.211.1.127.1.2.2) to nosSystemErrorText20 (1.3.6.1.4.1.211.1.127.1.2.21). If C-Fabric firmware is running on the switch, get the contents of from cfabSystemErrorInfoSwitch1 (1.3.6.1.4.1.211.1.127.118.2.1.101.1.1) to cfabSystemErrorInfoSwitch8 (1.3.6.1.4.1.211.1.127.118.2.1.101.1.8) to specify the switch that the error is occurred (The value from 1 to 8 shows the switch ID). If the value is 2, the error is occurred in the switch. Details of the error can be acquired from MIB information on the cfabSystemErrorSwitch group. For example, if it turns out that the error is occurred on the switch of switch_id=1, get the contents of from cfabSystemErrorText1Switch1 (1.3.6.1.4.1.211.1.127.118.2.1.101.2.1.5) to cfabSystemErrorText20Switch1 (1.3.6.1.4.1.211.1.127.118.2.1.101.2.1.24) to specify the content of the error."
+    --#STATE		NONOPERATIONAL
+    ::= 1
+
+END

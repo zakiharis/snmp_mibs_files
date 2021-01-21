@@ -1,0 +1,401 @@
+-- *****************************************************************
+--
+-- stn-ipsec.mib:  
+--                 Spring Tide Networks IPSEC MIB file.
+--
+--
+--      Copyright (c) 1999, 2000 by Spring Tide Networks, Inc.
+--                      ALL RIGHTS RESERVED       
+--
+-- *****************************************************************
+
+-- MIB Object definitions for Spring Tide Network IPSEC 
+
+
+STN-IPSEC-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        IpAddress, MODULE-IDENTITY,
+        OBJECT-TYPE
+                FROM SNMPv2-SMI
+
+        TimeStamp
+                FROM SNMPv2-TC
+
+        MODULE-COMPLIANCE 
+                FROM SNMPv2-CONF
+        
+        stnSystems
+                FROM SPRING-TIDE-NETWORKS-SMI;
+
+
+    stnIpSec MODULE-IDENTITY
+        LAST-UPDATED    "0002160000Z"
+        ORGANIZATION    "Spring Tide Networks, Inc."
+        CONTACT-INFO
+                "
+                Spring Tide Networks, Inc.
+                Customer Service
+                Postal: 3 Clock Tower Place
+                        Maynard, MA 01754
+                Tel:    1 888-786-4357
+                Email:  stncs@springtidenet.com
+                "
+        DESCRIPTION
+                "Initial version of this MIB module."
+        ::= { stnSystems 9 }
+
+
+    --
+    -- Top Level STN IpSec MIB Objects
+    --
+    stnIpSecObjects         OBJECT IDENTIFIER ::= { stnIpSec 1 }
+    stnIpSecMibConformance  OBJECT IDENTIFIER ::= { stnIpSec 2 }
+
+    stnIpSecPolicies        OBJECT IDENTIFIER ::= { stnIpSecObjects 1 }
+    stnIpSecPreferences     OBJECT IDENTIFIER ::= { stnIpSecObjects 2 }
+    stnIpSecManualSas       OBJECT IDENTIFIER ::= { stnIpSecObjects 3 }
+
+
+    --
+    -- STN IPSEC Policy Table
+    --
+
+    stnIpSecPolicyTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF StnIpSecPolicyEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION   "A list of IpSec Policy entries."
+        ::= { stnIpSecPolicies 1 }
+ 
+    stnIpSecPolicyEntry OBJECT-TYPE
+        SYNTAX          StnIpSecPolicyEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "Entry contains information about a particular 
+                        IpSec policy."  
+        --INDEX           { INTEGER }
+        ::= { stnIpSecPolicyTable 1 }
+ 
+    StnIpSecPolicyEntry ::= 
+        SEQUENCE {
+                stnIpSecPolicyPeerAddress       IpAddress,
+                stnIpSecPolicyPeerMask          IpAddress,
+                stnIpSecPolicyLocalAddress      IpAddress,
+                stnIpSecPolicyLocalMask         IpAddress,
+                stnIpSecPolicyLocalPort         INTEGER,
+                stnIpSecPolicyPeerPort          INTEGER,
+                stnIpSecPolicyProtocol          INTEGER,
+                stnIpSecPolicyAction            BITS,
+                stnIpSecPolicyMode              INTEGER,
+                stnIpSecPolicyPeerProxyAddress  IpAddress,
+                stnIpSecPolicyPeerProxyMask     IpAddress,
+                stnIpSecPolicyLocalProxyAddress IpAddress,
+                stnIpSecPolicyLocalProxyMask    IpAddress,
+                stnIpSecPolicyKeyNegotiation    INTEGER,
+                stnIpSecPolicyKey               OCTET STRING
+        }
+
+    stnIpSecPolicyPeerAddress OBJECT-TYPE
+        SYNTAX          IpAddress
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Peer IP address (Host order)."
+        ::= { stnIpSecPolicyEntry 1 }
+
+    stnIpSecPolicyPeerMask OBJECT-TYPE
+        SYNTAX          IpAddress
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Peer IP sub-network mask (Host order)."
+        ::= { stnIpSecPolicyEntry 2 }
+
+    stnIpSecPolicyLocalAddress OBJECT-TYPE
+        SYNTAX          IpAddress
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Local IP address (Host order)."
+        ::= { stnIpSecPolicyEntry 3 }
+
+    stnIpSecPolicyLocalMask OBJECT-TYPE
+        SYNTAX          IpAddress
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Local IP sub-network mask (Host order)."
+        ::= { stnIpSecPolicyEntry 4 }
+
+    stnIpSecPolicyPeerPort OBJECT-TYPE
+        SYNTAX          INTEGER
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Peer UDP port number (Host order)."
+        ::= { stnIpSecPolicyEntry 5 }
+
+    stnIpSecPolicyLocalPort OBJECT-TYPE
+        SYNTAX          INTEGER
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Local UDP port number (Host order)."
+        ::= { stnIpSecPolicyEntry 6 }
+
+    stnIpSecPolicyProtocol OBJECT-TYPE
+        SYNTAX          INTEGER
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Transport protocol as given by IANA."
+        ::= { stnIpSecPolicyEntry 7 }
+
+    stnIpSecPolicyAction OBJECT-TYPE
+        SYNTAX          BITS {
+                            secure(1),
+                            bypass(2),
+                            discard(4)
+                        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "bit mask 1=secure, 2=bypass, 4=discard."
+        ::= { stnIpSecPolicyEntry 8 }
+
+    stnIpSecPolicyMode OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            tunnel(1),
+                            transport(2)
+                        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "???"                  
+        DEFVAL          { tunnel }
+        ::= { stnIpSecPolicyEntry 9 }
+
+    stnIpSecPolicyPeerProxyAddress OBJECT-TYPE
+        SYNTAX          IpAddress
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Remote proxy IP."
+        ::= { stnIpSecPolicyEntry 10 }
+
+    stnIpSecPolicyPeerProxyMask OBJECT-TYPE
+        SYNTAX          IpAddress
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Remote proxy IP sub-network mask."
+        ::= { stnIpSecPolicyEntry 11 }
+
+    stnIpSecPolicyLocalProxyAddress OBJECT-TYPE
+        SYNTAX          IpAddress
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Local proxy IP."
+        ::= { stnIpSecPolicyEntry 12 }
+
+    stnIpSecPolicyLocalProxyMask OBJECT-TYPE
+        SYNTAX          IpAddress
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Local proxy IP sub-network mask."
+        ::= { stnIpSecPolicyEntry 13 }
+
+    stnIpSecPolicyKeyNegotiation OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            isakmp(1),
+                            manual(2)
+                        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Protocol for key negotiation."
+        ::= { stnIpSecPolicyEntry 14 }
+
+    stnIpSecPolicyKey OBJECT-TYPE 
+        SYNTAX          OCTET STRING
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Manual key value"                
+        ::= { stnIpSecPolicyEntry 15 }
+
+
+    --
+    -- STN IpSec Preference Table
+    --
+
+    stnIpSecPreferenceTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF StnIpSecPreferenceEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION   "A list of IpSec Preference entries."
+        ::= { stnIpSecPreferences 1 }
+ 
+    stnIpSecPreferenceEntry OBJECT-TYPE
+        SYNTAX          StnIpSecPreferenceEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "Entry contains information about a particular 
+                        IpSec preference."  
+        --INDEX           { INTEGER }
+        ::= { stnIpSecPreferenceTable 1 }
+ 
+    StnIpSecPreferenceEntry ::= 
+        SEQUENCE {
+                stnIpSecPrefId                  INTEGER,
+                stnIpSecPrefNum                 INTEGER,
+                stnIpSecPrefAhAlg               INTEGER,
+                stnIpSecPrefAhAuthKeyLen        INTEGER,
+                stnIpSecPrefEspAuthAlg          INTEGER,
+                stnIpSecPrefEspAuthKeyLen       INTEGER,
+                stnIpSecPrefEspEncryptHash      INTEGER,
+                stnIpSecPrefEspEncryptKeyLen    INTEGER,
+                stnIpSecPrefKeyLifeUnit         TimeStamp,
+                stnIpSecPrefKeyLifeValue        INTEGER
+        }
+
+    stnIpSecPrefId OBJECT-TYPE
+        SYNTAX          INTEGER
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "???"                      
+        ::= { stnIpSecPreferenceEntry 1 }
+
+    stnIpSecPrefNum OBJECT-TYPE
+        SYNTAX          INTEGER
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     ""      --                ???
+        ::= { stnIpSecPreferenceEntry 2 }
+
+    stnIpSecPrefAhAlg OBJECT-TYPE
+        SYNTAX          INTEGER
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     ""        --              ???
+        ::= { stnIpSecPreferenceEntry 3 }
+
+    stnIpSecPrefAhAuthKeyLen OBJECT-TYPE
+        SYNTAX          INTEGER
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     ""        --              ???
+        ::= { stnIpSecPreferenceEntry 4 }
+
+    stnIpSecPrefEspAuthAlg OBJECT-TYPE
+        SYNTAX          INTEGER
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     ""         --             ???
+        ::= { stnIpSecPreferenceEntry 5 }
+
+    stnIpSecPrefEspAuthKeyLen OBJECT-TYPE
+        SYNTAX          INTEGER
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     ""        --              ???
+        ::= { stnIpSecPreferenceEntry 6 }
+
+    stnIpSecPrefEspEncryptHash OBJECT-TYPE
+        SYNTAX          INTEGER
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     ""          --            ???
+        ::= { stnIpSecPreferenceEntry 7 }
+
+    stnIpSecPrefEspEncryptKeyLen OBJECT-TYPE
+        SYNTAX          INTEGER
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     ""            --          ???
+        ::= { stnIpSecPreferenceEntry 8 }
+
+    stnIpSecPrefKeyLifeUnit OBJECT-TYPE
+        SYNTAX          TimeStamp
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     ""            --          ???
+        ::= { stnIpSecPreferenceEntry 9 }
+
+    stnIpSecPrefKeyLifeValue OBJECT-TYPE
+        SYNTAX          INTEGER 
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     ""              --        ???
+        ::= { stnIpSecPreferenceEntry 10 }
+
+
+    --
+    -- STN IpSec Manual SA Table
+    --
+
+    stnIpSecManualSaTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF StnIpSecManualSaEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION   "A list of IpSec Manual SA entries."
+        ::= { stnIpSecManualSas 1 }
+ 
+    stnIpSecManualSaEntry OBJECT-TYPE
+        SYNTAX          StnIpSecManualSaEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "Entry contains information about a particular 
+                        IpSec Manual SA."  
+        -- INDEX           { ??? }
+        ::= { stnIpSecManualSaTable 1 }
+ 
+    StnIpSecManualSaEntry ::= 
+        SEQUENCE {
+                stnIpSecManualSAIpSecId             INTEGER,
+                stnIpSecManualSADirection           INTEGER,
+                stnIpSecManualSAProtocol            INTEGER,
+                stnIpSecManualSASpi                 INTEGER,
+                stnIpSecManualSATransformKey        OCTET STRING,
+                stnIpSecManualSAAuthKey             OCTET STRING
+        }
+
+
+    stnIpSecManualSAIpSecId OBJECT-TYPE
+        SYNTAX          INTEGER
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     ""                    --      ???
+        ::= { stnIpSecManualSaEntry 1 }
+
+    stnIpSecManualSADirection OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            inbound(1),
+                            outbound(2)
+                        }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     ""                        --  ???
+        ::= { stnIpSecManualSaEntry 2 }
+
+    stnIpSecManualSAProtocol OBJECT-TYPE
+        SYNTAX          INTEGER {
+                            ah(1),
+                            esp(2)
+                        }
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     ""                       --   ???
+        ::= { stnIpSecManualSaEntry 3 }
+
+    stnIpSecManualSASpi OBJECT-TYPE
+        SYNTAX          INTEGER
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "SPI"                    --   ???
+        ::= { stnIpSecManualSaEntry 4 }
+
+    stnIpSecManualSATransformKey OBJECT-TYPE
+        SYNTAX          OCTET STRING
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "transform key"         --    ???
+        ::= { stnIpSecManualSaEntry 5 }
+
+    stnIpSecManualSAAuthKey OBJECT-TYPE
+        SYNTAX          OCTET STRING
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "authentication key"     --   ???
+        ::= { stnIpSecManualSaEntry 6 }
+
+END
+

@@ -1,0 +1,1216 @@
+--MibName=uniserv
+UNISERV-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+ 	OBJECT-TYPE		FROM RFC-1212
+ 	mib-2, DisplayString	FROM RFC1213-MIB
+	enterprises  		FROM RFC1155-SMI;
+ 	sni			OBJECT IDENTIFIER	::= { enterprises    231 } 
+	sniProductMibs		OBJECT IDENTIFIER	::= { sni              2 } 
+	wsaObjects		OBJECT IDENTIFIER      	::= { sniProductMibs  41 } 
+	uniserv			OBJECT IDENTIFIER	::= { wsaObjects 4 } 
+        unitrap			OBJECT IDENTIFIER	::= { uniserv 8 }
+
+kaimachine	OBJECT-TYPE
+	SYNTAX	SEQUENCE OF Kaimachine
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION	"SNMP Table for Daps kaimachine"
+	::= { uniserv 1 }
+
+auxkaimachine	OBJECT-TYPE
+	SYNTAX	Kaimachine
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION ""
+	INDEX	{ kaimachineNumber }
+	::= { kaimachine 1 }
+
+Kaimachine ::= 
+SEQUENCE {
+	kaimachineNumber
+		INTEGER,
+	kaimachineNode
+		DisplayString,
+	kaimachineServerID
+		INTEGER,
+	kaimachineMachine
+		DisplayString,
+	kaimachineState
+		DisplayString,
+	kaimachineModel
+		DisplayString,
+	kaimachineNoOfPartitions
+		INTEGER,
+	kaimachineMonitoringStatus
+		DisplayString
+}
+
+kaimachineNumber	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Index Variable"
+	::= { auxkaimachine 1 } 
+
+kaimachineNode	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkaimachine 2 } 
+
+kaimachineServerID	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"ID for all machines"
+	::= { auxkaimachine 3 } 
+
+kaimachineMachine	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Label for all machines"
+	::= { auxkaimachine 4 } 
+
+kaimachineState	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Active state of machine"
+	::= { auxkaimachine 5 } 
+
+kaimachineModel	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"model name of server"
+	::= { auxkaimachine 6 } 
+
+kaimachineNoOfPartitions	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Number of Partitions in this machine"
+	::= { auxkaimachine 7 } 
+
+kaimachineMonitoringStatus OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     "Monitoring Status of this server"
+        ::= { auxkaimachine 8 }
+
+kaipar	OBJECT-TYPE
+	SYNTAX	SEQUENCE OF Kaipar
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION	"SNMP Table for Daps kaipar"
+	::= { uniserv 2 }
+
+auxkaipar	OBJECT-TYPE
+	SYNTAX	Kaipar
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION ""
+	INDEX	{ kaiparNumber }
+	::= { kaipar 1 }
+
+Kaipar ::= 
+SEQUENCE {
+	kaiparNumber
+		INTEGER,
+	kaiparNode
+		DisplayString,
+	kaiparNodeName
+		DisplayString,
+	kaiparPID
+		INTEGER,
+	kaiparServerID
+		INTEGER,
+	kaiparMachineName
+		DisplayString,
+	kaiparState
+		DisplayString,
+	kaiparHostID
+		DisplayString,
+	kaiparNoOfSystemBoards
+		INTEGER,
+	kaiparMAC
+		DisplayString,
+	kaiparOBPHomeBoardCab
+		INTEGER,
+	kaiparOBPHomeBoardSlot
+		INTEGER,
+	kaiparOBPHBHwAddr
+		DisplayString,
+	kaiparFreePoolSysBoards
+		INTEGER,
+	kaiparOperatingSystem
+		DisplayString,
+	kaiparConnNamePart
+		DisplayString,
+	kaiparPartitionNodeAddress
+		DisplayString,
+	kaiparCPUClock
+		DisplayString,
+	kaiparCPUEnabled
+		DisplayString
+}
+
+kaiparNumber	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Index Variable"
+	::= { auxkaipar 1 } 
+
+kaiparNode	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkaipar 2 } 
+
+kaiparNodeName	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Partition Node Name"
+	::= { auxkaipar 3 } 
+
+kaiparPID	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Partition ID"
+	::= { auxkaipar 4 } 
+
+kaiparServerID	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Server ID for this partition"
+	::= { auxkaipar 5 } 
+
+kaiparMachineName	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkaipar 6 } 
+
+kaiparState	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"State of Partition"
+	::= { auxkaipar 7 } 
+
+kaiparHostID	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Partition Host ID"
+	::= { auxkaipar 8 } 
+
+kaiparNoOfSystemBoards	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Number of System Boards"
+	::= { auxkaipar 9 } 
+
+kaiparMAC	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"MAC Adress"
+	::= { auxkaipar 10 } 
+
+kaiparOBPHomeBoardCab	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Defines System board with OBP and startup memory. Board cannot be detached"
+	::= { auxkaipar 11 } 
+
+kaiparOBPHomeBoardSlot	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Defines System board with OBP and startup memory. Board cannot be detached"
+	::= { auxkaipar 12 } 
+
+kaiparOBPHBHwAddr	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Defines System board with OBP and startup memory. Board cannot be detached"
+	::= { auxkaipar 13 } 
+
+kaiparFreePoolSysBoards	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Number of Systemboards in free pool management to configure dynamic"
+	::= { auxkaipar 14 } 
+
+kaiparOperatingSystem	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"OS of partition"
+	::= { auxkaipar 15 } 
+
+kaiparConnNamePart  OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     ""
+        ::= { auxkaipar 16 }
+
+kaiparPartitionNodeAddress       OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     "uname of partition for SCS"
+        ::= { auxkaipar 17 }
+
+kaiparCPUClock OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     "CPU CLock for SCS, currently unset"
+        ::= { auxkaipar 18 }
+
+kaiparCPUEnabled   OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     "CPU enabled for SCS"
+        ::= { auxkaipar 19 }
+
+
+kainode	OBJECT-TYPE
+	SYNTAX	SEQUENCE OF Kainode
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION	"kainode"
+	::= { uniserv 3 }
+
+auxkainode	OBJECT-TYPE
+	SYNTAX	Kainode
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION ""
+	INDEX	{ kainodeNumber }
+	::= { kainode 1 }
+
+Kainode ::= 
+SEQUENCE {
+	kainodeNumber
+		INTEGER,
+	kainodeNode
+		DisplayString,
+	kainodeNodeName
+		DisplayString,
+	kainodeMachineName
+		DisplayString,
+	kainodeSegID
+		INTEGER,
+	kainodeServerID
+		INTEGER,
+	kainodePID
+		INTEGER,
+	kainodeIPAddr
+		DisplayString,
+	kainodeMAC
+		DisplayString,
+	kainodeConsole
+		DisplayString,
+	kainodeModel
+		DisplayString,
+	kainodeConnNamePart
+        	DisplayString,
+	kainodeConnNameCons
+        	DisplayString,
+	kainodePrimConsole
+		DisplayString,
+	kainodePrimComm
+		DisplayString,
+	kainodePrimState
+		DisplayString,
+	kainodeSecConsole
+		DisplayString,
+	kainodeSecComm
+		DisplayString,
+	kainodeSecState
+		DisplayString
+}
+
+kainodeNumber	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Index Variable"
+	::= { auxkainode 1 } 
+
+kainodeNode	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkainode 2 } 
+
+kainodeNodeName	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Systemname of Partition"
+	::= { auxkainode 3 } 
+
+kainodeMachineName	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Name of Enterprise Server"
+	::= { auxkainode 4 } 
+
+kainodeSegID	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkainode 5 } 
+
+kainodeServerID	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkainode 6 } 
+
+kainodePID	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkainode 7 } 
+
+kainodeIPAddr	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkainode 8 } 
+
+kainodeMAC	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkainode 9 } 
+
+kainodeConsole	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Name of Console for this partition"
+	::= { auxkainode 10 } 
+
+kainodeModel	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Modelname of maschine which contains this partition"
+	::= { auxkainode 11 } 
+
+kainodeConnNamePart    OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     "Modelname of maschine which contains this partition"
+        ::= { auxkainode 12 }
+
+kainodeConnNameCons    OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     "Modelname of maschine which contains this partition"
+        ::= { auxkainode 13 }
+
+kainodePrimConsole    OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     "uname der primary SMC"
+        ::= { auxkainode 14 }
+
+kainodePrimComm    OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     "internal SCS communication name der primary SMC"
+        ::= { auxkainode 15 }
+
+kainodePrimState    OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     "console state der primary Console"
+        ::= { auxkainode 16 }
+
+kainodeSecConsole    OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     "uname der secondary SMC"
+        ::= { auxkainode 17 }
+
+kainodeSecComm    OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     "internal SCS communication name der secondary SMC"
+        ::= { auxkainode 18 }
+
+kainodeSecState    OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     "console state der secondary Console"
+        ::= { auxkainode 19 }
+
+kaisysb	OBJECT-TYPE
+	SYNTAX	SEQUENCE OF Kaisysb
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION	"kaisysb"
+	::= { uniserv 4 }
+
+auxkaisysb	OBJECT-TYPE
+	SYNTAX	Kaisysb
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION ""
+	INDEX	{ kaisysbNumber }
+	::= { kaisysb 1 }
+
+Kaisysb ::= 
+SEQUENCE {
+	kaisysbNumber
+		INTEGER,
+	kaisysbNode
+		DisplayString,
+	kaisysbHwAddr
+		DisplayString,
+	kaisysbServerID
+		INTEGER,
+	kaisysbSlot
+		INTEGER,
+	kaisysbCabinet
+		INTEGER,
+	kaisysbPartId
+		DisplayString,
+	kaisysbPartNextId
+		DisplayString,
+	kaisysbHwConfigState
+		DisplayString,
+	kaisysbBoardHWState
+		DisplayString,
+	kaisysbSerialNr
+		DisplayString,
+	kaisysbCacheSize
+		INTEGER,
+	kaisysbBoardType
+		DisplayString,
+	kaisysbnoobpsb
+		DisplayString,
+	kaisysbnoiosb
+		DisplayString,
+	kaisysbnomemsb
+		DisplayString,
+	kaisysbDRState
+		DisplayString,
+	kaisysbDRStateDetail
+		DisplayString,
+	kaisysbNumberOfCPUS
+		INTEGER,
+	kaisysbNumberOfMemoryStripes
+		INTEGER,
+	kaisysbNumberOfPCISlots
+		INTEGER,
+	kaisysbNumberOnboardPCI
+		INTEGER,
+	kaisysbSBPKey
+		DisplayString,
+	kaisysbLSBMode
+		DisplayString,
+	kaisysbLSBOffset
+		INTEGER,
+	kaisysbSystemBoardName
+		DisplayString,
+	kaisysbMachine
+		DisplayString,
+	kaisysbCPUFrequency
+		DisplayString,
+	kaisysbXPARMode
+		DisplayString
+}
+
+kaisysbNumber	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Index Variable"
+	::= { auxkaisysb 1 } 
+
+kaisysbNode	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkaisysb 2 } 
+
+kaisysbHwAddr	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkaisysb 3 } 
+
+kaisysbServerID	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkaisysb 4 } 
+
+kaisysbSlot	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkaisysb 5 } 
+
+kaisysbCabinet	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkaisysb 6 } 
+
+kaisysbPartId	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkaisysb 7 } 
+
+kaisysbPartNextId	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkaisysb 8 } 
+
+kaisysbHwConfigState	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkaisysb 9 } 
+
+kaisysbBoardHWState	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkaisysb 10 } 
+
+kaisysbSerialNr	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkaisysb 11 } 
+
+kaisysbCacheSize	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkaisysb 12 } 
+
+kaisysbBoardType	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkaisysb 13 } 
+
+kaisysbnoobpsb	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkaisysb 14 } 
+
+kaisysbnoiosb	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkaisysb 15 } 
+
+kaisysbnomemsb 	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkaisysb 16 } 
+
+kaisysbDRState	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkaisysb 17 } 
+
+kaisysbDRStateDetail	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkaisysb 18 } 
+
+kaisysbNumberOfCPUS	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkaisysb 19 } 
+
+kaisysbNumberOfMemoryStripes	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkaisysb 20 } 
+
+kaisysbNumberOfPCISlots	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkaisysb 21 } 
+
+kaisysbNumberOnboardPCI	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkaisysb 22 } 
+
+kaisysbSBPKey OBJECT-TYPE
+	SYNTAX DisplayString
+	ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     "Unknown"
+        ::= { auxkaisysb 23 }
+
+kaisysbLSBMode OBJECT-TYPE
+	SYNTAX  DisplayString
+	ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     "Unknown"
+        ::= { auxkaisysb 24 }
+
+kaisysbLSBOffset OBJECT-TYPE
+	SYNTAX  INTEGER
+	ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     "Unknown"
+        ::= { auxkaisysb 25 }
+
+kaisysbSystemBoardName OBJECT-TYPE
+	SYNTAX  DisplayString
+	ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     "Unknown"
+        ::= { auxkaisysb 26 }
+
+kaisysbMachine OBJECT-TYPE
+	SYNTAX  DisplayString
+	ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     "Unknown"
+        ::= { auxkaisysb 27 }
+
+kaisysbCPUFrequency OBJECT-TYPE
+	SYNTAX  DisplayString
+	ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     "Unknown"
+        ::= { auxkaisysb 28 }
+
+kaisysbXPARMode OBJECT-TYPE
+	SYNTAX  DisplayString
+	ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     "Unknown"
+        ::= { auxkaisysb 29 }
+
+kaicpu	OBJECT-TYPE
+	SYNTAX	SEQUENCE OF Kaicpu
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION	"kaicpu"
+	::= { uniserv 5 }
+
+auxkaicpu	OBJECT-TYPE
+	SYNTAX	Kaicpu
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION ""
+	INDEX	{ kaicpuNumber }
+	::= { kaicpu 1 }
+
+Kaicpu ::= 
+SEQUENCE {
+	kaicpuNumber
+		INTEGER,
+	kaicpuNode
+		DisplayString,
+	kaicpuHwAddr
+		DisplayString,
+	kaicpuServerID
+		INTEGER,
+	kaicpuCabinetNo
+		INTEGER,
+	kaicpuSBSlotNo
+		INTEGER,
+	kaicpuCPUNo
+		INTEGER,
+	kaicpuFreq
+		DisplayString,
+	kaicpuHWRevision
+		DisplayString,
+	kaicpuType
+		INTEGER,
+	kaicpuCache
+		DisplayString,
+	kaicpuStatus
+		INTEGER,
+	kaicpuTempStatus
+		DisplayString
+}
+
+kaicpuNumber	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Index Variable"
+	::= { auxkaicpu 1 } 
+
+kaicpuNode	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkaicpu 2 } 
+
+kaicpuHwAddr	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkaicpu 3 } 
+
+kaicpuServerID	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkaicpu 4 } 
+
+kaicpuCabinetNo	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkaicpu 5 } 
+
+kaicpuSBSlotNo	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkaicpu 6 } 
+
+kaicpuCPUNo	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkaicpu 7 } 
+
+kaicpuFreq	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkaicpu 8 } 
+
+kaicpuHWRevision	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkaicpu 9 } 
+
+kaicpuType	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkaicpu 10 } 
+
+kaicpuCache	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkaicpu 11 } 
+
+kaicpuStatus	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkaicpu 12 } 
+
+kaicpuTempStatus	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkaicpu 13 } 
+
+
+kaimemory	OBJECT-TYPE
+	SYNTAX	SEQUENCE OF Kaimemory
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION	"kaimemory"
+	::= { uniserv 6 }
+
+auxkaimemory	OBJECT-TYPE
+	SYNTAX	Kaimemory
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION ""
+	INDEX	{ kaimemoryNumber }
+	::= { kaimemory 1 }
+
+Kaimemory ::= 
+SEQUENCE {
+	kaimemoryNumber
+		INTEGER,
+	kaimemoryNode
+		DisplayString,
+	kaimemoryHwAddr
+		DisplayString,
+	kaimemoryServerID
+		INTEGER,
+	kaimemoryCabinetNo
+		INTEGER,
+	kaimemorySBSlotNo
+		INTEGER,
+	kaimemorySizeOnBoard
+		DisplayString,
+	kaimemoryInterleaveMode
+		DisplayString,
+	kaimemoryBlockNo
+		DisplayString,
+	kaimemoryWay
+		DisplayString,
+	kaimemoryMemSlotName
+		DisplayString,
+	kaimemorySizeInSlot
+		DisplayString,
+	kaimemoryType
+		DisplayString
+}
+
+kaimemoryNumber	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Index Variable"
+	::= { auxkaimemory 1 } 
+
+kaimemoryNode	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkaimemory 2 } 
+
+kaimemoryHwAddr	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkaimemory 3 } 
+
+kaimemoryServerID	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkaimemory 4 } 
+
+kaimemoryCabinetNo	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkaimemory 5 } 
+
+kaimemorySBSlotNo	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkaimemory 6 } 
+
+kaimemorySizeOnBoard	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkaimemory 7 } 
+
+kaimemoryInterleaveMode	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkaimemory 8 } 
+
+kaimemoryBlockNo	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkaimemory 9 } 
+
+kaimemoryWay	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkaimemory 10 } 
+
+kaimemoryMemSlotName	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkaimemory 11 } 
+
+kaimemorySizeInSlot	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkaimemory 12 } 
+
+kaimemoryType	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkaimemory 13 } 
+
+
+kaipci	OBJECT-TYPE
+	SYNTAX	SEQUENCE OF Kaipci
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION	"kaipci"
+	::= { uniserv 7 }
+
+auxkaipci	OBJECT-TYPE
+	SYNTAX	Kaipci
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION ""
+	INDEX	{ kaipciNumber }
+	::= { kaipci 1 }
+
+Kaipci ::= 
+SEQUENCE {
+	kaipciNumber
+		INTEGER,
+	kaipciNode
+		DisplayString,
+	kaipciHwAddr
+		DisplayString,
+	kaipciServerID
+		INTEGER,
+	kaipciSBSlotNo
+		INTEGER,
+	kaipciCabinetNo
+		INTEGER,
+	kaipciPCISlot
+		DisplayString,
+	kaipciNameProperty
+		DisplayString,
+	kaipciLSBOffset
+		INTEGER,
+	kaipciRackNo
+		INTEGER,
+	kaipciPCIBoxNo
+		INTEGER,
+	kaipciPCIBoxName
+		DisplayString,
+	kaipciMachine
+		DisplayString,
+	kaipciSbHwAddr
+		DisplayString
+}
+
+kaipciNumber	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Index Variable"
+	::= { auxkaipci 1 } 
+
+kaipciNode	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Unknown"
+	::= { auxkaipci 2 } 
+
+kaipciHwAddr	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"Hardware address of PCI card"
+	::= { auxkaipci 3 } 
+
+kaipciServerID	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"server ID"
+	::= { auxkaipci 4 } 
+
+kaipciSBSlotNo	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"system board slot number"
+	::= { auxkaipci 5 } 
+
+kaipciCabinetNo	OBJECT-TYPE
+	SYNTAX	INTEGER
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"cabinet number of corresponding SB"
+	::= { auxkaipci 6 } 
+
+kaipciPCISlot	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"pci slot"
+	::= { auxkaipci 7 } 
+
+kaipciNameProperty	OBJECT-TYPE
+	SYNTAX	DisplayString
+	ACCESS	read-only
+	STATUS	mandatory
+	DESCRIPTION	"card hardware description"
+	::= { auxkaipci 8 } 
+
+kaipciLSBOffset OBJECT-TYPE              
+	SYNTAX INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION "LSB offset: 0, 1, 2 or 3"
+	::= { auxkaipci 9 }
+
+kaipciRackNo  OBJECT-TYPE                
+	SYNTAX INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION "Rack number (of PCI-Box)"
+	::= { auxkaipci 10 }
+
+kaipciPCIBoxNo OBJECT-TYPE     
+	SYNTAX INTEGER
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION "PCI-box number"
+	::= { auxkaipci 11 }
+
+kaipciPCIBoxName OBJECT-TYPE
+	SYNTAX DisplayString       
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION "PCI-box name: PCI_BOX or IO_BOX"
+	::= { auxkaipci 12 }
+
+kaipciMachine OBJECT-TYPE
+	SYNTAX DisplayString       
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION "machine name"
+	::= { auxkaipci 13 }
+
+kaipciSbHwAddr OBJECT-TYPE
+	SYNTAX DisplayString        
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION "Hardware adress of assigned system board"
+	::= { auxkaipci 14 }
+
+kaiPowerNodeName OBJECT-TYPE
+        SYNTAX DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION "Name of Partition which changed Power State"
+        ::= { unitrap 1 }
+
+kaiPartitionOffline     TRAP-TYPE
+     ENTERPRISE         wsaObjects
+     VARIABLES          { kaiPowerNodeName }
+     DESCRIPTION        "Sent if Partition is powered off"
+     --#TYPE            "Partition Power Off Trap"
+     --#SUMMARY         "Partition %s was powered off"
+     --#ARGUMENTS       {0}
+     --#SEVERITY        MINOR
+     --#TIMEINDEX       1
+     --#STATE           NONOPERATIONAL
+     ::= 700
+
+kaiPartitionOnline      TRAP-TYPE
+     ENTERPRISE         wsaObjects
+     VARIABLES          { kaiPowerNodeName }
+     DESCRIPTION        "Sent if Partition is powered on"
+     --#TYPE            "Partition Power On Trap"
+     --#SUMMARY         "Partition %s was powered on"
+     --#ARGUMENTS       {0}
+     --#SEVERITY        INFORMATIONAL
+     --#TIMEINDEX       1
+     --#STATE           NONOPERATIONAL
+     ::= 701
+
+
+END

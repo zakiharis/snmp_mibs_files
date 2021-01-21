@@ -1,0 +1,411 @@
+Swyx-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Integer32, enterprises
+            FROM SNMPv2-SMI;
+
+    -- module
+
+    swyx MODULE-IDENTITY
+        LAST-UPDATED "1101120000Z"
+        ORGANIZATION "Swyx"
+        CONTACT-INFO
+                "productmanagement@swyx.com"
+        DESCRIPTION
+                "The MIB module for SwyxWare IP PBX's."
+        ::= { enterprises 23949 }
+
+    -- sub-tree for performance counters
+    
+    perfCountObjects OBJECT IDENTIFIER ::= { swyx 1 }
+
+    -- performance counters
+
+    activeCalls OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Number of Active Calls"
+        ::= { perfCountObjects 1 }
+
+    activeExternCalls OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Number of Active External Calls"
+        ::= { perfCountObjects 2 }
+
+    activeInternCalls OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Number of Active Internal Calls"
+        ::= { perfCountObjects 3 }
+
+    totalCalls OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Total Number of Calls"
+        ::= { perfCountObjects 4 }
+
+    loggedInUsers OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Number of Users logged-in"
+        ::= { perfCountObjects 5 }
+
+    swyxIt OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Number of SwyxIt! logged-in"
+        ::= { perfCountObjects 6 }
+
+    confDevices OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Number of Conference Devices logged-in"
+        ::= { perfCountObjects 7 }
+
+    swyxPhone OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Number of SwyxPhones logged-in"
+        ::= { perfCountObjects 8 }
+
+    h323Devices OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Number of H323-Devices logged-in"
+        ::= { perfCountObjects 9 }
+
+    sipDevices OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Number of SIP-Devices logged-in"
+        ::= { perfCountObjects 10 }
+
+    runningScripts OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Number of Running Scripts"
+        ::= { perfCountObjects 11 }
+
+    executedScripts OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+                "Total Number of Executed Scripts"
+        ::= { perfCountObjects 12 }
+
+    scriptLoadTime OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+				"Number of milliseconds needed to load call routing script for a call"
+        ::= { perfCountObjects 13 }
+
+    scriptCacheHits OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+				"Percentage of script loads where the script could be retrieved from the cache"
+        ::= { perfCountObjects 14 }
+
+    scriptCacheMisses OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+				"Percentage of script loads where the script had to be retrieved from the database"
+        ::= { perfCountObjects 15 }
+
+    scriptCacheSize OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+				"Script file cache size in bytes"
+        ::= { perfCountObjects 16 }
+
+    gatewayTrunks OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+				"Number of currently logged in SwyxGate trunks"
+        ::= { perfCountObjects 17 }
+
+    linkTrunks OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+				"Number of currently logged in IP link trunks"
+        ::= { perfCountObjects 18 }
+
+    allTrunks OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+				"Number of currently logged in trunks (sum of logged in SwyxGate and IP link trunks)"
+        ::= { perfCountObjects 19 }
+
+    allClients OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+				"Number of currently registered client devices"
+        ::= { perfCountObjects 20 }
+
+    workItemQueueLength OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+				"Number of currently queued thread pool work items"
+        ::= { perfCountObjects 21 }
+
+    subscriptions OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+				"Number of subscriptions clients have registered for getting notifications"
+        ::= { perfCountObjects 22 }
+
+    rejectedRegistrations OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+				"Number of rejected registrations per second because of high load"
+        ::= { perfCountObjects 23 }
+
+    rejectedSubscriptions OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+				"Number of rejected subscriptions per second because of high load"
+        ::= { perfCountObjects 24 }
+
+    rejectedCalls OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+				"Number of rejected calls per second because of high load"
+        ::= { perfCountObjects 25 }
+
+    licensedUsers OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+				"Total number of user licenses installed"
+         ::= { perfCountObjects 26 }
+
+    licensedChannels OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+				"Total number of channel licenses installed"
+        ::= { perfCountObjects 27 }
+
+    pbxConfigObjects OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+				"Number of PBX config objects"
+        ::= { perfCountObjects 28 }
+
+    pbxConfigUserObjects OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+				"Number of PBX config user objects"
+        ::= { perfCountObjects 29 }
+
+    pbxConfigStatusObjects OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+				"Number of PBX config status objects"
+        ::= { perfCountObjects 30 }
+
+    scriptDevices OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+				"Number of devices for scripting purpose"
+        ::= { perfCountObjects 31 }
+
+    pbxScriptObjects OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+				"Number of PBX script objects"
+        ::= { perfCountObjects 32 }
+
+    pbxScriptUserObjects OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+				"Number of PBX script user objects"
+        ::= { perfCountObjects 33 }
+
+    bxScriptCallObjects OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+				"Number of PBX script call objects"
+        ::= { perfCountObjects 34 }
+
+    trunks OBJECT-TYPE
+        SYNTAX     SEQUENCE OF TrunkInstance
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+				"List of trunk instances"
+        ::= { perfCountObjects 35 }
+
+    trunkInstance OBJECT-TYPE
+        SYNTAX     TrunkInstance
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+				"Trunk instance"
+        ::= { trunks 1 }
+
+	TrunkInstance ::=
+		SEQUENCE {	activeTrunkCalls		Integer32,
+					totalTrunkCalls			Integer32,
+					channelUtilization		Integer32,
+					trunkRegistration		Integer32,
+					activeInboundCalls		Integer32,
+					activeOutboundCalls		Integer32 }
+
+    activeTrunkCalls OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+				"Number of currently active trunk calls"
+        ::= { trunkInstance 1 }
+
+    totalTrunkCalls OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+				"Total number of calls made via trunk since system has been started"
+        ::= { trunkInstance 2 }
+
+    channelUtilization OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+				"Percentual number of channels currently in use"
+        ::= { trunkInstance 3 }
+
+    trunkRegistration OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+				"If value is nonzero trunk is registered at SwyxServer"
+        ::= { trunkInstance 4 }
+
+    activeInboundCalls OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+				"Number of currently active inbound trunk calls"
+        ::= { trunkInstance 5 }
+
+    activeOutboundCalls OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+				"Number of currently active outbound trunk calls"
+        ::= { trunkInstance 6 }
+
+    locations OBJECT-TYPE
+        SYNTAX     SEQUENCE OF LocationInstance
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+				"List of location instances"
+        ::= { perfCountObjects 36 }
+
+    locationInstance OBJECT-TYPE
+        SYNTAX     LocationInstance
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+				"Location instance"
+        ::= { locations 1 }
+
+	LocationInstance ::=
+		SEQUENCE {	interLocationCallLimit	Integer32,
+					interLocationCalls		Integer32 }
+
+    interLocationCallLimit OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+				"Number of allowed calls between this location and another location"
+        ::= { locationInstance 1 }
+
+    interLocationCalls OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+				"Number of current calls between this location and another location"
+        ::= { locationInstance 2 }
+
+    internalObjects OBJECT-TYPE
+        SYNTAX     Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+				"Number of internal objects"
+        ::= { perfCountObjects 37 } 
+END

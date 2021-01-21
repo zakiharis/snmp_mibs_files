@@ -1,0 +1,2128 @@
+-- ----------------------------------------------------------------------
+--
+--					Copyright (c) 2006 by Sinetica Corporation Ltd.
+--
+-- Filename:        RMS-C_SNMPv1_main.mib
+--
+-- Author:          Adrian Moruz
+--
+-- Description:     SNMPv1 MIB for the Knuerr RMS Compact
+--
+-- $Id: RMS-C_SNMPv1_main.mib,v 1.1 2006/10/11 11:23:04 adrian.moruz Exp $
+--
+-- $Name:  $
+--
+-- $Log: RMS-C_SNMPv1_main.mib,v $
+-- Revision 1.1  2006/10/11 11:23:04  adrian.moruz
+-- Created from RMS-C_SNMPv1.mib v1.2 to separate the different trap enterprise groups into separate MIBs
+--
+--
+-- ----------------------------------------------------------------------
+
+RMS-COMPACT-SNMPv1-MAIN-MIB DEFINITIONS ::= BEGIN
+
+
+
+-- {{{ Imports
+--	OBJECT-TYPE, Counter32, Unsigned32,
+
+IMPORTS
+        TRAP-TYPE
+                FROM RFC-1215
+        sysDescr, sysName, DisplayString
+                FROM RFC1213-MIB
+        OBJECT-TYPE
+                FROM RFC-1212
+        enterprises 
+                FROM RFC1155-SMI
+	;
+
+-- }}}
+
+
+
+sinetica   OBJECT IDENTIFIER ::= { enterprises 3711 }
+
+
+
+rms-compact	OBJECT IDENTIFIER ::= { sinetica 15 }
+rms-compact1	OBJECT IDENTIFIER ::= { rms-compact 1 }
+rms-cObjects	OBJECT IDENTIFIER ::= { rms-compact1 1 }
+
+
+-- {{{ rms-cObjects  
+
+rms-cEnviroment   OBJECT IDENTIFIER ::= { rms-cObjects 1  }
+rms-cContact       OBJECT IDENTIFIER ::= { rms-cObjects 2  }
+rms-cOutput        OBJECT IDENTIFIER ::= { rms-cObjects 3  }
+
+
+-- }}}
+-- {{{ rms-cTemp group    
+
+rms-cTemp1      OBJECT IDENTIFIER ::= { rms-cEnviroment 1 }
+rms-cHumid1          OBJECT IDENTIFIER ::= { rms-cEnviroment 2 }
+rms-cTemp2      OBJECT IDENTIFIER ::= { rms-cEnviroment 3 }
+rms-cHumid2          OBJECT IDENTIFIER ::= { rms-cEnviroment 4 }
+
+-- }}}
+-- {{{ rms-cTemp
+
+rms-cTemp1EnableMonitoring  OBJECT-TYPE
+    SYNTAX    INTEGER { off(0), on(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Setting to one enables monitoring of Temperature"
+    ::= { rms-cTemp1 1 }
+
+rms-cTemp1Name  OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..47))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The name of the temperature reading"	
+    ::= { rms-cTemp1 2 }
+
+rms-cTemp1CalibrationOffset  OBJECT-TYPE
+    SYNTAX    INTEGER (-100..100)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Calibration offset in 0.1 degrees"	
+    ::= { rms-cTemp1 3 }
+
+rms-cTemp1Current  OBJECT-TYPE
+    SYNTAX    INTEGER (-200..1000)
+    ACCESS    read-only
+    STATUS    mandatory
+    DESCRIPTION
+        "The current temperature reading in 0.1%"
+    ::= { rms-cTemp1 4 }
+
+rms-cTemp1Thresholds    OBJECT IDENTIFIER ::= { rms-cTemp1 5  }
+rms-cTemp1OFFtoONtraps    OBJECT IDENTIFIER ::= { rms-cTemp1 6  }
+rms-cTemp1OFFtoONrepeatTimers    OBJECT IDENTIFIER ::= { rms-cTemp1 7  }
+rms-cTemp1ONtoOFFtraps    OBJECT IDENTIFIER ::= { rms-cTemp1 8  }
+rms-cTemp1ONtoOFFrepeatTimers    OBJECT IDENTIFIER ::= { rms-cTemp1 9  }
+
+-- {{{ rms-cTempThresholds
+
+rms-cTemp1LowerControlLevel  OBJECT-TYPE
+    SYNTAX    INTEGER (-200..1000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "The Lower Limit temperature threshold in 0.1 degrees"
+    ::= { rms-cTemp1Thresholds 1 }
+
+rms-cTemp1LowerWarningLevel  OBJECT-TYPE
+    SYNTAX    INTEGER (-200..1000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "The Lower Control temperature threshold in 0.1 degrees"
+    ::= { rms-cTemp1Thresholds 2 }
+
+rms-cTemp1UpperWarningLevel  OBJECT-TYPE
+    SYNTAX    INTEGER (-200..1000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "The Upper Control temperature threshold in 0.1 degrees"
+    ::= { rms-cTemp1Thresholds 3 }
+
+rms-cTemp1UpperControlLevel  OBJECT-TYPE
+    SYNTAX    INTEGER (-200..1000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "The Upper Limit temperature threshold in 0.1 degrees"
+    ::= { rms-cTemp1Thresholds 4 }
+
+-- }}}
+-- {{{ rms-cTempOFFtoONtraps
+
+rms-cTemp1OFFtoONtrapLCL  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cTemp1OFFtoONtraps 1 }
+
+rms-cTemp1OFFtoONontrapLWL  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cTemp1OFFtoONtraps 2 }
+
+rms-cTemp1OFFtoONtrapUWL  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cTemp1OFFtoONtraps 3 }
+
+rms-cTemp1OFFtoONtrapUCL  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cTemp1OFFtoONtraps 4 }
+
+-- }}}
+-- {{{ rms-cTempOFFtoONrepeatTimers
+
+rms-cTemp1OFFtoONrepLCL  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in minutes"
+    ::= { rms-cTemp1OFFtoONrepeatTimers 1 }
+
+rms-cTemp1OFFtoONrepLWL  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in minutes"
+    ::= { rms-cTemp1OFFtoONrepeatTimers 2 }
+
+rms-cTemp1OFFtoONrepUWL  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in minutes"
+    ::= { rms-cTemp1OFFtoONrepeatTimers 3 }
+
+rms-cTemp1OFFtoONrepUCL  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in minutes"
+    ::= { rms-cTemp1OFFtoONrepeatTimers 4 }
+
+-- }}}
+-- {{{ rms-cTempONtoOFFtraps
+
+rms-cTemp1ONtoOFFtrapLCL  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cTemp1ONtoOFFtraps 1 }
+
+rms-cTemp1ONtoOFFtrapLWL  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cTemp1ONtoOFFtraps 2 }
+
+rms-cTemp1ONtoOFFtrapUWL  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cTemp1ONtoOFFtraps 3 }
+
+rms-cTemp1ONtoOFFtrapUCL  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cTemp1ONtoOFFtraps 4 }
+
+-- }}}
+-- {{{ rms-cTempONtoOFFrepeatTimers
+
+rms-cTemp1ONtoOFFrepLCL  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cTemp1ONtoOFFrepeatTimers 1 }
+
+rms-cTemp1ONtoOFFrepLWL  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cTemp1ONtoOFFrepeatTimers 2 }
+
+rms-cTemp1ONtoOFFrepUWL  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cTemp1ONtoOFFrepeatTimers 3 }
+
+rms-cTemp1ONtoOFFrepUCL  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cTemp1ONtoOFFrepeatTimers 4 }
+
+-- }}}
+
+rms-cTemp1LowControlLimitAlarm            TRAP-TYPE
+    ENTERPRISE rms-cTemp1
+    VARIABLES { 
+    			sysDescr,
+    			sysName,
+    			rms-cTemp1Name,
+    			rms-cTemp1LowerControlLevel
+    			}
+    DESCRIPTION
+        "Temperature is below the low control limit."
+	--#TYPE		"Temperature 1 below lower control limit"
+	--#SUMMARY	"Temperature %s below %d in %s at %s"
+	--#ARGUMENTS	{2,3,0,1}
+	--#SEVERITY 	MAJOR
+	--#TIMEINDEX	4
+	--#STATE		NONOPERATIONAL
+    ::= 101
+
+rms-cTemp1LowWarningLimitAlarm           TRAP-TYPE
+    ENTERPRISE rms-cTemp1
+    VARIABLES { 
+    			sysDescr,
+    			sysName,
+    			rms-cTemp1Name,
+    			rms-cTemp1LowerWarningLevel
+    			}
+    DESCRIPTION
+        "Temperature is below the low warning limit."
+	--#TYPE		"Temperature 1 below lower warning limit"
+	--#SUMMARY	"Temperature %s below %d in %s at %s"
+	--#ARGUMENTS	{2,3,0,1}
+	--#SEVERITY 	MINOR
+	--#TIMEINDEX	4
+	--#STATE		NONOPERATIONAL
+    ::= 102
+
+rms-cTemp1HighWarningLimitAlarm            TRAP-TYPE
+    ENTERPRISE rms-cTemp1
+    VARIABLES { 
+    			sysDescr,
+    			sysName,
+    			rms-cTemp1Name,
+    			rms-cTemp1UpperWarningLevel
+    			}
+    DESCRIPTION
+        "Temperature is over the high warning limit."
+	--#TYPE		"Temperature 1 above high warning limit"
+	--#SUMMARY	"Temperature %s above %d in %s at %s"
+	--#ARGUMENTS	{2,3,0,1}
+	--#SEVERITY 	MINOR
+	--#TIMEINDEX	4
+	--#STATE		NONOPERATIONAL
+    ::= 103
+
+rms-cTemp1HighControlLimitAlarm           TRAP-TYPE
+    ENTERPRISE rms-cTemp1
+    VARIABLES { 
+    			sysDescr,
+    			sysName,
+    			rms-cTemp1Name,
+    			rms-cTemp1UpperControlLevel
+    			}
+    DESCRIPTION
+        "Temperature is over the high control limit."
+	--#TYPE		"Temperature 1 above high control limit"
+	--#SUMMARY	"Temperature %s above %d in %s at %s"
+	--#ARGUMENTS	{2,3,0,1}
+	--#SEVERITY 	MAJOR
+	--#TIMEINDEX	4
+	--#STATE		NONOPERATIONAL
+    ::= 104
+
+rms-cTemp1LowControlLimitNormal            TRAP-TYPE
+    ENTERPRISE rms-cTemp1
+    VARIABLES { 
+    			sysDescr,
+    			sysName,
+    			rms-cTemp1Name,
+    			rms-cTemp1LowerControlLevel
+    			}
+    DESCRIPTION
+        "Temperature is inside the low control limit."
+	--#TYPE		"Temperature 1 above lower control limit"
+	--#SUMMARY	"Temperature %s above %d in %s at %s"
+	--#ARGUMENTS	{2,3,0,1}
+	--#SEVERITY 	INFORMATIONAL
+	--#TIMEINDEX	4
+	--#STATE		NONOPERATIONAL
+    ::= 105
+
+rms-cTemp1LowWarningLimitNormal           TRAP-TYPE
+    ENTERPRISE rms-cTemp1
+    VARIABLES { 
+    			sysDescr,
+    			sysName,
+    			rms-cTemp1Name,
+    			rms-cTemp1LowerWarningLevel
+    			}
+    DESCRIPTION
+        "Temperature is inside the low warning limit."
+	--#TYPE		"Temperature 1 above lower warning limit"
+	--#SUMMARY	"Temperature %s above %d in %s at %s"
+	--#ARGUMENTS	{2,3,0,1}
+	--#SEVERITY 	INFORMATIONAL
+	--#TIMEINDEX	4
+	--#STATE		NONOPERATIONAL
+    ::= 106
+
+rms-cTemp1HighWarningLimitNormal            TRAP-TYPE
+    ENTERPRISE rms-cTemp1
+    VARIABLES { 
+    			sysDescr,
+    			sysName,
+    			rms-cTemp1Name,
+    			rms-cTemp1UpperWarningLevel
+    			}
+    DESCRIPTION
+        "Temperature is inside the high warning limit."
+	--#TYPE		"Temperature 1 below high warning limit"
+	--#SUMMARY	"Temperature %s below %d in %s at %s"
+	--#ARGUMENTS	{2,3,0,1}
+	--#SEVERITY 	INFORMATIONAL
+	--#TIMEINDEX	4
+	--#STATE		NONOPERATIONAL
+    ::= 107
+
+rms-cTemp1HighControlLimitNormal           TRAP-TYPE
+    ENTERPRISE rms-cTemp1
+    VARIABLES { 
+    			sysDescr,
+    			sysName,
+    			rms-cTemp1Name,
+    			rms-cTemp1UpperControlLevel
+    			}
+    DESCRIPTION
+        "Temperature is inside the high control limit."
+	--#TYPE		"Temperature 1 below high control limit"
+	--#SUMMARY	"Temperature %s below %d in %s at %s"
+	--#ARGUMENTS	{2,3,0,1}
+	--#SEVERITY 	INFORMATIONAL
+	--#TIMEINDEX	4
+	--#STATE		NONOPERATIONAL
+    ::= 108
+
+-- }}}
+-- {{{ rms-cHumid
+
+rms-cHumid1EnableMonitoring  OBJECT-TYPE
+    SYNTAX    INTEGER { off(0), on(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Setting to one enables monitoring of Humidity"
+    ::= { rms-cHumid1 1 }
+
+rms-cHumid1Name  OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..47))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The name of the humidity reading"	
+    ::= { rms-cHumid1 2 }
+
+rms-cHumid1CalibrationOffset  OBJECT-TYPE
+    SYNTAX    INTEGER (-100..100)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Calibration offset in 0.1 percent"	
+    ::= { rms-cHumid1 3 }
+
+rms-cHumid1Current  OBJECT-TYPE
+    SYNTAX    INTEGER (-200..1000)
+    ACCESS    read-only
+    STATUS    mandatory
+    DESCRIPTION
+        "The current humidity reading in 0.1%"
+    ::= { rms-cHumid1 4 }
+
+rms-cHumid1Thresholds    OBJECT IDENTIFIER ::= { rms-cHumid1 5  }
+rms-cHumid1OFFtoONtraps    OBJECT IDENTIFIER ::= { rms-cHumid1 6  }
+rms-cHumid1OFFtoONrepeatTimers    OBJECT IDENTIFIER ::= { rms-cHumid1 7  }
+rms-cHumid1ONtoOFFtraps    OBJECT IDENTIFIER ::= { rms-cHumid1 8  }
+rms-cHumid1ONtoOFFrepeatTimers    OBJECT IDENTIFIER ::= { rms-cHumid1 9  }
+
+-- {{{ rms-cHumidThresholds
+
+rms-cHumid1LowerControlLevel  OBJECT-TYPE
+    SYNTAX    INTEGER (-200..1000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "The Lower Limit Humidity threshold in 0.1 percent"
+    ::= { rms-cHumid1Thresholds 1 }
+
+rms-cHumid1LowerWarningLevel  OBJECT-TYPE
+    SYNTAX    INTEGER (-200..1000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "The Lower Control humidity threshold in 0.1 percent"
+    ::= { rms-cHumid1Thresholds 2 }
+
+rms-cHumid1UpperWarningLevel  OBJECT-TYPE
+    SYNTAX    INTEGER (-200..1000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "The Upper Control humidity threshold in 0.1 percent"
+    ::= { rms-cHumid1Thresholds 3 }
+
+rms-cHumid1UpperControlLevel  OBJECT-TYPE
+    SYNTAX    INTEGER (-200..1000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "The Upper Limit humidity threshold in 0.1 percent"
+    ::= { rms-cHumid1Thresholds 4 }
+
+-- }}}
+-- {{{ rms-cTempOFFtoONtraps
+
+rms-cHumid1OFFtoONtrapLCL  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cHumid1OFFtoONtraps 1 }
+
+rms-cHumid1OFFtoONtrapLWL  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cHumid1OFFtoONtraps 2 }
+
+rms-cHumid1OFFtoONtrapUWL  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cHumid1OFFtoONtraps 3 }
+
+rms-cHumid1OFFtoONtrapUCL  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cHumid1OFFtoONtraps 4 }
+
+-- }}}
+-- {{{ rms-cHumidOFFtoONrepeatTimers
+
+rms-cHumid1OFFtoONrepLCL  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cHumid1OFFtoONrepeatTimers 1 }
+
+rms-cHumid1OFFtoONrepLWL  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cHumid1OFFtoONrepeatTimers 2 }
+
+rms-cHumid1OFFtoONrepUWL  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cHumid1OFFtoONrepeatTimers 3 }
+
+rms-cHumid1OFFtoONrepUCL  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cHumid1OFFtoONrepeatTimers 4 }
+
+-- }}}
+-- {{{ rms-cTempONtoOFFtraps
+
+rms-cHumid1ONtoOFFtrapLCL  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cHumid1ONtoOFFtraps 1 }
+
+rms-cHumid1ONtoOFFtrapLWL  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cHumid1ONtoOFFtraps 2 }
+
+rms-cHumid1ONtoOFFtrapUWL  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cHumid1ONtoOFFtraps 3 }
+
+rms-cHumid1ONtoOFFtrapUCL  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cHumid1ONtoOFFtraps 4 }
+
+-- }}}
+-- {{{ rms-cHumidONtoOFFrepeatTimers
+
+rms-cHumid1ONtoOFFrepLCL  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cHumid1ONtoOFFrepeatTimers 1 }
+
+rms-cHumid1ONtoOFFrepLWL  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cHumid1ONtoOFFrepeatTimers 2 }
+
+rms-cHumid1ONtoOFFrepUWL  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cHumid1ONtoOFFrepeatTimers 3 }
+
+rms-cHumid1ONtoOFFrepUCL  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cHumid1ONtoOFFrepeatTimers 4 }
+
+-- }}}
+-- {{{ rms-cTemp
+
+rms-cTemp2EnableMonitoring  OBJECT-TYPE
+    SYNTAX    INTEGER { off(0), on(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Setting to one enables monitoring of Temperature"
+    ::= { rms-cTemp2 1 }
+
+rms-cTemp2Name  OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..47))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The name of the temperature reading"	
+    ::= { rms-cTemp2 2 }
+
+rms-cTemp2CalibrationOffset  OBJECT-TYPE
+    SYNTAX    INTEGER (-100..100)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Calibration offset in 0.1 degrees"	
+    ::= { rms-cTemp2 3 }
+
+rms-cTemp2Current  OBJECT-TYPE
+    SYNTAX    INTEGER (-200..1000)
+    ACCESS    read-only
+    STATUS    mandatory
+    DESCRIPTION
+        "The current temperature reading in 0.1%"
+    ::= { rms-cTemp2 4 }
+
+rms-cTemp2Thresholds    OBJECT IDENTIFIER ::= { rms-cTemp2 5  }
+rms-cTemp2OFFtoONtraps    OBJECT IDENTIFIER ::= { rms-cTemp2 6  }
+rms-cTemp2OFFtoONrepeatTimers    OBJECT IDENTIFIER ::= { rms-cTemp2 7  }
+rms-cTemp2ONtoOFFtraps    OBJECT IDENTIFIER ::= { rms-cTemp2 8  }
+rms-cTemp2ONtoOFFrepeatTimers    OBJECT IDENTIFIER ::= { rms-cTemp2 9  }
+
+-- {{{ rms-cTempThresholds
+
+rms-cTemp2LowerControlLevel  OBJECT-TYPE
+    SYNTAX    INTEGER (-200..1000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "The Lower Limit temperature threshold in 0.1 degrees"
+    ::= { rms-cTemp2Thresholds 1 }
+
+rms-cTemp2LowerWarningLevel  OBJECT-TYPE
+    SYNTAX    INTEGER (-200..1000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "The Lower Control temperature threshold in 0.1 degrees"
+    ::= { rms-cTemp2Thresholds 2 }
+
+rms-cTemp2UpperWarningLevel  OBJECT-TYPE
+    SYNTAX    INTEGER (-200..1000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "The Upper Control temperature threshold in 0.1 degrees"
+    ::= { rms-cTemp2Thresholds 3 }
+
+rms-cTemp2UpperControlLevel  OBJECT-TYPE
+    SYNTAX    INTEGER (-200..1000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "The Upper Limit temperature threshold in 0.1 degrees"
+    ::= { rms-cTemp2Thresholds 4 }
+
+-- }}}
+-- {{{ rms-cTempOFFtoONtraps
+
+rms-cTemp2OFFtoONtrapLCL  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cTemp2OFFtoONtraps 1 }
+
+rms-cTemp2OFFtoONontrapLWL  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cTemp2OFFtoONtraps 2 }
+
+rms-cTemp2OFFtoONtrapUWL  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cTemp2OFFtoONtraps 3 }
+
+rms-cTemp2OFFtoONtrapUCL  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cTemp2OFFtoONtraps 4 }
+
+-- }}}
+-- {{{ rms-cTempOFFtoONrepeatTimers
+
+rms-cTemp2OFFtoONrepLCL  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cTemp2OFFtoONrepeatTimers 1 }
+
+rms-cTemp2OFFtoONrepLWL  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cTemp2OFFtoONrepeatTimers 2 }
+
+rms-cTemp2OFFtoONrepUWL  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cTemp2OFFtoONrepeatTimers 3 }
+
+rms-cTemp2OFFtoONrepUCL  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cTemp2OFFtoONrepeatTimers 4 }
+
+-- }}}
+-- {{{ rms-cTempONtoOFFtraps
+
+rms-cTemp2ONtoOFFtrapLCL  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cTemp2ONtoOFFtraps 1 }
+
+rms-cTemp2ONtoOFFtrapLWL  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cTemp2ONtoOFFtraps 2 }
+
+rms-cTemp2ONtoOFFtrapUWL  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cTemp2ONtoOFFtraps 3 }
+
+rms-cTemp2ONtoOFFtrapUCL  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cTemp2ONtoOFFtraps 4 }
+
+-- }}}
+-- {{{ rms-cTempONtoOFFrepeatTimers
+
+rms-cTemp2ONtoOFFrepLCL  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cTemp2ONtoOFFrepeatTimers 1 }
+
+rms-cTemp2ONtoOFFrepLWL  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cTemp2ONtoOFFrepeatTimers 2 }
+
+rms-cTemp2ONtoOFFrepUWL  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cTemp2ONtoOFFrepeatTimers 3 }
+
+rms-cTemp2ONtoOFFrepUCL  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cTemp2ONtoOFFrepeatTimers 4 }
+
+-- }}}
+-- {{{ rms-cHumid
+
+rms-cHumid2EnableMonitoring  OBJECT-TYPE
+    SYNTAX    INTEGER { off(0), on(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Setting to one enables monitoring of Humidity"
+    ::= { rms-cHumid2 1 }
+
+rms-cHumid2Name  OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..47))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The name of the humidity reading"	
+    ::= { rms-cHumid2 2 }
+
+rms-cHumid2CalibrationOffset  OBJECT-TYPE
+    SYNTAX    INTEGER (-100..100)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Calibration offset in 0.1 percent"	
+    ::= { rms-cHumid2 3 }
+
+rms-cHumid2Current  OBJECT-TYPE
+    SYNTAX    INTEGER (-200..1000)
+    ACCESS    read-only
+    STATUS    mandatory
+    DESCRIPTION
+        "The current humidity reading in 0.1%"
+    ::= { rms-cHumid2 4 }
+
+rms-cHumid2Thresholds    OBJECT IDENTIFIER ::= { rms-cHumid2 5  }
+rms-cHumid2OFFtoONtraps    OBJECT IDENTIFIER ::= { rms-cHumid2 6  }
+rms-cHumid2OFFtoONrepeatTimers    OBJECT IDENTIFIER ::= { rms-cHumid2 7  }
+rms-cHumid2ONtoOFFtraps    OBJECT IDENTIFIER ::= { rms-cHumid2 8  }
+rms-cHumid2ONtoOFFrepeatTimers    OBJECT IDENTIFIER ::= { rms-cHumid2 9  }
+
+-- {{{ rms-cHumidThresholds
+
+rms-cHumid2LowerControlLevel  OBJECT-TYPE
+    SYNTAX    INTEGER (-200..1000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "The Lower Limit Humidity threshold in 0.1 percent"
+    ::= { rms-cHumid2Thresholds 1 }
+
+rms-cHumid2LowerWarningLevel  OBJECT-TYPE
+    SYNTAX    INTEGER (-200..1000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "The Lower Control humidity threshold in 0.1 percent"
+    ::= { rms-cHumid2Thresholds 2 }
+
+rms-cHumid2UpperWarningLevel  OBJECT-TYPE
+    SYNTAX    INTEGER (-200..1000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "The Upper Control humidity threshold in 0.1 percent"
+    ::= { rms-cHumid2Thresholds 3 }
+
+rms-cHumid2UpperControlLevel  OBJECT-TYPE
+    SYNTAX    INTEGER (-200..1000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "The Upper Limit humidity threshold in 0.1 percent"
+    ::= { rms-cHumid2Thresholds 4 }
+
+-- }}}
+-- {{{ rms-cTempOFFtoONtraps
+
+rms-cHumid2OFFtoONtrapLCL  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cHumid2OFFtoONtraps 1 }
+
+rms-cHumid2OFFtoONtrapLWL  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cHumid2OFFtoONtraps 2 }
+
+rms-cHumid2OFFtoONtrapUWL  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cHumid2OFFtoONtraps 3 }
+
+rms-cHumid2OFFtoONtrapUCL  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cHumid2OFFtoONtraps 4 }
+
+-- }}}
+-- {{{ rms-cHumidOFFtoONrepeatTimers
+
+rms-cHumid2OFFtoONrepLCL  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cHumid2OFFtoONrepeatTimers 1 }
+
+rms-cHumid2OFFtoONrepLWL  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cHumid2OFFtoONrepeatTimers 2 }
+
+rms-cHumid2OFFtoONrepUWL  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cHumid2OFFtoONrepeatTimers 3 }
+
+rms-cHumid2OFFtoONrepUCL  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cHumid2OFFtoONrepeatTimers 4 }
+
+-- }}}
+-- {{{ rms-cTempONtoOFFtraps
+
+rms-cHumid2ONtoOFFtrapLCL  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cHumid2ONtoOFFtraps 1 }
+
+rms-cHumid2ONtoOFFtrapLWL  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cHumid2ONtoOFFtraps 2 }
+
+rms-cHumid2ONtoOFFtrapUWL  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cHumid2ONtoOFFtraps 3 }
+
+rms-cHumid2ONtoOFFtrapUCL  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cHumid2ONtoOFFtraps 4 }
+
+-- }}}
+-- {{{ rms-cHumidONtoOFFrepeatTimers
+
+rms-cHumid2ONtoOFFrepLCL  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cHumid2ONtoOFFrepeatTimers 1 }
+
+rms-cHumid2ONtoOFFrepLWL  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cHumid2ONtoOFFrepeatTimers 2 }
+
+rms-cHumid2ONtoOFFrepUWL  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cHumid2ONtoOFFrepeatTimers 3 }
+
+rms-cHumid2ONtoOFFrepUCL  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cHumid2ONtoOFFrepeatTimers 4 }
+
+-- }}}
+-- {{{ rms-cContact group    
+
+rms-cContactNames                OBJECT IDENTIFIER ::= { rms-cContact 1  }
+rms-cContactType				 OBJECT IDENTIFIER ::= { rms-cContact 2  }
+rms-cContactReset				 OBJECT IDENTIFIER ::= { rms-cContact 3  }
+rms-cContactNormalStates         OBJECT IDENTIFIER ::= { rms-cContact 4  }
+rms-cContactCurrentStates        OBJECT IDENTIFIER ::= { rms-cContact 5  }
+rms-cContactOFFtoONtraps         OBJECT IDENTIFIER ::= { rms-cContact 6  }
+rms-cContactOFFtoONrepeatTimers  OBJECT IDENTIFIER ::= { rms-cContact 7  }
+rms-cContactONtoOFFtraps         OBJECT IDENTIFIER ::= { rms-cContact 8  }
+rms-cContactONtoOFFrepeatTimers  OBJECT IDENTIFIER ::= { rms-cContact 9  }
+
+-- {{{ rms-cContactNames group
+
+rms-cContact1Name  OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..47))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The name of the contact"
+    ::= { rms-cContactNames 1 }
+
+rms-cContact2Name  OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..47))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The name of the contact"
+    ::= { rms-cContactNames 2 }
+
+rms-cContact3Name  OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..47))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The name of the contact"
+    ::= { rms-cContactNames 3 }
+
+rms-cContact4Name  OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..47))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The name of the contact"
+    ::= { rms-cContactNames 4 }
+
+rms-cContact5Name  OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..47))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The name of the contact"
+    ::= { rms-cContactNames 5 }
+
+rms-cContact6Name  OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..47))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The name of the contact"
+    ::= { rms-cContactNames 6 }
+
+rms-cContact7Name  OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..47))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The name of the contact"
+    ::= { rms-cContactNames 7 }
+
+rms-cContact8Name  OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..47))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The name of the contact"
+    ::= { rms-cContactNames 8 }
+
+-- }}}
+-- {{{ rms-cContactType group
+
+rms-cContact1Type  OBJECT-TYPE
+    SYNTAX    INTEGER { level(0), positive-edge(1), negative-edge(2) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Level or posedge or negedge input detection "
+    ::= { rms-cContactType 1 }
+
+rms-cContact2Type  OBJECT-TYPE
+    SYNTAX    INTEGER {  level(0), positive-edge(1), negative-edge(2) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Level or posedge or negedge input detection "
+    ::= { rms-cContactType 2 }
+
+rms-cContact3Type  OBJECT-TYPE
+    SYNTAX    INTEGER {  level(0), positive-edge(1), negative-edge(2) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Level or posedge or negedge input detection "
+    ::= { rms-cContactType 3 }
+
+rms-cContact4Type  OBJECT-TYPE
+    SYNTAX    INTEGER {  level(0), positive-edge(1), negative-edge(2) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Level or posedge or negedge input detection "
+    ::= { rms-cContactType 4 }
+
+rms-cContact5Type  OBJECT-TYPE
+    SYNTAX    INTEGER {  level(0), positive-edge(1), negative-edge(2) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Level or posedge or negedge input detection "
+    ::= { rms-cContactType 5 }
+
+rms-cContact6Type  OBJECT-TYPE
+    SYNTAX    INTEGER {  level(0), positive-edge(1), negative-edge(2) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Level or posedge or negedge input detection "
+    ::= { rms-cContactType 6 }
+
+rms-cContact7Type  OBJECT-TYPE
+    SYNTAX    INTEGER {  level(0), positive-edge(1), negative-edge(2) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Level or posedge or negedge input detection "
+    ::= { rms-cContactType 7 }
+
+rms-cContact8Type  OBJECT-TYPE
+    SYNTAX    INTEGER {  level(0), positive-edge(1), negative-edge(2) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Level or posedge or negedge input detection "
+    ::= { rms-cContactType 8 }
+
+-- }}}
+-- {{{ rms-cContactReset group
+
+rms-cContact1Reset  OBJECT-TYPE
+    SYNTAX    INTEGER { reset(1) }
+    ACCESS    write-only
+    STATUS    mandatory
+    DESCRIPTION
+        "Resets edge triggered input"
+    ::= { rms-cContactReset 1 }
+
+rms-cContact2Reset  OBJECT-TYPE
+    SYNTAX    INTEGER {  reset(1) }
+    ACCESS    write-only
+    STATUS    mandatory
+    DESCRIPTION
+        "Resets edge triggered input"
+    ::= { rms-cContactReset 2 }
+
+rms-cContact3Reset  OBJECT-TYPE
+    SYNTAX    INTEGER {  reset(1) }
+    ACCESS    write-only
+    STATUS    mandatory
+    DESCRIPTION
+        "Resets edge triggered input "
+    ::= { rms-cContactReset 3 }
+
+rms-cContact4Reset  OBJECT-TYPE
+    SYNTAX    INTEGER { reset(1) }
+    ACCESS    write-only
+    STATUS    mandatory
+    DESCRIPTION
+        "Resets edge triggered input "
+    ::= { rms-cContactReset 4 }
+
+rms-cContact5Reset  OBJECT-TYPE
+    SYNTAX    INTEGER { reset(1) }
+    ACCESS    write-only
+    STATUS    mandatory
+    DESCRIPTION
+        "Resets edge triggered input"
+    ::= { rms-cContactReset 5 }
+
+rms-cContact6Reset  OBJECT-TYPE
+    SYNTAX    INTEGER { reset(1) }
+    ACCESS    write-only
+    STATUS    mandatory
+    DESCRIPTION
+        "Resets edge triggered input "
+    ::= { rms-cContactReset 6 }
+
+rms-cContact7Reset  OBJECT-TYPE
+    SYNTAX    INTEGER {  reset(1) }
+    ACCESS    write-only
+    STATUS    mandatory
+    DESCRIPTION
+        "Resets edge triggered input "
+    ::= { rms-cContactReset 7 }
+
+rms-cContact8Reset  OBJECT-TYPE
+    SYNTAX    INTEGER {  reset(1) }
+    ACCESS    write-only
+    STATUS    mandatory
+    DESCRIPTION
+        "Resets edge triggered input "
+    ::= { rms-cContactReset 8 }
+-- }}}
+-- {{{ rms-cContactNormalStates group
+
+rms-cContact1NormalState  OBJECT-TYPE
+    SYNTAX    INTEGER { off(0), on(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for normally open condition, 1 for normally closed"
+    ::= { rms-cContactNormalStates 1 }
+
+rms-cContact2NormalState  OBJECT-TYPE
+    SYNTAX    INTEGER { off(0), on(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for normally open condition, 1 for normally closed"
+    ::= { rms-cContactNormalStates 2 }
+
+rms-cContact3NormalState  OBJECT-TYPE
+    SYNTAX    INTEGER { off(0), on(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for normally open condition, 1 for normally closed"
+    ::= { rms-cContactNormalStates 3 }
+
+rms-cContact4NormalState  OBJECT-TYPE
+    SYNTAX    INTEGER { off(0), on(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for normally open condition, 1 for normally closed"
+    ::= { rms-cContactNormalStates 4 }
+
+rms-cContact5NormalState  OBJECT-TYPE
+    SYNTAX    INTEGER { off(0), on(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for normally open condition, 1 for normally closed"
+    ::= { rms-cContactNormalStates 5 }
+
+rms-cContact6NormalState  OBJECT-TYPE
+    SYNTAX    INTEGER { off(0), on(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for normally open condition, 1 for normally closed"
+    ::= { rms-cContactNormalStates 6 }
+
+rms-cContact7NormalState  OBJECT-TYPE
+    SYNTAX    INTEGER { off(0), on(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for normally open condition, 1 for normally closed"
+    ::= { rms-cContactNormalStates 7 }
+
+rms-cContact8NormalState  OBJECT-TYPE
+    SYNTAX    INTEGER { off(0), on(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for normally open condition, 1 for normally closed"
+    ::= { rms-cContactNormalStates 8 }
+-- }}}
+-- {{{ rms-cContactCurrentStates group
+
+rms-cContact1CurrentState  OBJECT-TYPE
+    SYNTAX    INTEGER { off(0), on(1) }
+    ACCESS    read-only
+    STATUS    mandatory
+    DESCRIPTION
+        "The current state of the contact"
+    ::= { rms-cContactCurrentStates 1 }
+
+rms-cContact2CurrentState  OBJECT-TYPE
+    SYNTAX    INTEGER { off(0), on(1) }
+    ACCESS    read-only
+    STATUS    mandatory
+    DESCRIPTION
+        "The current state of the contact"
+    ::= { rms-cContactCurrentStates 2 }
+
+rms-cContact3CurrentState  OBJECT-TYPE
+    SYNTAX    INTEGER { off(0), on(1) }
+    ACCESS    read-only
+    STATUS    mandatory
+    DESCRIPTION
+        "The current state of the contact"
+    ::= { rms-cContactCurrentStates 3 }
+
+rms-cContact4CurrentState  OBJECT-TYPE
+    SYNTAX    INTEGER { off(0), on(1) }
+    ACCESS    read-only
+    STATUS    mandatory
+    DESCRIPTION
+        "The current state of the contact"
+    ::= { rms-cContactCurrentStates 4 }
+
+rms-cContact5CurrentState  OBJECT-TYPE
+    SYNTAX    INTEGER { off(0), on(1) }
+    ACCESS    read-only
+    STATUS    mandatory
+    DESCRIPTION
+        "The current state of the contact"
+    ::= { rms-cContactCurrentStates 5 }
+
+rms-cContact6CurrentState  OBJECT-TYPE
+    SYNTAX    INTEGER { off(0), on(1) }
+    ACCESS    read-only
+    STATUS    mandatory
+    DESCRIPTION
+        "The current state of the contact"
+    ::= { rms-cContactCurrentStates 6 }
+
+rms-cContact7CurrentState  OBJECT-TYPE
+    SYNTAX    INTEGER { off(0), on(1) }
+    ACCESS    read-only
+    STATUS    mandatory
+    DESCRIPTION
+        "The current state of the contact"
+    ::= { rms-cContactCurrentStates 7 }
+
+rms-cContact8CurrentState  OBJECT-TYPE
+    SYNTAX    INTEGER { off(0), on(1) }
+    ACCESS    read-only
+    STATUS    mandatory
+    DESCRIPTION
+        "The current state of the contact"
+    ::= { rms-cContactCurrentStates 8 }
+-- }}}
+-- {{{ rms-cContactOFFtoONtraps
+
+rms-cContact1OFFtoONtrap  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cContactOFFtoONtraps 1 }
+
+rms-cContact2OFFtoONtrap  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cContactOFFtoONtraps 2 }
+
+rms-cContact3OFFtoONtrap  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cContactOFFtoONtraps 3 }
+
+rms-cContact4OFFtoONtrap  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cContactOFFtoONtraps 4 }
+
+rms-cContact5OFFtoONtrap  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cContactOFFtoONtraps 5 }
+
+rms-cContact6OFFtoONtrap  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cContactOFFtoONtraps 6 }
+
+rms-cContact7OFFtoONtrap  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cContactOFFtoONtraps 7 }
+
+rms-cContact8OFFtoONtrap  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cContactOFFtoONtraps 8 }
+-- }}}
+-- {{{ rms-cContactOFFtoONrepeatTimers
+
+rms-cContact1OFFtoONrep  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cContactOFFtoONrepeatTimers 1 }
+
+rms-cContact2OFFtoONrep  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cContactOFFtoONrepeatTimers 2 }
+
+rms-cContact3OFFtoONrep  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cContactOFFtoONrepeatTimers 3 }
+
+rms-cContact4OFFtoONrep  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cContactOFFtoONrepeatTimers 4 }
+
+rms-cContact5OFFtoONrep  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cContactOFFtoONrepeatTimers 5 }
+
+rms-cContact6OFFtoONrep  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cContactOFFtoONrepeatTimers 6 }
+
+rms-cContact7OFFtoONrep  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cContactOFFtoONrepeatTimers 7 }
+
+rms-cContact8OFFtoONrep  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cContactOFFtoONrepeatTimers 8 }
+-- }}}
+-- {{{ rms-cContactONtoOFFtraps
+
+rms-cContact1ONtoOFFtrap  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cContactONtoOFFtraps 1 }
+
+rms-cContact2ONtoOFFtrap  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cContactONtoOFFtraps 2 }
+
+rms-cContact3ONtoOFFtrap  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cContactONtoOFFtraps 3 }
+
+rms-cContact4ONtoOFFtrap  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cContactONtoOFFtraps 4 }
+
+rms-cContact5ONtoOFFtrap  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cContactONtoOFFtraps 5 }
+
+rms-cContact6ONtoOFFtrap  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cContactONtoOFFtraps 6 }
+
+rms-cContact7ONtoOFFtrap  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cContactONtoOFFtraps 7 }
+
+rms-cContact8ONtoOFFtrap  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cContactONtoOFFtraps 8 }
+-- }}}
+-- {{{ rms-cContactONtoOFFrepeatTimers
+
+rms-cContact1ONtoOFFrep  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cContactONtoOFFrepeatTimers 1 }
+
+rms-cContact2ONtoOFFrep  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cContactONtoOFFrepeatTimers 2 }
+
+rms-cContact3ONtoOFFrep  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cContactONtoOFFrepeatTimers 3 }
+
+rms-cContact4ONtoOFFrep  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cContactONtoOFFrepeatTimers 4 }
+
+rms-cContact5ONtoOFFrep  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cContactONtoOFFrepeatTimers 5 }
+
+rms-cContact6ONtoOFFrep  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cContactONtoOFFrepeatTimers 6 }
+
+rms-cContact7ONtoOFFrep  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cContactONtoOFFrepeatTimers 7 }
+
+rms-cContact8ONtoOFFrep  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cContactONtoOFFrepeatTimers 8 }
+-- }}}
+-- {{{ rms-cOutput group    
+
+rms-cOutputEnables              OBJECT IDENTIFIER ::= { rms-cOutput 1  }
+rms-cOutputNames                OBJECT IDENTIFIER ::= { rms-cOutput 2  }
+rms-cOutputStates               OBJECT IDENTIFIER ::= { rms-cOutput 3  }
+rms-cOutputBooleanStates        OBJECT IDENTIFIER ::= { rms-cOutput 4  }
+rms-cOutputOnDelay              OBJECT IDENTIFIER ::= { rms-cOutput 5  }
+rms-cOutputOffDelay             OBJECT IDENTIFIER ::= { rms-cOutput 6  }
+rms-cOutputStrings           	OBJECT IDENTIFIER ::= { rms-cOutput 7  }
+rms-cOutputBooleanSelector      OBJECT IDENTIFIER ::= { rms-cOutput 8  }
+rms-cOutputOFFtoONtraps         OBJECT IDENTIFIER ::= { rms-cOutput 9  }
+rms-cOutputOFFtoONrepeatTimers  OBJECT IDENTIFIER ::= { rms-cOutput 10  }
+rms-cOutputONtoOFFtraps         OBJECT IDENTIFIER ::= { rms-cOutput 11  }
+rms-cOutputONtoOFFrepeatTimers  OBJECT IDENTIFIER ::= { rms-cOutput 12  }
+
+-- {{{ rms-cOutputEnables group
+
+rms-cOutput1Enable  OBJECT-TYPE
+    SYNTAX    INTEGER { off(0), on(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to one enables the output"
+    ::= { rms-cOutputEnables 1 }
+
+rms-cOutput2Enable  OBJECT-TYPE
+    SYNTAX    INTEGER { off(0), on(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to one enables the output"
+    ::= { rms-cOutputEnables 2 }
+
+rms-cOutput3Enable  OBJECT-TYPE
+    SYNTAX    INTEGER { off(0), on(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to one enables the output"
+    ::= { rms-cOutputEnables 3 }
+
+--rms-cOutput4Enable  OBJECT-TYPE
+--    SYNTAX    INTEGER { off(0), on(1) }
+--    ACCESS    read-write
+--    STATUS    mandatory
+--    DESCRIPTION
+--        "Set to one enables the output"
+--   ::= { rms-cOutputEnables 4 }
+
+-- }}}
+-- {{{ rms-cOutputNames group
+
+rms-cOutput1Name  OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..47))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The name of the output"
+    ::= { rms-cOutputNames 1 }
+
+rms-cOutput2Name  OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..47))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The name of the output"
+    ::= { rms-cOutputNames 2 }
+
+rms-cOutput3Name  OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..47))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The name of the output"
+    ::= { rms-cOutputNames 3 }
+
+rms-cOutput4Name  OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..47))
+    ACCESS read-write
+    STATUS mandatory
+    DESCRIPTION
+        "The name of the output"
+    ::= { rms-cOutputNames 4 }
+
+-- }}}
+-- {{{ rms-cOutputNormalStates group
+
+rms-cOutput1State  OBJECT-TYPE
+    SYNTAX    INTEGER { off(0), on(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Default State for the output"
+    ::= { rms-cOutputStates 1 }
+
+rms-cOutput2State  OBJECT-TYPE
+    SYNTAX    INTEGER { off(0), on(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Default State for the output"
+    ::= { rms-cOutputStates 2 }
+
+rms-cOutput3State  OBJECT-TYPE
+    SYNTAX    INTEGER { off(0), on(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Default State for the output"
+    ::= { rms-cOutputStates 3 }
+
+--rms-cOutput4State  OBJECT-TYPE
+--    SYNTAX    INTEGER { off(0), on(1) }
+--    ACCESS    read-write
+--    STATUS    mandatory
+--    DESCRIPTION
+--        "Default State for the output"
+--    ::= { rms-cOutputStates 4 }
+
+-- }}}
+-- {{{ rms-cOutputCurrentStates group
+
+rms-cOutput1BooleanState  OBJECT-TYPE
+    SYNTAX    INTEGER { off(0), on(1) }
+    ACCESS    read-only
+    STATUS    mandatory
+    DESCRIPTION
+        "Set as a result of the AND/OR comparison"
+    ::= { rms-cOutputBooleanStates 1 }
+
+rms-cOutput2BooleanState  OBJECT-TYPE
+    SYNTAX    INTEGER { off(0), on(1) }
+    ACCESS    read-only
+    STATUS    mandatory
+    DESCRIPTION
+        "Set as a result of the AND/OR comparison"
+    ::= { rms-cOutputBooleanStates 2 }
+
+rms-cOutput3BooleanState  OBJECT-TYPE
+    SYNTAX    INTEGER { off(0), on(1) }
+    ACCESS    read-only
+    STATUS    mandatory
+    DESCRIPTION
+        "Set as a result of the AND/OR comparison"
+    ::= { rms-cOutputBooleanStates 3 }
+
+rms-cOutput4BooleanState  OBJECT-TYPE
+    SYNTAX    INTEGER { off(0), on(1) }
+    ACCESS    read-only
+    STATUS    mandatory
+    DESCRIPTION
+        "Set as a result of the AND/OR comparison"
+    ::= { rms-cOutputBooleanStates 4 }
+
+-- }}}
+-- {{{ rms-cOutputOnDelay group
+
+rms-cOutput1OnDelay  OBJECT-TYPE
+    SYNTAX    INTEGER (0..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Delay in seconds for the activation of the output in response to a change into the on state"
+    ::= { rms-cOutputOnDelay 1 }
+
+rms-cOutput2OnDelay  OBJECT-TYPE
+    SYNTAX    INTEGER (0..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Delay in seconds for the activation of the output in response to a change into the on state"
+    ::= { rms-cOutputOnDelay 2 }
+
+rms-cOutput3OnDelay  OBJECT-TYPE
+    SYNTAX    INTEGER (0..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Delay in seconds for the activation of the output in response to a change into the on state"
+    ::= { rms-cOutputOnDelay 3 }
+
+rms-cOutput4OnDelay  OBJECT-TYPE
+    SYNTAX    INTEGER (0..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Delay in seconds for the activation of the output in response to a change into the on state"
+    ::= { rms-cOutputOnDelay 4 }
+
+-- }}}
+-- {{{ rms-cOutputOffDelay group
+
+rms-cOutput1OffDelay  OBJECT-TYPE
+    SYNTAX    INTEGER (0..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Delay in seconds for the activation of the output in response to a change into the OFF state"
+    ::= { rms-cOutputOffDelay 1 }
+
+rms-cOutput2OffDelay  OBJECT-TYPE
+    SYNTAX    INTEGER (0..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Delay in seconds for the activation of the output in response to a change into the OFF state"
+    ::= { rms-cOutputOffDelay 2 }
+
+rms-cOutput3OffDelay  OBJECT-TYPE
+    SYNTAX    INTEGER (0..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Delay in seconds for the activation of the output in response to a change into the OFF state"
+    ::= { rms-cOutputOffDelay 3 }
+
+rms-cOutput4OffDelay  OBJECT-TYPE
+    SYNTAX    INTEGER (0..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Delay in seconds for the activation of the output in response to a change into the OFF state"
+    ::= { rms-cOutputOffDelay 4 }
+
+-- }}}
+-- {{{ rms-cOutputAndStrings group
+
+rms-cOutput1BooleanInput  OBJECT-TYPE
+    SYNTAX    DisplayString
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Tn=temperature source, n is one of the following subindex:1->Temp1 LCL,2->Temp1 LWL,
+         3->Temp1 UWL,4->Temp1 UCL,5->Temp2 LCL,6->Temp2 LWL,7->Temp2 UWL,8->Temp2 UCL.
+         Cn=contact source, n is the contact order number. No spaces used. Max 12 inputs"    
+    ::= { rms-cOutputStrings 1 }
+
+rms-cOutput2BooleanInput  OBJECT-TYPE
+    SYNTAX    DisplayString
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Tn=temperature source, n is one of the following subindex:1->Temp1 LCL,2->Temp1 LWL,
+         3->Temp1 UWL,4->Temp1 UCL,5->Temp2 LCL,6->Temp2 LWL,7->Temp2 UWL,8->Temp2 UCL.
+         Cn=contact source, n is the contact order number. No spaces used. Max 12 inputs"    
+    ::= { rms-cOutputStrings 2 }
+
+rms-cOutput3BooleanInput  OBJECT-TYPE
+    SYNTAX    DisplayString
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Tn=temperature source, n is one of the following subindex:1->Temp1 LCL,2->Temp1 LWL,
+         3->Temp1 UWL,4->Temp1 UCL,5->Temp2 LCL,6->Temp2 LWL,7->Temp2 UWL,8->Temp2 UCL.
+         Cn=contact source, n is the contact order number. No spaces used. Max 12 inputs"    
+    ::= { rms-cOutputStrings 3 }
+
+rms-cOutput4BooleanInput  OBJECT-TYPE
+    SYNTAX    DisplayString
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Tn=temperature source, n is one of the following subindex:1->Temp1 LCL,2->Temp1 LWL,
+         3->Temp1 UWL,4->Temp1 UCL,5->Temp2 LCL,6->Temp2 LWL,7->Temp2 UWL,8->Temp2 UCL.
+         Cn=contact source, n is the contact order number. No spaces used. Max 12 inputs"    
+    ::= { rms-cOutputStrings 4 }
+
+-- }}}
+-- {{{ rms-cOutputBooleanSelector group
+
+rms-cOutput1BooleanSelector  OBJECT-TYPE
+    SYNTAX    INTEGER { or(0), and(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set 0 to select OR, and 1 to select AND"
+    ::= { rms-cOutputBooleanSelector 1 }
+
+rms-cOutput2BooleanSelector  OBJECT-TYPE
+    SYNTAX    INTEGER { or(0), and(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set 0 to select OR, and 1 to select AND"
+    ::= { rms-cOutputBooleanSelector 2 }
+
+rms-cOutput3BooleanSelector  OBJECT-TYPE
+    SYNTAX    INTEGER { or(0), and(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set 0 to select OR, and 1 to select AND"
+    ::= { rms-cOutputBooleanSelector 3 }
+
+rms-cOutput4BooleanSelector  OBJECT-TYPE
+    SYNTAX    INTEGER { or(0), and(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set 0 to select OR, and 1 to select AND"
+    ::= { rms-cOutputBooleanSelector 4 }
+
+-- }}}
+-- {{{ rms-cOutputOFFtoONtraps group
+
+rms-cOutput1OFFtoONtrap  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cOutputOFFtoONtraps 1 }
+
+rms-cOutput2OFFtoONtrap  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cOutputOFFtoONtraps 2 }
+
+rms-cOutput3OFFtoONtrap  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cOutputOFFtoONtraps 3 }
+
+rms-cOutput4OFFtoONtrap  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cOutputOFFtoONtraps 4 }
+
+-- }}}
+-- {{{ rms-cOutputOFFtoONrepeatTimers group
+
+rms-cOutput1OFFtoONrep  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cOutputOFFtoONrepeatTimers 1 }
+
+rms-cOutput2OFFtoONrep  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cOutputOFFtoONrepeatTimers 2 }
+
+rms-cOutput3OFFtoONrep  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cOutputOFFtoONrepeatTimers 3 }
+
+rms-cOutput4OFFtoONrep  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cOutputOFFtoONrepeatTimers 4 }
+
+-- }}}
+-- {{{ rms-cOutputONtoOFFtraps group
+
+rms-cOutput1ONtoOFFtrap  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cOutputONtoOFFtraps 1 }
+
+rms-cOutput2ONtoOFFtrap  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cOutputONtoOFFtraps 2 }
+
+rms-cOutput3ONtoOFFtrap  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cOutputONtoOFFtraps 3 }
+
+rms-cOutput4ONtoOFFtrap  OBJECT-TYPE
+    SYNTAX    INTEGER { disabled(0), enabled(1) }
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for trap disabled, 1 for enabled"
+    ::= { rms-cOutputONtoOFFtraps 4 }
+
+-- }}}
+-- {{{ rms-cOutputONtoOFFrepeatTimers group
+
+rms-cOutput1ONtoOFFrep  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cOutputONtoOFFrepeatTimers 1 }
+
+rms-cOutput2ONtoOFFrep  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cOutputONtoOFFrepeatTimers 2 }
+
+rms-cOutput3ONtoOFFrep  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cOutputONtoOFFrepeatTimers 3 }
+
+rms-cOutput4ONtoOFFrep  OBJECT-TYPE
+    SYNTAX    INTEGER (30..32000)
+    ACCESS    read-write
+    STATUS    mandatory
+    DESCRIPTION
+        "Set to 0 for no repetion after the first trap is sent, any other integer for the interval in seconds"
+    ::= { rms-cOutputONtoOFFrepeatTimers 4 }
+
+-- }}}
+
+END
+

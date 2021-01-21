@@ -1,0 +1,91 @@
+HPICF-CLOUD-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE, MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    OBJECT-GROUP, MODULE-COMPLIANCE
+        FROM SNMPv2-CONF
+    hpSwitch
+        FROM HP-ICF-OID;
+
+    hpicfCLOUDMIB MODULE-IDENTITY
+        LAST-UPDATED "201405270000Z"  -- May 27, 2014
+        ORGANIZATION "HP Networking"
+        CONTACT-INFO "Hewlett-Packard Company
+                      8000 Foothills Blvd.
+                      Roseville, CA 95747"
+	DESCRIPTION  "This MIB defines HP proprietary objects used to
+                      configure the cloud feature."
+        REVISION     "201405270000Z"  -- May 27, 2014
+        DESCRIPTION  "Add cloud proxy object"
+	REVISION     "201405020000Z"  -- May 02, 2014
+        DESCRIPTION  "Initial version"
+        ::= { hpSwitch 111 }
+
+    hpicfCLOUDNotifications  OBJECT IDENTIFIER ::= { hpicfCLOUDMIB 1 }
+    hpicfCLOUDObjects        OBJECT IDENTIFIER ::= { hpicfCLOUDMIB 2 }
+    hpicfCLOUDConformance    OBJECT IDENTIFIER ::= { hpicfCLOUDMIB 3 }
+
+    hpicfCLOUDUrl OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE (0..256))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "The URL used by the switch to connect to the cloud.
+                     The value should be a valid HTTP or HTTPS URL."
+        ::= { hpicfCLOUDObjects 1 }
+
+    hpicfCLOUDProxy OBJECT-TYPE
+        SYNTAX      OCTET STRING (SIZE (0..256))
+        MAX-ACCESS  read-write
+        STATUS      current
+	DESCRIPTION "The URL of the HTTP proxy used by the switch to connect to
+                     the cloud.  The value should be a valid HTTP or HTTPS URL."
+        ::= { hpicfCLOUDObjects 2 }
+
+    hpicfCLOUDStatus OBJECT-TYPE
+        SYNTAX      INTEGER {
+                                  enable (1),
+                                  disable (2)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Global configuration to enable or disable 
+                     Cloud support on the device." 
+        DEFVAL      { enable }
+        ::= { hpicfCLOUDObjects 3 }
+
+    hpicfCLOUDSupportMode OBJECT-TYPE
+        SYNTAX      INTEGER {
+                                  enable (1),
+                                  disable (2)
+                            }
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION "Global configuration to enable or disable 
+                     support-mode on the device."
+        DEFVAL      { disable }
+        ::= { hpicfCLOUDObjects 4 }        
+
+    hpicfCLOUDMIBCompliances  OBJECT IDENTIFIER ::= { hpicfCLOUDConformance 1 }
+    hpicfCLOUDMIBGroups       OBJECT IDENTIFIER ::= { hpicfCLOUDConformance 2 }
+
+    hpicfCLOUDMIBCompliance MODULE-COMPLIANCE
+        STATUS      current
+	DESCRIPTION "The compliance statement for HP switches implementing
+                     the HPICF-CLOUD MIB."
+        MODULE
+            MANDATORY-GROUPS { hpicfCLOUDGroup }
+        ::= { hpicfCLOUDMIBCompliances 1 }
+
+    hpicfCLOUDGroup OBJECT-GROUP
+        OBJECTS {
+	    hpicfCLOUDUrl,
+	    hpicfCLOUDProxy,
+            hpicfCLOUDStatus,
+            hpicfCLOUDSupportMode
+	}
+        STATUS      current
+        DESCRIPTION "A collection of objects to support the cloud feature."
+        ::= { hpicfCLOUDMIBGroups 1 }
+
+END

@@ -1,0 +1,197 @@
+-- ----------------------------------------------------------------------
+--
+--					Copyright (c) 2006 by Sinetica Corporation Ltd.
+--
+-- Filename:        RMS-C_SNMPv1_output.mib
+--
+-- Author:          Adrian Moruz
+--
+-- Description:     SNMPv1 MIB definition for the RMS Compact Output notifications
+--
+-- $Id: RMS-C_SNMPv1_output.mib,v 1.1 2006/10/11 11:23:18 adrian.moruz Exp $
+--
+-- $Name:  $
+--
+-- $Log: RMS-C_SNMPv1_output.mib,v $
+-- Revision 1.1  2006/10/11 11:23:18  adrian.moruz
+-- Created from RMS-C_SNMPv1.mib v1.2 to separate the different trap enterprise groups into separate MIBs
+--
+--
+-- ----------------------------------------------------------------------
+
+RMS-COMPACT-SNMPv1-OUTPUT-MIB DEFINITIONS ::= BEGIN
+
+-- {{{ Imports
+--	OBJECT-TYPE, Counter32, Unsigned32,
+
+IMPORTS
+        TRAP-TYPE
+                FROM RFC-1215
+        sysDescr, sysName, DisplayString
+                FROM RFC1213-MIB
+        OBJECT-TYPE
+                FROM RFC-1212
+        enterprises 
+                FROM RFC1155-SMI
+	;
+
+-- }}}
+
+
+
+sinetica   OBJECT IDENTIFIER ::= { enterprises 3711 }
+
+
+
+rms-compact          OBJECT IDENTIFIER ::= { sinetica 15 }
+rms-compact1         OBJECT IDENTIFIER ::= { rms-compact 1 }
+rms-cObjects   OBJECT IDENTIFIER ::= { rms-compact1 1 }
+
+
+-- {{{ rms-cObjects  
+
+rms-cOutput        OBJECT IDENTIFIER ::= { rms-cObjects 3  }
+
+-- }}}
+-- {{{
+
+rms-cOutput1OFFtoON            TRAP-TYPE
+    ENTERPRISE rms-cOutput
+    VARIABLES { 
+    			sysDescr,
+    			sysName,
+    			rms-cOutput1Name
+    			}
+    DESCRIPTION
+        "The Output number 1 is in an active state"
+	--#TYPE		"Output 1 is in an active state"
+	--#SUMMARY	"Output %s is active in %s at %s"
+	--#ARGUMENTS	{2,0,1}
+	--#SEVERITY 	MINOR
+	--#TIMEINDEX	3
+	--#STATE		NONOPERATIONAL
+    ::= 51
+
+rms-cOutput2OFFtoON           TRAP-TYPE
+    ENTERPRISE rms-cOutput
+    VARIABLES { 
+    			sysDescr,
+    			sysName,
+    			rms-cOutput2Name
+    			}
+    DESCRIPTION
+        "The Output number 2 is in an active state"
+	--#TYPE		"Output 2 is in an active state"
+	--#SUMMARY	"Output %s is active in %s at %s"
+	--#ARGUMENTS	{2,0,1}
+	--#SEVERITY 	MINOR
+	--#TIMEINDEX	3
+	--#STATE		NONOPERATIONAL
+    ::= 52
+
+rms-cOutput3OFFtoON            TRAP-TYPE
+    ENTERPRISE rms-cOutput
+    VARIABLES { 
+    			sysDescr,
+    			sysName,
+    			rms-cOutput3Name
+    			}
+    DESCRIPTION
+        "The Output number 3 is in an active state"
+	--#TYPE		"Output 3 is in an active state"
+	--#SUMMARY	"Output %s is active in %s at %s"
+	--#ARGUMENTS	{2,0,1}
+	--#SEVERITY 	MINOR
+	--#TIMEINDEX	3
+	--#STATE		NONOPERATIONAL
+    ::= 53
+
+rms-cOutput4OFFtoON           TRAP-TYPE
+    ENTERPRISE rms-cOutput
+    VARIABLES { 
+    			sysDescr,
+    			sysName,
+    			rms-cOutput4Name
+    			}
+    DESCRIPTION
+        "The Output number 4 is in an active state"
+	--#TYPE		"Output 4 is in an active state"
+	--#SUMMARY	"Output %s is active in %s at %s"
+	--#ARGUMENTS	{2,0,1}
+	--#SEVERITY 	MINOR
+	--#TIMEINDEX	3
+	--#STATE		NONOPERATIONAL
+    ::= 54
+
+rms-cOutput1ONtoOFF            TRAP-TYPE
+    ENTERPRISE rms-cOutput
+    VARIABLES { 
+    			sysDescr,
+    			sysName,
+    			rms-cOutput1Name
+    			}
+    DESCRIPTION
+        "The Output number 1 is in a normal state"
+	--#TYPE		"Output 1 is in a normal state"
+	--#SUMMARY	"Output %s is normal in %s at %s"
+	--#ARGUMENTS	{2,0,1}
+	--#SEVERITY 	INFORMATIONAL
+	--#TIMEINDEX	3
+	--#STATE		NONOPERATIONAL
+    ::= 55
+
+rms-cOutput2ONtoOFF           TRAP-TYPE
+    ENTERPRISE rms-cOutput
+    VARIABLES { 
+    			sysDescr,
+    			sysName,
+    			rms-cOutput2Name
+    			}
+    DESCRIPTION
+        "The Output number 2 is in a normal state"
+	--#TYPE		"Output 2 is in a normal state"
+	--#SUMMARY	"Output %s is normal in %s at %s"
+	--#ARGUMENTS	{2,0,1}
+	--#SEVERITY 	INFORMATIONAL
+	--#TIMEINDEX	3
+	--#STATE		NONOPERATIONAL
+    ::= 56
+
+rms-cOutput3ONtoOFF            TRAP-TYPE
+    ENTERPRISE rms-cOutput
+    VARIABLES { 
+    			sysDescr,
+    			sysName,
+    			rms-cOutput3Name
+    			}
+    DESCRIPTION
+        "The Output number 3 is in a normal state"
+	--#TYPE		"Output 3 is in a normal state"
+	--#SUMMARY	"Output %s is normal in %s at %s"
+	--#ARGUMENTS	{2,0,1}
+	--#SEVERITY 	INFORMATIONAL
+	--#TIMEINDEX	3
+	--#STATE		NONOPERATIONAL
+    ::= 57
+
+rms-cOutput4ONtoOFF           TRAP-TYPE
+    ENTERPRISE rms-cOutput
+    VARIABLES { 
+    			sysDescr,
+    			sysName,
+    			rms-cOutput4Name
+    			}
+    DESCRIPTION
+        "The Output number 4 is in a normal state"
+	--#TYPE		"Output 4 is in a normal state"
+	--#SUMMARY	"Output %s is normal in %s at %s"
+	--#ARGUMENTS	{2,0,1}
+	--#SEVERITY 	INFORMATIONAL
+	--#TIMEINDEX	3
+	--#STATE		NONOPERATIONAL
+    ::= 58
+
+-- }}}
+
+
+END

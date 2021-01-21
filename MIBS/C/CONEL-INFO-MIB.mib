@@ -1,0 +1,62 @@
+CONEL-INFO-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+			enterprises
+				FROM RFC1155-SMI
+			OBJECT-TYPE
+				FROM RFC-1212;
+
+conel			OBJECT IDENTIFIER ::= { enterprises 30140 }
+
+info			OBJECT IDENTIFIER ::= { conel 6 }
+
+infoProduct		OBJECT-TYPE
+			SYNTAX	OCTET STRING
+			ACCESS	read-only
+			STATUS	current
+	DESCRIPTION ""
+			::= { info 1 }
+
+infoFirmware		OBJECT-TYPE
+			SYNTAX	OCTET STRING
+			ACCESS	read-only
+			STATUS	current
+	DESCRIPTION ""
+			::= { info 2 }
+
+infoSN			OBJECT-TYPE
+			SYNTAX	OCTET STRING
+			ACCESS	read-only
+			STATUS	current
+	DESCRIPTION ""
+			::= { info 3 }
+
+infoIMEI		OBJECT-TYPE
+			SYNTAX	OCTET STRING
+			ACCESS	read-only
+			STATUS	current
+	DESCRIPTION ""
+			::= { info 4 }
+
+infoESN			OBJECT-TYPE
+			SYNTAX	OCTET STRING
+			ACCESS	read-only
+			STATUS	current
+	DESCRIPTION ""
+			::= { info 5 }
+
+infoMEID		OBJECT-TYPE
+			SYNTAX	OCTET STRING
+			ACCESS	read-only
+			STATUS	current
+	DESCRIPTION ""
+			::= { info 6 }
+
+infoICCID		OBJECT-TYPE
+			SYNTAX	OCTET STRING
+			ACCESS	read-only
+			STATUS	current
+	DESCRIPTION ""
+			::= { info 7 }
+
+END

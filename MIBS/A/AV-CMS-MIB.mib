@@ -1,0 +1,246 @@
+-- Avaya CMS MIB
+-- Copyright (c) 2012 by Avaya Inc. All rights reserved.
+-- MIB version 1.0.0 
+-- Avaya Compas ID: 
+
+AV-CMS-MIB DEFINITIONS ::= BEGIN
+
+-- Add your MIB specific imports in the below import section.
+IMPORTS
+    NOTIFICATION-TYPE, MODULE-IDENTITY, enterprises
+        FROM SNMPv2-SMI
+    NOTIFICATION-GROUP, MODULE-COMPLIANCE
+        FROM SNMPv2-CONF;
+        
+
+avCmsMibs MODULE-IDENTITY
+       LAST-UPDATED "201112011525Z" -- 16 July 2012
+       ORGANIZATION "Avaya, Inc."
+       CONTACT-INFO "Avaya Customer Services
+
+                     Postal: Avaya, Inc.
+                             211 Mount Airy Rd
+                             Basking Ridge. NJ 07920
+                             USA
+                             Tel: +1 908 953 6000
+                             WWW: http://www.avaya.com"
+       DESCRIPTION "This MIB module is for exposing Avaya CMS information via SNMP GET."
+       
+       REVISION 	"201112011525Z" --  July 16 2012
+       DESCRIPTION "MIB Version 1.0.0 - AVAYA.Initial version of the Avaya CMS MIB."
+       
+       ::= { mibs 72 }
+       
+       
+--
+-- The following are defined in Avaya CMS Manager-MIB
+--
+avaya              OBJECT IDENTIFIER ::= { enterprises 6889 }
+products           OBJECT IDENTIFIER ::= { avaya 1 }
+mibs               OBJECT IDENTIFIER ::= { avaya 2 }
+
+avCmsProd OBJECT IDENTIFIER ::= { products 72 }
+
+avCmsMibNotifications OBJECT IDENTIFIER ::= { avCmsMibs 0 }
+
+--Uncomment below two lines to include your product specific MIB Objects.
+avCmsMibObjects OBJECT IDENTIFIER ::= { avCmsMibs 1 }
+avCmsMibConformance OBJECT IDENTIFIER ::= { avCmsMibs 2 }
+
+-- Avaya CMS Notifications (avCmsMibNotifications) will be added here
+-- 
+-- According to RFC 2578 section 8.5, the next to last sub-identifier
+-- in the name of any newly defined notification must have the value
+-- zero. This is to achieve compatibility with SNMPv1 traps.
+-- 
+-- ****************** NOTIFICATION OBJECTS *********************************START
+avCmsTestAlarm NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION
+	"CMS Test Alarm(Major)"
+	::= { avCmsMibNotifications 1 }
+
+avCmsTestAlarmClr NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION
+	"CMS Test Alarm Clear(Cleared)"
+	::= { avCmsMibNotifications 2 }
+
+avCmsEsAlarm NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION
+	"CMS ES Alarm(Major)"
+	::= { avCmsMibNotifications 3 }
+
+avCmsEsAlarmClr NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION
+	"CMS ES Alarm Clear(Cleared)"
+	::= { avCmsMibNotifications 4 }
+
+avCmsLinkAlarm NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION
+	"CMS Link Alarm(Major)"
+	::= { avCmsMibNotifications 5 }
+
+avCmsLinkAlarmClr NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION
+	"CMS Link Alarm Clear(Cleared)"
+	::= { avCmsMibNotifications 6 }
+
+avCmsArchAlarm NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION
+	"CMS Archiver Alarm(Major)"
+	::= { avCmsMibNotifications 7 }
+
+avCmsArchAlarmClr NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION
+	"CMS Archiver Alarm Clear(Cleared)"
+	::= { avCmsMibNotifications 8 }
+
+avCmsDiskErrAlarm NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION
+	"CMS Disk Error Alarm(Major)"
+	::= { avCmsMibNotifications 9 }
+
+avCmsDiskErrAlarmClr NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION
+	"CMS Disk Error Alarm Clear(Cleared)"
+	::= { avCmsMibNotifications 10 }
+
+avCmsEchWarnAlarm NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION
+	"CMS ECH Warning Alarm(Warning)"
+	::= { avCmsMibNotifications 11 }
+
+avCmsEchWarnAlarmClr NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION
+	"CMS ECH Warning Alarm Clear(Cleared)"
+	::= { avCmsMibNotifications 12 }
+
+avCmsEchFailAlarm NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION
+	"CMS ECH Failure Alarm(Major)"
+	::= { avCmsMibNotifications 13 }
+
+avCmsEchFailAlarmClr NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION
+	"CMS ECH Failure Alarm Clear(Cleared)"
+	::= { avCmsMibNotifications 14 }
+
+avCmsSurvAlarm NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION
+	"CMS SURVIVING Alarm(Major)"
+	::= { avCmsMibNotifications 15 }
+
+avCmsSurvAlarmClr NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION
+	"CMS SURVIVING Alarm Clear(Cleared)"
+	::= { avCmsMibNotifications 16 }
+
+avCmsDiskWarn NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION
+	"CMS Disk Warning Alarm(Warning)"
+	::= { avCmsMibNotifications 17 }
+
+avCmsDiskWarnClr NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION
+	"CMS Disk Warning Alarm Clear(Cleared)"
+	::= { avCmsMibNotifications 18 }
+
+avCmsBatteryErr NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION
+	"CMS Raid Battery Error Alarm(Major)"
+	::= { avCmsMibNotifications 19 }
+
+avCmsBatteryErrClr NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION
+	"CMS Raid Battery Error Alarm Clear(Cleared)"
+	::= { avCmsMibNotifications 20 }
+
+avCmsBatteryWrn NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION
+	"CMS Raid Battery Warning Alarm(Warning)"
+	::= { avCmsMibNotifications 21 }
+
+avCmsBatteryWrnClr NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION
+	"CMS Raid Battery Warning Alarm Clear(Cleared)"
+	::= { avCmsMibNotifications 22 }
+
+avCmsRaidErr NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION
+	"CMS Raid Enclosure Error Alarm(Major)"
+	::= { avCmsMibNotifications 23 }
+
+avCmsRaidErrClr NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION
+	"CMS Raid Enclosure Error Alarm Clear(Cleared)"
+	::= { avCmsMibNotifications 24 }
+
+avCmsRaidWrn NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION
+	"CMS Raid Enclosure Warning Alarm(Warning)"
+	::= { avCmsMibNotifications 25 }
+
+avCmsRaidWrnClr NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION
+	"CMS Raid Enclosure Warning Alarm Clear(Cleared)"
+	::= { avCmsMibNotifications 26 }
+
+avCmsBackWrn NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION
+	"CMS Backup Warning Alarm(Warning)"
+	::= { avCmsMibNotifications 27 }
+
+avCmsBackWrnClr NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION
+	"CMS Backup Warning Alarm Clear(Cleared)"
+	::= { avCmsMibNotifications 28 }
+
+-- -----------------NOTIFICATION OBJECTS*******************************************END
+
+-- Conformance information
+-- ----------------------------------------------------------------------
+avCmsMibCompliances    OBJECT IDENTIFIER ::= { avCmsMibConformance 1 }
+avCmsMibGroups         OBJECT IDENTIFIER ::= { avCmsMibConformance 2 }
+
+avCmsMibCompliance   MODULE-COMPLIANCE
+    STATUS       current
+    DESCRIPTION
+    "The compliance statement for Avaya CMS MIB entities"
+    MODULE	
+    MANDATORY-GROUPS { avCmsNotificationGroup }
+    ::= { avCmsMibCompliances 1 }
+    
+avCmsNotificationGroup    NOTIFICATION-GROUP
+        NOTIFICATIONS     {avCmsTestAlarm,avCmsTestAlarmClr,avCmsEsAlarm,avCmsEsAlarmClr,avCmsLinkAlarm,avCmsLinkAlarmClr,avCmsArchAlarm,avCmsArchAlarmClr,avCmsDiskErrAlarm,avCmsDiskErrAlarmClr,avCmsEchWarnAlarm,avCmsEchWarnAlarmClr,avCmsEchFailAlarm,avCmsEchFailAlarmClr,avCmsSurvAlarm,avCmsSurvAlarmClr,avCmsDiskWarn,avCmsDiskWarnClr,avCmsBatteryErr,avCmsBatteryErrClr,avCmsBatteryWrn,avCmsBatteryWrnClr,avCmsRaidErr,avCmsRaidErrClr,avCmsRaidWrn,avCmsRaidWrnClr,avCmsBackWrn,avCmsBackWrnClr}
+        STATUS      current
+        DESCRIPTION
+          "Avaya CMS MIB NOTIFICATIONS"
+    ::= { avCmsMibGroups 1 }
+END

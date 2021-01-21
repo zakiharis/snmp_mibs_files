@@ -1,0 +1,70 @@
+-- *************************************************************************
+-- Kyocera Mita Printer/MFP Trap definision.
+-- COPYRIGHT 2005, KYOCERA MITA CORPORATION, All rights reserved.
+-- *************************************************************************
+
+KMTRAP DEFINITIONS ::= BEGIN
+
+--
+--      Kyocera Mita Printer/MFP Trap definision.
+--
+--      History:
+--          Sep 21, 2005
+--              Release 1.00
+--              First release.
+--
+
+    IMPORTS
+	enterprises, OBJECT-TYPE
+		FROM RFC1155-SMI
+	prtAlertSeverityLevel, prtAlertTrainingLevel, prtAlertGroup,prtAlertGroupIndex,
+	prtAlertLocation,prtAlertCode, prtAlertDescription, prtAlertTime
+		FROM Printer-MIB
+	TRAP-TYPE
+		FROM RFC-1215;
+
+--
+--  Object identifier definition
+--
+    kyocera         	OBJECT IDENTIFIER ::= { enterprises 1347 }
+    kmEventTrapV1Prefix	OBJECT IDENTIFIER ::= { kyocera 41 }
+
+--
+--  Trap definition
+--
+    kmEventGenerateTrap TRAP-TYPE
+	ENTERPRISE	kmEventTrapV1Prefix
+	VARIABLES {     
+		prtAlertSeverityLevel,
+		prtAlertTrainingLevel,
+		prtAlertGroup,
+		prtAlertGroupIndex,
+		prtAlertLocation,
+		prtAlertCode,
+		prtAlertDescription,
+		prtAlertTime
+		}	
+        DESCRIPTION
+                "This trap will send when trap setting is enabled and the correspond alert 
+		is generated."
+        ::= 1
+
+    kmEventReleaseTrap TRAP-TYPE
+	ENTERPRISE	kmEventTrapV1Prefix
+	VARIABLES {     
+		prtAlertSeverityLevel,
+		prtAlertTrainingLevel,
+		prtAlertGroup,
+		prtAlertGroupIndex,
+		prtAlertLocation,
+		prtAlertCode,
+		prtAlertDescription,
+		prtAlertTime
+		}	
+        DESCRIPTION
+                "This trap will send when trap setting is enabled and the correspond alert 
+		is released."
+        ::= 2
+
+END
+

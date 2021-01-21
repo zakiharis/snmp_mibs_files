@@ -1,0 +1,4058 @@
+    ADTRAN-ACTDAXL3-MIB     DEFINITIONS ::= BEGIN
+
+    -- TITLE:           ADTRAN ACTDAX L3 Product MIB (1150.032L3)
+    -- FILENAME:        ACTDAXL3.MIB
+    -- PARTNUMBER:      9950.017L1-1A
+    -- AUTHOR:          Stacy Murphree
+    -- DATE:            94/11/11
+
+    -- This MIB defines the management information for the ACTDAX
+    -- List 3 product.  The ACTDAX is a T1 LIU controller for the
+    -- ACT1241 Channel Bank.
+
+
+    IMPORTS
+           enterprises, Gauge
+                  FROM RFC1155-SMI
+           OBJECT-TYPE
+                  FROM RFC-1212
+           DisplayString
+                  FROM RFC1213-MIB
+           TRAP-TYPE
+                  FROM RFC-1215
+           dsx1LineIndex
+                  FROM RFC1406-MIB    
+           adProdPhysAddress
+                  FROM ADTRAN-MIB;
+
+    -- OBJECT IDENTIFIERS
+
+    adtran              OBJECT IDENTIFIER ::= { enterprises 664 }
+    adProducts         OBJECT IDENTIFIER ::= { adtran 1 }
+    adACTDAXL3          OBJECT IDENTIFIER ::= { adProducts 9 }
+    adMgmt              OBJECT IDENTIFIER ::= { adtran 2 }
+    adACTDAXL3mg        OBJECT IDENTIFIER ::= { adMgmt 9 }
+    adDAX3config        OBJECT IDENTIFIER ::= { adACTDAXL3mg 2 }
+    adDAX3systemEvent   OBJECT IDENTIFIER ::= { adACTDAXL3mg 6 }
+
+
+    --
+    -- The ACTDAX L3 Configuration Group
+    --
+
+    adDAX3password  OBJECT-TYPE
+           SYNTAX      DisplayString
+           ACCESS      read-write
+           STATUS      mandatory
+           DESCRIPTION
+                  "The password string used for authentication of SNMP
+                  messages between Proxy Agent and ACTDAX.  Maximum of
+                  12 characters.  The factory default is 'PASSWORD'.
+                  This password is NOT the same as either the read-only
+                  or read/write passwords for the EASYMENU terminal
+                  interface."
+           ::= { adDAX3config 1 }
+
+
+    adDAX3deviceAddress OBJECT-TYPE
+           SYNTAX      INTEGER
+           ACCESS      read-only
+           STATUS      mandatory
+           DESCRIPTION
+                  "The device address for this ACTDAX.  The device
+                  address is used to access the device from the proxy
+                  agent."
+           ::= { adDAX3config 2 }
+
+
+    adDAX3time  OBJECT-TYPE
+           SYNTAX      DisplayString
+           ACCESS      read-write
+           STATUS      mandatory
+           DESCRIPTION
+                  "The current ACTDAX time value. A sequence of
+                  ASCII characters encoded as HH:MM:SS.  For example,
+                  1:15 pm is 13:15:00."
+           ::= { adDAX3config 3 }
+
+
+    adDAX3date  OBJECT-TYPE
+           SYNTAX      DisplayString
+           ACCESS      read-write
+           STATUS      mandatory
+           DESCRIPTION
+                  "The current ACTDAX date value. A sequence of
+                  ASCII characters encoded as MM/DD/YY.  For example,
+                  April 28, 1994 is 04/28/94."
+           ::= { adDAX3config 4 }
+
+
+    adDAX3resetPM  OBJECT-TYPE
+           SYNTAX  INTEGER {
+                                resAll(1),
+                                resDS1A(2),
+                                resDS1B(3)
+                         }
+           ACCESS      read-write
+           STATUS      mandatory
+           DESCRIPTION
+                  "Resets Performance Monitor DS1 statistic counters
+                         in ACTDAX.  Parameter value 1 resets all lines,
+                  2 resets line 1 (DS1-A), 3 resets line 2 (DS1-B)."
+           ::= { adDAX3config 5 }
+
+
+    adDAX3auditProgCode  OBJECT-TYPE
+           SYNTAX  INTEGER {
+                                           romTestPASS(1),
+                                           romTestFAIL(2)
+                                    }
+           ACCESS  read-only
+           STATUS  mandatory
+           DESCRIPTION
+                  " A Get performs an audit of the units Program Code and
+         returns the result as PASS or FAIL."
+           ::= { adDAX3config 6 }
+
+
+    adDAX3selfTestAndRestart  OBJECT-TYPE
+           SYNTAX  INTEGER {
+                                           selfTestPASS(1),
+                                           selfTestFAIL(2)
+                                    }
+           ACCESS  read-write
+           STATUS  mandatory
+           DESCRIPTION
+                  " A Set restarts ACTDAX and performs unit self-test.
+                  Results of last unit self-test are shown as PASS or FAIL."
+           ::= { adDAX3config 7 }
+
+
+    adDAX3resetFactoryConfig  OBJECT-TYPE
+           SYNTAX  INTEGER
+           ACCESS  read-write
+           STATUS  mandatory
+           DESCRIPTION
+                  "A Set resets ALL provisioning to the factory defaults."
+           ::= { adDAX3config 8 }
+
+
+    adDAX3primaryTiming  OBJECT-TYPE
+           SYNTAX  INTEGER {
+                                localOrExternal(1),
+                                loopA(2),
+                                loopB(3)
+                         }
+           ACCESS read-write
+           STATUS mandatory
+           DESCRIPTION
+                  "The Primary Facility Timing for the ACT 1241 and the
+                  ACTDAX.  The timing set on the ACT OIU must match the
+                  timing set on the ACT DAX.
+
+                   'localOrExternal' indicates that the ACTDAX is timed
+                  either a local free-running oscillator or frequency
+                  locked to an external clock signal.
+
+                   'loopA' indicates that the ACTDAX is frequency locked
+                  to the received DS1 A line signal.
+
+                   'loopB' indicates that the ACTDAX is frequency locked
+                  to the received DS1 B line signal."
+           ::= { adDAX3config 9 }
+
+
+    adDAX3backupTiming  OBJECT-TYPE
+           SYNTAX  INTEGER {
+                                local(1),
+                                loop(2)
+                         }
+           ACCESS read-write
+           STATUS mandatory
+           DESCRIPTION
+                  "The Backup Facility Timing for the ACT 1241 and the
+                  ACTDAX.  The backup timing is only used if the
+                  adDAX3primaryTiming is either 'loopA' or 'loopB'.
+
+                   'local' indicates that if the DS1 line fails, which is
+                  the primary timing source, then the ACTDAX will time
+                  to a local free-running oscillator.
+
+                   'loop' indicates that if the DS1 line fails, which is
+                  the primary timing source, then the ACTDAX will time to
+                  the other DS1 line.  If both DS1 lines fail then the
+                  ACTDAX will time to a local free-running oscillator."
+           ::= { adDAX3config 10 }
+
+
+    adDAX3ds1AlineEqlz  OBJECT-TYPE
+           SYNTAX  INTEGER {
+                                ft000-110(1),
+                                ft110-220(2),
+                                ft220-330(3),
+                                ft330-440(4),
+                                ft440-550(5),
+                                ft550-655(6)
+                         }
+           ACCESS read-write
+           STATUS mandatory
+           DESCRIPTION
+                  "The DS1 Line A transmit pre-equalizer circuitry
+                  provisioning for conditioning the T1 output signal
+                  for connection to a CSU, other customer premises
+                  equipment, or the DSX-1 cross-connect through
+                  various cable lengths between 0 and 655 feet.
+
+                  '0-110' indicates 0-110 feet.
+                  '110-220' indicates 110-220 feet.
+                  '220-330' indicates 220-330 feet.
+                  '330-440' indicates 330-440 feet.
+                  '440-550' indicates 440-550 feet.
+                  '550-655' indicates 550-655 feet."
+           ::= { adDAX3config 11 }
+
+
+    adDAX3ds1BlineEqlz  OBJECT-TYPE
+           SYNTAX  INTEGER {
+                                ft000-110(1),
+                                ft110-220(2),
+                                ft220-330(3),
+                                ft330-440(4),
+                                ft440-550(5),
+                                ft550-655(6)
+                         }
+           ACCESS read-write
+           STATUS mandatory
+           DESCRIPTION
+                  "The DS1 Line B transmit pre-equalizer circuitry
+                  provisioning for conditioning the T1 output signal
+                  for connection to a CSU, other customer premises
+                  equipment, or the DSX-1 cross-connect through
+                  various cable lengths between 0 and 655 feet.
+
+                  '0-110' indicates 0-110 feet.
+                  '110-220' indicates 110-220 feet.
+                  '220-330' indicates 220-330 feet.
+                  '330-440' indicates 330-440 feet.
+                  '440-550' indicates 440-550 feet.
+                  '550-655' indicates 550-655 feet."
+           ::= { adDAX3config 12 }
+
+
+    adDAX3ds1Aoperation  OBJECT-TYPE
+           SYNTAX  INTEGER {
+                                disabled(1),
+                                enabled(2)
+                         }
+           ACCESS read-write
+           STATUS mandatory
+           DESCRIPTION
+                  "The DS1 Line A Operational Status.
+
+                  'disabled' turns off the faceplate indicators for
+                  DS1 A, disables EASY-MENU alarmsfor DS1 A, and stops
+                  data transmission for DS1 A.
+
+                  'enabled' reverses the effect of 'disabled'."
+           ::= { adDAX3config 13 }
+
+
+    adDAX3ds1Boperation  OBJECT-TYPE
+           SYNTAX  INTEGER {
+                                disabled(1),
+                                enabled(2)
+                         }
+           ACCESS read-write
+           STATUS mandatory
+           DESCRIPTION
+                  "The DS1 Line B Operational Status.
+
+                  'disabled' turns off the faceplate indicators for
+                  DS1 B, disables EASY-MENU alarmsfor DS1 B, and stops
+                  data transmission for DS1 B.
+
+                  'enabled' reverses the effect of 'disabled'."
+           ::= { adDAX3config 14 }
+
+
+    adDAX3trunkProcessMode  OBJECT-TYPE
+           SYNTAX  INTEGER {
+                                dax(1),
+                                liuA(2),
+                                liuB(3)
+                         }
+           ACCESS  read-only
+           STATUS  mandatory
+           DESCRIPTION
+                  "This item indicates how trunk processing will be
+                  initiated towards the channel units in the ACT bank
+                  in response to a DS1 alarm.  This item changes based
+                  on the cross-connect matrix configuration.
+
+                  'liuA' indicates that all connected digroup channels
+                  connected to DS1 Line A and are configured as full
+                  transparent connections.  For an alarm on DS1 Line A
+                  the normal bank facilities for trunk conditioning and
+                  CGA code insertion will be used.
+
+                  'liuB' indicates that all connected digroup channels
+                  connected to DS1 Line B and are configured as full
+                  transparent connections.  For an alarm on DS1 Line B
+                  the normal bank facilities for trunk conditioning and
+                  CGA code insertion will be used.
+
+                  'dax' indicates a cross connect matrix configuration
+                  other than that for 'liuA' or 'liuB'.  The ACT DAX will
+                  initiate trunk processing toward all the DS0 channels
+                  in the digroup on a channel by channel basis."
+           ::= { adDAX3config 15 }
+
+
+    adDAX3remPortBaudRate  OBJECT-TYPE
+           SYNTAX  INTEGER {
+                                bps1200(1),
+                                bps2400(2),
+                                bps9600(3),
+                                bps19200(4)
+                         }
+           ACCESS  read-write
+           STATUS  mandatory
+           DESCRIPTION
+                  "The ACTDAX Remote Port Baud Rate.  Changing the
+                  remote port buad rate WILL TERMINATE communications
+                  to this device at the current baud rate."
+           ::= { adDAX3config 16 }
+
+
+    adDAX3remPortProtocol  OBJECT-TYPE
+           SYNTAX  INTEGER {
+                                easyMenu(1),
+                                snmp-telnet(2)
+                         }
+           ACCESS  read-only
+           STATUS  mandatory
+           DESCRIPTION
+                  "The ACTDAX Remote Port Protocol."
+           ::= { adDAX3config 17 }
+
+
+    adDAX3remPortConnect  OBJECT-TYPE
+           SYNTAX  INTEGER {
+                                direct(1),
+                                dialUp(2)
+                         }
+           ACCESS  read-write
+           STATUS  mandatory
+           DESCRIPTION
+                  "The ACTDAX Remote Port Connection Type.  Changing
+                  the connection type may disrupt communication
+                  to this device.
+
+                  'direct' indicates a direct connection to the
+                  proxy agent.
+
+                  'dialUp' indicates a dial-Up connection to the
+                  proxy agent.  The adDAX3phone should be set."
+           ::= { adDAX3config 18 }
+
+
+    adDAX3phone OBJECT-TYPE
+           SYNTAX  DisplayString
+           ACCESS  read-write
+           STATUS  mandatory
+           DESCRIPTION
+                  "The dialing sequence (phone number) to reach the
+                  network manager.  Maximum of 35 characters."
+           ::= { adDAX3config 19 }
+
+
+    adDAX3mdmInitCmd  OBJECT-TYPE
+           SYNTAX  DisplayString
+           ACCESS  read-write
+           STATUS  mandatory
+           DESCRIPTION
+                  "The modem initialization command string.  The
+                  initialization string will be sent to the modem on
+                  unit power-up, before a call is made, and on user
+                  command.  Maximum of 40 characters.  Any control
+                  character should be entered as '^' plus the character.
+                  The factory default is 'ATE0Q0V1X4&C1&D2S0=1^M'."
+           ::= { adDAX3config 20 }
+
+
+    adDAX3mdmDialCmd  OBJECT-TYPE
+           SYNTAX  DisplayString
+           ACCESS  read-write
+           STATUS  mandatory
+           DESCRIPTION
+                  "The modem dialing command string.  The dialing
+                  command will be sent to the modem before the phone
+                  number.  Maximum of 15 characters.
+                  The factory default is 'ATDT'."
+           ::= { adDAX3config 21 }
+
+
+    adDAX3mdmDialCmdSfx  OBJECT-TYPE
+           SYNTAX  DisplayString
+           ACCESS  read-write
+           STATUS  mandatory
+           DESCRIPTION
+                  "The modem dialing command suffix.  The dialing
+                  command suffix will be sent to the modem after the
+                  phone number.  Maximum of 5 characters.  Any control
+                  character should be entered as '^' plus the character.
+                  The factory default is '^M'."
+           ::= { adDAX3config 22 }
+
+
+    adDAX3mdmHangUpCmd  OBJECT-TYPE
+           SYNTAX  DisplayString
+           ACCESS  read-write
+           STATUS  mandatory
+           DESCRIPTION
+                  "The modem hang-up command.  The hang-up command will
+                  be sent to the modem to hang-up the line.  Maximum of
+                  15 characters.  Any control character should be
+                  entered as '^' plus the character.  The first three
+                  characters should be the escape code sequence for
+                  the modem.
+                  The factory default is '+++ATH^M'."
+           ::= { adDAX3config 23 }
+
+
+    adDAX3mdmInit  OBJECT-TYPE
+           SYNTAX  INTEGER
+           ACCESS  read-write
+           STATUS  mandatory
+           DESCRIPTION
+                  "A Set will send the modem initialization string to
+                  the modem connected to the remote port.
+                  This WILL DISRUPT communications to this device."
+           ::= { adDAX3config 24 }
+
+
+    adDAX3daisyChain  OBJECT-TYPE
+           SYNTAX  INTEGER {
+                                off(1),
+                                on(2)
+                         }
+           ACCESS  read-write
+           STATUS  mandatory
+           DESCRIPTION
+                  "Disable/Enable the Local Rear Panel Port of the
+                  ACTDAX for Daisy Chain operation.
+
+                  'off' indicates that the Local Rear Panel Port
+                  will run the EASYMENU terminal interface.
+
+                  'on' indicates that the Local Rear Panel Port
+                  can be connected to the remote port of the next
+                  unit downstream from the proxy agent."
+           ::= { adDAX3config 25 }
+
+
+
+    --
+    -- Channel Configuration Table
+    --
+
+    adDAX3unitMap  OBJECT-TYPE
+                  SYNTAX  SEQUENCE OF AdDAX3unit
+                  ACCESS  not-accessible
+                  STATUS  mandatory
+                  DESCRIPTION
+                                "The ACT DAX channel configuration table which shows
+                                what intelligent devices are active in each channel."
+                  ::= { adACTDAXL3mg 3 }
+
+    adDAX3unit   OBJECT-TYPE
+                  SYNTAX  AdDAX3unit
+                  ACCESS  not-accessible
+                  STATUS  mandatory
+				  DESCRIPTION ""
+                  INDEX   { adDAX3chanNumber }
+                  ::= { adDAX3unitMap 1 }
+
+    AdDAX3unit ::=
+                  SEQUENCE {
+                                adDAX3chanNumber
+                                           INTEGER,
+                                adDAX3chanUnit
+                                           DisplayString,
+                                adDAX3device-2
+                                           DisplayString,
+                                adDAX3device-3
+                                           DisplayString,
+                                adDAX3device-4
+                                           DisplayString,
+                                adDAX3device-5
+                                           DisplayString
+                                }
+
+    adDAX3chanNumber        OBJECT-TYPE
+                  SYNTAX  INTEGER
+                  ACCESS  read-only
+                  STATUS  mandatory
+                  DESCRIPTION
+                                "The channel number of this table entry"
+                  ::= { adDAX3unit 1 }
+
+    adDAX3chanUnit        OBJECT-TYPE
+                  SYNTAX  DisplayString
+                  ACCESS  read-only
+                  STATUS  mandatory
+                  DESCRIPTION
+                                "The unit name plugged into this channel slot,
+                                for example, DSUDP"
+                  ::= { adDAX3unit 2 }
+
+    adDAX3device-2        OBJECT-TYPE
+                  SYNTAX  DisplayString
+                  ACCESS  read-only
+                  STATUS  mandatory
+                  DESCRIPTION
+                                "The device name of the PM loop unit connected
+                                to the channel unit, for example, LR-IV"
+                  ::= { adDAX3unit 3 }
+
+    adDAX3device-3        OBJECT-TYPE
+                  SYNTAX  DisplayString
+                  ACCESS  read-only
+                  STATUS  mandatory
+                  DESCRIPTION
+                                "The device name of the PM loop unit connected
+                                to a secondary loop, for example, DDST-IV"
+                  ::= { adDAX3unit 4 }
+
+    adDAX3device-4        OBJECT-TYPE
+                  SYNTAX  DisplayString
+                  ACCESS  read-only
+                  STATUS  mandatory
+                  DESCRIPTION
+                                "The device name of the PM loop unit connected
+                                to a secondary loop, for example, DDST-IV"
+                  ::= { adDAX3unit 5 }
+
+    adDAX3device-5        OBJECT-TYPE
+                  SYNTAX  DisplayString
+                  ACCESS  read-only
+                  STATUS  mandatory
+                  DESCRIPTION
+                                "The device name of the PM loop unit connected
+                                to a secondary loop, for example, DDST-IV"
+                  ::= { adDAX3unit 6 }
+
+
+
+    --
+    -- The ACTDAX Connection Table
+    --
+
+    adDAX3connTable  OBJECT-TYPE
+           SYNTAX  SEQUENCE OF AdDAX3connEntry
+           ACCESS  not-accessible
+           STATUS  mandatory
+           DESCRIPTION
+                  "The ACTDAX cross-connect matrix table."
+           ::= { adACTDAXL3mg 4 }
+
+
+    adDAX3connEntry  OBJECT-TYPE
+           SYNTAX  AdDAX3connEntry
+           ACCESS  not-accessible
+           STATUS  mandatory
+           DESCRIPTION
+                  "An entry in the ACTDAX cross-connect matrix table."
+           INDEX  { adDAXFromPort,
+                          adDAXFromChannel }
+           ::= { adDAX3connTable 1 }
+
+
+    AdDAX3connEntry ::=
+           SEQUENCE {
+                  adDAXFromPort
+                         INTEGER,
+                  adDAXFromChannel
+                         INTEGER,
+                  adDAXConnStatus
+                         INTEGER,
+                  adDAXToPort
+                         INTEGER,
+                  adDAXToChannel
+                         INTEGER,
+                  adDAXCircuitType
+                         INTEGER,
+                  adDAXTermination
+                         INTEGER,
+                  adDAXSgnlState
+                         INTEGER,
+                  adDAXTroubleInsert
+                         INTEGER,
+                  adDAXTroubleCode
+                         DisplayString,
+                  adDAXFromTC
+                         INTEGER,
+                  adDAXToTC
+                         INTEGER,
+                  adDAXUAC
+                         DisplayString,
+                  adDAXZeroCodeSuppress
+                         INTEGER,
+                  adDAXlastSetResponse
+                         DisplayString
+           }
+
+
+    adDAXFromPort  OBJECT-TYPE
+           SYNTAX  INTEGER {
+                                a0(1),
+                                a1(2),
+                                b1(3)
+                         }
+           ACCESS  read-only
+           STATUS  mandatory
+           DESCRIPTION
+                  "This object is the identifier of one of the three ports.
+                  The ACTDAX serves a a cross-point matrix switch between 72
+                  total DS0 channels distributed in three ports of 24 channels
+                  each, and can be configured to cross-connect any of the 72
+                  DS0 channels to any other DS0 channel.  The three ports
+                  are the DS1 Line A port (a1), the DS1 Line B port (b1),
+                  and the channel bank (a0).  This object in combination
+                  with adDAXFromChannel defines one of the 72 DS0 channels
+                  which can be connected."
+           ::= { adDAX3connEntry 1 }
+
+    adDAXFromChannel  OBJECT-TYPE
+           SYNTAX  INTEGER (1..24)
+           ACCESS  read-only
+           STATUS  mandatory
+           DESCRIPTION
+                  "This object is the identifier of one of the 24 channels
+                  in the DS1 port identified by adDAXFromPort.  For 'a1' or
+                  'b1' this object identifies a time slot in the DS1 stream.
+                  For 'a0' this object identifies a physical channel slot
+                  in the channel bank."
+           ::= { adDAX3connEntry 2 }
+
+    adDAXConnStatus  OBJECT-TYPE
+           SYNTAX  INTEGER {
+                                unmapped(1),
+                                connected(2)
+                         }
+           ACCESS  read-write
+           STATUS  mandatory
+           DESCRIPTION
+                  "The Connection Status for the channel.
+
+                   'unmapped' indicates that the channel is not connected.
+
+                   'connected' indicates that the channel is connected to
+                   the channel indicated by adDAXToPort and adDAXToChannel
+                   with the attributes defined by the other objects in
+                   adDAX3connTable.
+
+                   All connections are two-way connections, therefore any
+                   set operation performed will also change the corresponding
+                   table entry for which the To channel is the From channel.
+                   In short, any connection can be identified by either side
+                   of the connection.  The From and To designations have no
+                   true directional significance but are used to differentiate
+                   between the two sides of the circuit for assigning circuit
+                   parameters.  To channels and circuit parameters can be
+                   assigned but will not take affect until this object is
+                   set to 'connected'."
+           ::= { adDAX3connEntry 3 }
+
+    adDAXToPort  OBJECT-TYPE
+           SYNTAX  INTEGER {
+                                a0(1),
+                                a1(2),
+                                b1(3)
+                         }
+           ACCESS  read-write
+           STATUS  mandatory
+           DESCRIPTION
+                  "The port of the DS0 channel connected to the channel
+                  indicated by adDAXFromPort and adDAXFromChannel.  The
+                  three possible ports are the DS1 Line A port (a1),
+                  the DS1 Line B port (b1), and the channel bank (a0)."
+           ::= { adDAX3connEntry 4 }
+
+    adDAXToChannel  OBJECT-TYPE
+           SYNTAX  INTEGER (1..24)
+           ACCESS  read-write
+           STATUS  mandatory
+           DESCRIPTION
+                  "The channel in adDAXToPort that is connected to the
+                  channel indicated by adDAXFromPort and adDAXFromChannel."
+           ::= { adDAX3connEntry 5 }
+
+    adDAXCircuitType  OBJECT-TYPE
+           SYNTAX  INTEGER {
+                                fullTransparent(1),
+                                dataTransparent(2),
+                                dataSW56(3),
+                                voiceTransparent(4),
+                                dpt-dpo(5),
+                                dpo-dpt(6),
+                                fxo-fxs(7),
+                                fxs-fxo(8),
+                                em(9),
+                                plar-d3(10),
+                                plar-d4(11),
+                                user-defined(12)
+                         }
+           ACCESS  read-write
+           STATUS  mandatory
+           DESCRIPTION
+                  "The ciruit type for the connection.  The ciruit type will
+                  determine the settings for adDAXSgnlState, adDAXTroubleInsert,
+                  adDAXTroubleCode, adDAXFromTC, and adDAXToTC.  For voice
+                  circuit types such as 'fxo-fxs', 'fxo' represents the from
+                  channel and 'fxs' represents the to channel.
+
+                  'fullTransparent' indicates SgnlState=transparent,
+                  TroubleInsert=no, FromTC=none, and ToTC=none.
+
+                  'dataTransparent' indicates SgnlState=transparent,
+                  TroubleCode=9Ah, FromTC=none, and ToTC=none.
+
+                  'dataSW56' indicates SgnlState=2state, TroubleCode=9Ah,
+                  FromTC=0000, ToTC=0000.
+
+                  'voiceTransparent' indicates SgnlState=transparent,
+                  TroubleCode=7Fh, FromTC=none, and ToTC=none.
+
+                  'dpt-dpo' indicates SgnlState=2state, TroubleCode=7Fh,
+                  FromTC=0000, ToTC=0011.
+
+                  'dpo-dpt' indicates SgnlState=2state, TroubleCode=7Fh,
+                  FromTC=0011, ToTC=0000.
+
+                  'fxo-fxs' indicates SgnlState=4state, TroubleCode=7Fh,
+                  FromTC=0100, ToTC=1101.
+
+                  'fxs-fxo' indicates SgnlState=4state, TroubleCode=7Fh,
+                  FromTC=1101, ToTC=0100.
+
+                  'em' indicates SgnlState=2state, TroubleCode=7Fh,
+                  FromTC=0011, ToTC=0011.
+
+                  'plar-d3' indicates SgnlState=2state, TroubleCode=7Fh,
+                  FromTC=0000, ToTC=0000.
+
+                  'plar-d4' indicates SgnlState=2state, TroubleCode=7Fh,
+                  FromTC=1111, ToTC=1111."
+           ::= { adDAX3connEntry 6 }
+
+    adDAXTermination  OBJECT-TYPE
+           SYNTAX  INTEGER {
+                                none(1),
+                                fromChnl(2),
+                                toChnl(3),
+                                bothChnl(4)
+                         }
+           ACCESS  read-write
+           STATUS  mandatory
+           DESCRIPTION
+                  "The termination status of the circuit.  Terminating the
+                  circuit in one direction is equivalent to not connecting
+                  the circuit in that direction.  The Unassigned Channel
+                  Code will be transmitted in that direction of the circuit
+                  instead of circuit data.  In addition, if the Trunk
+                  Conditioning signaling bit states are defined, then the
+                  post 2.5 second trunk conditioning signaling bits will be
+                  inserted in that direction."
+           ::= { adDAX3connEntry 7 }
+
+    adDAXSgnlState  OBJECT-TYPE
+           SYNTAX  INTEGER {
+                                transparent(1),
+                                state2(2),
+                                state4(3),
+                                state16(4)
+                         }
+           ACCESS  read-write
+           STATUS  mandatory
+           DESCRIPTION
+                  "The signaling state of the circuit.
+
+                  'transparent' indicates that no signal bit robbing is
+                  performed.
+
+                  'state2' indicates that the A-bit is robbed and inserted
+                  in both the A-bit and B-bit positions in the outgoing
+                  data stream.
+
+                  'state4' indicates that both the A-bit and B-bit are
+                  robbed and inserted in the outgoing data stream.
+
+                  'state16' indicates that the A-bit, B-bit, C-bit, and D-bit
+                  are robbed and inserted in the outgoing data stream.  The
+                  16-state signaling can only be set for connections between
+                  the DS1 lines and then only if the DS1 lines are configured
+                  for ESF framing."
+           ::= { adDAX3connEntry 8 }
+
+    adDAXTroubleInsert  OBJECT-TYPE
+           SYNTAX  INTEGER {
+                                none(1),
+                                trb-7f(2),
+                                mos-9a(3),
+                                userDefined(4)
+                         }
+           ACCESS  read-write
+           STATUS  mandatory
+           DESCRIPTION
+                  "If the source channel's port is in an alarm state, the
+                  the Trouble Insertion Code will be inserted toward the
+                  DS0 channel in place of the outgoing data.  The available
+                  options include two common trouble codes, TRB (7f hex) and
+                  MOS (9a hex).  The Trouble Insertion Code can be set to
+                  None to have no Trouble Code inserted and to allow the
+                  outgoing data to pass through in alarm conditions.  The
+                  Trouble Code may also be set to a custom hex value
+                  with adACTDAXTroubleCode when this object is set to
+                  'userDefined'."
+           ::= { adDAX3connEntry 9 }
+
+    adDAXTroubleCode  OBJECT-TYPE
+           SYNTAX  DisplayString
+           ACCESS  read-write
+           STATUS  mandatory
+           DESCRIPTION
+                  "The Trouble Insertion Code that will be inserted toward
+                  a DS0 channel instead of outgoing data when the source
+                  channels's port is in an alarm state.  The TroubleCode
+                  will be the same for both the From and To channels.  If
+                  adDAXTroubleInsert is set to 'none', then the Trouble Code
+                  will show 'N/A'.  The Trouble Code should be entered as
+                  a two digit hex value, i.e. '9A' for a hex value of 9Ah."
+           ::= { adDAX3connEntry 10 }
+
+    adDAXFromTC  OBJECT-TYPE
+           SYNTAX  INTEGER {
+                                none(1),
+                                tc0000(2),
+                                tc0001(3),
+                                tc0010(4),
+                                tc0011(5),
+                                tc0100(6),
+                                tc0101(7),
+                                tc0110(8),
+                                tc0111(9),
+                                tc1000(10),
+                                tc1001(11),
+                                tc1010(12),
+                                tc1011(13),
+                                tc1100(14),
+                                tc1101(15),
+                                tc1110(16),
+                                tc1111(17)
+                         }
+           ACCESS  read-write
+           STATUS  mandatory
+           DESCRIPTION
+                  "The trunk conditioning bits that will be inserted in
+                  the From channel in place of received signaling bits
+                  during an alarm state on the To channel port.  The first
+                  two bits will be inserted for the A-bit and B-bit,
+                  respectively, during the first 2.5 seconds of the alarm.
+                  The second two bits will be inserted for the A-bit and
+                  B-bit, respectively, after the first 2.5 seconds of the
+                  alarm until the alarm clears.  For example, if '0110'
+                  is chosen, then during the first 2.5 seconds of the alarm
+                  the A-bit will be '0' and the B-bit will be '1'.  After
+                  the first 2.5 seconds the A-bit will be '1' and the B-bit
+                  will be '0'."
+           ::= { adDAX3connEntry 11 }
+
+    adDAXToTC  OBJECT-TYPE
+           SYNTAX  INTEGER {
+                                none(1),
+                                tc0000(2),
+                                tc0001(3),
+                                tc0010(4),
+                                tc0011(5),
+                                tc0100(6),
+                                tc0101(7),
+                                tc0110(8),
+                                tc0111(9),
+                                tc1000(10),
+                                tc1001(11),
+                                tc1010(12),
+                                tc1011(13),
+                                tc1100(14),
+                                tc1101(15),
+                                tc1110(16),
+                                tc1111(17)
+                         }
+           ACCESS  read-write
+           STATUS  mandatory
+           DESCRIPTION
+                  "The trunk conditioning bits that will be inserted in
+                  the To channel in place of received signaling bits during
+                  an alarm state on the From channel port.  The first
+                  two bits will be inserted for the A-bit and B-bit,
+                  respectively, during the first 2.5 seconds of the alarm.
+                  The second two bits will be inserted for the A-bit and
+                  B-bit, respectively, after the first 2.5 seconds of the
+                  alarm until the alarm clears.  For example, if '0110'
+                  is chosen, then during the first 2.5 seconds of the alarm
+                  the A-bit will be '0' and the B-bit will be '1'.  After
+                  the first 2.5 seconds the A-bit will be '1' and the B-bit
+                  will be '0'."
+           ::= { adDAX3connEntry 12 }
+
+
+    adDAXUAC  OBJECT-TYPE
+           SYNTAX  DisplayString
+           ACCESS  read-write
+           STATUS  mandatory
+           DESCRIPTION
+                  "The Unassigned Channel Code (UAC) is transmitted towards
+                  the From channel when the channel is not not assigned to
+                  a connection, or the channel is terminated in a connection.
+                  The factory default is Command Mode Idle (FEh).  The
+                  Unassigned Channel Code should be entered as a two digit
+                  hex value, i.e. 'FE' for a hex value of FEh."
+           ::= { adDAX3connEntry 13 }
+
+    adDAXZeroCodeSuppress  OBJECT-TYPE
+           SYNTAX  INTEGER {
+                                no(1),
+                                yes(2)
+                         }
+           ACCESS  read-write
+           STATUS  mandatory
+           DESCRIPTION
+                  "This object indicates if Zero Code Suppression is enabled
+                  or disabled for the from channel.  If Zero Code Suppression
+                  is enabled, zero bytes transmitted from the DS1 interface
+                  for this channel will be replaced with the code '00000010'.
+                  Zero Code Suppression does not apply to DS0 channels in the
+                  'a0' port."
+           ::= { adDAX3connEntry 14 }
+
+    adDAXlastSetResponse  OBJECT-TYPE
+           SYNTAX  DisplayString
+           ACCESS  read-only
+           STATUS  mandatory
+           DESCRIPTION
+                  "The response to the last set operation performed on
+                  an object in this table.  The repsonse indicates either
+                  SUCCESS or an explanation of failure."
+           ::= { adDAX3connEntry 15 }
+
+
+
+
+    --
+    -- The ACTDAX Connection Map Table
+    --
+
+    adDAX3connMapTable  OBJECT-TYPE
+           SYNTAX  SEQUENCE OF AdDAX3connMapEntry
+           ACCESS  not-accessible
+           STATUS  mandatory
+           DESCRIPTION
+                  "The ACTDAX cross-connect map table."
+           ::= { adACTDAXL3mg 5 }
+
+
+    adDAX3connMapEntry  OBJECT-TYPE
+           SYNTAX  AdDAX3connMapEntry
+           ACCESS  not-accessible
+           STATUS  mandatory
+           DESCRIPTION
+                  "An entry in the ACTDAX cross-connect map table."
+           INDEX  { adDAXPort }
+           ::= { adDAX3connMapTable 1 }
+
+
+    AdDAX3connMapEntry ::=
+           SEQUENCE {
+                  adDAXPort
+                         INTEGER,
+                  adDAXChnl1
+                         INTEGER,
+                  adDAXChnl2
+                         INTEGER,
+                  adDAXChnl3
+                         INTEGER,
+                  adDAXChnl4
+                         INTEGER,
+                  adDAXChnl5
+                         INTEGER,
+                  adDAXChnl6
+                         INTEGER,
+                  adDAXChnl7
+                         INTEGER,
+                  adDAXChnl8
+                         INTEGER,
+                  adDAXChnl9
+                         INTEGER,
+                  adDAXChnl10
+                         INTEGER,
+                  adDAXChnl11
+                         INTEGER,
+                  adDAXChnl12
+                         INTEGER,
+                  adDAXChnl13
+                         INTEGER,
+                  adDAXChnl14
+                         INTEGER,
+                  adDAXChnl15
+                         INTEGER,
+                  adDAXChnl16
+                         INTEGER,
+                  adDAXChnl17
+                         INTEGER,
+                  adDAXChnl18
+                         INTEGER,
+                  adDAXChnl19
+                         INTEGER,
+                  adDAXChnl20
+                         INTEGER,
+                  adDAXChnl21
+                         INTEGER,
+                  adDAXChnl22
+                         INTEGER,
+                  adDAXChnl23
+                         INTEGER,
+                  adDAXChnl24
+                         INTEGER
+           }
+
+
+    adDAXPort  OBJECT-TYPE
+           SYNTAX  INTEGER {
+                                a0(1),
+                                a1(2),
+                                b1(3)
+                         }
+           ACCESS  read-only
+           STATUS  mandatory
+           DESCRIPTION
+                  "This object is the identifier of one of the three ports.
+                  The ACTDAX serves a a cross-point matrix switch between 72
+                  total DS0 channels distributed in three ports of 24 channels
+                  each, and can be configured to cross-connect any of the 72
+                  DS0 channels to any other DS0 channel.  The three ports
+                  are the DS1 Line A port (a1), the DS1 Line B port (b1),
+                  and the channel bank (a0)."
+           ::= { adDAX3connMapEntry 1 }
+
+    adDAXChnl1  OBJECT-TYPE
+           SYNTAX  INTEGER {
+                                noConnect(1),
+                                a0-01(101), a0-02(102), a0-03(103), a0-04(104), a0-05(105), a0-06(106),
+                                a0-07(107), a0-08(108), a0-09(109), a0-10(110), a0-11(111), a0-12(112),
+                                a0-13(113), a0-14(114), a0-15(115), a0-16(116), a0-17(117), a0-18(118),
+                                a0-19(119), a0-20(120), a0-21(121), a0-22(122), a0-23(123), a0-24(124),
+                                a1-01(201), a1-02(202), a1-03(203), a1-04(204), a1-05(205), a1-06(206),
+                                a1-07(207), a1-08(208), a1-09(209), a1-10(210), a1-11(211), a1-12(212),
+                                a1-13(213), a1-14(214), a1-15(215), a1-16(216), a1-17(217), a1-18(218),
+                                a1-19(219), a1-20(220), a1-21(221), a1-22(222), a1-23(223), a1-24(224),
+                                b1-01(301), b1-02(302), b1-03(303), b1-04(304), b1-05(305), b1-06(306),
+                                b1-07(307), b1-08(308), b1-09(309), b1-10(310), b1-11(311), b1-12(312),
+                                b1-13(313), b1-14(314), b1-15(315), b1-16(316), b1-17(317), b1-18(318),
+                                b1-19(319), b1-20(320), b1-21(321), b1-22(322), b1-23(323), b1-24(324)
+                         }
+           ACCESS  read-only
+           STATUS  mandatory
+           DESCRIPTION
+                  "The DSO channel connected to channel 1 of adDAXPort."
+           ::= { adDAX3connMapEntry 2 }
+
+    adDAXChnl2  OBJECT-TYPE
+           SYNTAX  INTEGER {
+                                noConnect(1),
+                                a0-01(101), a0-02(102), a0-03(103), a0-04(104), a0-05(105), a0-06(106),
+                                a0-07(107), a0-08(108), a0-09(109), a0-10(110), a0-11(111), a0-12(112),
+                                a0-13(113), a0-14(114), a0-15(115), a0-16(116), a0-17(117), a0-18(118),
+                                a0-19(119), a0-20(120), a0-21(121), a0-22(122), a0-23(123), a0-24(124),
+                                a1-01(201), a1-02(202), a1-03(203), a1-04(204), a1-05(205), a1-06(206),
+                                a1-07(207), a1-08(208), a1-09(209), a1-10(210), a1-11(211), a1-12(212),
+                                a1-13(213), a1-14(214), a1-15(215), a1-16(216), a1-17(217), a1-18(218),
+                                a1-19(219), a1-20(220), a1-21(221), a1-22(222), a1-23(223), a1-24(224),
+                                b1-01(301), b1-02(302), b1-03(303), b1-04(304), b1-05(305), b1-06(306),
+                                b1-07(307), b1-08(308), b1-09(309), b1-10(310), b1-11(311), b1-12(312),
+                                b1-13(313), b1-14(314), b1-15(315), b1-16(316), b1-17(317), b1-18(318),
+                                b1-19(319), b1-20(320), b1-21(321), b1-22(322), b1-23(323), b1-24(324)
+                         }
+           ACCESS  read-only
+           STATUS  mandatory
+           DESCRIPTION
+                  "The DSO channel connected to channel 2 of adDAXPort."
+           ::= { adDAX3connMapEntry 3 }
+
+    adDAXChnl3  OBJECT-TYPE
+           SYNTAX  INTEGER {
+                                noConnect(1),
+                                a0-01(101), a0-02(102), a0-03(103), a0-04(104), a0-05(105), a0-06(106),
+                                a0-07(107), a0-08(108), a0-09(109), a0-10(110), a0-11(111), a0-12(112),
+                                a0-13(113), a0-14(114), a0-15(115), a0-16(116), a0-17(117), a0-18(118),
+                                a0-19(119), a0-20(120), a0-21(121), a0-22(122), a0-23(123), a0-24(124),
+                                a1-01(201), a1-02(202), a1-03(203), a1-04(204), a1-05(205), a1-06(206),
+                                a1-07(207), a1-08(208), a1-09(209), a1-10(210), a1-11(211), a1-12(212),
+                                a1-13(213), a1-14(214), a1-15(215), a1-16(216), a1-17(217), a1-18(218),
+                                a1-19(219), a1-20(220), a1-21(221), a1-22(222), a1-23(223), a1-24(224),
+                                b1-01(301), b1-02(302), b1-03(303), b1-04(304), b1-05(305), b1-06(306),
+                                b1-07(307), b1-08(308), b1-09(309), b1-10(310), b1-11(311), b1-12(312),
+                                b1-13(313), b1-14(314), b1-15(315), b1-16(316), b1-17(317), b1-18(318),
+                                b1-19(319), b1-20(320), b1-21(321), b1-22(322), b1-23(323), b1-24(324)
+                         }
+           ACCESS  read-only
+           STATUS  mandatory
+           DESCRIPTION
+                  "The DSO channel connected to channel 3 of adDAXPort."
+           ::= { adDAX3connMapEntry 4 }
+
+    adDAXChnl4  OBJECT-TYPE
+           SYNTAX  INTEGER {
+                                noConnect(1),
+                                a0-01(101), a0-02(102), a0-03(103), a0-04(104), a0-05(105), a0-06(106),
+                                a0-07(107), a0-08(108), a0-09(109), a0-10(110), a0-11(111), a0-12(112),
+                                a0-13(113), a0-14(114), a0-15(115), a0-16(116), a0-17(117), a0-18(118),
+                                a0-19(119), a0-20(120), a0-21(121), a0-22(122), a0-23(123), a0-24(124),
+                                a1-01(201), a1-02(202), a1-03(203), a1-04(204), a1-05(205), a1-06(206),
+                                a1-07(207), a1-08(208), a1-09(209), a1-10(210), a1-11(211), a1-12(212),
+                                a1-13(213), a1-14(214), a1-15(215), a1-16(216), a1-17(217), a1-18(218),
+                                a1-19(219), a1-20(220), a1-21(221), a1-22(222), a1-23(223), a1-24(224),
+                                b1-01(301), b1-02(302), b1-03(303), b1-04(304), b1-05(305), b1-06(306),
+                                b1-07(307), b1-08(308), b1-09(309), b1-10(310), b1-11(311), b1-12(312),
+                                b1-13(313), b1-14(314), b1-15(315), b1-16(316), b1-17(317), b1-18(318),
+                                b1-19(319), b1-20(320), b1-21(321), b1-22(322), b1-23(323), b1-24(324)
+                         }
+           ACCESS  read-only
+           STATUS  mandatory
+           DESCRIPTION
+                  "The DSO channel connected to channel 4 of adDAXPort."
+           ::= { adDAX3connMapEntry 5 }
+
+    adDAXChnl5  OBJECT-TYPE
+           SYNTAX  INTEGER {
+                                noConnect(1),
+                                a0-01(101), a0-02(102), a0-03(103), a0-04(104), a0-05(105), a0-06(106),
+                                a0-07(107), a0-08(108), a0-09(109), a0-10(110), a0-11(111), a0-12(112),
+                                a0-13(113), a0-14(114), a0-15(115), a0-16(116), a0-17(117), a0-18(118),
+                                a0-19(119), a0-20(120), a0-21(121), a0-22(122), a0-23(123), a0-24(124),
+                                a1-01(201), a1-02(202), a1-03(203), a1-04(204), a1-05(205), a1-06(206),
+                                a1-07(207), a1-08(208), a1-09(209), a1-10(210), a1-11(211), a1-12(212),
+                                a1-13(213), a1-14(214), a1-15(215), a1-16(216), a1-17(217), a1-18(218),
+                                a1-19(219), a1-20(220), a1-21(221), a1-22(222), a1-23(223), a1-24(224),
+                                b1-01(301), b1-02(302), b1-03(303), b1-04(304), b1-05(305), b1-06(306),
+                                b1-07(307), b1-08(308), b1-09(309), b1-10(310), b1-11(311), b1-12(312),
+                                b1-13(313), b1-14(314), b1-15(315), b1-16(316), b1-17(317), b1-18(318),
+                                b1-19(319), b1-20(320), b1-21(321), b1-22(322), b1-23(323), b1-24(324)
+                         }
+           ACCESS  read-only
+           STATUS  mandatory
+           DESCRIPTION
+                  "The DSO channel connected to channel 5 of adDAXPort."
+           ::= { adDAX3connMapEntry 6 }
+
+    adDAXChnl6  OBJECT-TYPE
+           SYNTAX  INTEGER {
+                                noConnect(1),
+                                a0-01(101), a0-02(102), a0-03(103), a0-04(104), a0-05(105), a0-06(106),
+                                a0-07(107), a0-08(108), a0-09(109), a0-10(110), a0-11(111), a0-12(112),
+                                a0-13(113), a0-14(114), a0-15(115), a0-16(116), a0-17(117), a0-18(118),
+                                a0-19(119), a0-20(120), a0-21(121), a0-22(122), a0-23(123), a0-24(124),
+                                a1-01(201), a1-02(202), a1-03(203), a1-04(204), a1-05(205), a1-06(206),
+                                a1-07(207), a1-08(208), a1-09(209), a1-10(210), a1-11(211), a1-12(212),
+                                a1-13(213), a1-14(214), a1-15(215), a1-16(216), a1-17(217), a1-18(218),
+                                a1-19(219), a1-20(220), a1-21(221), a1-22(222), a1-23(223), a1-24(224),
+                                b1-01(301), b1-02(302), b1-03(303), b1-04(304), b1-05(305), b1-06(306),
+                                b1-07(307), b1-08(308), b1-09(309), b1-10(310), b1-11(311), b1-12(312),
+                                b1-13(313), b1-14(314), b1-15(315), b1-16(316), b1-17(317), b1-18(318),
+                                b1-19(319), b1-20(320), b1-21(321), b1-22(322), b1-23(323), b1-24(324)
+                         }
+           ACCESS  read-only
+           STATUS  mandatory
+           DESCRIPTION
+                  "The DSO channel connected to channel 6 of adDAXPort."
+           ::= { adDAX3connMapEntry 7 }
+
+    adDAXChnl7  OBJECT-TYPE
+           SYNTAX  INTEGER {
+                                noConnect(1),
+                                a0-01(101), a0-02(102), a0-03(103), a0-04(104), a0-05(105), a0-06(106),
+                                a0-07(107), a0-08(108), a0-09(109), a0-10(110), a0-11(111), a0-12(112),
+                                a0-13(113), a0-14(114), a0-15(115), a0-16(116), a0-17(117), a0-18(118),
+                                a0-19(119), a0-20(120), a0-21(121), a0-22(122), a0-23(123), a0-24(124),
+                                a1-01(201), a1-02(202), a1-03(203), a1-04(204), a1-05(205), a1-06(206),
+                                a1-07(207), a1-08(208), a1-09(209), a1-10(210), a1-11(211), a1-12(212),
+                                a1-13(213), a1-14(214), a1-15(215), a1-16(216), a1-17(217), a1-18(218),
+                                a1-19(219), a1-20(220), a1-21(221), a1-22(222), a1-23(223), a1-24(224),
+                                b1-01(301), b1-02(302), b1-03(303), b1-04(304), b1-05(305), b1-06(306),
+                                b1-07(307), b1-08(308), b1-09(309), b1-10(310), b1-11(311), b1-12(312),
+                                b1-13(313), b1-14(314), b1-15(315), b1-16(316), b1-17(317), b1-18(318),
+                                b1-19(319), b1-20(320), b1-21(321), b1-22(322), b1-23(323), b1-24(324)
+                         }
+           ACCESS  read-only
+           STATUS  mandatory
+           DESCRIPTION
+                  "The DSO channel connected to channel 7 of adDAXPort."
+           ::= { adDAX3connMapEntry 8 }
+
+    adDAXChnl8  OBJECT-TYPE
+           SYNTAX  INTEGER {
+                                noConnect(1),
+                                a0-01(101), a0-02(102), a0-03(103), a0-04(104), a0-05(105), a0-06(106),
+                                a0-07(107), a0-08(108), a0-09(109), a0-10(110), a0-11(111), a0-12(112),
+                                a0-13(113), a0-14(114), a0-15(115), a0-16(116), a0-17(117), a0-18(118),
+                                a0-19(119), a0-20(120), a0-21(121), a0-22(122), a0-23(123), a0-24(124),
+                                a1-01(201), a1-02(202), a1-03(203), a1-04(204), a1-05(205), a1-06(206),
+                                a1-07(207), a1-08(208), a1-09(209), a1-10(210), a1-11(211), a1-12(212),
+                                a1-13(213), a1-14(214), a1-15(215), a1-16(216), a1-17(217), a1-18(218),
+                                a1-19(219), a1-20(220), a1-21(221), a1-22(222), a1-23(223), a1-24(224),
+                                b1-01(301), b1-02(302), b1-03(303), b1-04(304), b1-05(305), b1-06(306),
+                                b1-07(307), b1-08(308), b1-09(309), b1-10(310), b1-11(311), b1-12(312),
+                                b1-13(313), b1-14(314), b1-15(315), b1-16(316), b1-17(317), b1-18(318),
+                                b1-19(319), b1-20(320), b1-21(321), b1-22(322), b1-23(323), b1-24(324)
+                         }
+           ACCESS  read-only
+           STATUS  mandatory
+           DESCRIPTION
+                  "The DSO channel connected to channel 8 of adDAXPort."
+           ::= { adDAX3connMapEntry 9 }
+
+    adDAXChnl9  OBJECT-TYPE
+           SYNTAX  INTEGER {
+                                noConnect(1),
+                                a0-01(101), a0-02(102), a0-03(103), a0-04(104), a0-05(105), a0-06(106),
+                                a0-07(107), a0-08(108), a0-09(109), a0-10(110), a0-11(111), a0-12(112),
+                                a0-13(113), a0-14(114), a0-15(115), a0-16(116), a0-17(117), a0-18(118),
+                                a0-19(119), a0-20(120), a0-21(121), a0-22(122), a0-23(123), a0-24(124),
+                                a1-01(201), a1-02(202), a1-03(203), a1-04(204), a1-05(205), a1-06(206),
+                                a1-07(207), a1-08(208), a1-09(209), a1-10(210), a1-11(211), a1-12(212),
+                                a1-13(213), a1-14(214), a1-15(215), a1-16(216), a1-17(217), a1-18(218),
+                                a1-19(219), a1-20(220), a1-21(221), a1-22(222), a1-23(223), a1-24(224),
+                                b1-01(301), b1-02(302), b1-03(303), b1-04(304), b1-05(305), b1-06(306),
+                                b1-07(307), b1-08(308), b1-09(309), b1-10(310), b1-11(311), b1-12(312),
+                                b1-13(313), b1-14(314), b1-15(315), b1-16(316), b1-17(317), b1-18(318),
+                                b1-19(319), b1-20(320), b1-21(321), b1-22(322), b1-23(323), b1-24(324)
+                         }
+           ACCESS  read-only
+           STATUS  mandatory
+           DESCRIPTION
+                  "The DSO channel connected to channel 9 of adDAXPort."
+           ::= { adDAX3connMapEntry 10 }
+
+    adDAXChnl10  OBJECT-TYPE
+           SYNTAX  INTEGER {
+                                noConnect(1),
+                                a0-01(101), a0-02(102), a0-03(103), a0-04(104), a0-05(105), a0-06(106),
+                                a0-07(107), a0-08(108), a0-09(109), a0-10(110), a0-11(111), a0-12(112),
+                                a0-13(113), a0-14(114), a0-15(115), a0-16(116), a0-17(117), a0-18(118),
+                                a0-19(119), a0-20(120), a0-21(121), a0-22(122), a0-23(123), a0-24(124),
+                                a1-01(201), a1-02(202), a1-03(203), a1-04(204), a1-05(205), a1-06(206),
+                                a1-07(207), a1-08(208), a1-09(209), a1-10(210), a1-11(211), a1-12(212),
+                                a1-13(213), a1-14(214), a1-15(215), a1-16(216), a1-17(217), a1-18(218),
+                                a1-19(219), a1-20(220), a1-21(221), a1-22(222), a1-23(223), a1-24(224),
+                                b1-01(301), b1-02(302), b1-03(303), b1-04(304), b1-05(305), b1-06(306),
+                                b1-07(307), b1-08(308), b1-09(309), b1-10(310), b1-11(311), b1-12(312),
+                                b1-13(313), b1-14(314), b1-15(315), b1-16(316), b1-17(317), b1-18(318),
+                                b1-19(319), b1-20(320), b1-21(321), b1-22(322), b1-23(323), b1-24(324)
+                         }
+           ACCESS  read-only
+           STATUS  mandatory
+           DESCRIPTION
+                  "The DSO channel connected to channel 10 of adDAXPort."
+           ::= { adDAX3connMapEntry 11 }
+
+    adDAXChnl11  OBJECT-TYPE
+           SYNTAX  INTEGER {
+                                noConnect(1),
+                                a0-01(101), a0-02(102), a0-03(103), a0-04(104), a0-05(105), a0-06(106),
+                                a0-07(107), a0-08(108), a0-09(109), a0-10(110), a0-11(111), a0-12(112),
+                                a0-13(113), a0-14(114), a0-15(115), a0-16(116), a0-17(117), a0-18(118),
+                                a0-19(119), a0-20(120), a0-21(121), a0-22(122), a0-23(123), a0-24(124),
+                                a1-01(201), a1-02(202), a1-03(203), a1-04(204), a1-05(205), a1-06(206),
+                                a1-07(207), a1-08(208), a1-09(209), a1-10(210), a1-11(211), a1-12(212),
+                                a1-13(213), a1-14(214), a1-15(215), a1-16(216), a1-17(217), a1-18(218),
+                                a1-19(219), a1-20(220), a1-21(221), a1-22(222), a1-23(223), a1-24(224),
+                                b1-01(301), b1-02(302), b1-03(303), b1-04(304), b1-05(305), b1-06(306),
+                                b1-07(307), b1-08(308), b1-09(309), b1-10(310), b1-11(311), b1-12(312),
+                                b1-13(313), b1-14(314), b1-15(315), b1-16(316), b1-17(317), b1-18(318),
+                                b1-19(319), b1-20(320), b1-21(321), b1-22(322), b1-23(323), b1-24(324)
+                         }
+           ACCESS  read-only
+           STATUS  mandatory
+           DESCRIPTION
+                  "The DSO channel connected to channel 11 of adDAXPort."
+           ::= { adDAX3connMapEntry 12 }
+
+    adDAXChnl12  OBJECT-TYPE
+           SYNTAX  INTEGER {
+                                noConnect(1),
+                                a0-01(101), a0-02(102), a0-03(103), a0-04(104), a0-05(105), a0-06(106),
+                                a0-07(107), a0-08(108), a0-09(109), a0-10(110), a0-11(111), a0-12(112),
+                                a0-13(113), a0-14(114), a0-15(115), a0-16(116), a0-17(117), a0-18(118),
+                                a0-19(119), a0-20(120), a0-21(121), a0-22(122), a0-23(123), a0-24(124),
+                                a1-01(201), a1-02(202), a1-03(203), a1-04(204), a1-05(205), a1-06(206),
+                                a1-07(207), a1-08(208), a1-09(209), a1-10(210), a1-11(211), a1-12(212),
+                                a1-13(213), a1-14(214), a1-15(215), a1-16(216), a1-17(217), a1-18(218),
+                                a1-19(219), a1-20(220), a1-21(221), a1-22(222), a1-23(223), a1-24(224),
+                                b1-01(301), b1-02(302), b1-03(303), b1-04(304), b1-05(305), b1-06(306),
+                                b1-07(307), b1-08(308), b1-09(309), b1-10(310), b1-11(311), b1-12(312),
+                                b1-13(313), b1-14(314), b1-15(315), b1-16(316), b1-17(317), b1-18(318),
+                                b1-19(319), b1-20(320), b1-21(321), b1-22(322), b1-23(323), b1-24(324)
+                         }
+           ACCESS  read-only
+           STATUS  mandatory
+           DESCRIPTION
+                  "The DSO channel connected to channel 12 of adDAXPort."
+           ::= { adDAX3connMapEntry 13 }
+
+    adDAXChnl13  OBJECT-TYPE
+           SYNTAX  INTEGER {
+                                noConnect(1),
+                                a0-01(101), a0-02(102), a0-03(103), a0-04(104), a0-05(105), a0-06(106),
+                                a0-07(107), a0-08(108), a0-09(109), a0-10(110), a0-11(111), a0-12(112),
+                                a0-13(113), a0-14(114), a0-15(115), a0-16(116), a0-17(117), a0-18(118),
+                                a0-19(119), a0-20(120), a0-21(121), a0-22(122), a0-23(123), a0-24(124),
+                                a1-01(201), a1-02(202), a1-03(203), a1-04(204), a1-05(205), a1-06(206),
+                                a1-07(207), a1-08(208), a1-09(209), a1-10(210), a1-11(211), a1-12(212),
+                                a1-13(213), a1-14(214), a1-15(215), a1-16(216), a1-17(217), a1-18(218),
+                                a1-19(219), a1-20(220), a1-21(221), a1-22(222), a1-23(223), a1-24(224),
+                                b1-01(301), b1-02(302), b1-03(303), b1-04(304), b1-05(305), b1-06(306),
+                                b1-07(307), b1-08(308), b1-09(309), b1-10(310), b1-11(311), b1-12(312),
+                                b1-13(313), b1-14(314), b1-15(315), b1-16(316), b1-17(317), b1-18(318),
+                                b1-19(319), b1-20(320), b1-21(321), b1-22(322), b1-23(323), b1-24(324)
+                         }
+           ACCESS  read-only
+           STATUS  mandatory
+           DESCRIPTION
+                  "The DSO channel connected to channel 13 of adDAXPort."
+           ::= { adDAX3connMapEntry 14 }
+
+    adDAXChnl14  OBJECT-TYPE
+           SYNTAX  INTEGER {
+                                noConnect(1),
+                                a0-01(101), a0-02(102), a0-03(103), a0-04(104), a0-05(105), a0-06(106),
+                                a0-07(107), a0-08(108), a0-09(109), a0-10(110), a0-11(111), a0-12(112),
+                                a0-13(113), a0-14(114), a0-15(115), a0-16(116), a0-17(117), a0-18(118),
+                                a0-19(119), a0-20(120), a0-21(121), a0-22(122), a0-23(123), a0-24(124),
+                                a1-01(201), a1-02(202), a1-03(203), a1-04(204), a1-05(205), a1-06(206),
+                                a1-07(207), a1-08(208), a1-09(209), a1-10(210), a1-11(211), a1-12(212),
+                                a1-13(213), a1-14(214), a1-15(215), a1-16(216), a1-17(217), a1-18(218),
+                                a1-19(219), a1-20(220), a1-21(221), a1-22(222), a1-23(223), a1-24(224),
+                                b1-01(301), b1-02(302), b1-03(303), b1-04(304), b1-05(305), b1-06(306),
+                                b1-07(307), b1-08(308), b1-09(309), b1-10(310), b1-11(311), b1-12(312),
+                                b1-13(313), b1-14(314), b1-15(315), b1-16(316), b1-17(317), b1-18(318),
+                                b1-19(319), b1-20(320), b1-21(321), b1-22(322), b1-23(323), b1-24(324)
+                         }
+           ACCESS  read-only
+           STATUS  mandatory
+           DESCRIPTION
+                  "The DSO channel connected to channel 14 of adDAXPort."
+           ::= { adDAX3connMapEntry 15 }
+
+    adDAXChnl15  OBJECT-TYPE
+           SYNTAX  INTEGER {
+                                noConnect(1),
+                                a0-01(101), a0-02(102), a0-03(103), a0-04(104), a0-05(105), a0-06(106),
+                                a0-07(107), a0-08(108), a0-09(109), a0-10(110), a0-11(111), a0-12(112),
+                                a0-13(113), a0-14(114), a0-15(115), a0-16(116), a0-17(117), a0-18(118),
+                                a0-19(119), a0-20(120), a0-21(121), a0-22(122), a0-23(123), a0-24(124),
+                                a1-01(201), a1-02(202), a1-03(203), a1-04(204), a1-05(205), a1-06(206),
+                                a1-07(207), a1-08(208), a1-09(209), a1-10(210), a1-11(211), a1-12(212),
+                                a1-13(213), a1-14(214), a1-15(215), a1-16(216), a1-17(217), a1-18(218),
+                                a1-19(219), a1-20(220), a1-21(221), a1-22(222), a1-23(223), a1-24(224),
+                                b1-01(301), b1-02(302), b1-03(303), b1-04(304), b1-05(305), b1-06(306),
+                                b1-07(307), b1-08(308), b1-09(309), b1-10(310), b1-11(311), b1-12(312),
+                                b1-13(313), b1-14(314), b1-15(315), b1-16(316), b1-17(317), b1-18(318),
+                                b1-19(319), b1-20(320), b1-21(321), b1-22(322), b1-23(323), b1-24(324)
+                         }
+           ACCESS  read-only
+           STATUS  mandatory
+           DESCRIPTION
+                  "The DSO channel connected to channel 15 of adDAXPort."
+           ::= { adDAX3connMapEntry 16 }
+
+    adDAXChnl16  OBJECT-TYPE
+           SYNTAX  INTEGER {
+                                noConnect(1),
+                                a0-01(101), a0-02(102), a0-03(103), a0-04(104), a0-05(105), a0-06(106),
+                                a0-07(107), a0-08(108), a0-09(109), a0-10(110), a0-11(111), a0-12(112),
+                                a0-13(113), a0-14(114), a0-15(115), a0-16(116), a0-17(117), a0-18(118),
+                                a0-19(119), a0-20(120), a0-21(121), a0-22(122), a0-23(123), a0-24(124),
+                                a1-01(201), a1-02(202), a1-03(203), a1-04(204), a1-05(205), a1-06(206),
+                                a1-07(207), a1-08(208), a1-09(209), a1-10(210), a1-11(211), a1-12(212),
+                                a1-13(213), a1-14(214), a1-15(215), a1-16(216), a1-17(217), a1-18(218),
+                                a1-19(219), a1-20(220), a1-21(221), a1-22(222), a1-23(223), a1-24(224),
+                                b1-01(301), b1-02(302), b1-03(303), b1-04(304), b1-05(305), b1-06(306),
+                                b1-07(307), b1-08(308), b1-09(309), b1-10(310), b1-11(311), b1-12(312),
+                                b1-13(313), b1-14(314), b1-15(315), b1-16(316), b1-17(317), b1-18(318),
+                                b1-19(319), b1-20(320), b1-21(321), b1-22(322), b1-23(323), b1-24(324)
+                         }
+           ACCESS  read-only
+           STATUS  mandatory
+           DESCRIPTION
+                  "The DSO channel connected to channel 16 of adDAXPort."
+           ::= { adDAX3connMapEntry 17 }
+
+    adDAXChnl17  OBJECT-TYPE
+           SYNTAX  INTEGER {
+                                noConnect(1),
+                                a0-01(101), a0-02(102), a0-03(103), a0-04(104), a0-05(105), a0-06(106),
+                                a0-07(107), a0-08(108), a0-09(109), a0-10(110), a0-11(111), a0-12(112),
+                                a0-13(113), a0-14(114), a0-15(115), a0-16(116), a0-17(117), a0-18(118),
+                                a0-19(119), a0-20(120), a0-21(121), a0-22(122), a0-23(123), a0-24(124),
+                                a1-01(201), a1-02(202), a1-03(203), a1-04(204), a1-05(205), a1-06(206),
+                                a1-07(207), a1-08(208), a1-09(209), a1-10(210), a1-11(211), a1-12(212),
+                                a1-13(213), a1-14(214), a1-15(215), a1-16(216), a1-17(217), a1-18(218),
+                                a1-19(219), a1-20(220), a1-21(221), a1-22(222), a1-23(223), a1-24(224),
+                                b1-01(301), b1-02(302), b1-03(303), b1-04(304), b1-05(305), b1-06(306),
+                                b1-07(307), b1-08(308), b1-09(309), b1-10(310), b1-11(311), b1-12(312),
+                                b1-13(313), b1-14(314), b1-15(315), b1-16(316), b1-17(317), b1-18(318),
+                                b1-19(319), b1-20(320), b1-21(321), b1-22(322), b1-23(323), b1-24(324)
+                         }
+           ACCESS  read-only
+           STATUS  mandatory
+           DESCRIPTION
+                  "The DSO channel connected to channel 17 of adDAXPort."
+           ::= { adDAX3connMapEntry 18 }
+
+    adDAXChnl18  OBJECT-TYPE
+           SYNTAX  INTEGER {
+                                noConnect(1),
+                                a0-01(101), a0-02(102), a0-03(103), a0-04(104), a0-05(105), a0-06(106),
+                                a0-07(107), a0-08(108), a0-09(109), a0-10(110), a0-11(111), a0-12(112),
+                                a0-13(113), a0-14(114), a0-15(115), a0-16(116), a0-17(117), a0-18(118),
+                                a0-19(119), a0-20(120), a0-21(121), a0-22(122), a0-23(123), a0-24(124),
+                                a1-01(201), a1-02(202), a1-03(203), a1-04(204), a1-05(205), a1-06(206),
+                                a1-07(207), a1-08(208), a1-09(209), a1-10(210), a1-11(211), a1-12(212),
+                                a1-13(213), a1-14(214), a1-15(215), a1-16(216), a1-17(217), a1-18(218),
+                                a1-19(219), a1-20(220), a1-21(221), a1-22(222), a1-23(223), a1-24(224),
+                                b1-01(301), b1-02(302), b1-03(303), b1-04(304), b1-05(305), b1-06(306),
+                                b1-07(307), b1-08(308), b1-09(309), b1-10(310), b1-11(311), b1-12(312),
+                                b1-13(313), b1-14(314), b1-15(315), b1-16(316), b1-17(317), b1-18(318),
+                                b1-19(319), b1-20(320), b1-21(321), b1-22(322), b1-23(323), b1-24(324)
+                         }
+           ACCESS  read-only
+           STATUS  mandatory
+           DESCRIPTION
+                  "The DSO channel connected to channel 18 of adDAXPort."
+           ::= { adDAX3connMapEntry 19 }
+
+    adDAXChnl19  OBJECT-TYPE
+           SYNTAX  INTEGER {
+                                noConnect(1),
+                                a0-01(101), a0-02(102), a0-03(103), a0-04(104), a0-05(105), a0-06(106),
+                                a0-07(107), a0-08(108), a0-09(109), a0-10(110), a0-11(111), a0-12(112),
+                                a0-13(113), a0-14(114), a0-15(115), a0-16(116), a0-17(117), a0-18(118),
+                                a0-19(119), a0-20(120), a0-21(121), a0-22(122), a0-23(123), a0-24(124),
+                                a1-01(201), a1-02(202), a1-03(203), a1-04(204), a1-05(205), a1-06(206),
+                                a1-07(207), a1-08(208), a1-09(209), a1-10(210), a1-11(211), a1-12(212),
+                                a1-13(213), a1-14(214), a1-15(215), a1-16(216), a1-17(217), a1-18(218),
+                                a1-19(219), a1-20(220), a1-21(221), a1-22(222), a1-23(223), a1-24(224),
+                                b1-01(301), b1-02(302), b1-03(303), b1-04(304), b1-05(305), b1-06(306),
+                                b1-07(307), b1-08(308), b1-09(309), b1-10(310), b1-11(311), b1-12(312),
+                                b1-13(313), b1-14(314), b1-15(315), b1-16(316), b1-17(317), b1-18(318),
+                                b1-19(319), b1-20(320), b1-21(321), b1-22(322), b1-23(323), b1-24(324)
+                         }
+           ACCESS  read-only
+           STATUS  mandatory
+           DESCRIPTION
+                  "The DSO channel connected to channel 19 of adDAXPort."
+           ::= { adDAX3connMapEntry 20 }
+
+    adDAXChnl20  OBJECT-TYPE
+           SYNTAX  INTEGER {
+                                noConnect(1),
+                                a0-01(101), a0-02(102), a0-03(103), a0-04(104), a0-05(105), a0-06(106),
+                                a0-07(107), a0-08(108), a0-09(109), a0-10(110), a0-11(111), a0-12(112),
+                                a0-13(113), a0-14(114), a0-15(115), a0-16(116), a0-17(117), a0-18(118),
+                                a0-19(119), a0-20(120), a0-21(121), a0-22(122), a0-23(123), a0-24(124),
+                                a1-01(201), a1-02(202), a1-03(203), a1-04(204), a1-05(205), a1-06(206),
+                                a1-07(207), a1-08(208), a1-09(209), a1-10(210), a1-11(211), a1-12(212),
+                                a1-13(213), a1-14(214), a1-15(215), a1-16(216), a1-17(217), a1-18(218),
+                                a1-19(219), a1-20(220), a1-21(221), a1-22(222), a1-23(223), a1-24(224),
+                                b1-01(301), b1-02(302), b1-03(303), b1-04(304), b1-05(305), b1-06(306),
+                                b1-07(307), b1-08(308), b1-09(309), b1-10(310), b1-11(311), b1-12(312),
+                                b1-13(313), b1-14(314), b1-15(315), b1-16(316), b1-17(317), b1-18(318),
+                                b1-19(319), b1-20(320), b1-21(321), b1-22(322), b1-23(323), b1-24(324)
+                         }
+           ACCESS  read-only
+           STATUS  mandatory
+           DESCRIPTION
+                  "The DSO channel connected to channel 20 of adDAXPort."
+           ::= { adDAX3connMapEntry 21 }
+
+    adDAXChnl21  OBJECT-TYPE
+           SYNTAX  INTEGER {
+                                noConnect(1),
+                                a0-01(101), a0-02(102), a0-03(103), a0-04(104), a0-05(105), a0-06(106),
+                                a0-07(107), a0-08(108), a0-09(109), a0-10(110), a0-11(111), a0-12(112),
+                                a0-13(113), a0-14(114), a0-15(115), a0-16(116), a0-17(117), a0-18(118),
+                                a0-19(119), a0-20(120), a0-21(121), a0-22(122), a0-23(123), a0-24(124),
+                                a1-01(201), a1-02(202), a1-03(203), a1-04(204), a1-05(205), a1-06(206),
+                                a1-07(207), a1-08(208), a1-09(209), a1-10(210), a1-11(211), a1-12(212),
+                                a1-13(213), a1-14(214), a1-15(215), a1-16(216), a1-17(217), a1-18(218),
+                                a1-19(219), a1-20(220), a1-21(221), a1-22(222), a1-23(223), a1-24(224),
+                                b1-01(301), b1-02(302), b1-03(303), b1-04(304), b1-05(305), b1-06(306),
+                                b1-07(307), b1-08(308), b1-09(309), b1-10(310), b1-11(311), b1-12(312),
+                                b1-13(313), b1-14(314), b1-15(315), b1-16(316), b1-17(317), b1-18(318),
+                                b1-19(319), b1-20(320), b1-21(321), b1-22(322), b1-23(323), b1-24(324)
+                         }
+           ACCESS  read-only
+           STATUS  mandatory
+           DESCRIPTION
+                  "The DSO channel connected to channel 21 of adDAXPort."
+           ::= { adDAX3connMapEntry 22 }
+
+    adDAXChnl22  OBJECT-TYPE
+           SYNTAX  INTEGER {
+                                noConnect(1),
+                                a0-01(101), a0-02(102), a0-03(103), a0-04(104), a0-05(105), a0-06(106),
+                                a0-07(107), a0-08(108), a0-09(109), a0-10(110), a0-11(111), a0-12(112),
+                                a0-13(113), a0-14(114), a0-15(115), a0-16(116), a0-17(117), a0-18(118),
+                                a0-19(119), a0-20(120), a0-21(121), a0-22(122), a0-23(123), a0-24(124),
+                                a1-01(201), a1-02(202), a1-03(203), a1-04(204), a1-05(205), a1-06(206),
+                                a1-07(207), a1-08(208), a1-09(209), a1-10(210), a1-11(211), a1-12(212),
+                                a1-13(213), a1-14(214), a1-15(215), a1-16(216), a1-17(217), a1-18(218),
+                                a1-19(219), a1-20(220), a1-21(221), a1-22(222), a1-23(223), a1-24(224),
+                                b1-01(301), b1-02(302), b1-03(303), b1-04(304), b1-05(305), b1-06(306),
+                                b1-07(307), b1-08(308), b1-09(309), b1-10(310), b1-11(311), b1-12(312),
+                                b1-13(313), b1-14(314), b1-15(315), b1-16(316), b1-17(317), b1-18(318),
+                                b1-19(319), b1-20(320), b1-21(321), b1-22(322), b1-23(323), b1-24(324)
+                         }
+           ACCESS  read-only
+           STATUS  mandatory
+           DESCRIPTION
+                  "The DSO channel connected to channel 22 of adDAXPort."
+           ::= { adDAX3connMapEntry 23 }
+
+    adDAXChnl23  OBJECT-TYPE
+           SYNTAX  INTEGER {
+                                noConnect(1),
+                                a0-01(101), a0-02(102), a0-03(103), a0-04(104), a0-05(105), a0-06(106),
+                                a0-07(107), a0-08(108), a0-09(109), a0-10(110), a0-11(111), a0-12(112),
+                                a0-13(113), a0-14(114), a0-15(115), a0-16(116), a0-17(117), a0-18(118),
+                                a0-19(119), a0-20(120), a0-21(121), a0-22(122), a0-23(123), a0-24(124),
+                                a1-01(201), a1-02(202), a1-03(203), a1-04(204), a1-05(205), a1-06(206),
+                                a1-07(207), a1-08(208), a1-09(209), a1-10(210), a1-11(211), a1-12(212),
+                                a1-13(213), a1-14(214), a1-15(215), a1-16(216), a1-17(217), a1-18(218),
+                                a1-19(219), a1-20(220), a1-21(221), a1-22(222), a1-23(223), a1-24(224),
+                                b1-01(301), b1-02(302), b1-03(303), b1-04(304), b1-05(305), b1-06(306),
+                                b1-07(307), b1-08(308), b1-09(309), b1-10(310), b1-11(311), b1-12(312),
+                                b1-13(313), b1-14(314), b1-15(315), b1-16(316), b1-17(317), b1-18(318),
+                                b1-19(319), b1-20(320), b1-21(321), b1-22(322), b1-23(323), b1-24(324)
+                         }
+           ACCESS  read-only
+           STATUS  mandatory
+           DESCRIPTION
+                  "The DSO channel connected to channel 23 of adDAXPort."
+           ::= { adDAX3connMapEntry 24 }
+
+    adDAXChnl24  OBJECT-TYPE
+           SYNTAX  INTEGER {
+                                noConnect(1),
+                                a0-01(101), a0-02(102), a0-03(103), a0-04(104), a0-05(105), a0-06(106),
+                                a0-07(107), a0-08(108), a0-09(109), a0-10(110), a0-11(111), a0-12(112),
+                                a0-13(113), a0-14(114), a0-15(115), a0-16(116), a0-17(117), a0-18(118),
+                                a0-19(119), a0-20(120), a0-21(121), a0-22(122), a0-23(123), a0-24(124),
+                                a1-01(201), a1-02(202), a1-03(203), a1-04(204), a1-05(205), a1-06(206),
+                                a1-07(207), a1-08(208), a1-09(209), a1-10(210), a1-11(211), a1-12(212),
+                                a1-13(213), a1-14(214), a1-15(215), a1-16(216), a1-17(217), a1-18(218),
+                                a1-19(219), a1-20(220), a1-21(221), a1-22(222), a1-23(223), a1-24(224),
+                                b1-01(301), b1-02(302), b1-03(303), b1-04(304), b1-05(305), b1-06(306),
+                                b1-07(307), b1-08(308), b1-09(309), b1-10(310), b1-11(311), b1-12(312),
+                                b1-13(313), b1-14(314), b1-15(315), b1-16(316), b1-17(317), b1-18(318),
+                                b1-19(319), b1-20(320), b1-21(321), b1-22(322), b1-23(323), b1-24(324)
+                         }
+           ACCESS  read-only
+           STATUS  mandatory
+           DESCRIPTION
+                  "The DSO channel connected to channel 24 of adDAXPort."
+           ::= { adDAX3connMapEntry 25 }
+
+
+
+    --
+    -- The ACTDAX System Alarm Event Group
+    --
+
+    adDAX3AlarmStatus  OBJECT-TYPE
+           SYNTAX      INTEGER
+           ACCESS      read-only
+           STATUS      mandatory
+           DESCRIPTION
+                  "This bit map variable indicates alarm status for the
+                  ACTDAX and the ACT 1241 channel bank.  This item does
+                  not include DS1 line status.
+
+                  The various alarm event bit positions are:
+                         1   System Hardware Failure
+                         2   System Software Failure
+                         4   Channel Bank Out Of Service"
+
+           ::= { adDAX3systemEvent 1 }
+
+    adDAX3AlarmEnable    OBJECT-TYPE
+           SYNTAX      INTEGER
+           ACCESS      read-write
+           STATUS      mandatory
+           DESCRIPTION
+                  "This bit map variable arms or disarms an individual or
+                  group of events identified in adDAX3AlarmStatus as a source
+                  for generation of System Alarm Trap.
+
+                  The various arm event bit positions are:
+                         1   System Hardware Failure
+                         2   System Software Failure
+                         4   Channel Bank Out Of Service"
+
+           ::= { adDAX3systemEvent 2 }
+
+    adDAX3sysAlarm   OBJECT-TYPE
+           SYNTAX      INTEGER {
+                                  noAlarms(1),
+                                  info(2),
+                                  alert(3),
+                                  minor(4),
+                                  major(5),
+                                  critical(6)
+                                }
+           ACCESS      read-only
+           STATUS      mandatory
+           DESCRIPTION
+                  "This item can be polled to determine if there are any
+                  active alarms on the ACTDAX or its corresponding
+                  intelligent units."
+           ::= { adDAX3systemEvent 3 }
+
+
+    adDAX3sysAlarmEnable  OBJECT-TYPE
+           SYNTAX    INTEGER {
+                                off(1),
+                                on(2)
+                           }
+           ACCESS    read-write
+           STATUS    mandatory
+           DESCRIPTION
+                  "This is a global enable/disable for all enterprise traps
+                  from this node controller."
+           ::= { adDAX3systemEvent 4 }
+
+
+    adDAX3LedStatus   OBJECT-TYPE
+           SYNTAX    INTEGER
+           ACCESS    read-only
+           STATUS    mandatory
+           DESCRIPTION
+                    "This variable contains bit encoded values for the
+                    ACTDAX LED status:
+
+                                1   RLBK-A  (1=off, 0=yellow)
+                                2   ESF-A   (1=off, 0=green)
+                                4   B8ZS-A  (1=off, 0=green)
+                                8   RLBK-B  (1=off, 0=yellow)
+                            16   ESF-B   (1=off, 0=green)
+                            32   B8ZS-B  (1=off, 0=green)
+                            64   TEST    (1=off, 0=yellow)
+                           128   unused
+                           256   DS1-A   combine with next bit
+                           512           (00=off, 01=red, 10=green, 11=yellow)
+                          1024   DS1-B   combine with next bit
+                          2048           (00=off, 01=red, 10=green, 11=yellow)
+                          4096   STAT    combine with next bit
+                          8192           (00=off, 01=red, 10=green)
+                         16384   DS0-PM  combine with next bit
+                         32768           (00=off, 01=red, 10=green)."
+           ::= { adDAX3systemEvent 5 }
+
+
+
+    --
+    -- The ACTDAX DS1 Alarm/Alert Event Group
+    --
+
+    adDAX3ds1EventTable  OBJECT-TYPE
+           SYNTAX      SEQUENCE OF AdDAX3ds1EventEntry
+           ACCESS      not-accessible
+           STATUS      mandatory
+            DESCRIPTION
+                  "The DS1 Alarm/Alert Event Table."
+           ::= { adACTDAXL3mg 7 }
+
+    adDAX3ds1EventEntry  OBJECT-TYPE
+           SYNTAX      AdDAX3ds1EventEntry
+           ACCESS      not-accessible
+           STATUS      mandatory
+           DESCRIPTION
+                  "An entry in the DS1 Alarm/Alert Event Table."
+           INDEX       { adDAX3ds1EventIndex }
+           ::= { adDAX3ds1EventTable 1 }
+
+    AdDAX3ds1EventEntry ::=
+           SEQUENCE {
+                  adDAX3ds1EventIndex
+                         INTEGER,
+                  adDAX3LineStatus
+                         INTEGER,
+                  adDAX3LineArm
+                         INTEGER,
+                  adDAX3CurrentAlert
+                         INTEGER,
+                  adDAX3TotalAlert
+                         INTEGER,
+                  adDAX3FarCurrentAlert
+                         INTEGER,
+                  adDAX3FarTotalAlert
+                         INTEGER,
+                  adDAX3CurrentArm
+                         INTEGER,
+                  adDAX3TotalArm
+                         INTEGER,
+                  adDAX3FarCurrentArm
+                         INTEGER,
+                  adDAX3FarTotalArm
+                         INTEGER
+           }
+
+    adDAX3ds1EventIndex  OBJECT-TYPE
+           SYNTAX      INTEGER(1..'7fffffff'h)
+           ACCESS      read-only
+           STATUS      mandatory
+           DESCRIPTION
+                  "The index value which uniquely identifies the DS1
+                  interface. The interface identified by a particular
+                  value of this index is the same interface as identified
+                  by dsx1LineIndex in DS1 MIB."
+           ::= { adDAX3ds1EventEntry 1 }
+
+    adDAX3LineStatus  OBJECT-TYPE
+           SYNTAX      INTEGER(1..8191)
+           ACCESS      read-only
+           STATUS      mandatory
+           DESCRIPTION
+                  "This bit map variable indicates both alarm and loopback
+                  status for the DS1 Line.
+
+                  The various alarm event bit positions are:
+                         1   Far end LOF ( a.k.a., Yellow Alarm )
+                         2   Near end sending LOF Indication
+                         4   Far end sending AIS ( Blue Alarm )
+                         8   Near end sending AIS
+                        16   Near end LOF ( a.k.a., Red Alarm )
+                        32   Near end Loss Of Signal
+                        64   Near end Local Loopback
+                    128   Near end Line Loopback
+                    256   Near end Payload Loopback
+                    512   Far end Requested Line Loopback
+                   1024   Far end Requested Payload Loopback
+                   2048   Far end in Line Loopback (commanded from near end)
+                   4096   Far end in Payload Loopback (commanded from near end)"
+
+           ::= { adDAX3ds1EventEntry 2 }
+
+    adDAX3LineArm    OBJECT-TYPE
+           SYNTAX      INTEGER(1..8191)
+           ACCESS      read-write
+           STATUS      mandatory
+           DESCRIPTION
+                  "This bit map variable arms or disarms an individual or
+                  group of events identified in adDAX3LineStatus as a source
+                  for generation of DS1 Alarm Trap.
+
+                  The various arm event bit positions are:
+                         1   Far end LOF ( a.k.a., Yellow Alarm )
+                         2   Near end sending LOF Indication
+                         4   Far end sending AIS ( Blue Alarm )
+                         8   Near end sending AIS
+                        16   Near end LOF ( a.k.a., Red Alarm )
+                        32   Near end Loss Of Signal
+                        64   Near end Local Loopback
+                    128   Near end Line Loopback
+                    256   Near end Payload Loopback
+                    512   Far end Requested Line Loopback
+                   1024   Far end Requested Payload Loopback
+                   2048   Far end in Line Loopback (commanded from near end)
+                   4096   Far end in Payload Loopback (commanded from near end)"
+
+           ::= { adDAX3ds1EventEntry 3 }
+
+
+    adDAX3CurrentAlert  OBJECT-TYPE
+           SYNTAX      INTEGER(1..1023)
+           ACCESS      read-only
+           STATUS      mandatory
+           DESCRIPTION
+                  "This DS1 performance status variable indicates Threshold
+                  Crossing Alerts for Near End Current 15 minute interval.
+                  An alert bit is set in this variable when the value of
+                  the dsx1CurrentTable object exceeds the Threshold Value.
+                  This variable contains the sum of alert values.
+
+                  Threshold Crossing Alert bit position values:
+
+                        1  ES   - Errored Seconds
+                        2  SES  - Severely Errored Seconds
+                        4  SEFS - Severely Errored Framing Seconds
+                        8  UAS  - Unavailable Seconds
+                    16  CSS  - Controlled Slip Seconds
+                    32  PCV  - Path Coding Violations
+                    64  LES  - Line Errored Seconds
+                   128  BES  - Bursty Errored Seconds
+                   256  DM   - Degraded Minutes
+                   512  LCV  - Line Code Violations"
+
+           ::= { adDAX3ds1EventEntry 4 }
+
+    adDAX3TotalAlert  OBJECT-TYPE
+           SYNTAX      INTEGER(1..1023)
+           ACCESS      read-only
+           STATUS      mandatory
+           DESCRIPTION
+                  "This DS1 performance status variable indicates Threshold
+                  Crossing Alerts for Near End Total performance variables.
+                  An alert bit is set in this variable when the value of
+                  the dsx1TotalTable object exceeds the Threshold Value.
+                  This variable contains the sum of alert values.
+
+                  Threshold Crossing Alert bit position values:
+                        1  ES   - Errored Seconds
+                        2  SES  - Severely Errored Seconds
+                        4  SEFS - Severely Errored Framing Seconds
+                        8  UAS  - Unavailable Seconds
+                    16  CSS  - Controlled Slip Seconds
+                    32  PCV  - Path Coding Violations
+                    64  LES  - Line Errored Seconds
+                   128  BES  - Bursty Errored Seconds
+                   256  DM   - Degraded Minutes
+                   512  LCV  - Line Code Violations"
+
+           ::= { adDAX3ds1EventEntry 5 }
+
+    adDAX3FarCurrentAlert  OBJECT-TYPE
+           SYNTAX      INTEGER(1..511)
+           ACCESS      read-only
+           STATUS      mandatory
+           DESCRIPTION
+                  "This DS1 performance status variable indicates Threshold
+                  Crossing Alerts for Far End Current 15 minute interval.
+                  An alert bit is set in this variable when the value of
+                  the dsx1FarEndCurrentTable object exceeds the Threshold
+                  Value. This variable contains the sum of alert values.
+
+                  Threshold Crossing Alert bit position values:
+                         1  ES   - Errored Seconds
+                         2  SES  - Severely Errored Seconds
+                         4  SEFS - Severely Errored Framing Seconds
+                         8  UAS  - Unavailable Seconds
+                        16  CSS  - Controlled Slip Seconds
+                        32  PCV  - Path Coding Violations
+                        64  LES  - Line Errored Seconds
+                    128  BES  - Bursty Errored Seconds
+                    256  DM   - Degraded Minutes"
+
+           ::= { adDAX3ds1EventEntry 6 }
+
+    adDAX3FarTotalAlert  OBJECT-TYPE
+           SYNTAX      INTEGER(1..511)
+           ACCESS      read-only
+           STATUS      mandatory
+           DESCRIPTION
+                  "This DS1 performance status variable indicates Threshold
+                  Crossing Alerts for Far End Total performance variables.
+                  An alert bit is set in this variable when the value of
+                  the dsx1FarEndTotalTable object exceeds the Threshold
+                  Value. This variable contains the sum of alert values.
+
+                  Threshold Crossing Alert bit position values:
+                         1  ES   - Errored Seconds
+                         2  SES  - Severely Errored Seconds
+                         4  SEFS - Severely Errored Framing Seconds
+                         8  UAS  - Unavailable Seconds
+                        16  CSS  - Controlled Slip Seconds
+                        32  PCV  - Path Coding Violations
+                        64  LES  - Line Errored Seconds
+                    128  BES  - Bursty Errored Seconds
+                    256  DM   - Degraded Minutes"
+
+           ::= { adDAX3ds1EventEntry 7 }
+
+    adDAX3CurrentArm  OBJECT-TYPE
+           SYNTAX      INTEGER(1..1023)
+           ACCESS      read-write
+           STATUS      mandatory
+           DESCRIPTION
+                  "This variable arms and disarms an individual or group
+                  of alerts identified in adDAX3CurrentAlert as a source
+                  for the generation of Threshold Crossing Alert Trap.
+                  This variable contains the sum of Arm values.
+
+                  Threshold Crossing Arm bit position values:
+                         1  ES   - Errored Seconds
+                         2  SES  - Severely Errored Seconds
+                         4  SEFS - Severely Errored Framing Seconds
+                         8  UAS  - Unavailable Seconds
+                        16  CSS  - Controlled Slip Seconds
+                        32  PCV  - Path Coding Violations
+                        64  LES  - Line Errored Seconds
+                    128  BES  - Bursty Errored Seconds
+                    256  DM   - Degraded Minutes
+                    512  LCV  - Line Code Violations"
+
+           ::= { adDAX3ds1EventEntry 8 }
+
+    adDAX3TotalArm  OBJECT-TYPE
+           SYNTAX      INTEGER(1..1023)
+           ACCESS      read-write
+           STATUS      mandatory
+           DESCRIPTION
+                  "This variable arms and disarms an individual or group
+                  of alerts identified in adDAX3TotalAlert as a source
+                  for the generation of Threshold Crossing Alert Trap.
+                  This variable contains the sum of Arm values.
+
+                  Threshold Crossing Arm bit position values:
+                         1  ES   - Errored Seconds
+                         2  SES  - Severely Errored Seconds
+                         4  SEFS - Severely Errored Framing Seconds
+                         8  UAS  - Unavailable Seconds
+                        16  CSS  - Controlled Slip Seconds
+                        32  PCV  - Path Coding Violations
+                        64  LES  - Line Errored Seconds
+                    128  BES  - Bursty Errored Seconds
+                    256  DM   - Degraded Minutes
+                    512  LCV  - Line Code Violations"
+
+           ::= { adDAX3ds1EventEntry 9 }
+
+    adDAX3FarCurrentArm  OBJECT-TYPE
+           SYNTAX      INTEGER(1..511)
+           ACCESS      read-write
+           STATUS      mandatory
+           DESCRIPTION
+                  "This variable arms and disarms an individual or group
+                  of alerts identified in adDAX3FarCurrentAlert as a source
+                  for the generation of Threshold Crossing Alert Trap.
+                  This variable contains the sum of Arm values.
+
+                  Threshold Crossing Arm bit position values:
+                         1  ES   - Errored Seconds
+                         2  SES  - Severely Errored Seconds
+                         4  SEFS - Severely Errored Framing Seconds
+                         8  UAS  - Unavailable Seconds
+                        16  CSS  - Controlled Slip Seconds
+                        32  PCV  - Path Coding Violations
+                        64  LES  - Line Errored Seconds
+                    128  BES  - Bursty Errored Seconds
+                    256  DM   - Degraded Minutes"
+
+           ::= { adDAX3ds1EventEntry 10 }
+
+    adDAX3FarTotalArm  OBJECT-TYPE
+           SYNTAX      INTEGER(1..511)
+           ACCESS      read-write
+           STATUS      mandatory
+           DESCRIPTION
+                  "This variable arms and disarms an individual or group
+                  of alerts identified in adDAX3FarTotalAlert as a source
+                  for the generation of Threshold Crossing Alert Trap.
+                  This variable contains the sum of Arm values.
+
+                  Threshold Crossing Arm bit position values:
+                         1  ES   - Errored Seconds
+                         2  SES  - Severely Errored Seconds
+                         4  SEFS - Severely Errored Framing Seconds
+                         8  UAS  - Unavailable Seconds
+                        16  CSS  - Controlled Slip Seconds
+                        32  PCV  - Path Coding Violations
+                        64  LES  - Line Errored Seconds
+                    128  BES  - Bursty Errored Seconds
+                    256  DM   - Degraded Minutes"
+
+           ::= { adDAX3ds1EventEntry 11 }
+
+
+
+
+    -- DS1 Threshold Values
+
+    -- The current and total threshold value groups define performance threshold
+    -- values for DS1 Line and Path statistics. If a statistic value exceeds its
+    -- threshold value, then its corresponding Threshold Crossing Alert bit is set
+    -- in the Alert Table entry for the line.  The device sends an Alert Trap to the
+    -- manager if the alert event is armed and Alert Traps are enabled.
+
+    -- Threshold values apply to both Near End and Far End parameters.
+    -- Default threshold values are from "Generic Digital Transmission
+    -- Surveillance",TA-NWT-000820,Issue 1, June 1993.
+
+    --
+    -- The Current Threshold Value Table
+    --
+
+
+    adDAX3CurrentThrsTable  OBJECT-TYPE
+           SYNTAX      SEQUENCE OF AdDAX3CurrentThrsEntry
+           ACCESS      not-accessible
+           STATUS      mandatory
+            DESCRIPTION
+                  "The DS1 Current Threshold Table."
+           ::= { adACTDAXL3mg 8 }
+
+    adDAX3CurrentThrsEntry  OBJECT-TYPE
+           SYNTAX      AdDAX3CurrentThrsEntry
+           ACCESS      not-accessible
+           STATUS      mandatory
+           DESCRIPTION
+                  "An entry in the DS1 Current Threshold Table."
+           INDEX       { adDAX3CurrentThrsIndex }
+           ::= { adDAX3CurrentThrsTable 1 }
+
+    AdDAX3CurrentThrsEntry ::=
+           SEQUENCE {
+                  adDAX3CurrentThrsIndex
+                    INTEGER,
+                  adDAX3CurrentThrsES
+                         INTEGER,
+                  adDAX3CurrentThrsSES
+                         INTEGER,
+                  adDAX3CurrentThrsSEFS
+                         INTEGER,
+                  adDAX3CurrentThrsUAS
+                         INTEGER,
+                  adDAX3CurrentThrsCSS
+                         INTEGER,
+                  adDAX3CurrentThrsPCVsf
+                         INTEGER,
+                  adDAX3CurrentThrsPCVesf
+                         INTEGER,
+                  adDAX3CurrentThrsLES
+                         INTEGER,
+                  adDAX3CurrentThrsBES
+                         INTEGER,
+                  adDAX3CurrentThrsLCV
+                         INTEGER
+           }
+
+    adDAX3CurrentThrsIndex  OBJECT-TYPE
+           SYNTAX      INTEGER(1..'7fffffff'h)
+           ACCESS      read-only
+           STATUS      mandatory
+           DESCRIPTION
+                  "The index value which uniquely identifies the DS1
+                  interface. The interface identified by a particular
+                  value of this index is the same interface as identified
+                  by dsx1LineIndex in DS1 MIB."
+           ::= { adDAX3CurrentThrsEntry 1 }
+
+    adDAX3CurrentThrsES  OBJECT-TYPE
+           SYNTAX      INTEGER
+           ACCESS      read-write
+           STATUS      mandatory
+           DESCRIPTION
+                  "The DS1 performance monitor Threshold Value for the
+                  Current 15 minute Errored Seconds parameter.  The
+                  default value is 65 for an approximate BER level of
+                  (10** -5)."
+           ::= { adDAX3CurrentThrsEntry 2 }
+
+    adDAX3CurrentThrsSES  OBJECT-TYPE
+           SYNTAX      INTEGER
+           ACCESS      read-write
+           STATUS      mandatory
+           DESCRIPTION
+                  "The DS1 performance monitor Threshold Value for the
+                  Current 15 minute Severely Errored Seconds parameter.
+                  The default value is 10 for an approximate BER level of
+                  (10** -5)."
+           ::= { adDAX3CurrentThrsEntry 3 }
+
+    adDAX3CurrentThrsSEFS  OBJECT-TYPE
+           SYNTAX      INTEGER
+           ACCESS      read-write
+           STATUS      mandatory
+           DESCRIPTION
+                  "The DS1 performance monitor Threshold Value for the
+                  Current 15 minute Severely Errored Framing Seconds
+                  parameter.  The default value is 2 for an approximate
+                  BER level of (10** -5)."
+           ::= { adDAX3CurrentThrsEntry 4 }
+
+    adDAX3CurrentThrsUAS  OBJECT-TYPE
+           SYNTAX      INTEGER
+           ACCESS      read-write
+           STATUS      mandatory
+           DESCRIPTION
+                  "The DS1 performance monitor Threshold Value for the
+                  Current 15 minute Unavailable Seconds parameter.  The
+                  default value is 10 for an approximate BER level of
+                  (10** -5)."
+           ::= { adDAX3CurrentThrsEntry 5 }
+
+    adDAX3CurrentThrsCSS  OBJECT-TYPE
+           SYNTAX      INTEGER
+           ACCESS      read-write
+           STATUS      mandatory
+           DESCRIPTION
+                  "The DS1 performance monitor Threshold Value for the
+                  Current 15 minute Controlled Slip Seconds parameter.
+                  The default value is 1 for an approximate BER level of
+                  (10** -5)."
+           ::= { adDAX3CurrentThrsEntry 6 }
+
+    adDAX3CurrentThrsPCVsf  OBJECT-TYPE
+           SYNTAX      INTEGER
+           ACCESS      read-write
+           STATUS      mandatory
+           DESCRIPTION
+                  "The DS1 performance monitor Threshold Value for the
+                  Current 15 minute Path Coding Violations parameter,
+                  when the Line Type is Super Frame (AT&T D4 format) DS1.
+                  Default value for an approximate BER level of (10**-5)
+                  is 72 Framing errors."
+           ::= { adDAX3CurrentThrsEntry 7 }
+
+    adDAX3CurrentThrsPCVesf  OBJECT-TYPE
+           SYNTAX      INTEGER
+           ACCESS      read-write
+           STATUS      mandatory
+           DESCRIPTION
+                  "The DS1 performance monitor Threshold Value for the
+                  Current 15 minute Path Coding Violations parameter,
+                  when the Line Type is Extended Super Frame (ESF) DS1.
+                  Default value for an approximate BER level of (10**-5)
+                  is 13,296 CRC errors."
+           ::= { adDAX3CurrentThrsEntry 8 }
+
+    adDAX3CurrentThrsLES  OBJECT-TYPE
+           SYNTAX      INTEGER
+           ACCESS      read-write
+           STATUS      mandatory
+           DESCRIPTION
+                  "The DS1 performance monitor Threshold Value for the
+                  Current 15 minute Line Errored Seconds parameter.
+                  The default value is 65 for an approximate BER level of
+                  (10** -5)."
+           ::= { adDAX3CurrentThrsEntry 9 }
+
+
+    adDAX3CurrentThrsBES  OBJECT-TYPE
+           SYNTAX      INTEGER
+           ACCESS      read-write
+           STATUS      mandatory
+           DESCRIPTION
+                  "The DS1 performance monitor Threshold Value for the
+                  Current 15 minute Bursty Errored Seconds parameter.
+                  The default value is ?? for an approximate BER level of
+                  (10** -5)."
+           ::= { adDAX3CurrentThrsEntry 10 }
+
+    adDAX3CurrentThrsLCV  OBJECT-TYPE
+           SYNTAX      INTEGER
+           ACCESS      read-write
+           STATUS      mandatory
+           DESCRIPTION
+                  "The DS1 performance monitor Threshold Value for the
+                  Current 15 minute Line Code Violations parameter.  The
+                  default value is 13,340 for an approximate BER level of
+                  (10** -5)."
+           ::= { adDAX3CurrentThrsEntry 11 }
+
+
+    --
+    -- The Total Threshold Value Table
+    --
+
+
+    adDAX3TotalThrsTable  OBJECT-TYPE
+           SYNTAX      SEQUENCE OF AdDAX3TotalThrsEntry
+           ACCESS      not-accessible
+           STATUS      mandatory
+            DESCRIPTION
+                  "The DS1 Total Threshold Table."
+           ::= { adACTDAXL3mg 9 }
+
+    adDAX3TotalThrsEntry  OBJECT-TYPE
+           SYNTAX      AdDAX3TotalThrsEntry
+           ACCESS      not-accessible
+           STATUS      mandatory
+           DESCRIPTION
+                  "An entry in the DS1 Total Threshold Table."
+           INDEX       { adDAX3TotalThrsIndex }
+           ::= { adDAX3TotalThrsTable 1 }
+
+    AdDAX3TotalThrsEntry ::=
+           SEQUENCE {
+                  adDAX3TotalThrsIndex
+                    INTEGER,
+                  adDAX3TotalThrsES
+                         INTEGER,
+                  adDAX3TotalThrsSES
+                         INTEGER,
+                  adDAX3TotalThrsSEFS
+                         INTEGER,
+                  adDAX3TotalThrsUAS
+                         INTEGER,
+                  adDAX3TotalThrsCSS
+                         INTEGER,
+                  adDAX3TotalThrsPCVsf
+                         INTEGER,
+                  adDAX3TotalThrsPCVesf
+                         INTEGER,
+                  adDAX3TotalThrsLES
+                         INTEGER,
+                  adDAX3TotalThrsBES
+                         INTEGER,
+                  adDAX3TotalThrsLCV
+                         INTEGER
+           }
+
+    adDAX3TotalThrsIndex  OBJECT-TYPE
+           SYNTAX      INTEGER(1..'7fffffff'h)
+           ACCESS      read-only
+           STATUS      mandatory
+           DESCRIPTION
+                  "The index value which uniquely identifies the DS1
+                  interface. The interface identified by a particular
+                  value of this index is the same interface as identified
+                  by dsx1LineIndex in DS1 MIB."
+           ::= { adDAX3TotalThrsEntry 1 }
+
+        adDAX3TotalThrsES  OBJECT-TYPE
+           SYNTAX      INTEGER
+           ACCESS      read-write
+           STATUS      mandatory
+           DESCRIPTION
+                  "The DS1 performance monitor Threshold Value for the
+                  Total Errored Seconds parameter.  The default value
+                  is 648 for an approximate BER level of (10** -5)."
+           ::= { adDAX3TotalThrsEntry 2 }
+
+    adDAX3TotalThrsSES  OBJECT-TYPE
+           SYNTAX      INTEGER
+           ACCESS      read-write
+           STATUS      mandatory
+           DESCRIPTION
+                  "The DS1 performance monitor Threshold Value for the
+                  Total Severely Errored Seconds parameter. The default
+                  value is 100 for an approximate BER level of (10** -5)."
+           ::= { adDAX3TotalThrsEntry 3 }
+
+    adDAX3TotalThrsSEFS  OBJECT-TYPE
+           SYNTAX      INTEGER
+           ACCESS      read-write
+           STATUS      mandatory
+           DESCRIPTION
+                  "The DS1 performance monitor Threshold Value for the
+                  Total Severely Errored Framing Seconds parameter.  The
+                  default value is 17 for an approximate BER level of
+                  (10** -5)."
+           ::= { adDAX3TotalThrsEntry 4 }
+
+    adDAX3TotalThrsUAS  OBJECT-TYPE
+           SYNTAX      INTEGER
+           ACCESS      read-write
+           STATUS      mandatory
+           DESCRIPTION
+                  "The DS1 performance monitor Threshold Value for the
+                  Total Unavailable Seconds parameter.  The default value
+                  is 10 for an approximate BER level of (10** -5)."
+           ::= { adDAX3TotalThrsEntry 5 }
+
+    adDAX3TotalThrsCSS  OBJECT-TYPE
+           SYNTAX      INTEGER
+           ACCESS      read-write
+           STATUS      mandatory
+           DESCRIPTION
+                  "The DS1 performance monitor Threshold Value for the
+                  Total Controlled Slip Seconds parameter. The default
+                  value is 4 for an approximate BER level of(10** -5)."
+           ::= { adDAX3TotalThrsEntry 6 }
+
+    adDAX3TotalThrsPCVsf  OBJECT-TYPE
+           SYNTAX      INTEGER
+           ACCESS      read-write
+           STATUS      mandatory
+           DESCRIPTION
+                  "The DS1 performance monitor Threshold Value for the
+                  Total Path Coding Violations parameter, when the Line
+                  Type is Super Frame (AT&T D4 format) DS1.  The default
+                  value for an approximate BER level of (10**-5) is 691
+                  framing errors."
+           ::= { adDAX3TotalThrsEntry 7 }
+
+    adDAX3TotalThrsPCVesf  OBJECT-TYPE
+           SYNTAX      INTEGER
+           ACCESS      read-write
+           STATUS      mandatory
+           DESCRIPTION
+                  "The DS1 performance monitor Threshold Value for the
+                  Total Path Coding Violations parameter, when the Line
+                  Type is Extended Super Frame (ESF) DS1.  The default
+                  value for an approximate BER level of (10**-5) is
+                  132,960 CRC errors."
+           ::= { adDAX3TotalThrsEntry 8 }
+
+    adDAX3TotalThrsLES  OBJECT-TYPE
+           SYNTAX      INTEGER
+           ACCESS      read-write
+           STATUS      mandatory
+           DESCRIPTION
+                  "The DS1 performance monitor Threshold Value for the
+                  Total Line Errored Seconds parameter. The default value
+                  is 648 for an approximate BER level of (10** -5)."
+           ::= { adDAX3TotalThrsEntry 9 }
+
+    adDAX3TotalThrsBES  OBJECT-TYPE
+           SYNTAX      INTEGER
+           ACCESS      read-write
+           STATUS      mandatory
+           DESCRIPTION
+                  "The DS1 performance monitor Threshold Value for the
+                  Total Bursty Errored Seconds parameter. The default value
+                  is ??? for an approximate BER level of (10** -5)."
+           ::= { adDAX3TotalThrsEntry 10 }
+
+    adDAX3TotalThrsLCV  OBJECT-TYPE
+           SYNTAX      INTEGER
+           ACCESS      read-write
+           STATUS      mandatory
+           DESCRIPTION
+                  "The DS1 performance monitor Threshold Value for the
+                  Total Line Code Violations parameter.  The default value
+                  is 133,400 for an approximate BER level of (10** -5)."
+           ::= { adDAX3TotalThrsEntry 11 }
+
+
+
+
+
+    --
+    --  DS1 Daily Interval Table
+    --
+    -- The DS1 Daily Interval Table contains various statistics
+    -- collected by each DS1 interface over the previous 6 days
+    -- of operation.
+
+    adDS1DailyIntervalTable  OBJECT-TYPE
+           SYNTAX  SEQUENCE OF AdDS1DailyIntervalEntry
+           ACCESS  not-accessible
+           STATUS  optional
+           DESCRIPTION
+                  "The DS1 Daily Interval Table."
+    ::= { adACTDAXL3mg 10 }
+
+    adDS1DailyIntervalEntry  OBJECT-TYPE
+           SYNTAX  AdDS1DailyIntervalEntry
+           ACCESS  not-accessible
+           STATUS  optional
+           DESCRIPTION
+                  "An entry in the DS1 Daily Interval Table."
+           INDEX       { adDS1DailyIntervalIndex, adDS1DailyIntervalNumber }
+    ::= {adDS1DailyIntervalTable 1 }
+
+    AdDS1DailyIntervalEntry  ::=
+           SEQUENCE {
+                  adDS1DailyIntervalIndex
+                         INTEGER,
+                  adDS1DailyIntervalNumber
+                         INTEGER,
+                  adDS1DailyIntervalValid
+                         INTEGER,
+                  adDS1DailyIntervalESs
+                         Gauge,
+                  adDS1DailyIntervalSESs
+                         Gauge,
+                  adDS1DailyIntervalSEFSs
+                         Gauge,
+                  adDS1DailyIntervalUASs
+                         Gauge,
+                  adDS1DailyIntervalCSSs
+                         Gauge,
+                  adDS1DailyIntervalPCVs
+                         Gauge,
+                  adDS1DailyIntervalLESs
+                         Gauge,
+                  adDS1DailyIntervalBESs
+                         Gauge,
+                  adDS1DailyIntervalDMs
+                         Gauge,
+                  adDS1DailyIntervalLCVs
+                         Gauge
+           }
+
+
+           adDS1DailyIntervalIndex  OBJECT-TYPE
+                  SYNTAX  INTEGER (1..'7fffffff'h)
+                  ACCESS  read-only
+                  STATUS  mandatory
+                  DESCRIPTION
+                         "The index value which uniquely identifies the
+                         DS1 interface to which this entry is applicable.
+                         The interface identified by a particular value
+                         of this index is the same interface as identified
+                         by the same value as a dsx1LineIndex object
+                         instance."
+
+           ::= { adDS1DailyIntervalEntry 1 }
+
+           adDS1DailyIntervalNumber  OBJECT-TYPE
+                  SYNTAX  INTEGER (1..6)            -- maybe this should be 30
+                  ACCESS  read-only
+                  STATUS  mandatory
+                  DESCRIPTION
+                         "A number between 1 and 6, where 1 is the most
+                         recently completed 15 minute interval and 6 is
+                         the least recently completed daily interval
+                         (assuming that all 6 intervals are valid)."
+           ::= { adDS1DailyIntervalEntry 2 }
+
+           adDS1DailyIntervalValid  OBJECT-TYPE
+                  SYNTAX  INTEGER {
+                                    no(1),
+                                    yes(2)
+                                }
+                  ACCESS  read-only
+                  STATUS  mandatory
+                  DESCRIPTION
+                         "Indicates if this daily interval contains valid data."
+           ::= { adDS1DailyIntervalEntry 3 }
+
+           adDS1DailyIntervalESs  OBJECT-TYPE
+                  SYNTAX  Gauge
+                  ACCESS  read-only
+                  STATUS  mandatory
+                  DESCRIPTION
+                         "The number of Errored Seconds encountered by a
+                         DS1 interface in one of the prevoius daily intervals."
+           ::= { adDS1DailyIntervalEntry 4 }
+
+           adDS1DailyIntervalSESs  OBJECT-TYPE
+                  SYNTAX  Gauge
+                  ACCESS  read-only
+                  STATUS  mandatory
+                  DESCRIPTION
+                         "The number of Severely Errored Seconds encountered
+                         by a DS1 interface in one of the previous daily
+                         intervals."
+           ::= { adDS1DailyIntervalEntry 5 }
+
+           adDS1DailyIntervalSEFSs  OBJECT-TYPE
+                  SYNTAX  Gauge
+                  ACCESS  read-only
+                  STATUS  mandatory
+                  DESCRIPTION
+                         "The number of Severely Errored Framing Seconds
+                         encountered by a DS1 interface in one of the
+                         previous daily intervals."
+           ::= { adDS1DailyIntervalEntry 6 }
+
+           adDS1DailyIntervalUASs  OBJECT-TYPE
+                  SYNTAX  Gauge
+                  ACCESS  read-only
+                  STATUS  mandatory
+                  DESCRIPTION
+                         "The number of Unavailable Seconds encountered
+                         by a DS1 interface in one of the previous daily
+                         intervals."
+           ::= { adDS1DailyIntervalEntry 7 }
+
+           adDS1DailyIntervalCSSs  OBJECT-TYPE
+                  SYNTAX  Gauge
+                  ACCESS  read-only
+                  STATUS  mandatory
+                  DESCRIPTION
+                         "The number of Controlled Slip Seconds encountered
+                         by a DS1 interface in one of the previous daily
+                         intervals."
+           ::= { adDS1DailyIntervalEntry 8 }
+
+           adDS1DailyIntervalPCVs  OBJECT-TYPE
+                  SYNTAX  Gauge
+                  ACCESS  read-only
+                  STATUS  mandatory
+                  DESCRIPTION
+                         "The number of Path Coding Violations encountered
+                         by a DS1 interface in one of the previous daily
+                         intervals."
+           ::= { adDS1DailyIntervalEntry 9 }
+
+           adDS1DailyIntervalLESs  OBJECT-TYPE
+                  SYNTAX  Gauge
+                  ACCESS  read-only
+                  STATUS  mandatory
+                  DESCRIPTION
+                         "The number of Line Errored Seconds encountered
+                         by a DS1 interface in one of the previous daily
+                         intervals."
+           ::= { adDS1DailyIntervalEntry 10 }
+
+           adDS1DailyIntervalBESs  OBJECT-TYPE
+                  SYNTAX  Gauge
+                  ACCESS  read-only
+                  STATUS  mandatory
+                  DESCRIPTION
+                         "The number of Bursty Errored Seconds encountered
+                         by a DS1 interface in one of the previous daily
+                         intervals."
+           ::= { adDS1DailyIntervalEntry 11 }
+
+           adDS1DailyIntervalDMs  OBJECT-TYPE
+                  SYNTAX  Gauge
+                  ACCESS  read-only
+                  STATUS  mandatory
+                  DESCRIPTION
+                         "The number of Degraded Minutes encountered by
+                         a DS1 interface in one of the previous daily
+                         intervals."
+           ::= { adDS1DailyIntervalEntry 12 }
+
+           adDS1DailyIntervalLCVs  OBJECT-TYPE
+                  SYNTAX  Gauge
+                  ACCESS  read-only
+                  STATUS  mandatory
+                  DESCRIPTION
+                         "The number of Line Code Violations encountered
+                         by a DS1 interface in one of the previous daily
+                         intervals."
+           ::= { adDS1DailyIntervalEntry 13 }
+
+
+
+
+
+    --
+    --  DS1 Far End Daily Interval Table
+    --
+    -- The DS1 Far End Daily Interval Table contains various
+    -- statistics collected by each DS1 interface over the
+    -- previous 6 days of operation.
+
+    adDS1FarEndDailyIntervalTable  OBJECT-TYPE
+           SYNTAX  SEQUENCE OF AdDS1FarEndDailyIntervalEntry
+           ACCESS  not-accessible
+           STATUS  optional
+           DESCRIPTION
+                  "The DS1 Daily Interval Table."
+    ::= { adACTDAXL3mg 11 }
+
+    adDS1FarEndDailyIntervalEntry  OBJECT-TYPE
+           SYNTAX  AdDS1FarEndDailyIntervalEntry
+           ACCESS  not-accessible
+           STATUS  optional
+           DESCRIPTION
+                  "An entry in the DS1 Daily Interval Table."
+           INDEX       { adDS1FarEndDailyIntervalIndex,
+                                        adDS1FarEndDailyIntervalNumber }
+    ::= {adDS1FarEndDailyIntervalTable 1 }
+
+    AdDS1FarEndDailyIntervalEntry  ::=
+           SEQUENCE {
+                  adDS1FarEndDailyIntervalIndex
+                         INTEGER,
+                  adDS1FarEndDailyIntervalNumber
+                         INTEGER,
+                  adDS1FarEndDailyIntervalValid
+                         INTEGER,
+                  adDS1FarEndDailyIntervalESs
+                         Gauge,
+                  adDS1FarEndDailyIntervalSESs
+                         Gauge,
+                  adDS1FarEndDailyIntervalSEFSs
+                         Gauge,
+                  adDS1FarEndDailyIntervalUASs
+                         Gauge,
+                  adDS1FarEndDailyIntervalCSSs
+                         Gauge,
+                  adDS1FarEndDailyIntervalPCVs
+                         Gauge,
+                  adDS1FarEndDailyIntervalLESs
+                         Gauge,
+                  adDS1FarEndDailyIntervalBESs
+                         Gauge,
+                  adDS1FarEndDailyIntervalDMs
+                         Gauge,
+                  adDS1FarEndDailyIntervalLCVs
+                         Gauge
+           }
+
+
+           adDS1FarEndDailyIntervalIndex  OBJECT-TYPE
+                  SYNTAX  INTEGER (1..'7fffffff'h)
+                  ACCESS  read-only
+                  STATUS  mandatory
+                  DESCRIPTION
+                         "The index value which uniquely identifies the
+                         DS1 interface to which this entry is applicable.
+                         The interface identified by a particular value
+                         of this index is the same interface as identified
+                         by the same value as a dsx1LineIndex object
+                         instance."
+
+           ::= { adDS1FarEndDailyIntervalEntry 1 }
+
+           adDS1FarEndDailyIntervalNumber  OBJECT-TYPE
+                  SYNTAX  INTEGER (1..6)            -- maybe this should be 30
+                  ACCESS  read-only
+                  STATUS  mandatory
+                  DESCRIPTION
+                         "A number between 1 and 6, where 1 is the most
+                         recently completed 15 minute interval and 6 is
+                         the least recently completed daily interval
+                         (assuming that all 6 intervals are valid)."
+           ::= { adDS1FarEndDailyIntervalEntry 2 }
+
+           adDS1FarEndDailyIntervalValid  OBJECT-TYPE
+                  SYNTAX  INTEGER {
+                                    no(1),
+                                    yes(2)
+                                }
+                  ACCESS  read-only
+                  STATUS  mandatory
+                  DESCRIPTION
+                         "Indicates if this far end daily interval
+                         contains valid data."
+           ::= { adDS1FarEndDailyIntervalEntry 3 }
+
+           adDS1FarEndDailyIntervalESs  OBJECT-TYPE
+                  SYNTAX  Gauge
+                  ACCESS  read-only
+                  STATUS  mandatory
+                  DESCRIPTION
+                         "The number of Far End Errored Seconds encountered
+                         by a DS1 interface in one of the prevoius daily
+                         intervals."
+           ::= { adDS1FarEndDailyIntervalEntry 4 }
+
+           adDS1FarEndDailyIntervalSESs  OBJECT-TYPE
+                  SYNTAX  Gauge
+                  ACCESS  read-only
+                  STATUS  mandatory
+                  DESCRIPTION
+                         "The number of Far End Severely Errored Seconds
+                         encountered by a DS1 interface in one of the
+                         previous daily intervals."
+           ::= { adDS1FarEndDailyIntervalEntry 5 }
+
+           adDS1FarEndDailyIntervalSEFSs  OBJECT-TYPE
+                  SYNTAX  Gauge
+                  ACCESS  read-only
+                  STATUS  mandatory
+                  DESCRIPTION
+                         "The number of Far End Severely Errored Framing
+                         Seconds encountered by a DS1 interface in one
+                         of the previous daily intervals."
+           ::= { adDS1FarEndDailyIntervalEntry 6 }
+
+           adDS1FarEndDailyIntervalUASs  OBJECT-TYPE
+                  SYNTAX  Gauge
+                  ACCESS  read-only
+                  STATUS  mandatory
+                  DESCRIPTION
+                         "The number of Far End Unavailable Seconds
+                         encountered by a DS1 interface in one of the
+                         previous daily intervals."
+           ::= { adDS1FarEndDailyIntervalEntry 7 }
+
+           adDS1FarEndDailyIntervalCSSs  OBJECT-TYPE
+                  SYNTAX  Gauge
+                  ACCESS  read-only
+                  STATUS  mandatory
+                  DESCRIPTION
+                         "The number of Far End Controlled Slip Seconds
+                         encountered by a DS1 interface in one of the
+                         previous daily intervals."
+           ::= { adDS1FarEndDailyIntervalEntry 8 }
+
+           adDS1FarEndDailyIntervalPCVs  OBJECT-TYPE
+                  SYNTAX  Gauge
+                  ACCESS  read-only
+                  STATUS  mandatory
+                  DESCRIPTION
+                         "The number of Far End Path Coding Violations
+                         encountered by a DS1 interface in one of the
+                         previous daily intervals."
+           ::= { adDS1FarEndDailyIntervalEntry 9 }
+
+           adDS1FarEndDailyIntervalLESs  OBJECT-TYPE
+                  SYNTAX  Gauge
+                  ACCESS  read-only
+                  STATUS  mandatory
+                  DESCRIPTION
+                         "The number of Far End Line Errored Seconds
+                         encountered by a DS1 interface in one of the
+                         previous daily intervals."
+           ::= { adDS1FarEndDailyIntervalEntry 10 }
+
+           adDS1FarEndDailyIntervalBESs  OBJECT-TYPE
+                  SYNTAX  Gauge
+                  ACCESS  read-only
+                  STATUS  mandatory
+                  DESCRIPTION
+                         "The number of Far End Bursty Errored Seconds
+                         encountered by a DS1 interface in one of the
+                         previous daily intervals."
+           ::= { adDS1FarEndDailyIntervalEntry 11 }
+
+           adDS1FarEndDailyIntervalDMs  OBJECT-TYPE
+                  SYNTAX  Gauge
+                  ACCESS  read-only
+                  STATUS  mandatory
+                  DESCRIPTION
+                         "The number of Far End Degraded Minutes
+                         encountered by a DS1 interface in one of
+                         the previous daily intervals."
+           ::= { adDS1FarEndDailyIntervalEntry 12 }
+
+           adDS1FarEndDailyIntervalLCVs  OBJECT-TYPE
+                  SYNTAX  Gauge
+                  ACCESS  read-only
+                  STATUS  mandatory
+                  DESCRIPTION
+                         "The number of Far End Line Code Violations
+                         encountered by a DS1 interface in one of the
+                         previous daily intervals."
+           ::= { adDS1FarEndDailyIntervalEntry 13 }
+
+
+
+
+    --
+    -- ACTDAX L3 System Traps
+    --
+
+    adACTDAXL3systemHdwFailureClear  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress
+           }
+           DESCRIPTION
+                  "This trap indicates that a system hardware failure
+                  has cleared on the ACT DAX."
+           --#TYPE       "Error - System Hardware Failure"
+           --#SUMMARY    "ACTDAXL3 906: System hardware failure condition no longer exists for "
+           --#SUMMARY    "Unit Id: %x"
+           --#ARGUMENTS  {0}
+           --#SEVERITY   MAJOR
+           --#GENERIC    6
+           --#CATEGORY   "Error Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 906
+
+    adACTDAXL3systemHdwFailure  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress
+           }
+           DESCRIPTION
+                  "This trap indicates that a system hardware failure
+                  has occured on the ACT DAX."
+           --#TYPE       "Error - System Hardware Failure"
+           --#SUMMARY    "ACTDAXL3 907: System hardware failure condition exists for "
+           --#SUMMARY    "Unit Id: %x"
+           --#ARGUMENTS  {0}
+           --#SEVERITY   MAJOR
+           --#GENERIC    6
+           --#CATEGORY   "Error Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 907
+
+    adACTDAXL3systemSfwFailureClear  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress
+           }
+           DESCRIPTION
+                  "This trap indicates that a system software failure
+                  has cleared on the ACT DAX."
+           --#TYPE       "Error - System Software Failure"
+           --#SUMMARY    "ACTDAXL3 908: System software failure condition no longer exists for "
+           --#SUMMARY    "Unit Id: %x"
+           --#ARGUMENTS  {0}
+           --#SEVERITY   MAJOR
+           --#GENERIC    6
+           --#CATEGORY   "Error Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 908
+
+    adACTDAXL3systemSfwFailure  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress
+           }
+           DESCRIPTION
+                  "This trap indicates that a system software failure
+                  has occured on the ACT DAX."
+           --#TYPE       "Error - System Software Failure"
+           --#SUMMARY    "ACTDAXL3 909: System software failure condition exists for "
+           --#SUMMARY    "Unit Id: %x"
+           --#ARGUMENTS  {0}
+           --#SEVERITY   MAJOR
+           --#GENERIC    6
+           --#CATEGORY   "Error Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 909
+
+    adACTDAXL3bankAlarmClear  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress
+           }
+           DESCRIPTION
+                  "This trap indicates that a ACT 1241 bank has cleared."
+           --#TYPE       "Error - Bank Alarm"
+           --#SUMMARY    "ACTDAXL3 936: Bank alarm condition no longer exists for "
+           --#SUMMARY    "Unit Id: %x"
+           --#ARGUMENTS  {0}
+           --#SEVERITY   MAJOR
+           --#GENERIC    6
+           --#CATEGORY   "Error Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 936
+
+    adACTDAXL3bankAlarm  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress
+           }
+           DESCRIPTION
+                  "This trap indicates that the ACT 1241 bank is in alarm."
+           --#TYPE       "Error - Bank Alarm"
+           --#SUMMARY    "ACTDAXL3 937: Bank alarm condition exists for "
+           --#SUMMARY    "Unit Id: %x"
+           --#ARGUMENTS  {0}
+           --#SEVERITY   MAJOR
+           --#GENERIC    6
+           --#CATEGORY   "Error Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 937
+
+    --
+    -- ACTDAX L3 DS1 Alarm Traps
+    --
+
+    adACTDAXL3RxYellowClear  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex            
+           }
+           DESCRIPTION
+                  "This trap indicates that a yellow alarm state has cleared
+                  on the specified ds1 line."
+           --#TYPE       "Error - RX Yellow Alarm"
+           --#SUMMARY    "ACTDAXL3 910: Received yellow alarm state has cleared for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   MINOR
+           --#GENERIC    6
+           --#CATEGORY   "Error Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 910
+
+    adACTDAXL3RxYellow  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex             
+           }
+           DESCRIPTION
+                  "This trap indicates that yellow alarm is being received
+                  on the specified ds1 line."
+           --#TYPE       "Error - RX Yellow Alarm"
+           --#SUMMARY    "ACTDAXL3 911: Received yellow alarm state is active for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   MINOR
+           --#GENERIC    6
+           --#CATEGORY   "Error Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 911
+
+    adACTDAXL3TxYellowClear  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex              
+           }
+           DESCRIPTION
+                  "This trap indicates that a yellow alarm signal is no
+                  longer being transmitted on the specified ds1 line."
+           --#TYPE       "Error - TX Yellow Alarm"
+           --#SUMMARY    "ACTDAXL3 912: Transmit yellow alarm state has cleared for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   WARNING
+           --#GENERIC    6
+           --#CATEGORY   "Error Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 912
+
+    adACTDAXL3TxYellow  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex            
+           }
+           DESCRIPTION
+                  "This trap indicates that a yellow alarm signal is being
+                  transmitted on the specifed ds1 line."
+           --#TYPE       "Error - TX Yellow Alarm"
+           --#SUMMARY    "ACTDAXL3 913: Transmit yellow alarm state is active for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   WARNING
+           --#GENERIC    6
+           --#CATEGORY   "Error Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 913
+
+    adACTDAXL3RxAISclear  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex            
+           }
+           DESCRIPTION
+                  "This trap indicates that an alarm indication signal (AIS)
+                  state has cleared on the specified ds1 line."
+           --#TYPE       "Error - RX (AIS) Alarm"
+           --#SUMMARY    "ACTDAXL3 914: Received Alarm Indication Signal state has cleared for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   MINOR
+           --#GENERIC    6
+           --#CATEGORY   "Error Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 914
+
+    adACTDAXL3RxAIS  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex              
+           }
+           DESCRIPTION
+                  "This trap indicates that an alarm indication signal (AIS)
+                  state has occured on the specified ds1 line."
+           --#TYPE       "Error - RX (AIS) Alarm"
+           --#SUMMARY    "ACTDAXL3 915: Received Alarm Indication Signal state is active for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   MINOR
+           --#GENERIC    6
+           --#CATEGORY   "Error Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 915
+
+    adACTDAXL3TxAISclear  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex              
+           }
+           DESCRIPTION
+                  "This trap indicates that an alarm indication signal (AIS)
+                  is no longer being transmitted on the specified ds1 line."
+           --#TYPE       "Error - TX (AIS) Alarm"
+           --#SUMMARY    "ACTDAXL3 916: Transmit Alarm Indication Signal state has cleared for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   WARNING
+           --#GENERIC    6
+           --#CATEGORY   "Error Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 916
+
+    adACTDAXL3TxAIS  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex             
+           }
+           DESCRIPTION
+                  "This trap indicates that an alarm indication signal (AIS)
+                  is being transmitted on the specifed ds1 line."
+           --#TYPE       "Error - TX (AIS) Alarm"
+           --#SUMMARY    "ACTDAXL3 917: Transmit Alarm Indication Signal state is active for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   WARNING
+           --#GENERIC    6
+           --#CATEGORY   "Error Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 917
+
+    adACTDAXL3RedAlarmClear  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex             
+           }
+           DESCRIPTION
+                  "This trap indicates that a red alarm has cleared on the
+                  specified ds1 line."
+           --#TYPE       "Error - RED Alarm"
+           --#SUMMARY    "ACTDAXL3 918: RED alarm state has cleared for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   MAJOR
+           --#GENERIC    6
+           --#CATEGORY   "Error Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 918
+
+    adACTDAXL3RedAlarm  TRAP-TYPE
+           ENTERPRISE      adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex             
+           }
+           DESCRIPTION
+                  "This trap indicates that a red alarm has occured on the
+                  specified ds1 line."
+           --#TYPE       "Error - RED Alarm"
+           --#SUMMARY    "ACTDAXL3 919: RED alarm state is active for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   MAJOR
+           --#GENERIC    6
+           --#CATEGORY   "Error Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 919
+
+    adACTDAXL3LOSclear  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex             
+           }
+           DESCRIPTION
+                  "This trap indicates that a loss of signal state has cleared
+                  on the specified ds1 line."
+           --#TYPE       "Error - Loss of Signal"
+           --#SUMMARY    "ACTDAXL3 920: Loss of Signal state has cleared for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   MAJOR
+           --#GENERIC    6
+           --#CATEGORY   "Error Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 920
+
+    adACTDAXL3LOS  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex             
+           }
+           DESCRIPTION
+                  "This trap indicates that a loss of signal state has occured
+                  on the specified ds1 line."
+           --#TYPE       "Error - Loss of Signal"
+           --#SUMMARY    "ACTDAXL3 921: Loss of Signal state is active for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   MAJOR
+           --#GENERIC    6
+           --#CATEGORY   "Error Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+          ::= 921
+
+    adACTDAXL3LocalLoopClear  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex             
+           }
+           DESCRIPTION
+                  "This trap indicates that a local loopback has cleared on
+                  the specified ds1 line."
+           --#TYPE       "Status - Local Loopback"
+           --#SUMMARY    "ACTDAXL3 922: Local loopback condition no longer exists for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   WARNING
+           --#GENERIC    6
+           --#CATEGORY   "Status Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 922
+
+    adACTDAXL3LocalLoop  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex               
+           }
+           DESCRIPTION
+                  "This trap indicates that a local loopback has occured on
+                  the specified ds1 line."
+           --#TYPE       "Status - Local Loopback"
+           --#SUMMARY    "ACTDAXL3 923: Local loopback condition exists for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   WARNING
+           --#GENERIC    6
+           --#CATEGORY   "Status Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 923
+
+    adACTDAXL3LineLoopClear  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex              
+           }
+           DESCRIPTION
+                  "This trap indicates that a line loopback has cleared on
+                  the specified ds1 line.  The line loopback was commanded
+                  by the hardware switch or through an administrative port."
+           --#TYPE       "Status - Line Loopback"
+           --#SUMMARY    "ACTDAXL3 924: Line loopback condition no longer exists for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   WARNING
+           --#GENERIC    6
+           --#CATEGORY   "Status Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 924
+
+    adACTDAXL3LineLoop  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex            
+           }
+           DESCRIPTION
+                  "This trap indicates that a line loopback has occured on
+                  the specified ds1 line.  The line loopback was commanded
+                  by the hardware switch or through an administrative port."
+           --#TYPE       "Status - Line Loopback"
+           --#SUMMARY    "ACTDAXL3 925: Line loopback condition exists for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   WARNING
+           --#GENERIC    6
+           --#CATEGORY   "Status Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 925
+
+    adACTDAXL3PayloadLoopClear  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex             
+           }
+           DESCRIPTION
+                  "This trap indicates that a payload loopback has occured
+                  on the specified ds1 line.  The payload loopback was commanded
+                  by the hardware switch or through an administrative port."
+           --#TYPE       "Status - Payload Loopback"
+           --#SUMMARY    "ACTDAXL3 926: Payload loopback condition no longer exists for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   WARNING
+           --#GENERIC    6
+           --#CATEGORY   "Status Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 926
+
+    adACTDAXL3PayloadLoop  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex              
+           }
+           DESCRIPTION
+                  "This trap indicates that a payload loopback has occured
+                  on the specified ds1 line.  The payload loopback was commanded
+                  by the hardware switch or through an administrative port."
+           --#TYPE       "Status - Payload Loopback"
+           --#SUMMARY    "ACTDAXL3 927: Payload loopback condition exists for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   WARNING
+           --#GENERIC    6
+           --#CATEGORY   "Status Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 927
+
+    adACTDAXL3fdlLineLoopClear  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex              
+           }
+           DESCRIPTION
+                  "This trap indicates that a line loopback has cleared on
+                  the specified ds1 line.  The line loopback was commanded
+                  from the far end through the facility data link."
+           --#TYPE       "Status - fdl Line Loopback"
+           --#SUMMARY    "ACTDAXL3 928: fdl Line loopback condition no longer exists for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   WARNING
+           --#GENERIC    6
+           --#CATEGORY   "Status Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 928
+
+    adACTDAXL3fdlLineLoop  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex              
+           }
+           DESCRIPTION
+                  "This trap indicates that a line loopback has occured on
+                  the specified ds1 line.  The line loopback was commanded
+                  from the far end through the facility data link."
+           --#TYPE       "Status - fdl Line Loopback"
+           --#SUMMARY    "ACTDAXL3 929: fdl Line loopback condition exists for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   WARNING
+           --#GENERIC    6
+           --#CATEGORY   "Status Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 929
+
+    adACTDAXL3fdlPayloadLoopClear  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex             
+           }
+           DESCRIPTION
+                  "This trap indicates that a payload loopback has occured
+                  on the specified ds1 line.  The payload loopback was commanded
+                  from the far end through the facility data link."
+           --#TYPE       "Status - fdl Payload Loopback"
+           --#SUMMARY    "ACTDAXL3 930: fdl Payload loopback condition no longer exists for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   WARNING
+           --#GENERIC    6
+           --#CATEGORY   "Status Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 930
+
+    adACTDAXL3fdlPayloadLoop  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex            
+           }
+           DESCRIPTION
+                  "This trap indicates that a payload loopback has occured
+                  on the specified ds1 line.  The payload loopback was commanded
+                  from the far end through the facility data link."
+           --#TYPE       "Status - fdl Payload Loopback"
+           --#SUMMARY    "ACTDAXL3 931: fdl Payload loopback condition exists for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   WARNING
+           --#GENERIC    6
+           --#CATEGORY   "Status Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 931
+
+    adACTDAXL3farLineLoopClear  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex             
+           }
+           DESCRIPTION
+                  "This trap indicates that the far end has cleared a line
+                  loopback which was commanded from the near end through
+                  the facility data link."
+           --#TYPE       "Status - Far end Line Loopback"
+           --#SUMMARY    "ACTDAXL3 932: Far end Line loopback condition no longer exists for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   WARNING
+           --#GENERIC    6
+           --#CATEGORY   "Status Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 932
+
+    adACTDAXL3farLineLoop  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex             
+           }
+           DESCRIPTION
+                  "This trap indicates that the far end has been commanded
+                  into a line loopback from the near end through the facility
+                  data link."
+           --#TYPE       "Status - Far end Line Loopback"
+           --#SUMMARY    "ACTDAXL3 933: Far end Line loopback condition exists for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   WARNING
+           --#GENERIC    6
+           --#CATEGORY   "Status Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 933
+
+    adACTDAXL3farPayloadLoopClear  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex            
+           }
+           DESCRIPTION
+                  "This trap indicates that the far end has cleared a payload
+                  loopback which was commanded from the near end through
+                  the facility data link."
+           --#TYPE       "Status - Far end Payload Loopback"
+           --#SUMMARY    "ACTDAXL3 934: Far end Payload loopback condition no longer exists for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   WARNING
+           --#GENERIC    6
+           --#CATEGORY   "Status Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 934
+
+    adACTDAXL3farPayloadLoop  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex             
+           }
+           DESCRIPTION
+                  "This trap indicates that the far end has been commanded
+                  into a payload loopback from the near end through the facility
+                  data link."
+           --#TYPE       "Status - Far end Payload Loopback"
+           --#SUMMARY    "ACTDAXL3 935: Far end Payload loopback condition exists for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   WARNING
+           --#GENERIC    6
+           --#CATEGORY   "Status Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 935
+
+
+    --
+    -- ACTDAX L3 DS1 Threshold Crossingrm Traps
+    --
+
+    adACTDAXL3CurrentES  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex               
+           }
+           DESCRIPTION
+                  "This trap indicates that the current interval Errored
+                  Seconds threshold has been exceeded on the specified ds1 line."
+           --#TYPE       "Threshold - Current Errored Seconds"
+           --#SUMMARY    "ACTDAXL3 970: Current interval errored seconds threshold exceeded for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   WARNING
+           --#GENERIC    6
+           --#CATEGORY   "Threshold Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 970
+
+    adACTDAXL3CurrentSES  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex               
+           }
+           DESCRIPTION
+                  "This trap indicates that the current interval Severely
+                  Errored Seconds threshold has been exceeded on the specified ds1 line."
+           --#TYPE       "Threshold - Current Severely Errored Seconds"
+           --#SUMMARY    "ACTDAXL3 971: Current interval severely errored seconds threshold exceeded for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   WARNING
+           --#GENERIC    6
+           --#CATEGORY   "Threshold Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 971
+
+    adACTDAXL3CurrentSEFS  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex             
+           }
+           DESCRIPTION
+                  "This trap indicates that the current interval Severely
+                  Errored Framing Seconds threshold has been exceeded on the specified ds1 line."
+           --#TYPE       "Threshold - Current Severely Errored Framing Seconds"
+           --#SUMMARY    "ACTDAXL3 972: Current interval severely errored framing seconds threshold exceeded for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   WARNING
+           --#GENERIC    6
+           --#CATEGORY   "Threshold Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 972
+
+    adACTDAXL3CurrentUAS  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex             
+           }
+           DESCRIPTION
+                  "This trap indicates that the current interval Unavailable
+                  Seconds threshold has been exceeded on the specified ds1 line."
+           --#TYPE       "Threshold - Current Unavailable Seconds"
+           --#SUMMARY    "ACTDAXL3 973: Current interval unavailable seconds threshold exceeded for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   MAJOR
+           --#GENERIC    6
+           --#CATEGORY   "Threshold Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 973
+
+    adACTDAXL3CurrentCSS  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex             
+           }
+           DESCRIPTION
+                  "This trap indicates that the current interval Controlled
+                  Slip Seconds threshold has been exceeded on the specified ds1 line."
+           --#TYPE       "Threshold - Current Controlled Slip Seconds"
+           --#SUMMARY    "ACTDAXL3 974: Current interval controlled slip seconds threshold exceeded for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   WARNING
+           --#GENERIC    6
+           --#CATEGORY   "Threshold Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 974
+
+    adACTDAXL3CurrentPCV  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex            
+           }
+           DESCRIPTION
+                  "This trap indicates that the current interval Path Code
+                  Violations threshold has been exceeded on the specified ds1 line."
+           --#TYPE       "Threshold - Current Path Code Violations"
+           --#SUMMARY    "ACTDAXL3 975: Current interval path code violations threshold exceeded for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   WARNING
+           --#GENERIC    6
+           --#CATEGORY   "Threshold Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 975
+
+    adACTDAXL3CurrentLES  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex            
+           }
+           DESCRIPTION
+                  "This trap indicates that the current interval Line Errored
+                  Seconds threshold has been exceeded on the specified ds1 line."
+           --#TYPE       "Threshold - Current Line Errored Seconds"
+           --#SUMMARY    "ACTDAXL3 976: Current interval line errored seconds threshold exceeded for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   WARNING
+           --#GENERIC    6
+           --#CATEGORY   "Threshold Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 976
+
+    adACTDAXL3CurrentBES  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex              
+           }
+           DESCRIPTION
+                  "This trap indicates that the current interval Bursty Errored
+                  Seconds threshold has been exceeded on the specified ds1 line."
+           --#TYPE       "Threshold - Current Bursty Errored Seconds"
+           --#SUMMARY    "ACTDAXL3 977: Current interval bursty errored seconds threshold exceeded for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   WARNING
+           --#GENERIC    6
+           --#CATEGORY   "Threshold Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 977
+
+    adACTDAXL3CurrentLCV  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex              
+           }
+           DESCRIPTION
+                  "This trap indicates that the current interval Line Code
+                  Violations threshold has been exceeded on the specified ds1 line."
+           --#TYPE       "Threshold - Current Line Code Violations"
+           --#SUMMARY    "ACTDAXL3 979: Current interval line code violations threshold exceeded for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   WARNING
+           --#GENERIC    6
+           --#CATEGORY   "Threshold Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 979
+
+    adACTDAXL3DailyES  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex               
+           }
+           DESCRIPTION
+                  "This trap indicates that the daily (total) interval Errored
+                  Seconds threshold has been exceeded on the specified ds1 line."
+           --#TYPE       "Threshold - Daily Errored Seconds"
+           --#SUMMARY    "ACTDAXL3 960: Daily interval errored seconds threshold exceeded for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   WARNING
+           --#GENERIC    6
+           --#CATEGORY   "Threshold Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 960
+
+    adACTDAXL3DailySES  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex            
+           }
+           DESCRIPTION
+                  "This trap indicates that the daily (total) interval Severely
+                  Errored Seconds threshold has been exceeded on the specified ds1 line."
+           --#TYPE       "Threshold - Daily Severely Errored Seconds"
+           --#SUMMARY    "ACTDAXL3 961: Daily interval severely errored seconds threshold exceeded for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   WARNING
+           --#GENERIC    6
+           --#CATEGORY   "Threshold Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 961
+
+    adACTDAXL3DailySEFS  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex             
+           }
+           DESCRIPTION
+                  "This trap indicates that the daily (total) interval Severely
+                  Errored Framing Seconds threshold has been exceeded on the specified ds1 line."
+           --#TYPE       "Threshold - Daily Severely Errored Framing Seconds"
+           --#SUMMARY    "ACTDAXL3 962: Daily interval severely errored framing seconds threshold exceeded for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   WARNING
+           --#GENERIC    6
+           --#CATEGORY   "Threshold Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 962
+
+    adACTDAXL3DailyUAS  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex            
+           }
+           DESCRIPTION
+                  "This trap indicates that the daily (total) interval Unavailable
+                  Seconds threshold has been exceeded on the specified ds1 line."
+           --#TYPE       "Threshold - Daily Unavailable Seconds"
+           --#SUMMARY    "ACTDAXL3 963: Daily interval unavailable seconds threshold exceeded for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   MAJOR
+           --#GENERIC    6
+           --#CATEGORY   "Threshold Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 963
+
+    adACTDAXL3DailyCSS  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex             
+           }
+           DESCRIPTION
+                  "This trap indicates that the daily (total) interval Controlled
+                  Slip Seconds threshold has been exceeded on the specified ds1 line."
+           --#TYPE       "Threshold - Daily Controlled Slip Seconds"
+           --#SUMMARY    "ACTDAXL3 964: Daily interval controlled slip seconds threshold exceeded for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   WARNING
+           --#GENERIC    6
+           --#CATEGORY   "Threshold Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 964
+
+    adACTDAXL3DailyPCV  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex            
+           }
+           DESCRIPTION
+                  "This trap indicates that the daily (total) interval Path Code
+                  Violations threshold has been exceeded on the specified ds1 line."
+           --#TYPE       "Threshold - Daily Path Code Violations"
+           --#SUMMARY    "ACTDAXL3 965: Daily interval path code violations threshold exceeded for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   WARNING
+           --#GENERIC    6
+           --#CATEGORY   "Threshold Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 965
+
+    adACTDAXL3DailyLES  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex             
+           }
+           DESCRIPTION
+                  "This trap indicates that the daily (total) interval Line Errored
+                  Seconds threshold has been exceeded on the specified ds1 line."
+           --#TYPE       "Threshold - Daily Line Errored Seconds"
+           --#SUMMARY    "ACTDAXL3 966: Daily interval line errored seconds threshold exceeded for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   WARNING
+           --#GENERIC    6
+           --#CATEGORY   "Threshold Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 966
+
+    adACTDAXL3DailyBES  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex             
+           }
+           DESCRIPTION
+                  "This trap indicates that the daily (total) interval Bursty Errored
+                  Seconds threshold has been exceeded on the specified ds1 line."
+           --#TYPE       "Threshold - Daily Bursty Errored Seconds"
+           --#SUMMARY    "ACTDAXL3 967: Daily interval bursty errored seconds threshold exceeded for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   WARNING
+           --#GENERIC    6
+           --#CATEGORY   "Threshold Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 967
+
+    adACTDAXL3DailyLCV  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex              
+           }
+           DESCRIPTION
+                  "This trap indicates that the daily (total) interval Line Code
+                  Violations threshold has been exceeded on the specified ds1 line."
+           --#TYPE       "Threshold - Daily Line Code Violations"
+           --#SUMMARY    "ACTDAXL3 969: Daily interval line code violations threshold exceeded for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   WARNING
+           --#GENERIC    6
+           --#CATEGORY   "Threshold Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 969
+
+    adACTDAXL3FarCurrentES  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex              
+           }
+           DESCRIPTION
+                  "This trap indicates that the far end current interval Errored
+                  Seconds threshold has been exceeded on the specified ds1 line."
+           --#TYPE       "Threshold - Far Current Errored Seconds"
+           --#SUMMARY    "ACTDAXL3 990: Far current interval errored seconds threshold exceeded for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   WARNING
+           --#GENERIC    6
+           --#CATEGORY   "Threshold Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 990
+
+    adACTDAXL3FarCurrentSES  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex             
+           }
+           DESCRIPTION
+                  "This trap indicates that the far end current interval Severely
+                  Errored Seconds threshold has been exceeded on the specified ds1 line."
+           --#TYPE       "Threshold - Far Current Severely Errored Seconds"
+           --#SUMMARY    "ACTDAXL3 991: Far current interval severely errored seconds threshold exceeded for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   WARNING
+           --#GENERIC    6
+           --#CATEGORY   "Threshold Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 991
+
+    adACTDAXL3FarCurrentSEFS  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex               
+           }
+           DESCRIPTION
+                  "This trap indicates that the far end current interval Severely
+                  Errored Framing Seconds threshold has been exceeded on the specified ds1 line."
+           --#TYPE       "Threshold - Far Current Severely Errored Framing Seconds"
+           --#SUMMARY    "ACTDAXL3 992: Far current interval severely errored framing seconds threshold exceeded for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   WARNING
+           --#GENERIC    6
+           --#CATEGORY   "Threshold Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 992
+
+    adACTDAXL3FarCurrentUAS  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex             
+           }
+           DESCRIPTION
+                  "This trap indicates that the far end current interval Unavailable
+                  Seconds threshold has been exceeded on the specified ds1 line."
+           --#TYPE       "Threshold - Far Current Unavailable Seconds"
+           --#SUMMARY    "ACTDAXL3 993: Far current interval unavailable seconds threshold exceeded for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   MAJOR
+           --#GENERIC    6
+           --#CATEGORY   "Threshold Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 993
+
+    adACTDAXL3FarCurrentCSS  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex               
+           }
+           DESCRIPTION
+                  "This trap indicates that the far end current interval Controlled
+                  Slip Seconds threshold has been exceeded on the specified ds1 line."
+           --#TYPE       "Threshold - Far Current Controlled Slip Seconds"
+           --#SUMMARY    "ACTDAXL3 994: Far current interval controlled slip seconds threshold exceeded for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   WARNING
+           --#GENERIC    6
+           --#CATEGORY   "Threshold Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 994
+
+    adACTDAXL3FarCurrentPCV  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex              
+           }
+           DESCRIPTION
+                  "This trap indicates that the far end current interval Path Code
+                  Violations threshold has been exceeded on the specified ds1 line."
+           --#TYPE       "Threshold - Far Current Path Code Violations"
+           --#SUMMARY    "ACTDAXL3 995: Far current interval path code violations threshold exceeded for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   WARNING
+           --#GENERIC    6
+           --#CATEGORY   "Threshold Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 995
+
+    adACTDAXL3FarCurrentLES  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex            
+           }
+           DESCRIPTION
+                  "This trap indicates that the far end current interval Line Errored
+                  Seconds threshold has been exceeded on the specified ds1 line."
+           --#TYPE       "Threshold - Far Current Line Errored Seconds"
+           --#SUMMARY    "ACTDAXL3 996: Far current interval line errored seconds threshold exceeded for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   WARNING
+           --#GENERIC    6
+           --#CATEGORY   "Threshold Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 996
+
+    adACTDAXL3FarCurrentBES  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex             
+           }
+           DESCRIPTION
+                  "This trap indicates that the far end current interval Bursty Errored
+                  Seconds threshold has been exceeded on the specified ds1 line."
+           --#TYPE       "Threshold - Far Current Bursty Errored Seconds"
+           --#SUMMARY    "ACTDAXL3 997: Far current interval bursty errored seconds threshold exceeded for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   WARNING
+           --#GENERIC    6
+           --#CATEGORY   "Threshold Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 997
+
+    adACTDAXL3FarDailyES  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex             
+           }
+           DESCRIPTION
+                  "This trap indicates that the far end daily (total) interval Errored
+                  Seconds threshold has been exceeded on the specified ds1 line."
+           --#TYPE       "Threshold - Far Daily Errored Seconds"
+           --#SUMMARY    "ACTDAXL3 980: Far daily interval errored seconds threshold exceeded for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   WARNING
+           --#GENERIC    6
+           --#CATEGORY   "Threshold Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 980
+
+    adACTDAXL3FarDailySES  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex             
+           }
+           DESCRIPTION
+                  "This trap indicates that the far end daily (total) interval Severely
+                  Errored Seconds threshold has been exceeded on the specified ds1 line."
+           --#TYPE       "Threshold - Far Daily Severely Errored Seconds"
+           --#SUMMARY    "ACTDAXL3 981: Far daily interval severely errored seconds threshold exceeded for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   WARNING
+           --#GENERIC    6
+           --#CATEGORY   "Threshold Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 981
+
+    adACTDAXL3FarDailySEFS  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex            
+           }
+           DESCRIPTION
+                  "This trap indicates that the far end daily (total) interval Severely
+                  Errored Framing Seconds threshold has been exceeded on the specified ds1 line."
+           --#TYPE       "Threshold - Far Daily Severely Errored Framing Seconds"
+           --#SUMMARY    "ACTDAXL3 982: Far daily interval severely errored framing seconds threshold exceeded for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   WARNING
+           --#GENERIC    6
+           --#CATEGORY   "Threshold Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 982
+
+    adACTDAXL3FarDailyUAS  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex            
+           }
+           DESCRIPTION
+                  "This trap indicates that the far end daily (total) interval Unavailable
+                  Seconds threshold has been exceeded on the specified ds1 line."
+           --#TYPE       "Threshold - Far Daily Unavailable Seconds"
+           --#SUMMARY    "ACTDAXL3 983: Far daily unavailable seconds threshold exceeded for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   MAJOR
+           --#GENERIC    6
+           --#CATEGORY   "Threshold Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 983
+
+    adACTDAXL3FarDailyCSS  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex             
+           }
+           DESCRIPTION
+                  "This trap indicates that the far end daily (total) interval Controlled
+                  Slip Seconds threshold has been exceeded on the specified ds1 line."
+           --#TYPE       "Threshold - Far Daily Controlled Slip Seconds"
+           --#SUMMARY    "ACTDAXL3 984: Far daily interval controlled slip seconds threshold exceeded for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   WARNING
+           --#GENERIC    6
+           --#CATEGORY   "Threshold Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 984
+
+    adACTDAXL3FarDailyPCV  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex             
+           }
+           DESCRIPTION
+                  "This trap indicates that the far end daily (total) interval Path Code
+                  Violations threshold has been exceeded on the specified ds1 line."
+           --#TYPE       "Threshold - Far Daily Path Code Violations"
+           --#SUMMARY    "ACTDAXL3 985: Far daily interval path code violations threshold exceeded for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   WARNING
+           --#GENERIC    6
+           --#CATEGORY   "Threshold Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 985
+
+    adACTDAXL3FarDailyLES  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex            
+           }
+           DESCRIPTION
+                  "This trap indicates that the far end daily (total) interval Line Errored
+                  Seconds threshold has been exceeded on the specified ds1 line."
+           --#TYPE       "Threshold - Far Daily Line Errored Seconds"
+           --#SUMMARY    "ACTDAXL3 986: Far daily interval line errored seconds threshold exceeded for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   WARNING
+           --#GENERIC    6
+           --#CATEGORY   "Threshold Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 986
+
+    adACTDAXL3FarDailyBES  TRAP-TYPE
+           ENTERPRISE  adACTDAXL3
+           VARIABLES {
+                  adProdPhysAddress,
+                  dsx1LineIndex             
+           }
+           DESCRIPTION
+                  "This trap indicates that the far end daily (total) interval Bursty Errored
+                  Seconds threshold has been exceeded on the specified ds1 line."
+           --#TYPE       "Threshold - Far Daily Bursty Errored Seconds"
+           --#SUMMARY    "ACTDAXL3 987: Far daily interval bursty errored seconds threshold exceeded for "
+           --#SUMMARY    "Unit Id: %x, Line Index: %d"
+           --#ARGUMENTS  {0,1}
+           --#SEVERITY   WARNING
+           --#GENERIC    6
+           --#CATEGORY   "Threshold Events"
+           --#SOURCE_ID  "A"
+           --#TIMEINDEX  0
+           ::= 987
+
+    END

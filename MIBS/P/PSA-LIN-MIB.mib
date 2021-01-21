@@ -1,0 +1,949 @@
+PSA-LIN-MIB DEFINITIONS ::= BEGIN
+
+--PRIMEQUEST system management MIB for Partition
+--
+--
+--$Copyright$
+--Copyright Fujitsu Limited 2003 - 2009
+--All rights reserved
+--
+--
+--MIB Revision: 02000000
+--
+
+IMPORTS
+	OBJECT-TYPE								FROM RFC-1212
+	TRAP-TYPE								FROM RFC-1215
+	mib-2, DisplayString, PhysAddress		FROM RFC1213-MIB
+	TimeTicks, Counter, Gauge, IpAddress	FROM RFC1155-SMI
+	mgmt, enterprises						FROM RFC1155-SMI
+	InetAddressType, InetAddress			FROM INET-ADDRESS-MIB;
+
+--enterprises	OBJECT IDENTIFIER ::={ iso org(3) dod(6) internet(1) private(4) 1 }
+--
+--PRIMEQUEST system management MIB nodes
+--fujitsu:                    1.3.6.1.4.1.211
+-- products:                  1.3.6.1.4.1.211.1
+--  iaServer:                 1.3.6.1.4.1.211.1.31
+--   primequest:              1.3.6.1.4.1.211.1.31.1
+--    partition:              1.3.6.1.4.1.211.1.31.1.2
+--     partitionCommon:       1.3.6.1.4.1.211.1.31.1.2.100
+--
+
+--FUJITSU PRIMEQUEST system management MIB nodes for Partition
+  fujitsu        OBJECT IDENTIFIER  ::={ enterprises 211 }
+  products       OBJECT IDENTIFIER  ::={ fujitsu 1 }
+  iaServer       OBJECT IDENTIFIER  ::={ products 31 }
+  primequest     OBJECT IDENTIFIER  ::={ iaServer 1 }
+   partition     OBJECT IDENTIFIER  ::={ primequest 2 }
+    partitionCommon	OBJECT IDENTIFIER	::={ partition	100 }
+     physicalComponent	OBJECT IDENTIFIER	::={ partitionCommon 1 }
+     logicalComponentForLinux	OBJECT IDENTIFIER	::={ partitionCommon 2 }
+     logicalComponentForWindows	OBJECT IDENTIFIER	::={ partitionCommon 3 }
+     monitoringFunction	OBJECT IDENTIFIER	::={ partitionCommon 4 }
+     thresholdFunction	OBJECT IDENTIFIER	::={ partitionCommon 5 }
+     statusFunction	OBJECT IDENTIFIER	::={ partitionCommon 6 }
+     otherFunction	OBJECT IDENTIFIER	::={ partitionCommon 7 }
+     pxFunction	OBJECT IDENTIFIER	::={ partitionCommon 8 }
+
+--FUJITSU PRIMEQUEST system management MIB objects for Partition
+
+
+--physicalComponent-MIB groups
+
+
+--logicalComponentForLinux-MIB groups
+
+     linLogicalCpuInfo	OBJECT IDENTIFIER	::={ logicalComponentForLinux 1 }
+     linLogicalMemoryInfo	OBJECT IDENTIFIER	::={ logicalComponentForLinux 2 }
+     linNetworkInfo	OBJECT IDENTIFIER	::={ logicalComponentForLinux 4 }
+     linHardwareResourceInfo	OBJECT IDENTIFIER	::={ logicalComponentForLinux 5 }
+     linOperatingSystemInfo	OBJECT IDENTIFIER	::={ logicalComponentForLinux 6 }
+
+-- ****************************************************************************
+--
+-- GROUP: linLogicalCpuInfo
+--
+--	linLogicalCpuInfo :	.1.3.6.1.4.1.211.1.31.1.2.100.2.1
+--
+--Implementation of this group is mandatory
+--
+-- ****************************************************************************
+
+
+-- ----------------------------------------------------------------------------
+-- TABLE: linLogcalCpuTable
+--
+--	linLogcalCpuTable :	.1.3.6.1.4.1.211.1.31.1.2.100.2.1.1
+--
+--Implementation of this table is mandatory
+-- ----------------------------------------------------------------------------
+linLogcalCpuTable OBJECT-TYPE
+   SYNTAX   SEQUENCE OF LinLogicalCpu
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Table with logical CPU information"
+   ::= { linLogicalCpuInfo 1 }
+
+linLogicalCpuEntry OBJECT-TYPE
+   SYNTAX   LinLogicalCpu
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   INDEX   { linLgCpuNumber }
+   ::= { linLogcalCpuTable 1 }
+
+LinLogicalCpu ::=
+   SEQUENCE {
+      linLgCpuNumber
+         INTEGER
+   }
+
+linLgCpuNumber OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Logical identification number that OS allots to the CPU.(index: 0based)"
+   ::= { linLogicalCpuEntry 1 }
+
+linNumOfLogicalCpus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Number of effective logical CPUs in the partition."
+   ::= { linLogicalCpuInfo 6 }
+
+
+-- ****************************************************************************
+--
+-- GROUP: linLogicalMemoryInfo
+--
+--	linLogicalMemoryInfo :	.1.3.6.1.4.1.211.1.31.1.2.100.2.2
+--
+--Implementation of this group is mandatory
+--
+-- ****************************************************************************
+
+linLgMemSize OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Memory size of the partition.(unit:Mbyte)"
+   ::= { linLogicalMemoryInfo 1 }
+
+linLgMemSwapSize OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Swap size of the partition.(unit:Mbyte)"
+   ::= { linLogicalMemoryInfo 2 }
+
+
+-- ****************************************************************************
+--
+-- GROUP: linNetworkInfo
+--
+--	linNetworkInfo :	.1.3.6.1.4.1.211.1.31.1.2.100.2.4
+--
+--Implementation of this group is mandatory
+--
+-- ****************************************************************************
+
+
+-- ----------------------------------------------------------------------------
+-- TABLE: linNetworkInterfaceTable
+--
+--	linNetworkInterfaceTable :	.1.3.6.1.4.1.211.1.31.1.2.100.2.4.1
+--
+--Implementation of this table is mandatory
+-- ----------------------------------------------------------------------------
+linNetworkInterfaceTable OBJECT-TYPE
+   SYNTAX   SEQUENCE OF LinNetworkInterface
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Table with network interface information."
+   ::= { linNetworkInfo 1 }
+
+linNetworkInterfaceEntry OBJECT-TYPE
+   SYNTAX   LinNetworkInterface
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   INDEX   { linNIIndex }
+   ::= { linNetworkInterfaceTable 1 }
+
+LinNetworkInterface ::=
+   SEQUENCE {
+      linNIIndex
+         INTEGER,
+      linNIMACAddress
+         PhysAddress,
+      linNIIPAddress
+         OCTET STRING,
+      linNIInterfaceName
+         DisplayString,
+      linNISpeed
+         INTEGER,
+      linNISubNetMask
+         OCTET STRING,
+      linNINetworkType
+         INTEGER,
+      linNIBusType
+         INTEGER,
+      linNISegment
+         INTEGER,
+      linNIBusNumber
+         INTEGER,
+      linNIDeviceNumber
+         INTEGER,
+      linNIFunction
+         INTEGER,
+      linNIStatus
+         INTEGER,
+      linNIIpPacketsIn
+         Counter,
+      linNIIpPacketsOut
+         Counter,
+      linNILinkStatus
+         INTEGER,
+      linNIPhysicalID
+         DisplayString,
+      linNIIPAddress2
+         DisplayString,
+      linNISubNetMask2
+         DisplayString
+   }
+
+linNIIndex OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Network inteface identification number."
+   ::= { linNetworkInterfaceEntry 1 }
+
+linNIMACAddress OBJECT-TYPE
+   SYNTAX   PhysAddress
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "The interface address of the physical layer of the network."
+   ::= { linNetworkInterfaceEntry 2 }
+
+linNIIPAddress OBJECT-TYPE
+   SYNTAX   OCTET STRING
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "IP address of the network interface."
+   ::= { linNetworkInterfaceEntry 3 }
+
+linNIInterfaceName OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Network interface name.(e.g.eth0)."
+   ::= { linNetworkInterfaceEntry 4 }
+
+linNISpeed OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Network speed.(unit:Mbit/s)"
+   ::= { linNetworkInterfaceEntry 5 }
+
+linNISubNetMask OBJECT-TYPE
+   SYNTAX   OCTET STRING
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Subnet address of the network interface."
+   ::= { linNetworkInterfaceEntry 6 }
+
+linNINetworkType OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Network interface type.  The network type definition are assigned by the IANA."
+   ::= { linNetworkInterfaceEntry 7 }
+
+linNIBusType OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Bus type of the network interface. Refer to the following definitions;
+                value     contens
+                 0           other
+                 1           isa
+                 2           eisa
+                 3           pci"
+   ::= { linNetworkInterfaceEntry 8 }
+
+linNISegment OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Segment number of the network interface."
+   ::= { linNetworkInterfaceEntry 9 }
+
+linNIBusNumber OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Bus number of the network interface."
+   ::= { linNetworkInterfaceEntry 10 }
+
+linNIDeviceNumber OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Device number of the network interface."
+   ::= { linNetworkInterfaceEntry 11 }
+
+linNIFunction OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Function number of the network interface."
+   ::= { linNetworkInterfaceEntry 12 }
+
+linNIStatus OBJECT-TYPE
+   SYNTAX   INTEGER{
+      up(1),
+      down(2),
+      testing(3)
+   }
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "The current operational state of the interface.
+                The testing(3) state indicates that no operational packets can be passed."
+   ::= { linNetworkInterfaceEntry 13 }
+
+linNIIpPacketsIn OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { linNetworkInterfaceEntry 14 }
+
+linNIIpPacketsOut OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { linNetworkInterfaceEntry 15 }
+
+linNILinkStatus OBJECT-TYPE
+   SYNTAX   INTEGER{
+      up(1),
+      down(2)
+   }
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "The current link state of the interface. If 0; link status is unknown."
+   ::= { linNetworkInterfaceEntry 16 }
+
+linNIPhysicalID OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Identification name of Network Interface cand."
+   ::= { linNetworkInterfaceEntry 17 }
+
+linNIIPAddress2 OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "IP address of the network interface.
+                Please use this object instead of 'linNIIPAddress'."
+   ::= { linNetworkInterfaceEntry 18 }
+
+linNISubNetMask2 OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Subnet address of the network interface.
+                Please use this object instead of 'linNISubNetMask'."
+   ::= { linNetworkInterfaceEntry 19 }
+
+
+-- ----------------------------------------------------------------------------
+-- TABLE: linRoutingTable
+--
+--	linRoutingTable :	.1.3.6.1.4.1.211.1.31.1.2.100.2.4.2
+--
+--Implementation of this table is mandatory
+-- ----------------------------------------------------------------------------
+linRoutingTable OBJECT-TYPE
+   SYNTAX   SEQUENCE OF LinRouting
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Table with routing information"
+   ::= { linNetworkInfo 2 }
+
+linRoutingEntry OBJECT-TYPE
+   SYNTAX   LinRouting
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   INDEX   { linRTIndex }
+   ::= { linRoutingTable 1 }
+
+LinRouting ::=
+   SEQUENCE {
+      linRTIndex
+         INTEGER,
+      linRTInterfaceName
+         DisplayString,
+      linRTDestination
+         OCTET STRING,
+      linRTNextHop
+         OCTET STRING,
+      linRTRouteType
+         OCTET STRING,
+      linRTRouteMask
+         OCTET STRING,
+      linRTDestination2
+         DisplayString,
+      linRTNextHop2
+         DisplayString,
+      linRTRouteMask2
+         DisplayString
+   }
+
+linRTIndex OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Routing identification number."
+   ::= { linRoutingEntry 1 }
+
+linRTInterfaceName OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Network interface name.(e.g.eth0)."
+   ::= { linRoutingEntry 2 }
+
+linRTDestination OBJECT-TYPE
+   SYNTAX   OCTET STRING
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "The destination IP address of this route."
+   ::= { linRoutingEntry 3 }
+
+linRTNextHop OBJECT-TYPE
+   SYNTAX   OCTET STRING
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "The IP address of the next hop of this route."
+   ::= { linRoutingEntry 4 }
+
+linRTRouteType OBJECT-TYPE
+   SYNTAX   OCTET STRING
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "The type of route. Refer to the following definition.
+                  Byte field              Contents
+                  0x0001                 route unable
+                  0x0002                 destination is a gateway
+                  0x0004                 host entry (net otherwise)
+                  0x0008                 reinstate route after tmout
+                  0x0010                 created dyn. (by redirect)
+                  0x0020                 modified dyn. (by redirect)
+                  0x0040                 specific MTU for this route
+                  0x0080                 per route window clamping
+                  0x0100                 Initial round trip time
+                  0x0200                 Reject route
+                  0x0400                 this route isn't cached"
+   ::= { linRoutingEntry 5 }
+
+linRTRouteMask OBJECT-TYPE
+   SYNTAX   OCTET STRING
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Indicate the mask to be logical-ANDed with the destination address before being
+                compared to the value in the linRTDestination field."
+   ::= { linRoutingEntry 6 }
+
+linRTDestination2 OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "The destination IP address of this route.
+                Please use this object instead of 'linRTDestination'."
+   ::= { linRoutingEntry 7 }
+
+linRTNextHop2 OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "The IP address of the next hop of this route.
+                Please use this object instead of 'linRTNextHop'."
+   ::= { linRoutingEntry 8 }
+
+linRTRouteMask2 OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Indicate the mask to be logical-ANDed with the destination address before being
+                compared to the value in the linRTDestination2 field.
+                Please use this object instead of 'linRTRouteMask'."
+   ::= { linRoutingEntry 9 }
+
+
+-- ----------------------------------------------------------------------------
+-- TABLE: linIPv6NetworkInterfaceTable
+--
+--	linIPv6NetworkInterfaceTable :	.1.3.6.1.4.1.211.1.31.1.2.100.2.4.3
+--
+--Implementation of this table is mandatory
+-- ----------------------------------------------------------------------------
+linIPv6NetworkInterfaceTable OBJECT-TYPE
+   SYNTAX   SEQUENCE OF LinIPv6NetworkInterface
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION "Table with IPv6 network interface information."
+   ::= { linNetworkInfo 3 }
+
+linIPv6NetworkInterfaceEntry OBJECT-TYPE
+   SYNTAX   LinIPv6NetworkInterface
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   INDEX   { linIPv6NIIndex }
+   ::= { linIPv6NetworkInterfaceTable 1 }
+
+LinIPv6NetworkInterface ::=
+   SEQUENCE {
+      linIPv6NIIndex
+         INTEGER,
+      linIPv6NIMACAddress
+         PhysAddress,
+      linIPv6NIIPAddress
+         OCTET STRING,
+      linIPv6NIIPAddress2
+         DisplayString,
+      linIPv6NIInterfaceName
+         DisplayString,
+      linIPv6NISpeed
+         INTEGER,
+      linIPv6NIPrefix
+         INTEGER,
+      linIPv6NIScope
+         INTEGER,
+      linIPv6NIDADStatus
+         INTEGER,
+      linIPv6NINetworkType
+         INTEGER,
+      linIPv6NIBusType
+         INTEGER,
+      linIPv6NISegment
+         INTEGER,
+      linIPv6NIBusNumber
+         INTEGER,
+      linIPv6NIDeviceNumber
+         INTEGER,
+      linIPv6NIFunction
+         INTEGER,
+      linIPv6NIStatus
+         INTEGER,
+      linIPv6NIIpPacketsIn
+         Counter,
+      linIPv6NIIpPacketsOut
+         Counter,
+      linIPv6NILinkStatus
+         INTEGER,
+      linIPv6NIPhysicalID
+         DisplayString
+   }
+
+linIPv6NIIndex OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "IPv6 Network inteface identification number."
+   ::= { linIPv6NetworkInterfaceEntry 1 }
+
+linIPv6NIMACAddress OBJECT-TYPE
+   SYNTAX   PhysAddress
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "The interface address of the physical layer of the IPv6 network."
+   ::= { linIPv6NetworkInterfaceEntry 2 }
+
+linIPv6NIIPAddress OBJECT-TYPE
+   SYNTAX   OCTET STRING
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "IPv6 address of the network interface. This object returns IPv6 address of 16 bytes binary data."
+   ::= { linIPv6NetworkInterfaceEntry 3 }
+
+linIPv6NIIPAddress2 OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "IPv6 address of the network interface. This object returns IPv6 address of text string format"
+   ::= { linIPv6NetworkInterfaceEntry 4 }
+
+linIPv6NIInterfaceName OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "IPv6 Network interface name.(e.g.eth0)."
+   ::= { linIPv6NetworkInterfaceEntry 5 }
+
+linIPv6NISpeed OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "IPv6 Network speed.(unit:Mbit/s)"
+   ::= { linIPv6NetworkInterfaceEntry 6 }
+
+linIPv6NIPrefix OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "IPv6 network interface prefix"
+   ::= { linIPv6NetworkInterfaceEntry 7 }
+
+linIPv6NIScope OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "IPv6 network interface scope. Refer to the following definitions;
+                value    contents
+                  0        global
+                 16       loopback
+                 32       link
+                 64       site"
+   ::= { linIPv6NetworkInterfaceEntry 8 }
+
+linIPv6NIDADStatus OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "IPv6 network interface DAD Status. Refer to the following definitions;
+                value     contents
+                  0         The IP address is the preferred address.
+                  4         The IP address is the optimistic address.
+                 32        The IP address has been deprecated.
+                 64        The DAD state is tentative."
+   ::= { linIPv6NetworkInterfaceEntry 9 }
+
+linIPv6NINetworkType OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "IPv6 network interface type. The network type definition are assigned by the IANA."
+   ::= { linIPv6NetworkInterfaceEntry 10 }
+
+linIPv6NIBusType OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Bus type of the IPv6 network interface. Refer to the following definitions;
+                value     contens
+                 0           other
+                 1           isa
+                 2           eisa
+                 3           pci"
+   ::= { linIPv6NetworkInterfaceEntry 11 }
+
+linIPv6NISegment OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Segment number of the IPv6 network interface."
+   ::= { linIPv6NetworkInterfaceEntry 12 }
+
+linIPv6NIBusNumber OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Bus number of the IPv6 network interface."
+   ::= { linIPv6NetworkInterfaceEntry 13 }
+
+linIPv6NIDeviceNumber OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Device number of the IPv6 network interface."
+   ::= { linIPv6NetworkInterfaceEntry 14 }
+
+linIPv6NIFunction OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Function number of the IPv6 network interface."
+   ::= { linIPv6NetworkInterfaceEntry 15 }
+
+linIPv6NIStatus OBJECT-TYPE
+   SYNTAX   INTEGER{
+      up(1),
+      down(2),
+      testing(3)
+   }
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "The current operational state of the IPv6 interface.
+                The testing(3) state indicates that no operational packets can be passed."
+   ::= { linIPv6NetworkInterfaceEntry 16 }
+
+linIPv6NIIpPacketsIn OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { linIPv6NetworkInterfaceEntry 17 }
+
+linIPv6NIIpPacketsOut OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { linIPv6NetworkInterfaceEntry 18 }
+
+linIPv6NILinkStatus OBJECT-TYPE
+   SYNTAX   INTEGER{
+      up(1),
+      down(2)
+   }
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "The current link state of the IPv6 interface. If 0; link status is unknown."
+   ::= { linIPv6NetworkInterfaceEntry 19 }
+
+linIPv6NIPhysicalID OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Identification name of IPv6 network interface cand."
+   ::= { linIPv6NetworkInterfaceEntry 20 }
+
+
+-- ****************************************************************************
+--
+-- GROUP: linHardwareResourceInfo
+--
+--	linHardwareResourceInfo :	.1.3.6.1.4.1.211.1.31.1.2.100.2.5
+--
+--Implementation of this group is mandatory
+--
+-- ****************************************************************************
+
+
+-- ----------------------------------------------------------------------------
+-- TABLE: linHardwareResourceTable
+--
+--	linHardwareResourceTable :	.1.3.6.1.4.1.211.1.31.1.2.100.2.5.1
+--
+--Implementation of this table is mandatory
+-- ----------------------------------------------------------------------------
+linHardwareResourceTable OBJECT-TYPE
+   SYNTAX   SEQUENCE OF LinHardwareResource
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   ::= { linHardwareResourceInfo 1 }
+
+linHardwareResourceEntry OBJECT-TYPE
+   SYNTAX   LinHardwareResource
+   ACCESS   not-accessible
+   STATUS   mandatory
+   DESCRIPTION " "
+   INDEX   { linHWRBusType,
+	     linHWRSegment,
+	     linHWRBusNumber,
+	     linHWRDeviceNumber,
+	     linHWRFunction }
+   ::= { linHardwareResourceTable 1 }
+
+LinHardwareResource ::=
+   SEQUENCE {
+      linHWRBusType
+         INTEGER,
+      linHWRSegment
+         INTEGER,
+      linHWRBusNumber
+         INTEGER,
+      linHWRDeviceNumber
+         INTEGER,
+      linHWRFunction
+         INTEGER,
+      linHWRMemArea
+         DisplayString,
+      linHWRIRQ
+         INTEGER,
+      linHWRIoPort
+         DisplayString,
+      linHWRAdapterName
+         DisplayString,
+      linHWRVendor
+         DisplayString,
+      linHWRClass
+         OCTET STRING
+   }
+
+linHWRBusType OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Bus type of the device. Refer to the following definitions;
+                value     contens
+                 0           other
+                 1           isa
+                 2           eisa
+                 3           pci"
+   ::= { linHardwareResourceEntry 1 }
+
+linHWRSegment OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Segment number of the device."
+   ::= { linHardwareResourceEntry 2 }
+
+linHWRBusNumber OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Bus number of the device."
+   ::= { linHardwareResourceEntry 3 }
+
+linHWRDeviceNumber OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Device number of the device."
+   ::= { linHardwareResourceEntry 4 }
+
+linHWRFunction OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Function number of the device."
+   ::= { linHardwareResourceEntry 5 }
+
+linHWRMemArea OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Memory area used the device."
+   ::= { linHardwareResourceEntry 6 }
+
+linHWRIRQ OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Interrupt number used the device."
+   ::= { linHardwareResourceEntry 7 }
+
+linHWRIoPort OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "I/O port area used the device."
+   ::= { linHardwareResourceEntry 8 }
+
+linHWRAdapterName OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Adapter name id of the device."
+   ::= { linHardwareResourceEntry 9 }
+
+linHWRVendor OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Vendor id of the device."
+   ::= { linHardwareResourceEntry 10 }
+
+linHWRClass OBJECT-TYPE
+   SYNTAX   OCTET STRING
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Device classification; according to the PCI classification scheme.
+                   Byte           Contents
+                      0               BaseClass
+                      1               SubClass
+                      2               ProgIf"
+   ::= { linHardwareResourceEntry 11 }
+
+
+-- ****************************************************************************
+--
+-- GROUP: linOperatingSystemInfo
+--
+--	linOperatingSystemInfo :	.1.3.6.1.4.1.211.1.31.1.2.100.2.6
+--
+--Implementation of this group is mandatory
+--
+-- ****************************************************************************
+
+linOSName OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Operating system name that running on the partition."
+   ::= { linOperatingSystemInfo 1 }
+
+linOSVersion OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Operating system version that running on the partition."
+   ::= { linOperatingSystemInfo 2 }
+
+linOSRunTime OBJECT-TYPE
+   SYNTAX   Counter
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Current partition up time.(unit:sec)"
+   ::= { linOperatingSystemInfo 3 }
+
+linOSSystemTime OBJECT-TYPE
+   SYNTAX   DisplayString
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Current date and time as visible string."
+   ::= { linOperatingSystemInfo 4 }
+
+linOSLoginCurrentValue OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "Number of current login users to the partition."
+   ::= { linOperatingSystemInfo 5 }
+
+linOSAverageUsageRate OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "The average system usage rate over all processors since startup.(unit:%)"
+   ::= { linOperatingSystemInfo 6 }
+
+linOSRunlevel OBJECT-TYPE
+   SYNTAX   INTEGER
+   ACCESS   read-only
+   STATUS   mandatory
+   DESCRIPTION "The current runlevel of the partition."
+   ::= { linOperatingSystemInfo 7 }
+
+
+--logicalComponentForWindows-MIB groups
+
+
+--monitoringFunction-MIB groups
+
+
+--thresholdFunction-MIB groups
+
+
+--statusFunction-MIB groups
+
+
+--otherFunction-MIB groups
+
+
+--pxFunction-MIB groups
+
+
+END

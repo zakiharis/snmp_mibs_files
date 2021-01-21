@@ -1,0 +1,125 @@
+AVQUARANTINE-STATISTICS-MIB DEFINITIONS ::= BEGIN
+
+--	
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, Integer32,
+	NOTIFICATION-TYPE, Unsigned32, Counter64, Counter32
+		FROM SNMPv2-SMI
+	DateAndTime, DisplayString,TimeStamp
+		FROM SNMPv2-TC
+	SnmpAdminString
+		FROM SNMP-FRAMEWORK-MIB
+	statistics
+		FROM KAV4FS-STATISTICS-MIB
+;
+
+avQuarantineStatistics MODULE-IDENTITY
+	LAST-UPDATED "201602241200Z"
+	ORGANIZATION "www.kaspersky.com"
+	CONTACT-INFO "Kaspersky Lab"
+	DESCRIPTION "Quarantine statistics till current time period"
+	-- revisions
+	REVISION "201602241200Z"
+	DESCRIPTION  "Automatically generated."
+ ::= { statistics 6 }
+
+
+	avQuarantineStatisticsObjectsInQuarantine OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		""
+	::= { avQuarantineStatistics 1 }
+
+	avQuarantineStatisticsAutoSavedObjects OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		""
+	::= { avQuarantineStatistics 2 }
+
+	avQuarantineStatisticsManualySavedObjects OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		""
+	::= { avQuarantineStatistics 3 }
+
+	avQuarantineStatisticsRestoredObjects OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		""
+	::= { avQuarantineStatistics 4 }
+
+	avQuarantineStatisticsRemovedObjects OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		""
+	::= { avQuarantineStatistics 5 }
+
+	avQuarantineStatisticsInfectedObjects OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		""
+	::= { avQuarantineStatistics 6 }
+
+	avQuarantineStatisticsRiskwareObjects OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		""
+	::= { avQuarantineStatistics 7 }
+
+	avQuarantineStatisticsSuspiciousObjects OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		""
+	::= { avQuarantineStatistics 8 }
+
+	avQuarantineStatisticsCurableObjects OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		""
+	::= { avQuarantineStatistics 9 }
+
+	avQuarantineStatisticsPasswordProtectedObjects OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		""
+	::= { avQuarantineStatistics 10 }
+
+	avQuarantineStatisticsCorruptedObjects OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		""
+	::= { avQuarantineStatistics 11 }
+
+	avQuarantineStatisticsFalseDetectedObjects OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		""
+	::= { avQuarantineStatistics 12 }
+
+
+END

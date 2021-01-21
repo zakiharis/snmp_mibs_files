@@ -1,0 +1,272 @@
+--MibName=dominfo
+DOMAIN-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+        OBJECT-TYPE             FROM RFC-1212
+        mib-2, DisplayString    FROM RFC1213-MIB
+        enterprises             FROM RFC1155-SMI; 
+        sni                     OBJECT IDENTIFIER       ::= { enterprises    231 }
+        sniProductMibs          OBJECT IDENTIFIER       ::= { sni              2 }
+        wsaObjects              OBJECT IDENTIFIER       ::= { sniProductMibs  41 }
+	
+        dominfo                 OBJECT IDENTIFIER       ::= { wsaObjects 5 }
+	domTrapParams		OBJECT IDENTIFIER	::= { dominfo 1 }
+
+-- textual conventions
+   -- a truth value
+   Boolean ::=   INTEGER { true(1), false(2) }
+   StateInfo ::= INTEGER { ok(1), broken(2)  }
+   PingInfo ::= INTEGER { reachable(1), notReachable(2), unknown(3) }
+
+-- Only when the machine on which this agent runs is a 
+-- Management Server the  Mib values will be retreived by the 
+-- agent. ESM system should discover this agent iff 
+-- IsManagementServer is set to true (see wsaagt)"
+-- If the machine is not a management server the agent exits 
+-- immediately
+
+
+domClientAddr   OBJECT-TYPE
+     SYNTAX             DisplayString
+     ACCESS             read-only
+     STATUS             mandatory
+     DESCRIPTION        "This Contains the lates ip address of a node on which 
+			 a state change occured (reachable to not_reachable or
+			 not_reachable to reachable"
+     ::= { domTrapParams 1 }
+
+domComState   OBJECT-TYPE
+        SYNTAX          StateInfo
+        ACCESS          read-only
+        STATUS          mandatory
+        DESCRIPTION     "The value is ok, iff all agent nodes within the domain
+			 are reachable via ping"
+        ::= { domTrapParams 2 }
+
+domaintable      OBJECT-TYPE
+        SYNTAX  SEQUENCE OF Domaintable
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION     "Table of nodes which are part of the domain"
+        ::= { dominfo 2 }
+
+auxdomaintable   OBJECT-TYPE
+        SYNTAX  Domaintable
+        ACCESS  not-accessible
+        STATUS  mandatory
+        DESCRIPTION ""
+        INDEX   { domainIndex }
+        ::= { domaintable 1 }
+
+Domaintable ::=
+SEQUENCE {
+        domainIndex
+                INTEGER,
+        domName
+                DisplayString,
+	domGroup
+                DisplayString,
+	domSubGroup
+                DisplayString,
+	domPathname
+                DisplayString,
+	domMs
+		Boolean,
+	domHw
+                DisplayString,
+	domOsRelease
+                DisplayString,
+	domSystemId
+                DisplayString,
+	domWsaRelease
+                DisplayString,
+	domNetAddress
+		DisplayString,
+	domNetAlias
+		DisplayString,
+	domSysObjId
+                DisplayString,
+	domPingState
+                PingInfo,
+	domCombinedState
+                DisplayString
+}
+
+domainIndex        OBJECT-TYPE
+        SYNTAX  INTEGER
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     "Index Variable"
+        ::= { auxdomaintable 1 }
+
+domName        OBJECT-TYPE
+        SYNTAX  DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     "Name of Agent Node in this Domain"
+        ::= { auxdomaintable 2 }
+
+domGroup	OBJECT-TYPE
+       	SYNTAX         DisplayString
+	ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     "Indicator if Unix or SNMP Node
+			 further values may be possible in the
+			 future"
+        ::= { auxdomaintable 3 }
+
+domSubGroup	OBJECT-TYPE
+       	SYNTAX         DisplayString
+	ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     "Further Type Specification"
+        ::= { auxdomaintable 4 }
+
+domPathname	OBJECT-TYPE
+       	SYNTAX         DisplayString
+	ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     "Full qualified Name of Domain Path 
+			 in DomainAdmin Interface"
+        ::= { auxdomaintable 5 }
+
+domMs		OBJECT-TYPE
+       	SYNTAX         Boolean
+	ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     "True iff the node is a Management Server"
+        ::= { auxdomaintable 6 }
+
+domHw		OBJECT-TYPE
+       	SYNTAX         DisplayString
+	ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     "Type of Hardware (if Unix) for this node"
+        ::= { auxdomaintable 7 }
+
+domOsRelease	OBJECT-TYPE
+       	SYNTAX         DisplayString
+	ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     "Type of OS version (if Unix) for this node"
+        ::= { auxdomaintable 8 }
+
+domSystemId	OBJECT-TYPE
+       	SYNTAX         DisplayString
+	ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     "Mac Address (if Unix) for this node"
+        ::= { auxdomaintable 9 }
+
+domWsaRelease	OBJECT-TYPE
+       	SYNTAX         DisplayString
+	ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     "Version of installed WSA Release"
+        ::= { auxdomaintable 10 }
+
+domNetAddress	OBJECT-TYPE
+       	SYNTAX         DisplayString
+	ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     "IP Address used by DomAdmin for communication with
+			 this node"
+        ::= { auxdomaintable 11 }
+
+domNetAlias    OBJECT-TYPE
+        SYNTAX         DisplayString
+        ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     "Name used for communication with this node by WSA"
+        ::= { auxdomaintable 12 }
+
+domSysObjId	OBJECT-TYPE
+       	SYNTAX         DisplayString
+	ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     "If SNMP further specification of Node Type"
+        ::= { auxdomaintable 13 }
+
+domPingState	OBJECT-TYPE
+       	SYNTAX        PingInfo
+	ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     "This Contains the Ping State of the node as it was detected
+			 during the latest fping loop"
+        ::= { auxdomaintable 14 }
+
+domCombinedState	OBJECT-TYPE
+       	SYNTAX         DisplayString
+	ACCESS  read-only
+        STATUS  mandatory
+        DESCRIPTION     "State of this node (summary of hadware state)"
+        ::= { auxdomaintable 15 }
+
+domNodeOffline TRAP-TYPE
+     ENTERPRISE         wsaObjects
+     VARIABLES          { domClientAddr }
+     DESCRIPTION        "Sent when a Node goes offline"
+     --#TYPE            "Client Node went offline"
+     --#SUMMARY         "Client %s went offline"
+     --#ARGUMENTS       {0}
+     --#SEVERITY        INFORMATIONAL
+     --#TIMEINDEX       1
+     --#STATE           NONOPERATIONAL
+     ::= 50
+
+domNodeOnline TRAP-TYPE
+     ENTERPRISE         wsaObjects
+     VARIABLES          { domClientAddr }
+     DESCRIPTION        "Sent when a node goes online"
+     --#TYPE            "Client Node went online"
+     --#SUMMARY         "Client %s goes online"
+     --#ARGUMENTS       {0}
+     --#SEVERITY        INFORMATIONAL
+     --#TIMEINDEX       1
+     --#STATE           NONOPERATIONAL
+     ::= 51
+
+domNodeAdded TRAP-TYPE
+     ENTERPRISE         wsaObjects
+     VARIABLES          { domClientAddr }
+     DESCRIPTION        "Sent when a Node is added to the domain"
+     --#TYPE            "Client Node was added "
+     --#SUMMARY         "Client %s was added to domain"
+     --#ARGUMENTS       {0}
+     --#SEVERITY        INFORMATIONAL
+     --#TIMEINDEX       1
+     --#STATE           NONOPERATIONAL
+     ::= 52
+
+domNodeDeleted TRAP-TYPE
+     ENTERPRISE         wsaObjects
+     VARIABLES          { domClientAddr }
+     DESCRIPTION        "Sent when a node is deleted from the domain"
+     --#TYPE            "Client node was deleted"
+     --#SUMMARY         "Client %s was deleted"
+     --#ARGUMENTS       {0}
+     --#SEVERITY        INFORMATIONAL
+     --#TIMEINDEX       1
+     --#STATE           NONOPERATIONAL
+     ::= 53
+
+domStartTrap TRAP-TYPE
+     ENTERPRISE         wsaObjects
+     DESCRIPTION        "Sent when the agent was started"
+     --#TYPE            "Agent was started"
+     --#SUMMARY         "Agent was started"
+     --#SEVERITY        INFORMATIONAL
+     --#TIMEINDEX       1
+     --#STATE           NONOPERATIONAL
+     ::= 54
+
+domNoManagementServer TRAP-TYPE
+     ENTERPRISE         wsaObjects
+     DESCRIPTION        "Sent when the agent was stopped due to Change of MS"
+     --#TYPE            "Agent was stopped"
+     --#SUMMARY         "Agent was stopped"
+     --#SEVERITY        INFORMATIONAL
+     --#TIMEINDEX       1
+     --#STATE           NONOPERATIONAL
+     ::= 55
+
+END

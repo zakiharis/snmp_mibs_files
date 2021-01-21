@@ -1,0 +1,49 @@
+HPROD-SNMP-MIB DEFINITIONS ::= BEGIN
+
+--
+--	Hedberg Productions Root MIB
+--
+
+-- Imports
+
+IMPORTS
+        MODULE-IDENTITY, enterprises
+        	FROM SNMPv2-SMI
+		MODULE-COMPLIANCE
+			FROM SNMPv2-CONF
+;
+
+-- Module description stuff
+
+hPsnmpRootMIB MODULE-IDENTITY
+	LAST-UPDATED "201503080000Z"
+	ORGANIZATION "Hedberg Productions"
+	CONTACT-INFO "johan@hedbergproductions.com"
+	DESCRIPTION "Hedberg Productions Root MIB"
+	REVISION "201503080000Z"
+	DESCRIPTION "First release"
+	::= { hPsnmpModuleIdentity 0 }
+
+hPsnmpRootMIBcompliance MODULE-COMPLIANCE
+	STATUS current
+	DESCRIPTION "Why do I need this shit?"
+	MODULE
+	::= { hPsnmpModuleCompliances 1 }
+
+-- Root and categoric oids
+
+hedbergProductions       OBJECT IDENTIFIER ::= {enterprises 44776}
+
+hPsnmpRoot OBJECT IDENTIFIER ::= {hedbergProductions 1}
+
+hPsnmpMIBgroups OBJECT IDENTIFIER ::= {hPsnmpRoot 1}
+
+hPsnmpModuleIdentity OBJECT IDENTIFIER ::= {hPsnmpRoot 2}
+
+hPsnmpMIBS OBJECT IDENTIFIER ::= {hPsnmpRoot 3}
+
+hPsnmpModuleCompliances OBJECT IDENTIFIER ::= {hPsnmpRoot 4}
+
+hPsnmpRootRoot OBJECT IDENTIFIER ::= {hPsnmpMIBS 0}
+
+END

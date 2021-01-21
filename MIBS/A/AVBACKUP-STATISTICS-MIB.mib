@@ -1,0 +1,77 @@
+AVBACKUP-STATISTICS-MIB DEFINITIONS ::= BEGIN
+
+--	
+
+IMPORTS
+	MODULE-IDENTITY, OBJECT-TYPE, Integer32,
+	NOTIFICATION-TYPE, Unsigned32, Counter64, Counter32
+		FROM SNMPv2-SMI
+	DateAndTime, DisplayString,TimeStamp
+		FROM SNMPv2-TC
+	SnmpAdminString
+		FROM SNMP-FRAMEWORK-MIB
+	statistics
+		FROM KAV4FS-STATISTICS-MIB
+;
+
+avBackupStatistics MODULE-IDENTITY
+	LAST-UPDATED "201602241200Z"
+	ORGANIZATION "www.kaspersky.com"
+	CONTACT-INFO "Kaspersky Lab"
+	DESCRIPTION "Backup statistic till current time period"
+	-- revisions
+	REVISION "201602241200Z"
+	DESCRIPTION  "Automatically generated."
+ ::= { statistics 1 }
+
+
+	avBackupStatisticsObjectsInBackup OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		""
+	::= { avBackupStatistics 1 }
+
+	avBackupStatisticsRestoredObjects OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		""
+	::= { avBackupStatistics 2 }
+
+	avBackupStatisticsRemovedObjects OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		""
+	::= { avBackupStatistics 3 }
+
+	avBackupStatisticsInfectedObjects OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		""
+	::= { avBackupStatistics 4 }
+
+	avBackupStatisticsRiskwareObjects OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		""
+	::= { avBackupStatistics 5 }
+
+	avBackupStatisticsSuspiciousObjects OBJECT-TYPE
+	SYNTAX Counter64
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		""
+	::= { avBackupStatistics 6 }
+
+
+END
